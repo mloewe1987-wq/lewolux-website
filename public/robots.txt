@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /downloads/
+Disallow: /admin/
+
+Sitemap: https://lewolux.de/sitemap.xml

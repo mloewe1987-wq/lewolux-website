@@ -1,0 +1,1 @@
+Den Web-Export von Ordnungsgilde hier hineinkopieren (index.html muss direkt in diesem Ordner liegen). Danach ist das Spiel auf der Website sofort spielbar.

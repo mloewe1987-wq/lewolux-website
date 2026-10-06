@@ -1,0 +1,40 @@
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal-bg" data-close></div>
+  <div class="modal-panel" id="mPanel">
+    <div class="m-head">
+      <p class="m-title" id="mTitle">Spiel</p>
+      <div class="genres" id="mGenres"></div>
+      <button class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="m-grid">
+      <div>
+        <div class="stage" id="stage">
+          <canvas class="stage-shot" id="stageShot" role="img" aria-label="Screenshot"></canvas>
+          <div class="demo" id="demoHost" hidden></div>
+        </div>
+        <div class="stage-bar">
+          <div class="seg" role="group" aria-label="Ansicht">
+            <button id="modeDemo" aria-pressed="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Spielen</button>
+            <button id="modeShots" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 7"/></svg>Screenshots</button>
+          </div>
+          <a class="d-btn" id="newTab" href="#" target="_blank" rel="noopener" style="margin-left:auto;text-decoration:none;display:inline-flex;align-items:center">Im neuen Tab</a><button class="d-btn" id="fsBtn">Vollbild</button>
+        </div>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+      <aside class="m-side">
+        <div><p class="m-h">Story</p><p class="story" id="mStory"></p></div>
+        <div class="dl-box">
+          <p class="rec-k">★ Empfohlen: das beste Spielerlebnis</p>
+          <ul class="tip-list"><li><b>Startet sofort</b>, ohne Ladezeit</li><li><b>Läuft offline</b>, überall, auch ohne Internet</li><li><b>Eine Datei</b>: nichts installieren, kein Account, keine Werbung</li><li><b>Deine Version gehört dir</b>, dein Spielstand bleibt auf deinem Gerät</li></ul>
+          <div class="row"><span>Early Access</span><b>Kostenlos</b></div>
+          <div class="row"><span>Format</span><b id="mFormat"></b></div>
+          <a class="btn btn-primary" id="mDownload" href="#" download style="width:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg>Kostenlos herunterladen</a>
+        </div>
+        <a class="m-more" id="mPage" href="#">Handbuch, alle Infos &amp; Download →</a>
+        <div><p class="m-h">Steuerung</p><ul class="keys" id="mKeys"></ul></div>
+        <div><p class="m-h">Features</p><ul class="feats" id="mFeats"></ul></div>
+      </aside>
+    </div>
+  </div>
+</div>
+

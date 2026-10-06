@@ -1,0 +1,14 @@
+{
+  // Website lewolux.de: statische Dateien aus ./public (wird von build.py erzeugt)
+  "name": "lewolux",
+  "compatibility_date": "2026-10-06",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  "routes": [
+    { "pattern": "lewolux.de", "custom_domain": true },
+    { "pattern": "www.lewolux.de", "custom_domain": true }
+  ]
+}

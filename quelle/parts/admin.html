@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Feedback-Verwaltung | Lewolux Studio</title>
+<style>
+:root{--bg:#0a0b10;--card:#161924;--line:rgba(150,190,255,.18);--fg:#eef1f8;--muted:#9aa3b8;--cyan:#3be8ff;--ember:#ff8a3d;--red:#ff6b6b}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+input,textarea{font:inherit;color:var(--fg);background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{min-height:70px;resize:vertical;margin-top:10px}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 16px;cursor:pointer}
+.ok{background:var(--cyan);color:#041318}.del{background:transparent;color:var(--red);border:1px solid rgba(255,107,107,.5)}.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tabs button{background:transparent;color:var(--muted);border:1px solid var(--line)}.tabs button[aria-pressed=true]{background:var(--fg);color:#000}
+.meta{display:flex;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:6px}.meta b{color:var(--fg)}
+.tag{padding:2px 8px;border-radius:6px;background:rgba(59,232,255,.14);color:var(--cyan);font-size:12px;font-weight:700}
+.text{white-space:pre-line;overflow-wrap:anywhere;margin:4px 0 0}
+.poll{display:grid;gap:6px}.poll div{display:grid;grid-template-columns:140px 1fr 60px;gap:10px;align-items:center;font-size:14px}
+.bar{height:8px;background:rgba(255,255,255,.08);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ember)}
+.msg{color:var(--cyan);min-height:1.4em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Feedback-Verwaltung</h1>
+  <p class="sub">Neue Beiträge prüfen, freigeben, beantworten oder löschen. Nur freigegebene Beiträge sind auf der Website sichtbar.</p>
+
+  <form class="card row" id="login">
+    <input type="password" id="key" placeholder="Admin-Schlüssel" autocomplete="current-password" style="flex:1;min-width:200px">
+    <button class="ok" type="submit">Anmelden</button>
+  </form>
+
+  <div id="app" hidden>
+    <div class="card"><b>Umfrage: Welches Spiel als Nächstes?</b><div class="poll" id="poll" style="margin-top:10px"></div></div>
+    <div class="row tabs" style="margin:18px 0 12px">
+      <button data-st="pending" aria-pressed="true">Neu / zu prüfen</button>
+      <button data-st="approved" aria-pressed="false">Freigegeben</button>
+      <button class="ghost" id="logout" style="margin-left:auto">Abmelden</button>
+    </div>
+    <p class="msg" id="msg"></p>
+    <div id="list"></div>
+  </div>
+</div>
+<script>
+const API="{{API}}",NAMES=Object.assign({{GAMES}},{allgemein:"Allgemein"}),KIND={wunsch:"Wunsch",idee:"Idee",bug:"Fehler",lob:"Lob"};
+let KEY="";try{KEY=localStorage.getItem("lwx_admin")||""}catch(_){}
+let st="pending";const $=s=>document.querySelector(s);
+const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const call=(p,o={})=>fetch(API+p,{...o,headers:{"Content-Type":"application/json",Authorization:"Bearer "+KEY}}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(d.error||"Fehler "+r.status),{status:r.status});return d});
+function load(){$("#msg").textContent="Lädt …";call("admin/comments?status="+st).then(d=>{
+  $("#login").hidden=true;$("#app").hidden=false;$("#msg").textContent=d.comments.length?"":"Keine Beiträge in dieser Liste.";
+  const tot=d.poll.total||0;$("#poll").innerHTML=Object.keys(NAMES).filter(k=>k!=="allgemein").map(k=>{const n=d.poll.counts[k]||0,p=tot?Math.round(n*100/tot):0;return`<div><span>${esc(NAMES[k])}</span><span class="bar"><i style="width:${p}%"></i></span><span>${n} (${p}%)</span></div>`}).join("")+`<div><span><b>Gesamt</b></span><span></span><span><b>${tot}</b></span></div>`;
+  $("#list").innerHTML=d.comments.map(c=>`<div class="card" data-id="${c.id}"><div class="meta"><span class="tag">${KIND[c.kind]||c.kind}</span><b>${esc(c.name)}</b><span>${esc(NAMES[c.game]||c.game)}</span><span>${new Date(c.created).toLocaleString("de-DE")}</span></div><p class="text">${esc(c.text)}</p><textarea placeholder="Antwort vom Studio (optional, wird öffentlich angezeigt)">${esc(c.reply||"")}</textarea><div class="row" style="margin-top:10px">${st==="pending"?'<button class="ok" data-a="approve">Freigeben</button>':'<button class="ok" data-a="reply">Antwort speichern</button>'}<button class="del" data-a="delete">Löschen</button></div></div>`).join("");
+}).catch(e=>{if(e.status===401){$("#login").hidden=false;$("#app").hidden=true;$("#msg").textContent="";alertBox("Falscher Schlüssel.")}else $("#msg").textContent="Verbindung fehlgeschlagen: "+e.message})}
+function alertBox(t){let m=$("#loginMsg");if(!m){m=document.createElement("p");m.id="loginMsg";m.className="msg";$("#login").after(m)}m.textContent=t}
+$("#login").onsubmit=e=>{e.preventDefault();KEY=$("#key").value.trim();try{localStorage.setItem("lwx_admin",KEY)}catch(_){}alertBox("");load()};
+$("#logout").onclick=()=>{KEY="";try{localStorage.removeItem("lwx_admin")}catch(_){}$("#app").hidden=true;$("#login").hidden=false};
+document.querySelector(".tabs").onclick=e=>{const b=e.target.closest("[data-st]");if(!b)return;st=b.dataset.st;document.querySelectorAll("[data-st]").forEach(x=>x.setAttribute("aria-pressed",x===b));load()};
+$("#list").onclick=e=>{const b=e.target.closest("[data-a]");if(!b)return;const card=b.closest("[data-id]"),a=b.dataset.a;
+  if(a==="delete"&&!b.dataset.sure){b.dataset.sure=1;b.textContent="Wirklich löschen?";return}
+  b.disabled=true;call("admin/comments/"+card.dataset.id,{method:"POST",body:JSON.stringify({action:a,reply:card.querySelector("textarea").value})}).then(()=>{if(a==="reply"){b.textContent="Gespeichert";b.disabled=false}else card.remove()}).catch(err=>{$("#msg").textContent=err.message;b.disabled=false})};
+if(KEY)load();
+</script>
+</body>
+</html>

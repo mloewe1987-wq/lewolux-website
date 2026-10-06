@@ -1,0 +1,136 @@
+<main id="top">
+  <div class="wrap">
+    <div class="keyart" id="keyart">
+      <picture><source type="image/webp" srcset="{{ROOT}}assets/img/lewolux-studio-banner.webp"><img src="{{ROOT}}assets/img/lewolux-studio-banner.jpg" alt="Lewolux Studio Key Art: leuchtender Neon-Löwe vor einer futuristischen Stadt – Shaping the Future of Play" width="1024" height="434" fetchpriority="high" decoding="async"></picture>
+      <div class="scan" aria-hidden="true"></div>
+      <div class="keyart-tag"><span class="live-dot"></span>{{GAMECOUNT}} Spiele in Entwicklung<span class="hide-sm"> · kostenlos spielbar</span></div>
+    </div>
+
+    <div class="hero">
+      <div>
+        <span class="eyebrow">Hobbyprojekt · Games · Software</span>
+        <h1><span class="h1-brand">Lewolux Studio</span><span class="h1-main">Shaping the Future <em>of Play.</em></span></h1>
+        <p class="hero-lead">Lewolux Studio entwickelt <strong>kostenlose Browserspiele</strong> und Indie-Games aus Deutschland: vom Polit-RPG bis zur Lern-App für Kinder. Spiel direkt im Browser, auf PC und Handy, oder lade die Early-Access-Versionen gratis herunter. Ein privates Hobbyprojekt: alles kostenlos, ohne Werbung und ohne Käufe.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#spiele"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Alle {{GAMECOUNT}} Spiele entdecken</a>
+          <a class="btn btn-outline" href="#software">Unsere Software</a>
+        </div>
+        <ul class="hero-facts"><li>100 % kostenlos</li><li>Kein Account nötig</li><li>Läuft auf PC &amp; Handy</li><li>Gamepad-Support (RPG-Titel)</li></ul>
+      </div>
+      <div class="spotlight" aria-label="Spiel im Spotlight">
+        <div class="monitor"><div class="monitor-inner"><img id="spotPoster" class="spot-poster" src="{{ROOT}}assets/screenshots/{{FEAT}}-1.jpg" alt="Screenshot aus {{FEATNAME}}" width="1280" height="720" decoding="async"><canvas id="spotCanvas" aria-hidden="true"></canvas><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span></div></div>
+        <div class="spot-info">
+          <div class="spot-text"><div class="spot-label">Im Spotlight</div><a class="spot-title" id="spotTitle" href="{{ROOT}}spiele/{{FEAT}}/">{{FEATNAME}}</a><div class="spot-tag" id="spotTag"></div></div>
+          <button class="btn btn-play spot-play" id="heroPlay" data-open="{{FEAT}}" data-mode="demo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span id="heroPlayLabel">{{FEATNAME}} spielen</span></button>
+        </div>
+        <div class="spot-dots" id="spotDots" aria-label="Spotlight wechseln"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker" aria-hidden="true"><div class="ticker-track"><span>RPG Maker MZ</span><span>HTML5 Canvas</span><span>React</span><span>Electron</span><span>TypeScript</span><span>Tailwind</span><span>Expo / Android</span><span>Gamepad API</span><span>RPG Maker MZ</span><span>HTML5 Canvas</span><span>React</span><span>Electron</span><span>TypeScript</span><span>Tailwind</span><span>Expo / Android</span><span>Gamepad API</span></div></div>
+
+  <section id="spiele" aria-labelledby="spiele-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="eyebrow">Game Library</span><h2 id="spiele-h">Unsere Spiele</h2><p>Kostenlos im Browser spielen oder als Early Access herunterladen. Jedes Spiel startet direkt hier im Browser, ohne Installation.</p></div>
+        <div class="filters" id="filters" role="group" aria-label="Spiele filtern">
+          <button aria-pressed="true" data-f="all">Alle</button>
+          <button aria-pressed="false" data-f="rpg">Action &amp; RPG</button>
+          <button aria-pressed="false" data-f="arcade">Arcade</button>
+          <button aria-pressed="false" data-f="retro">Retro / 2D</button>
+          <button aria-pressed="false" data-f="family">Family</button>
+          <button aria-pressed="false" data-f="exp">Experimental</button>
+        </div>
+      </div>
+      <div class="grid" id="grid">
+{{CARDS}}
+      </div>
+      <aside class="dl-tip" aria-label="Download-Empfehlung">
+        <div class="dl-tip-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg></div>
+        <div><p class="rec-k">★ Unser Tipp für das beste Spielerlebnis</p><h3>Lade dir die Spiele kostenlos herunter</h3>
+        <ul class="tip-list"><li><b>Startet sofort</b>, ohne Ladezeit</li><li><b>Läuft offline</b>, überall, auch ohne Internet</li><li><b>Eine Datei</b>: nichts installieren, kein Account, keine Werbung</li><li><b>Deine Version gehört dir</b>, dein Spielstand bleibt auf deinem Gerät</li></ul>
+        <p class="tip-how">So geht's: Download antippen, Datei öffnen, spielen. Am PC per Doppelklick, auf Android über „Downloads“ mit Chrome öffnen. Auf dem iPhone spielst du am besten direkt hier mit „Jetzt spielen“.</p></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="screenshots" aria-labelledby="shots-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="eyebrow">Inside the Games</span><h2 id="shots-h">Screenshots</h2><p>Ein Blick in die Welten, die gerade entstehen. Klick auf ein Bild öffnet das Spiel.</p></div>
+        <div class="reel-nav"><button id="reelPrev" aria-label="Vorheriger Screenshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button><button id="reelNext" aria-label="Nächster Screenshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button></div>
+      </div>
+      <div class="reel" id="reel">
+{{REEL}}
+      </div>
+    </div>
+  </section>
+
+  <section id="mitmachen" class="community" aria-labelledby="mm-h" data-api="{{API}}">
+    <div class="wrap">
+      <div class="sec-head"><div><span class="eyebrow">Community</span><h2 id="mm-h">Du entscheidest mit</h2><p>Unsere Spiele entstehen offen und gemeinsam mit euch. Stimm ab, welches Spiel als Nächstes wachsen soll, und schick uns deine Wünsche, Ideen und Fehlermeldungen.</p></div></div>
+      <div class="cm-grid">
+        <div class="cm-card poll" id="poll">
+          <p class="cm-k">Umfrage</p>
+          <h3>Welches Spiel sollen wir als Nächstes weiterentwickeln?</h3>
+          <p class="cm-sub" id="pollSub">Eine Stimme pro Person. Du kannst deine Wahl jederzeit ändern.</p>
+          <ul class="poll-list" id="pollList">
+{{POLL}}
+          </ul>
+          <p class="cm-note" id="pollNote" aria-live="polite"></p>
+        </div>
+{{FEEDBACKFORM}}
+      </div>
+      <div class="cm-wall">
+        <h3 class="cm-wall-h">Was die Community sagt</h3>
+        <div class="cm-list" id="cmList" data-game="" aria-live="polite"><p class="cm-empty">Noch keine Beiträge. Schreib den ersten!</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="software" class="software" aria-labelledby="sw-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="eyebrow">Beyond Games</span><h2 id="sw-h">Nicht nur Games.<br>Auch Software.</h2><p>Was beim Spielebau entsteht, steckt auch in diesen kleinen Programmen: klare Bedienung, schnelle Abläufe und Spaß an der Benutzung. Alles Hobbyprojekte aus eigenen Ideen.</p></div>
+      </div>
+      <div class="sw-grid">
+{{SOFTWARE}}
+      </div>
+      <div class="sw-banner"><p><strong>Ein Hobbyprojekt, kein Shop.</strong> Alle Spiele und Programme entstehen in der Freizeit, sind kostenlos und nicht zu kaufen. Ideen oder Wünsche? Ab damit in den Bereich „Mitmachen“.</p><a class="btn btn-outline" href="#mitmachen">Feedback geben</a></div>
+    </div>
+  </section>
+
+  <section id="studio" aria-labelledby="studio-h">
+    <div class="wrap about">
+      <div>
+        <span class="eyebrow">Über das Studio</span>
+        <h2 id="studio-h">Spiele mit Biss. Software mit Herz.</h2>
+        <p>Der Name ist Programm: <strong>Lew</strong> heißt Löwe, <strong>Lux</strong> heißt Licht. Der leuchtende Löwe steht für Spiele mit Mut, Kraft und Strahlkraft.</p>
+        <p>Lewolux Studio ist ein privates Hobbyprojekt aus Schleswig-Holstein. Hier entstehen in der Freizeit Spiele, die man ohne Installation im Browser starten kann, und jede Idee wird früh mit echten Spielerinnen und Spielern getestet. <strong>Alles ist kostenlos, ohne Werbung und ohne Käufe.</strong></p>
+        <ul class="pillars">
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"/></svg></span><div><b>Play first</b><span>Jedes Spiel startet direkt im Browser, auf PC, Tablet und Handy.</span></div></li>
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></span><div><b>Fair statt Pay-to-Win</b><span>Fortschritt durch Spielen. Keine Abo-Fallen, keine Pflicht-Accounts.</span></div></li>
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></span><div><b>Gebaut mit Profi-Tools</b><span>RPG Maker MZ, React, Electron und HTML5 Canvas.</span></div></li>
+        </ul>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat" style="--c:var(--cyan)"><b data-count="{{GAMECOUNT}}">{{GAMECOUNT}}</b><span>Spiele in Entwicklung</span></div>
+        <div class="stat" style="--c:var(--violet)"><b data-count="3">3</b><span>Software-Projekte</span></div>
+        <div class="stat" style="--c:var(--ember)"><b data-count="250">250</b><span>Sammelkarten in Ring Legends</span></div>
+        <div class="stat" style="--c:#7dff9e"><b data-count="96">96</b><span>Buchstaben &amp; Zahlen in Kritzelheld</span></div>
+        <div class="stat" style="--c:var(--cyan)"><b data-count="0" data-prefix="" data-suffix=" €">0 €</b><span>kostet jedes Spiel und Programm</span></div>
+        <div class="stat" style="--c:var(--violet)"><b data-count="10000000" data-prefix="1:" data-fmt="short">1:10 Mio.</b><span>Krone des Alls in Sternenwurf</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" aria-labelledby="faq-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head"><div><span class="eyebrow">FAQ</span><h2 id="faq-h">Häufige Fragen</h2></div></div>
+      <div class="faq">
+{{FAQ}}
+      </div>
+    </div>
+  </section>
+</main>
