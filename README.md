@@ -7,3 +7,7 @@ Quellcode und fertige Dateien der Website **https://lewolux.de**.
 - `quelle/feedback-worker/` – Umfrage & Feedback (Cloudflare Worker + D1, läuft unter api.lewolux.de).
 
 Ein privates, nicht-kommerzielles Hobbyprojekt.
+
+## Updates
+
+Jeder Push auf `main` wird von Cloudflare automatisch veröffentlicht (Workers Builds, `npx wrangler deploy`).
