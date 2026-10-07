@@ -279,10 +279,25 @@ def game_feedback(c, g):
 
 
 # ---------------------------------------------------------------- Handbuch & Software
+def deskboard_setup():
+    d = P("software-dateien", "deskboard")
+    exes = sorted(f for f in os.listdir(d) if f.endswith(".exe")) if os.path.isdir(d) else []
+    return exes[-1] if exes else None
+
 def deskboard_dl(c):
-    f = P("software-dateien", "deskboard", "DeskBoard-Setup.exe")
-    if os.path.isfile(f) and os.path.getsize(f) < 25 * 1024 * 1024: return f"{c.root}downloads/DeskBoard-Setup.exe"
+    exe = deskboard_setup()
+    if exe: return f"{c.root}downloads/{exe}"
     return DESKBOARD_URL or None
+
+def deskboard_parts():
+    """Setup-Datei in Teile < 25 MB zerlegen (Cloudflare-Grenze); der Worker (worker.js) setzt sie beim Download wieder zusammen."""
+    exe = deskboard_setup()
+    if not exe: return
+    out = P("dist/downloads/teile"); os.makedirs(out, exist_ok=True)
+    data = open(P("software-dateien", "deskboard", exe), "rb").read(); n = 24_000_000; parts = []
+    for i in range(0, len(data), n):
+        name = f"{exe.rsplit('.',1)[0]}.teil{i//n}.bin"; open(os.path.join(out, name), "wb").write(data[i:i+n]); parts.append(name)
+    json.dump({exe: {"size": len(data), "parts": parts}}, open(os.path.join(out, "manifest.json"), "w"))
 
 SICO = {k: f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{v}</svg>' for k, v in {
  "mic": '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
@@ -356,7 +371,7 @@ def software_page(c, sw_):
            "applicationCategory": "BusinessApplication" if sid != "deskboard" else "UtilitiesApplication", "operatingSystem": "Windows" if "Windows" in sw_["cat"] else "Web",
            "author": {"@id": SITE + "#studio"}, "inLanguage": "de"}
     if sid == "deskboard": app["offers"] = {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}
-    if dl and sid == "deskboard": app["downloadUrl"] = dl if dl.startswith("http") else SITE + "downloads/DeskBoard-Setup.exe"
+    if dl and sid == "deskboard": app["downloadUrl"] = dl if dl.startswith("http") else SITE + "downloads/" + deskboard_setup()
     jsonld = [{"@context": "https://schema.org", "@graph": [ORG, app,
         {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Start", "item": SITE}, {"@type": "ListItem", "position": 2, "name": "Software", "item": SITE + "#software"}, {"@type": "ListItem", "position": 3, "name": sw_["title"], "item": SITE + url}]},
         {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in sp["manual"]]}]}]
@@ -503,8 +518,7 @@ def main():
         os.makedirs(P(f"dist/software/{sw_['id']}"), exist_ok=True)
         og_image(P(f"dist/assets/screenshots/software-{sw_['id']}.jpg"), P(f"dist/assets/og/og-software-{sw_['id']}.jpg"))
         open(P(f"dist/software/{sw_['id']}/index.html"), "w", encoding="utf-8").write(software_page(Ctx("../../"), sw_))
-    _f = P("software-dateien", "deskboard", "DeskBoard-Setup.exe")
-    if os.path.isfile(_f) and os.path.getsize(_f) < 25 * 1024 * 1024: shutil.copy(_f, P("dist/downloads/DeskBoard-Setup.exe"))
+    deskboard_parts()
     todo = '<p class="todo">Platzhalter: Hier müssen die Pflichtangaben eingetragen werden. Bitte mit einem Generator (z. B. e-recht24.de) oder anwaltlich erstellen lassen.</p>'
     for slug, title in (("impressum", "Impressum"), ("datenschutz", "Datenschutzerklärung")):
         os.makedirs(P(f"dist/{slug}"), exist_ok=True)

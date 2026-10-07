@@ -1,11 +1,14 @@
 {
-  // Website lewolux.de: statische Dateien aus ./public (wird von build.py erzeugt)
+  // Website lewolux.de: statische Dateien aus ./public (wird von quelle/build.py erzeugt)
   "name": "lewolux",
+  "main": "worker.js",
   "compatibility_date": "2026-10-06",
   "assets": {
     "directory": "./public",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "html_handling": "auto-trailing-slash"
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/downloads/*.exe"]
   },
   "routes": [
     { "pattern": "lewolux.de", "custom_domain": true },
