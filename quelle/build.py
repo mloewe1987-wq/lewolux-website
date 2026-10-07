@@ -513,7 +513,7 @@ def lux_data(c):
     ]
     voice = sorted(f[:-4] for f in os.listdir(P("lux-voice")) if f.endswith(".mp3")) if os.path.isdir(P("lux-voice")) else []
     return json.dumps({"root": R, "voice": voice, "games": games, "intents": [{"k": k, "a": a, "w": (0.5 if k[0] in ("kostenlos", "download", "handy", "account", "spielstand", "feedback", "kontakt", "danke", "software") else 2.5 if k[0] in ("deskboard", "diktakte", "speisekarte", "horror", "umfrage") else 1)} for k, a in intents],
-        "chips": ["Welche Spiele gibt es?", "Was soll ich spielen?", "Kostet das was?", "DeskBoard herunterladen", "Erzähl einen Witz"]}, ensure_ascii=False).replace("</", "<\\/")
+        "vv": "th2", "chips": ["Ich will mit dir zusammen spielen 🎲", "Welche Spiele gibt es?", "Was soll ich spielen?", "Kostet das was?", "DeskBoard herunterladen", "Erzähl einen Witz"]}, ensure_ascii=False).replace("</", "<\\/")
 
 # ---------------------------------------------------------------- pages
 def index_page(c):

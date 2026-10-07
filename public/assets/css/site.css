@@ -732,3 +732,15 @@ html.modal-open .lux,html.player-open .lux{display:none}
  .lux-panel{position:fixed;left:8px;right:8px;width:auto;bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(60vh,520px);height:min(calc(100dvh - 210px),520px);transform-origin:85% 100%}
  .lux-panel::after{right:30px;bottom:-14px;transform:rotate(135deg)}}
 @media (prefers-reduced-motion:reduce){.lux-stage{animation:none}}
+/* Text-Adventure im Chat */
+.lux-adv{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 12px 8px;padding:8px 12px;border-radius:14px;background:linear-gradient(90deg,rgba(87,255,154,.08),rgba(59,232,255,.08));border:1px solid rgba(87,255,154,.25);font-size:12.5px}
+.lux-adv .adv-t{font:800 12px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:#57ff9a}
+.lux-adv .adv-hp{letter-spacing:1px}.lux-adv .adv-gems{display:inline-flex;gap:5px}
+.lux-adv .gem{width:11px;height:14px;display:inline-block;clip-path:polygon(50% 0,100% 35%,50% 100%,0 35%);background:rgba(255,255,255,.14)}
+.lux-adv .gem.on{background:var(--c);filter:drop-shadow(0 0 5px var(--c))}
+.lux-adv .adv-it{color:var(--muted);width:100%}
+.lux-chips button.adv{border-color:rgba(87,255,154,.45);background:rgba(87,255,154,.08)}
+.lux-chips button.adv:hover{border-color:#57ff9a}
+.lux-chips button.adv-x{border-style:dashed;color:var(--muted);background:transparent}
+.lux.adv .lux-panel{background:linear-gradient(180deg,#0f1f1c,#0b1014) padding-box,linear-gradient(135deg,#57ff9a,var(--cyan) 55%,var(--violet)) border-box}
+.lux.adv .lux-panel::after{background:#0b1014;border-color:var(--violet)}

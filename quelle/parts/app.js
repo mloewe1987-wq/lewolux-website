@@ -448,6 +448,7 @@ const root=document.createElement('div');root.className='lux';root.innerHTML=`
 <section class="lux-panel" role="dialog" aria-label="Chat mit Lux" hidden>
  <header class="lux-head"><b>Lux</b><small><i></i>Studio-Löwe</small><button class="lux-voice" type="button" aria-pressed="false" aria-label="Lux spricht seine Antworten vor" title="Lux spricht (Ton an/aus)"><span class="lv-txt">Ton</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="lv-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="lv-off" d="M17 9l5 6M22 9l-5 6"/></svg></button><button class="lux-x" aria-label="Chat schließen">✕</button></header>
  <div class="lux-log" aria-live="polite"></div>
+ <div class="lux-adv" hidden></div>
  <div class="lux-chips"></div>
  <form class="lux-form"><input class="lux-in" maxlength="200" placeholder="Frag Lux etwas …" aria-label="Nachricht an Lux" autocomplete="off"><button class="lux-mic" type="button" aria-label="Spracheingabe: Frage einsprechen" title="Reinsprechen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button><button class="lux-send" aria-label="Senden"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg></button></form>
 </section>`;document.body.appendChild(root);
@@ -495,7 +496,7 @@ function say(html,g){if(talking)talking.finish();const m=add(html,'bot');m.class
   if(!speaking){const ch=at(k).toLowerCase();mt=/[aeiouäöüy]/.test(ch)?.95:/[.,!?:;…]/.test(ch)?0:ch===' '?.12:.45}
   if(seq.length>1&&now-gt>850){gt=now;gi=(gi+1)%seq.length;pose(seq[gi])}
   if(k>=N)finish();else requestAnimationFrame(step)}
- talking={finish};requestAnimationFrame(step);kick();hush();if(file)playClip(`${D.root}assets/voice/${key}.mp3`,d=>{if(d&&isFinite(d))dur=Math.max(700,d*920)});else speak(plain)}
+ talking={finish};requestAnimationFrame(step);kick();hush();if(file)playClip(`${D.root}assets/voice/${key}.mp3?v=${D.vv||1}`,d=>{if(d&&isFinite(d))dur=Math.max(700,d*920)});else speak(plain)}
 function setVoice(on){voiceOn=on;vbtn.setAttribute('aria-pressed',on);vbtn.classList.toggle('on',on);try{localStorage.setItem('luxVoice',on?'1':'0')}catch(_){}if(on)unlock();else hush()}
 if(!synth)vbtn.hidden=true;else{setVoice(voiceOn);vbtn.onclick=()=>{setVoice(!voiceOn);if(voiceOn)say(VOICEON,'wave')}}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;
@@ -522,8 +523,68 @@ function answer(raw){const t=' '+norm(raw)+' ';
  let best=null,score=0;for(const it of D.intents){let s=0;for(const k of it.k)if(t.includes(k))s+=k.length;s*=it.w||1;if(s>score){score=s;best=it}}
  if(best){let a=pick(best.a);if(a==='__random__')return{g:'point',a:tipLine(pick(D.games.filter(x=>x.play))),c:['Noch ein Tipp','Welche Spiele gibt es?']};return{a,g:GEST[best.k[0]]||'talk',c:D.chips.slice(0,3)}}
  return{g:'shrug',a:pick(FALLBACK),c:D.chips}}
-function ask(text){if(!text.trim())return;add(esc(text),'me');inp.value='';chipsEl.innerHTML='';const typing=add('<span class="lux-typing"><i></i><i></i><i></i></span>','bot');
+function ask(text){if(!text.trim())return;if(advOn){add(esc(text),'me');inp.value='';advText(text);return}
+ if(ADVTRIG.test(norm(text))){add(esc(text),'me');inp.value='';chipsEl.innerHTML='';setTimeout(advStart,450);return}
+ add(esc(text),'me');inp.value='';chipsEl.innerHTML='';const typing=add('<span class="lux-typing"><i></i><i></i><i></i></span>','bot');
  setTimeout(()=>{typing.remove();const r=answer(text==='Noch ein Tipp'?'was soll ich spielen':text);say(r.a,r.g);chips(r.c||D.chips)},450+Math.random()*450)}
+/* ---------- Text-Adventure: Lux und das Herz des Neon-Dschungels ---------- */
+const ADVTRIG=/(mit dir (zusammen )?spielen|spiel (doch )?mit mir|spielen wir|lass uns spielen|abenteuer|text ?adventure)/;
+const RESUME='Da bist du ja wieder, Partner! Der Neon-Dschungel wartet noch auf uns. Machen wir weiter, wo wir aufgehört haben, oder fangen wir ganz von vorne an?',
+ EXITLINE='Okay, Abenteuer pausiert. Ich merke mir genau, wo wir waren. Sag einfach „Ich will mit dir zusammen spielen“, dann geht es weiter! 🦁',
+ ADVHELP='Hm, das verstehe ich im Dschungel nicht. Tipp einfach auf eine der Antworten unten. Oder sag „Abenteuer beenden“, dann machen wir Pause.';
+const ADV={
+ start:{g:'open',t:'Psst, komm näher. Ich verrate dir ein Geheimnis: Hinter dieser Website liegt der Neon-Dschungel. Dort leuchtet alles, die Bäume, die Flüsse, sogar die Käfer. Aber seit gestern wird das Leuchten immer schwächer. Das Herz des Dschungels, ein riesiger Kristall, ist in drei Splitter zersprungen. Wenn wir sie nicht finden, wird es dort für immer dunkel. Kommst du mit?',c:[["Klar, los geht's!",'hub'],['Was muss ich wissen?','regeln']]},
+ regeln:{g:'beat',t:'Ganz einfach: Du entscheidest, ich führe dich. Du hast drei Herzen Mut. Verlierst du alle, ruhen wir uns am Lagerfeuer aus und machen weiter. Gefundene Splitter und Gegenstände behältst du. Dein Fortschritt wird automatisch auf diesem Gerät gespeichert, und mit „Abenteuer beenden“ kannst du jederzeit Pause machen.',c:[['Verstanden, los!','hub']]},
+ rand0:{g:'point',t:'Wir stehen am Rand des Neon-Dschungels. Riesige Farne glühen türkis, irgendwo zirpt etwas in Lila. Vor uns teilt sich der Pfad: Links rauscht der Flüsterfluss. Geradeaus ragt eine alte Ruine aus dem Dickicht. Und rechts schaukelt eine Hängebrücke über einer tiefen Schlucht. Wohin zuerst?'},
+ rand1:{g:'open',t:'Zurück am Dschungelrand. Ein Splitter summt schon in deiner Tasche, und die Farne leuchten ein kleines bisschen heller. Zwei fehlen noch. Wohin jetzt?'},
+ rand2:{g:'open',t:'Wieder am Dschungelrand. Zwei Splitter, nur noch einer! Ich kann es schon fast riechen, das Licht kommt zurück. Wohin gehen wir?'},
+ rand3:{g:'wave',t:'Alle drei Splitter summen in deiner Tasche, blau, grün und rot! Hörst du das? Oben auf dem Berg öffnet sich der Weg zum Sonnentempel. Dort gehört das Herz des Dschungels hin. Bereit für das große Finale?',c:[['Auf zum Sonnentempel!','tempel']]},
+ fluss:{g:'point',t:'Der Flüsterfluss glitzert wie flüssiges Mondlicht. Mitten im Wasser, auf einem Stein, funkelt etwas Blaues: ein Splitter! Aber die Strömung ist stark. Am Ufer liegt ein altes Seil, und ein Stück weiter treibt ein umgekippter Baumstamm.',c:[['Mit dem Seil zum Stein','fluss_seil'],['Über den Baumstamm balancieren','fluss_stamm'],['Einfach rüberschwimmen','rand:fluss_fische|fluss_strudel']]},
+ fluss_seil:{g:'laugh',e:{shard:'blau',item:'seil'},t:'Du knotest das Seil an einen Ast, ich halte mit aller Löwenkraft dagegen. Stück für Stück hangelst du dich zum Stein. Geschafft! Der blaue Splitter summt leise in deiner Hand. Das Seil nehmen wir mit, wer weiß, wofür es noch gut ist.',c:[['Zurück zum Dschungelrand','hub']]},
+ fluss_stamm:{g:'shrug',e:{hp:-1},t:'Der Stamm wackelt, wackelt … und dreht sich! Platsch! Du landest im Wasser, und ich fische dich mit dem Schwanz wieder raus. Klitschnass, aber heil. Das hat ein Herz Mut gekostet.',c:[['Diesmal mit dem Seil','fluss_seil'],['Doch rüberschwimmen','rand:fluss_fische|fluss_strudel']]},
+ fluss_fische:{g:'laugh',e:{shard:'blau',item:'beere'},t:'Mutig! Die Strömung zerrt an dir, doch plötzlich tauchen leuchtende Fische auf und schieben dich sanft zum Stein. Sie mögen offenbar Abenteurer. Der blaue Splitter gehört dir! Zum Abschied zwinkert dir ein Fisch zu und lässt eine Glühbeere ans Ufer treiben.',c:[['Zurück zum Dschungelrand','hub']]},
+ fluss_strudel:{g:'shrug',e:{hp:-1},t:'Ein Strudel packt dich, wirbelt dich herum und spuckt dich zurück ans Ufer. Vor Schreck ist meine Mähne ganz zerzaust. Ein Herz Mut ist weg.',c:[['Lieber mit dem Seil','fluss_seil'],['Nochmal schwimmen','rand:fluss_fische|fluss_strudel']]},
+ ruine:{g:'think',t:'Die Ruine der Glühwürmchen. Tausende kleine Lichter tanzen um eine steinerne Tür. Darauf steht ein Rätsel: „Ich habe Tasten, aber kein Klavier. Ich habe eine Leertaste, aber keinen leeren Raum. Und ohne mich schreibst du am Computer kein Wort. Was bin ich?“',c:[['Eine Tastatur','ruine_auf'],['Ein Schlüsselbund','ruine_falsch'],['Eine Fernbedienung','ruine_falsch']]},
+ ruine_falsch:{g:'shrug',e:{hp:-1},t:'Die Tür grummelt, und die Glühwürmchen pieksen dich in die Nase. Autsch! Ein Herz Mut weniger. Denk an das Ding, auf dem man tippt …',c:[['Eine Tastatur','ruine_auf'],['Ein Schlüsselbund','ruine_falsch'],['Eine Fernbedienung','ruine_falsch']]},
+ ruine_auf:{g:'laugh',t:'Richtig, eine Tastatur! Knirschend schiebt sich die Tür zur Seite. Drinnen liegt der grüne Splitter auf einem Sockel, umringt von schlafenden Glühwürmchen. Leise jetzt …',c:[['Auf Zehenspitzen hinschleichen','ruine_leise'],['Schnell schnappen und rennen','ruine_schnell']]},
+ ruine_leise:{g:'open',e:{shard:'gruen',item:'laterne'},t:'Auf Zehenspitzen schleichst du zum Sockel. Kein einziges Glühwürmchen wacht auf. Der grüne Splitter ist unser! Neben dem Sockel steht eine alte Laterne mit warmem Licht. Die nehmen wir mit.',c:[['Zurück zum Dschungelrand','hub']]},
+ ruine_schnell:{g:'shrug',e:{shard:'gruen',hp:-1},t:'Zack, der Splitter ist in deiner Hand! Aber alle Glühwürmchen wachen auf und jagen uns brummend nach draußen. Wir rennen, bis die Pfoten qualmen. Splitter gerettet, aber ein Herz Mut ist futsch.',c:[['Zurück zum Dschungelrand','hub']]},
+ bruecke:{g:'point',t:'Die Hängebrücke schaukelt über der Schlucht. In der Mitte hockt ein Neon-Affe und hält den roten Splitter fest wie eine Banane. „Den gebe ich nur her, wenn du mir etwas richtig Gutes gibst!“, kreischt er.',c:[['Glühbeere anbieten','affe_beere',{need:'beere'}],['Einen Witz erzählen','rand:affe_lacht|affe_gaehnt'],['Splitter wegschnappen','if:seil?affe_seil:affe_sturz']]},
+ affe_beere:{g:'laugh',e:{shard:'rot',drop:'beere'},t:'Die Augen des Affen werden riesengroß. „Eine Glühbeere! Mein Lieblingssnack!“ Er tauscht sofort und schmatzt glücklich vor sich hin. Der rote Splitter gehört dir!',c:[['Zurück zum Dschungelrand','hub']]},
+ affe_lacht:{g:'laugh',e:{shard:'rot'},t:'Du erzählst: „Was ist grün und klopft an die Tür? Ein Klopfsalat!“ Der Affe lacht so sehr, dass er fast von der Brücke fällt. „Okay, okay, den hast du dir verdient!“ Der rote Splitter gehört dir!',c:[['Zurück zum Dschungelrand','hub']]},
+ affe_gaehnt:{g:'shrug',e:{hp:-1},t:'Der Affe gähnt. „Kenn ich schon.“ Dann wirft er dir eine Bananenschale an den Kopf. Autsch, ein Herz Mut weniger. Versuch etwas anderes!',c:[['Glühbeere anbieten','affe_beere',{need:'beere'}],['Noch einen Witz','rand:affe_lacht|affe_gaehnt'],['Splitter wegschnappen','if:seil?affe_seil:affe_sturz']]},
+ affe_seil:{g:'laugh',e:{shard:'rot'},t:'Du bindest das Seil an die Brücke, schwingst dich darunter durch und schnappst den Splitter von unten. Der Affe ist so verdutzt, dass er nur „Hä?“ sagt. Der rote Splitter gehört dir!',c:[['Zurück zum Dschungelrand','hub']]},
+ affe_sturz:{g:'shrug',e:{hp:-1},t:'Du greifst zu, der Affe weicht aus, die Brücke schaukelt wild, und plötzlich hängst du kopfüber am Geländer. Ich ziehe dich zurück. Puh! Ein Herz Mut weniger. Mit einem Seil hätte das vielleicht geklappt.',c:[['Glühbeere anbieten','affe_beere',{need:'beere'}],['Einen Witz erzählen','rand:affe_lacht|affe_gaehnt'],['Zurück zum Dschungelrand','hub']]},
+ tempel:{g:'think',t:'Der Sonnentempel. Ganz oben steht der leere Sockel für das Herz des Dschungels. Doch davor löst sich etwas aus der Dunkelheit: der Schattenpanther! Seine Augen glühen kalt. „Das Licht gehört jetzt mir“, faucht er.',c:[['Laterne hochhalten','panther_licht',{need:'laterne'}],['Mit ihm reden','panther_reden'],['Kämpfen!','panther_kampf']]},
+ panther_kampf:{g:'shrug',e:{hp:-1},t:'Ich brülle so laut ich kann, und du stellst dich mutig neben mich. Der Panther zuckt zurück, dann springt er. Wir weichen aus, aber seine Pfote streift dich. Ein Herz Mut weniger. So kommen wir nicht weiter.',c:[['Laterne hochhalten','panther_licht',{need:'laterne'}],['Mit ihm reden','panther_reden']]},
+ panther_reden:{g:'think',t:'„Warum willst du das Licht?“, fragst du. Der Panther senkt den Kopf. „Weil mich im Dunkeln niemand sieht. Alle haben Angst vor mir. Ich bin immer allein.“ Oh. Er ist gar nicht böse, nur einsam.',c:[['Ihn einladen, mit uns zu leuchten','ende_gut'],['Ihn auslachen','panther_wut']]},
+ panther_wut:{g:'shrug',e:{hp:-1},t:'Schlechte Idee! Der Panther faucht, und ein eiskalter Schatten streift dich. Ein Herz Mut weniger. Vielleicht etwas netter?',c:[['Entschuldigen und nochmal reden','panther_reden']]},
+ panther_licht:{g:'open',t:'Du hebst die alte Laterne. Ihr warmes Licht fällt auf den Panther, und plötzlich sieht man es: Sein Fell schimmert wunderschön silbern. „So hat mich noch nie jemand gesehen“, flüstert er. Der kalte Schatten verschwindet.',c:[['Die Splitter einsetzen','ende_gut']]},
+ ende_gut:{g:'laugh',e:{done:true},t:'Wir setzen die drei Splitter in den Sockel: blau, grün, rot. Ein Summen, ein Blitz, und das Herz des Dschungels strahlt heller als je zuvor! Der Panther bekommt ein silbernes Leuchten ab und schnurrt zum ersten Mal in seinem Leben. Der Neon-Dschungel ist gerettet. Und das, Partner, verdanken wir dir! 🦁✨',c:[['Nochmal spielen','__new'],['Zurück zum Chat','__exit']]},
+ ende_mut:{g:'open',e:{heal:true},t:'Uff, kein Mut mehr übrig. Wir setzen uns ans Lagerfeuer am Dschungelrand, trinken einen Kokos-Kakao und sammeln neue Kraft. Deine Splitter und Gegenstände sind sicher. Mit vollen Herzen geht es weiter!',c:[["Weiter geht's",'hub']]}};
+const HUBC=[['Zum Flüsterfluss','fluss',{hide:'blau'}],['Zur Ruine','ruine',{hide:'gruen'}],['Über die Hängebrücke','bruecke',{hide:'rot'}]];
+['rand0','rand1','rand2'].forEach(k=>ADV[k].c=HUBC);
+const AKEY='luxAdv',advEl=q('.lux-adv'),fresh=()=>({s:'start',hp:3,sh:[],it:[],done:false});
+let A=null,advOn=false,advCur=[];try{A=JSON.parse(localStorage.getItem(AKEY))}catch(_){}
+const advSave=()=>{try{localStorage.setItem(AKEY,JSON.stringify(A))}catch(_){}};
+const has=k=>A.it.includes(k)||A.sh.includes(k);
+function resolve(t){if(t==='hub')return'rand'+A.sh.length;if(t.startsWith('rand:'))return pick(t.slice(5).split('|'));if(t.startsWith('if:')){const[k,r]=t.slice(3).split('?'),[x,y]=r.split(':');return has(k)?x:y}return t}
+function advBar(){advEl.hidden=!advOn;if(!advOn||!A)return;const gem=(k,c)=>`<i class="gem${A.sh.includes(k)?' on':''}" style="--c:${c}" title="Splitter ${k}"></i>`;const IT={seil:'🪢 Seil',beere:'🫐 Glühbeere',laterne:'🏮 Laterne'};
+ advEl.innerHTML=`<span class="adv-t">Neon-Dschungel</span><span class="adv-hp" title="Mut">${'❤️'.repeat(A.hp)}${'🖤'.repeat(3-A.hp)}</span><span class="adv-gems">${gem('blau','#3be8ff')}${gem('gruen','#57ff9a')}${gem('rot','#ff4d6d')}</span>${A.it.length?`<span class="adv-it">${A.it.map(k=>IT[k]).join(' · ')}</span>`:''}`}
+function advChips(list){advCur=list;chipsEl.innerHTML='';list.forEach(([l,t])=>{const b=document.createElement('button');b.type='button';b.className='adv';b.textContent=l;b.onclick=()=>{unlock();advPick(l,t)};chipsEl.appendChild(b)});
+ if(list.some(c=>c[1]==='__exit'))return;const x=document.createElement('button');x.type='button';x.className='adv-x';x.textContent='Abenteuer beenden';x.onclick=()=>{unlock();add('Abenteuer beenden','me');advExit()};chipsEl.appendChild(x)}
+function advPick(label,t){add(esc(label),'me');chipsEl.innerHTML='';const ty=add('<span class="lux-typing"><i></i><i></i><i></i></span>','bot');setTimeout(()=>{ty.remove();advGo(t)},420)}
+function advGo(t,replay){if(t==='__new'){A=fresh();t='start'}if(t==='__exit')return advExit();if(t==='__cont'){t=A.s;replay=true}
+ const id=resolve(t),sc=ADV[id];A.s=id;const e=replay?{}:(sc.e||{});
+ if(e.hp)A.hp=Math.max(0,A.hp+e.hp);if(e.shard&&!A.sh.includes(e.shard))A.sh.push(e.shard);if(e.item&&!A.it.includes(e.item))A.it.push(e.item);if(e.drop)A.it=A.it.filter(k=>k!==e.drop);if(e.heal)A.hp=3;if(e.done)A.done=true;
+ advSave();advBar();say(sc.t,sc.g);
+ advChips(A.hp<=0?[['Ans Lagerfeuer 🔥','ende_mut']]:(sc.c||[]).filter(([,,o={}])=>(!o.need||has(o.need))&&(!o.hide||!A.sh.includes(o.hide))))}
+function advStart(){advOn=true;root.classList.add('adv');if(A&&!A.done&&A.s!=='start'){advBar();say(RESUME,'wave');advChips([['Weiterspielen','__cont'],['Neu starten','__new']])}else{A=fresh();advGo('start')}}
+function advExit(){advOn=false;root.classList.remove('adv');advBar();say(EXITLINE,'wave');chips(D.chips)}
+function advText(raw){const t=norm(raw);if(/beend|stopp|aufhör|pause|zurück zum chat/.test(t))return advExit();
+ if(/^(ruine|ruine_falsch)$/.test(A.s)&&/tastatur|keyboard/.test(t))return setTimeout(()=>advGo('ruine_auf'),400);
+ const hit=advCur.find(([l])=>{const n=norm(l);return n.includes(t)||t.includes(n)||n.split(' ').some(w=>w.length>4&&t.includes(w))});
+ if(hit){chipsEl.innerHTML='';setTimeout(()=>advGo(hit[1]),400);return}say(ADVHELP,'shrug')}
 let started=false;function open(o){panel.hidden=!o;stage.setAttribute('aria-expanded',o);stage.setAttribute('aria-label',o?'Chat mit Lux schließen':'Chat mit Lux öffnen');root.classList.toggle('open',o);hint.hidden=true;try{sessionStorage.setItem('luxSeen','1')}catch(_){}
  if(!o){if(talking)talking.finish();hush();if(listening&&rec)rec.stop()}
  if(o&&!started){started=true;setTimeout(()=>say(pick(GREET),'wave'),350);chips(D.chips)}if(o)setTimeout(()=>inp.focus({preventScroll:true}),50)}
@@ -534,7 +595,7 @@ log.addEventListener('click',e=>{if(e.target.closest('.lux-play'))open(false)});
 let seen=false;try{seen=!!sessionStorage.getItem('luxSeen')}catch(_){}
 if(!seen)setTimeout(()=>{if(panel.hidden){hint.hidden=false;pose('wave');setTimeout(()=>{if(panel.hidden)pose('')},1800)}},6000);
 let dk=0;addEventListener('scroll',()=>{if(!panel.hidden)return;root.classList.add('duck');hint.hidden=true;clearTimeout(dk);dk=setTimeout(()=>root.classList.remove('duck'),650)},{passive:true});
-if(location.hash==='#luxlines'){const tmp=document.createElement('div'),P=h=>{tmp.innerHTML=h;return plainOf(tmp)},out=[...GREET,...FALLBACK,VOICEON,MICDENY,MICNONE];
+if(location.hash==='#luxlines'){const tmp=document.createElement('div'),P=h=>{tmp.innerHTML=h;return plainOf(tmp)},out=[...GREET,...FALLBACK,VOICEON,MICDENY,MICNONE,RESUME,EXITLINE,ADVHELP,...Object.values(ADV).map(x=>x.t)];
  D.intents.forEach(it=>it.a.forEach(a=>{if(a!=='__random__')out.push(a)}));
  D.games.forEach(g=>{[' ',' steuer ',' tipp ',' speicher ',' start ',' download '].forEach(t=>out.push(gameAnswer(g,t).a));if(g.play)out.push(tipLine(g))});
  const seen2=new Set;window.__luxLines=out.map(P).filter(t=>!seen2.has(t)&&seen2.add(t)).map(t=>({h:hash(t),t,s:forSpeech(t)}))}
