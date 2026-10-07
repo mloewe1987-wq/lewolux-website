@@ -423,12 +423,7 @@ const hm=location.hash.match(/^#spiel-([a-z0-9-]+)$/);if(hm&&GAMES.find(g=>g.id=
 
 /* ---------- Chat-Begleiter „Lux“ (läuft komplett im Browser) ---------- */
 (()=>{const src=document.getElementById('lux-data');if(!src||window.LGS_RENDER_ONLY)return;let D;try{D=JSON.parse(src.textContent)}catch(_){return}
-const face=`<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lxm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset=".55" stop-color="#9b5cff"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>
-<g fill="url(#lxm)">${Array.from({length:12},(_,i)=>{const a=i/12*Math.PI*2,x=32+Math.cos(a)*22,y=34+Math.sin(a)*22;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9"/>`}).join('')}</g>
-<circle cx="32" cy="34" r="19" fill="#ffcf8a"/><circle cx="18" cy="19" r="5" fill="#ffcf8a"/><circle cx="46" cy="19" r="5" fill="#ffcf8a"/><circle cx="18" cy="19" r="2.4" fill="#f2a65a"/><circle cx="46" cy="19" r="2.4" fill="#f2a65a"/>
-<ellipse cx="32" cy="42" rx="10" ry="7.5" fill="#fff1dc"/><g class="lx-eyes"><ellipse cx="25" cy="31" rx="2.6" ry="3.3" fill="#1b1430"/><ellipse cx="39" cy="31" rx="2.6" ry="3.3" fill="#1b1430"/><circle cx="25.9" cy="29.8" r=".9" fill="#fff"/><circle cx="39.9" cy="29.8" r=".9" fill="#fff"/></g>
-<path d="M28.5 38.5h7l-3.5 3.6z" fill="#7a3b2e"/><path d="M32 42.2v2.2M32 44.4c-1.6 1.8-3.8 1.8-5 .6M32 44.4c1.6 1.8 3.8 1.8 5 .6" stroke="#7a3b2e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-<circle cx="21" cy="38" r="2.4" fill="#ff9a9a" opacity=".55"/><circle cx="43" cy="38" r="2.4" fill="#ff9a9a" opacity=".55"/></svg>`;
+
 const mane2=Array.from({length:14},(_,i)=>{const a=i/14*Math.PI*2,x=80+Math.cos(a)*30,y=90+Math.sin(a)*30;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="12"/>`}).join('');
 const arm=(c,x)=>`<g class="fx-arm ${c}"><rect x="${x-8}" y="134" width="16" height="42" rx="8" fill="#1c2140" stroke="#3be8ff" stroke-opacity=".55" stroke-width="1.3"/><circle cx="${x}" cy="178" r="9" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.1"/></g>`;
 const body=`<svg class="lux-fig" viewBox="0 0 160 250"><defs><linearGradient id="lxb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset=".55" stop-color="#9b5cff"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>
@@ -448,17 +443,17 @@ ${arm('fx-l',55)}
 <g class="fx-mouth"><ellipse cx="80" cy="109.5" rx="6.5" ry="5" fill="#5a1f2a"/><ellipse cx="80" cy="112.3" rx="4" ry="2" fill="#ff7b8a"/></g></g>
 ${arm('fx-r',105)}</svg>`;
 const root=document.createElement('div');root.className='lux';root.innerHTML=`
-<button class="lux-fab" aria-label="Chat mit Lux öffnen" aria-expanded="false">${face}<span class="lux-dot"></span></button>
-<div class="lux-stage" aria-hidden="true">${body}</div>
+<button class="lux-stage" type="button" aria-label="Chat mit Lux öffnen" aria-expanded="false">${body}</button>
 <div class="lux-hint" hidden>Psst! Brauchst du einen Tipp? 🦁</div>
 <section class="lux-panel" role="dialog" aria-label="Chat mit Lux" hidden>
- <header class="lux-head"><span class="lux-av">${face}</span><div><b>Lux</b><small><i></i>Studio-Löwe · antwortet sofort</small></div><button class="lux-voice" type="button" aria-pressed="false" aria-label="Lux spricht seine Antworten vor" title="Lux spricht (Ton an/aus)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="lv-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="lv-off" d="M17 9l5 6M22 9l-5 6"/></svg></button><button class="lux-x" aria-label="Chat schließen">✕</button></header>
+ <header class="lux-head"><b>Lux</b><small><i></i>Studio-Löwe</small><button class="lux-voice" type="button" aria-pressed="false" aria-label="Lux spricht seine Antworten vor" title="Lux spricht (Ton an/aus)"><span class="lv-txt">Ton</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="lv-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="lv-off" d="M17 9l5 6M22 9l-5 6"/></svg></button><button class="lux-x" aria-label="Chat schließen">✕</button></header>
  <div class="lux-log" aria-live="polite"></div>
  <div class="lux-chips"></div>
  <form class="lux-form"><input class="lux-in" maxlength="200" placeholder="Frag Lux etwas …" aria-label="Nachricht an Lux" autocomplete="off"><button class="lux-mic" type="button" aria-label="Spracheingabe: Frage einsprechen" title="Reinsprechen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button><button class="lux-send" aria-label="Senden"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg></button></form>
 </section>`;document.body.appendChild(root);
-const q=s=>root.querySelector(s),fab=q('.lux-fab'),panel=q('.lux-panel'),log=q('.lux-log'),chipsEl=q('.lux-chips'),inp=q('.lux-in'),hint=q('.lux-hint');
+const q=s=>root.querySelector(s),panel=q('.lux-panel'),log=q('.lux-log'),chipsEl=q('.lux-chips'),inp=q('.lux-in'),hint=q('.lux-hint');
 const pick=a=>a[Math.floor(Math.random()*a.length)];
+const GREET=['Rawr! 🦁 Ich bin Lux, der Studio-Löwe. Was kann ich für dich tun?','Hey! Ich bin Lux. Frag mich nach Spielen, Tipps oder Downloads! Du kannst auch aufs Mikro tippen und mit mir reden.'],FALLBACK=['Hm, da muss ich passen. 🦁 Frag mich zu Spielen, Downloads, Steuerung oder Software!','Das weiß selbst ein Löwe nicht. Versuch es mit einem Spielnamen, zum Beispiel „Tipps für Sternenwurf“.','Brüll… ich meine: Das habe ich nicht verstanden. Vielleicht hilft einer dieser Vorschläge?'],VOICEON='Okay, ab jetzt spreche ich mit dir! 🦁',MICDENY='Ich darf dein Mikrofon gerade nicht benutzen. Erlaube es über das Schloss-Symbol neben der Adresse und tipp dann nochmal aufs Mikro.',MICNONE='Ich habe nichts gehört. Tipp aufs Mikro und sprich einfach los! 🦁';
 const norm=t=>t.toLowerCase().replace(/[ä]/g,'ä').replace(/[^a-z0-9äöüß ]+/g,' ').replace(/\s+/g,' ').trim();
 const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const L=(u,t)=>`<a href="${D.root}${u}">${t}</a>`;
@@ -466,19 +461,31 @@ function add(html,who){const m=document.createElement('div');m.className='lux-ms
 const stage=q('.lux-stage'),mouth=q('.fx-mouth'),smile=q('.fx-smile'),vbtn=q('.lux-voice'),mic=q('.lux-mic'),synth=window.speechSynthesis;
 const GSEQ={talk:['beat','open','','beat','point'],wave:['wave','wave','beat'],laugh:['laugh','laugh','laugh'],point:['point','point','beat'],shrug:['shrug','shrug',''],think:['think','think','beat'],open:['open','beat','open']};
 const GEST={hallo:'wave','tschüss':'wave',danke:'wave',witz:'laugh','wer bist du':'open',lewolux:'open',horror:'think',kostenlos:'open',deskboard:'point',diktakte:'point',speisekarte:'point'};
-let ml=0,mt=0,mraf=0,speaking=false,talking=null,voiceOn=false;try{voiceOn=localStorage.getItem('luxVoice')==='1'}catch(_){}
+const VOICE=new Set(D.voice||[]),hash=s=>{let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)}return(h>>>0).toString(16).padStart(8,'0')};
+const plainOf=el=>{const a=[],w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))a.push(n.nodeValue);return a.join(' ').replace(/\s+/g,' ').trim()};
+const SAYFIX=[[/House in the Desert/g,'Hauss in se Desört'],[/DeskBoard/g,'Deskbord'],[/Ring Legends/g,'Ring Ledschends'],[/Idle Legenden/g,'Eidl Legenden'],[/\bIdle\b/g,'Eidl'],[/Downloads/g,'Daunlods'],[/Download/g,'Daunlod'],[/Browser/g,'Brauser'],[/Gamepad/g,'Gämpäd'],[/Feedback/g,'Fiedbäck'],[/Rawr/g,'Roarr'],[/\bPets\b/g,'Pätts'],[/Early Access/g,'Örli Äxess'],[/offline/g,'offlein'],[/Account/g,'Äkaunt'],[/Xbox/g,'Ex Box'],[/PlayStation/g,'Pläi Stäischen'],[/E-Mail/g,'I-Mail'],[/Cookies/g,'Kukies'],[/Tracking/g,'Träcking'],[/Software/g,'Softwär'],[/Widgets/g,'Widschets'],[/QR-Code/g,'Ku Er Kod'],[/§/g,'Paragraph'],[/Abs\./g,'Absatz'],[/\bBGB\b/g,'B G B'],[/\bHTML\b/g,'H T M L'],[/RPG-Maker/g,'R P G Mäiker'],[/\bRNG\b/g,'R N G'],[/\bTCG\b/g,'T C G'],[/\bbeA\b/g,'be A'],[/Windows/g,'Windous'],[/@/g,' ät '],[/lewolux\.de/g,'lewolux punkt de'],[/\bBug\b/g,'Bagg'],[/Hobby/g,'Hobbi']];
+const forSpeech=t=>{t=t.replace(/[\u{1F300}-\u{1FAFF}☀-➿▶]/gu,'').replace(/\*[^*]+\*/g,'');for(const[a,b]of SAYFIX)t=t.replace(a,b);return t.replace(/\s+/g,' ').trim()};
+let actx=null,an=null,abuf=null,au=null;
+function audioEl(){if(au)return au;au=new Audio();au.preload='auto';try{actx=new(window.AudioContext||window.webkitAudioContext)();const src=actx.createMediaElementSource(au);an=actx.createAnalyser();an.fftSize=512;src.connect(an);an.connect(actx.destination);abuf=new Uint8Array(an.fftSize)}catch(_){an=null}return au}
+const unlock=()=>{if(!voiceOn)return;audioEl();if(actx&&actx.state==='suspended')actx.resume().catch(()=>{})};
+function level(){an.getByteTimeDomainData(abuf);let s=0;for(const v of abuf){const x=(v-128)/128;s+=x*x}return Math.min(1,Math.max(0,(Math.sqrt(s/abuf.length)-.012)*7.5))}
+function hush(){if(synth)synth.cancel();if(au&&!au.paused)au.pause()}
+let ml=0,mt=0,mraf=0,speaking=false,clip=false,talking=null,voiceOn=false;try{voiceOn=localStorage.getItem('luxVoice')==='1'}catch(_){}
 const pose=p=>{stage.dataset.pose=p||''};
 function setMouth(l){mouth.setAttribute('transform',`translate(80 105) scale(${(.85+l*.25).toFixed(2)} ${Math.max(l,.001).toFixed(3)}) translate(-80 -105)`);smile.style.opacity=Math.max(0,1-l*1.6).toFixed(2)}
-function mloop(t){if(speaking)mt=.2+.7*Math.abs(Math.sin(t/75))*(.55+.45*Math.sin(t/240));ml+=(mt-ml)*.45;setMouth(ml);
+function mloop(t){if(speaking)mt=clip&&an?level():.2+.7*Math.abs(Math.sin(t/75))*(.55+.45*Math.sin(t/240));ml+=(mt-ml)*.45;setMouth(ml);
  if(talking||speaking||ml>.02)mraf=requestAnimationFrame(mloop);else{ml=0;setMouth(0);mraf=0}}
 const kick=()=>{if(!mraf)mraf=requestAnimationFrame(mloop)};setMouth(0);
 (function blink(){setTimeout(()=>{stage.classList.add('blink');setTimeout(()=>{stage.classList.remove('blink');blink()},140)},2200+Math.random()*3200)})();
-function speak(text){if(!synth||!voiceOn)return;synth.cancel();const u=new SpeechSynthesisUtterance(text.replace(/[\u{1F300}-\u{1FAFF}☀-➿▶]/gu,'').replace(/\*[^*]+\*/g,'').replace(/\s+/g,' ').trim());
- u.lang='de-DE';const vs=synth.getVoices().filter(v=>/^de/i.test(v.lang));u.voice=vs.find(v=>/conrad|killian|florian|stefan|markus|yannick/i.test(v.name))||vs.find(v=>/natural|online|google/i.test(v.name))||vs[0]||null;u.pitch=1.15;u.rate=1.05;
- u.onstart=()=>{speaking=true;stage.classList.add('talking');kick()};u.onend=u.onerror=()=>{speaking=false;mt=0;if(!talking){stage.classList.remove('talking');pose('')}};synth.speak(u)}
+const endTalk=()=>{speaking=false;clip=false;mt=0;if(!talking){stage.classList.remove('talking');pose('')}};
+function playClip(url,onDur){const a=audioEl();if(actx&&actx.state==='suspended')actx.resume().catch(()=>{});a.src=url;a.onloadedmetadata=()=>onDur(a.duration);a.onplay=()=>{speaking=true;clip=true;stage.classList.add('talking');kick()};a.onended=a.onerror=a.onpause=endTalk;a.play().catch(()=>endTalk())}
+function speak(text){if(!synth||!voiceOn||!text)return;synth.cancel();const u=new SpeechSynthesisUtterance(forSpeech(text));
+ u.lang='de-DE';const vs=synth.getVoices().filter(v=>/^de/i.test(v.lang));u.voice=vs.find(v=>/natural/i.test(v.name)&&/conrad|killian|florian|ralf/i.test(v.name))||vs.find(v=>/natural|online/i.test(v.name))||vs.find(v=>/google/i.test(v.name))||vs[0]||null;u.pitch=1.05;u.rate=1;
+ u.onstart=()=>{speaking=true;stage.classList.add('talking');kick()};u.onend=u.onerror=endTalk;synth.speak(u)}
 function say(html,g){if(talking)talking.finish();const m=add(html,'bot');m.classList.add('typing-out');
  const nodes=[],w=document.createTreeWalker(m,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){nodes.push([n,n.nodeValue]);n.nodeValue=''}
- const plain=nodes.map(x=>x[1]).join(' '),N=plain.length,dur=Math.min(Math.max(N*(voiceOn?55:30),700),voiceOn?9000:4500),t0=performance.now(),seq=GSEQ[g]||GSEQ.talk;
+ const plain=nodes.map(x=>x[1]).join(' ').replace(/\s+/g,' ').trim(),N=nodes.reduce((a,x)=>a+x[1].length,0),key=hash(plain),file=voiceOn&&VOICE.has(key),t0=performance.now(),seq=GSEQ[g]||GSEQ.talk;
+ let dur=Math.min(Math.max(N*(voiceOn?60:30),700),voiceOn?12000:4500);
  let gi=0,gt=t0,done=false;pose(seq[0]);stage.classList.add('talking');
  const fill=k=>{for(const[nd,tx]of nodes){const c=Math.min(k,tx.length);nd.nodeValue=tx.slice(0,c);k-=c;if(k<=0&&c<tx.length)break}};
  const at=k=>{for(const[,tx]of nodes){if(k<=tx.length)return tx[k-1]||' ';k-=tx.length}return' '};
@@ -488,19 +495,18 @@ function say(html,g){if(talking)talking.finish();const m=add(html,'bot');m.class
   if(!speaking){const ch=at(k).toLowerCase();mt=/[aeiouäöüy]/.test(ch)?.95:/[.,!?:;…]/.test(ch)?0:ch===' '?.12:.45}
   if(seq.length>1&&now-gt>850){gt=now;gi=(gi+1)%seq.length;pose(seq[gi])}
   if(k>=N)finish();else requestAnimationFrame(step)}
- talking={finish};requestAnimationFrame(step);kick();speak(plain)}
-function setVoice(on){voiceOn=on;vbtn.setAttribute('aria-pressed',on);vbtn.classList.toggle('on',on);try{localStorage.setItem('luxVoice',on?'1':'0')}catch(_){}if(!on&&synth)synth.cancel()}
-if(!synth)vbtn.hidden=true;else{setVoice(voiceOn);vbtn.onclick=()=>{setVoice(!voiceOn);if(voiceOn)say('Okay, ab jetzt spreche ich mit dir! 🦁','wave')}}
+ talking={finish};requestAnimationFrame(step);kick();hush();if(file)playClip(`${D.root}assets/voice/${key}.mp3`,d=>{if(d&&isFinite(d))dur=Math.max(700,d*920)});else speak(plain)}
+function setVoice(on){voiceOn=on;vbtn.setAttribute('aria-pressed',on);vbtn.classList.toggle('on',on);try{localStorage.setItem('luxVoice',on?'1':'0')}catch(_){}if(on)unlock();else hush()}
+if(!synth)vbtn.hidden=true;else{setVoice(voiceOn);vbtn.onclick=()=>{setVoice(!voiceOn);if(voiceOn)say(VOICEON,'wave')}}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;
-if(!SR)mic.hidden=true;else mic.onclick=()=>{if(listening){rec.stop();return}if(synth)synth.cancel();if(talking)talking.finish();
+if(!SR)mic.hidden=true;else mic.onclick=()=>{if(listening){rec.stop();return}hush();if(talking)talking.finish();
  rec=new SR();rec.lang='de-DE';rec.interimResults=true;rec.maxAlternatives=1;let sent=false;
  rec.onstart=()=>{listening=true;mic.classList.add('on');inp.value='';inp.placeholder='Ich höre zu …';pose('listen')};
  rec.onresult=e=>{let t='',fin=false;for(const r of e.results){t+=r[0].transcript;if(r.isFinal)fin=true}inp.value=t;if(fin&&!sent){sent=true;rec.stop();ask(t)}};
- rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error))say('Ich darf dein Mikrofon gerade nicht benutzen. Erlaube es über das Schloss-Symbol neben der Adresse und tipp dann nochmal aufs Mikro.','shrug');else if(e.error==='no-speech')say('Ich habe nichts gehört. Tipp aufs Mikro und sprich einfach los! 🦁','shrug')};
+ rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error))say(MICDENY,'shrug');else if(e.error==='no-speech')say(MICNONE,'shrug')};
  rec.onend=()=>{listening=false;mic.classList.remove('on');inp.placeholder='Frag Lux etwas …';if(stage.dataset.pose==='listen')pose('')};
  try{rec.start()}catch(_){}};
-stage.addEventListener('click',()=>say(pick(['Hihi, das kitzelt! 🦁','Hey, nicht an der Mähne ziehen!','Rawr! Hab ich dich erschreckt?','Ich bin Lux. Stups mich ruhig, ich beiße nur Pixel.']),'laugh'));
-function chips(list){chipsEl.innerHTML='';list.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>ask(t);chipsEl.appendChild(b)})}
+function chips(list){chipsEl.innerHTML='';list.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>{unlock();ask(t)};chipsEl.appendChild(b)})}
 function gameAnswer(g,t){
  if(g.teaser)return{a:`<b>${g.name}</b>: ${g.desc} Empfohlen ab ${g.age}, noch nicht spielbar. ${L(g.url,'Zur Vorschau')}`,c:['Welche Spiele gibt es?','Wo kann ich abstimmen?']};
  const want=k=>k.some(w=>t.includes(w));
@@ -510,22 +516,28 @@ function gameAnswer(g,t){
  if(want(['start','anfang','einsteig','erste schritt']))return{a:`Schnellstart <b>${g.name}</b>:<br>1. ${g.quick.map(esc).join('<br>2. ')}`,c:[`Steuerung ${g.name}`]};
  if(want(['download','herunter','runterlad']))return{a:g.dl?`${g.name} gibt es als eine einzige Datei zum Download. ${L(g.url,'Zur Spielseite mit Download')}`:`${g.name} gibt es noch nicht als Download.`,c:[`${g.name} spielen`]};
  return{a:`<b>${g.name}</b> – ${esc(g.tag)}<br>${esc(g.desc)}<br>${g.play?`<button class="lux-play" data-open="${g.id}" data-mode="demo">▶ Jetzt spielen</button> `:''}${L(g.url,'Mehr Infos & Handbuch')}`,c:[`Steuerung ${g.name}`,`Tipps für ${g.name}`,'Was soll ich spielen?']}}
+const tipLine=p=>`Mein Tipp: <b>${p.name}</b>! ${esc(p.tag)} <button class="lux-play" data-open="${p.id}" data-mode="demo">▶ Jetzt spielen</button>`;
 function answer(raw){const t=' '+norm(raw)+' ';
  const g=D.games.find(g=>g.keys.some(k=>t.includes(' '+k)||t.includes(k+' ')||t.includes(k)));if(g){const r=gameAnswer(g,t);r.g=g.teaser?'think':'point';return r}
  let best=null,score=0;for(const it of D.intents){let s=0;for(const k of it.k)if(t.includes(k))s+=k.length;s*=it.w||1;if(s>score){score=s;best=it}}
- if(best){let a=pick(best.a);if(a==='__random__'){const p=pick(D.games.filter(x=>x.play));return{g:'point',a:`Mein Tipp: <b>${p.name}</b>! ${esc(p.tag)} <button class="lux-play" data-open="${p.id}" data-mode="demo">▶ Jetzt spielen</button>`,c:['Noch ein Tipp','Welche Spiele gibt es?']}}return{a,g:GEST[best.k[0]]||'talk',c:D.chips.slice(0,3)}}
- return{g:'shrug',a:pick(['Hm, da muss ich passen. 🦁 Frag mich zu Spielen, Downloads, Steuerung oder Software!','Das weiß selbst ein Löwe nicht. Versuch es mit einem Spielnamen, zum Beispiel „Tipps für Sternenwurf“.','Brüll… ich meine: Das habe ich nicht verstanden. Vielleicht hilft einer dieser Vorschläge?']),c:D.chips}}
+ if(best){let a=pick(best.a);if(a==='__random__')return{g:'point',a:tipLine(pick(D.games.filter(x=>x.play))),c:['Noch ein Tipp','Welche Spiele gibt es?']};return{a,g:GEST[best.k[0]]||'talk',c:D.chips.slice(0,3)}}
+ return{g:'shrug',a:pick(FALLBACK),c:D.chips}}
 function ask(text){if(!text.trim())return;add(esc(text),'me');inp.value='';chipsEl.innerHTML='';const typing=add('<span class="lux-typing"><i></i><i></i><i></i></span>','bot');
  setTimeout(()=>{typing.remove();const r=answer(text==='Noch ein Tipp'?'was soll ich spielen':text);say(r.a,r.g);chips(r.c||D.chips)},450+Math.random()*450)}
-let started=false;function open(o){panel.hidden=!o;fab.setAttribute('aria-expanded',o);root.classList.toggle('open',o);hint.hidden=true;try{sessionStorage.setItem('luxSeen','1')}catch(_){}
- if(!o){if(talking)talking.finish();if(synth)synth.cancel();if(listening&&rec)rec.stop()}
- if(o&&!started){started=true;setTimeout(()=>say(pick(['Rawr! 🦁 Ich bin Lux, der Studio-Löwe. Was kann ich für dich tun?','Hey! Ich bin Lux. Frag mich nach Spielen, Tipps oder Downloads! Du kannst auch aufs Mikro tippen und mit mir reden.']),'wave'),350);chips(D.chips)}if(o)setTimeout(()=>inp.focus({preventScroll:true}),50)}
-fab.onclick=()=>open(panel.hidden);q('.lux-x').onclick=()=>open(false);hint.onclick=()=>open(true);
-q('.lux-form').onsubmit=e=>{e.preventDefault();ask(inp.value)};
+let started=false;function open(o){panel.hidden=!o;stage.setAttribute('aria-expanded',o);stage.setAttribute('aria-label',o?'Chat mit Lux schließen':'Chat mit Lux öffnen');root.classList.toggle('open',o);hint.hidden=true;try{sessionStorage.setItem('luxSeen','1')}catch(_){}
+ if(!o){if(talking)talking.finish();hush();if(listening&&rec)rec.stop()}
+ if(o&&!started){started=true;setTimeout(()=>say(pick(GREET),'wave'),350);chips(D.chips)}if(o)setTimeout(()=>inp.focus({preventScroll:true}),50)}
+stage.onclick=()=>{unlock();open(panel.hidden)};q('.lux-x').onclick=()=>open(false);hint.onclick=()=>open(true);
+q('.lux-form').onsubmit=e=>{e.preventDefault();unlock();ask(inp.value)};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)open(false)});
 log.addEventListener('click',e=>{if(e.target.closest('.lux-play'))open(false)});
 let seen=false;try{seen=!!sessionStorage.getItem('luxSeen')}catch(_){}
-if(!seen)setTimeout(()=>{if(panel.hidden)hint.hidden=false},9000);
+if(!seen)setTimeout(()=>{if(panel.hidden){hint.hidden=false;pose('wave');setTimeout(()=>{if(panel.hidden)pose('')},1800)}},6000);
+let dk=0;addEventListener('scroll',()=>{if(!panel.hidden)return;root.classList.add('duck');hint.hidden=true;clearTimeout(dk);dk=setTimeout(()=>root.classList.remove('duck'),650)},{passive:true});
+if(location.hash==='#luxlines'){const tmp=document.createElement('div'),P=h=>{tmp.innerHTML=h;return plainOf(tmp)},out=[...GREET,...FALLBACK,VOICEON,MICDENY,MICNONE];
+ D.intents.forEach(it=>it.a.forEach(a=>{if(a!=='__random__')out.push(a)}));
+ D.games.forEach(g=>{[' ',' steuer ',' tipp ',' speicher ',' start ',' download '].forEach(t=>out.push(gameAnswer(g,t).a));if(g.play)out.push(tipLine(g))});
+ const seen2=new Set;window.__luxLines=out.map(P).filter(t=>!seen2.has(t)&&seen2.add(t)).map(t=>({h:hash(t),t,s:forSpeech(t)}))}
 })();
 
 /* ---------- Guck-Löwe: Lux lugt hinter den Kacheln hervor und folgt der Maus (nur PC) ---------- */

@@ -511,7 +511,8 @@ def lux_data(c):
         (["danke", "dankeschön", "super", "cool", "top", "nice", "geil", "klasse"], ["Gern geschehen! *schnurrt zufrieden* 🦁", "Immer wieder gern. Viel Spaß beim Spielen!"]),
         (["tschüss", "bye", "ciao", "bis dann", "gute nacht"], ["Bis bald! Ich halte hier die Stellung. 🦁"]),
     ]
-    return json.dumps({"root": R, "games": games, "intents": [{"k": k, "a": a, "w": (0.5 if k[0] in ("kostenlos", "download", "handy", "account", "spielstand", "feedback", "kontakt", "danke", "software") else 2.5 if k[0] in ("deskboard", "diktakte", "speisekarte", "horror", "umfrage") else 1)} for k, a in intents],
+    voice = sorted(f[:-4] for f in os.listdir(P("lux-voice")) if f.endswith(".mp3")) if os.path.isdir(P("lux-voice")) else []
+    return json.dumps({"root": R, "voice": voice, "games": games, "intents": [{"k": k, "a": a, "w": (0.5 if k[0] in ("kostenlos", "download", "handy", "account", "spielstand", "feedback", "kontakt", "danke", "software") else 2.5 if k[0] in ("deskboard", "diktakte", "speisekarte", "horror", "umfrage") else 1)} for k, a in intents],
         "chips": ["Welche Spiele gibt es?", "Was soll ich spielen?", "Kostet das was?", "DeskBoard herunterladen", "Erzähl einen Witz"]}, ensure_ascii=False).replace("</", "<\\/")
 
 # ---------------------------------------------------------------- pages
@@ -613,6 +614,10 @@ def main():
         for w in ws: shutil.copy(P(f"fontsrc/node_modules/@fontsource/{slug}/files/{slug}-latin-{w}-normal.woff2"), P("dist/assets/fonts"))
     open(P("dist/assets/css/site.css"), "w", encoding="utf-8").write(font_face("../fonts/") + "\n" + part("style.css"))
     open(P("dist/assets/js/app.js"), "w", encoding="utf-8").write(part("app.js"))
+    if os.path.isdir(P("lux-voice")):
+        os.makedirs(P("dist/assets/voice"), exist_ok=True)
+        for f in os.listdir(P("lux-voice")):
+            if f.endswith(".mp3"): shutil.copy(P("lux-voice/" + f), P("dist/assets/voice/" + f))
     # echte Spiele kopieren
     for g in GAMES:
         if has_game(g):
