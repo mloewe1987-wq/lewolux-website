@@ -697,3 +697,4 @@ html.modal-open .lux,html.player-open .lux{display:none}
 .peek .pk-brow{transition:transform .2s}.peek.shy .pk-brow{transform:translateY(-2px)}
 @keyframes pk-tilt{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}65%{transform:rotate(6deg)}}
 @media print{.peek{display:none}}
+@media (prefers-reduced-motion:reduce){.peek.idle .pk-head{animation:none}}

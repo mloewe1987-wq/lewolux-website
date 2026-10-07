@@ -474,7 +474,7 @@ if(!seen)setTimeout(()=>{if(panel.hidden)hint.hidden=false},9000);
 /* ---------- Guck-Löwe: Lux lugt hinter den Kacheln hervor und folgt der Maus (nur PC) ---------- */
 (()=>{if(window.LGS_RENDER_ONLY)return;
 const fine=matchMedia('(hover:hover) and (pointer:fine)'),calm=matchMedia('(prefers-reduced-motion:reduce)');
-if(!fine.matches||calm.matches)return;
+if(!fine.matches)return;
 const SEL='.card,.shot,.keyart,.monitor,.sp-feat,.mn-tile,.mn-panel,.cm-card,.dl-box,.dl-tip,.sp-shot,.sp-fig,.sp-why,.sw,.sw-banner,.stat,.tp-shot,.tp-hero,.sp-hero,.tp-notice,.g-shot';
 const W=100,H=81,HIDE=H+6,html=document.documentElement;
 const mane=Array.from({length:14},(_,i)=>{const a=Math.PI+i/13*Math.PI,x=48+Math.cos(a)*29,y=50+Math.sin(a)*29;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="10"/>`}).join('')+'<circle cx="21" cy="62" r="10"/><circle cx="75" cy="62" r="10"/>';
