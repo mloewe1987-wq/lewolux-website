@@ -446,7 +446,7 @@ const root=document.createElement('div');root.className='lux';root.innerHTML=`
 <button class="lux-stage" type="button" aria-label="Chat mit Lux öffnen" aria-expanded="false">${body}</button>
 <div class="lux-hint" hidden>Psst! Brauchst du einen Tipp? 🦁</div>
 <section class="lux-panel" role="dialog" aria-label="Chat mit Lux" hidden>
- <header class="lux-head"><b>Lux</b><small><i></i>Studio-Löwe</small><button class="lux-voice" type="button" aria-pressed="false" aria-label="Lux spricht seine Antworten vor" title="Lux spricht (Ton an/aus)"><span class="lv-txt">Ton</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="lv-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="lv-off" d="M17 9l5 6M22 9l-5 6"/></svg></button><button class="lux-x" aria-label="Chat schließen">✕</button></header>
+ <header class="lux-head"><b>Lux</b><small><i></i>Studio-Löwe</small><button class="lux-voice" type="button" aria-pressed="false" aria-label="Lux spricht seine Antworten vor" title="Lux spricht (Ton an/aus)"><span class="lv-txt">Ton</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="lv-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="lv-off" d="M17 9l5 6M22 9l-5 6"/></svg></button><input class="lux-vol" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Lautstärke" title="Lautstärke"><button class="lux-x" aria-label="Chat schließen">✕</button></header>
  <div class="lux-log" aria-live="polite"></div>
  <div class="lux-adv" hidden></div>
  <div class="lux-chips"></div>
@@ -466,8 +466,8 @@ const VOICE=new Set(D.voice||[]),hash=s=>{let h=0x811c9dc5;for(let i=0;i<s.lengt
 const plainOf=el=>{const a=[],w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))a.push(n.nodeValue);return a.join(' ').replace(/\s+/g,' ').trim()};
 const SAYFIX=[[/House in the Desert/g,'Hauss in se Desört'],[/DeskBoard/g,'Deskbord'],[/Ring Legends/g,'Ring Ledschends'],[/Idle Legenden/g,'Eidl Legenden'],[/\bIdle\b/g,'Eidl'],[/Downloads/g,'Daunlods'],[/Download/g,'Daunlod'],[/Browser/g,'Brauser'],[/Gamepad/g,'Gämpäd'],[/Feedback/g,'Fiedbäck'],[/Rawr/g,'Roarr'],[/\bPets\b/g,'Pätts'],[/Early Access/g,'Örli Äxess'],[/offline/g,'offlein'],[/Account/g,'Äkaunt'],[/Xbox/g,'Ex Box'],[/PlayStation/g,'Pläi Stäischen'],[/E-Mail/g,'I-Mail'],[/Cookies/g,'Kukies'],[/Tracking/g,'Träcking'],[/Software/g,'Softwär'],[/Widgets/g,'Widschets'],[/QR-Code/g,'Ku Er Kod'],[/§/g,'Paragraph'],[/Abs\./g,'Absatz'],[/\bBGB\b/g,'B G B'],[/\bHTML\b/g,'H T M L'],[/RPG-Maker/g,'R P G Mäiker'],[/\bRNG\b/g,'R N G'],[/\bTCG\b/g,'T C G'],[/\bbeA\b/g,'be A'],[/Windows/g,'Windous'],[/@/g,' ät '],[/lewolux\.de/g,'lewolux punkt de'],[/\bBug\b/g,'Bagg'],[/Hobby/g,'Hobbi']];
 const forSpeech=t=>{t=t.replace(/[\u{1F300}-\u{1FAFF}☀-➿▶]/gu,'').replace(/\*[^*]+\*/g,'');for(const[a,b]of SAYFIX)t=t.replace(a,b);return t.replace(/\s+/g,' ').trim()};
-let actx=null,an=null,abuf=null,au=null;
-function audioEl(){if(au)return au;au=new Audio();au.preload='auto';try{actx=new(window.AudioContext||window.webkitAudioContext)();const src=actx.createMediaElementSource(au);an=actx.createAnalyser();an.fftSize=512;src.connect(an);an.connect(actx.destination);abuf=new Uint8Array(an.fftSize)}catch(_){an=null}return au}
+let actx=null,an=null,abuf=null,au=null,gain=null,vol=.8;try{const v=parseFloat(localStorage.getItem('luxVol'));if(v>=0&&v<=1)vol=v}catch(_){}
+function audioEl(){if(au)return au;au=new Audio();au.preload='auto';try{actx=new(window.AudioContext||window.webkitAudioContext)();const src=actx.createMediaElementSource(au);an=actx.createAnalyser();an.fftSize=512;gain=actx.createGain();gain.gain.value=vol;src.connect(an);an.connect(gain);gain.connect(actx.destination);abuf=new Uint8Array(an.fftSize)}catch(_){an=null;au.volume=vol}return au}
 const unlock=()=>{if(!voiceOn)return;audioEl();if(actx&&actx.state==='suspended')actx.resume().catch(()=>{})};
 function level(){an.getByteTimeDomainData(abuf);let s=0;for(const v of abuf){const x=(v-128)/128;s+=x*x}return Math.min(1,Math.max(0,(Math.sqrt(s/abuf.length)-.012)*7.5))}
 function hush(){if(synth)synth.cancel();if(au&&!au.paused)au.pause()}
@@ -480,7 +480,7 @@ const kick=()=>{if(!mraf)mraf=requestAnimationFrame(mloop)};setMouth(0);
 (function blink(){setTimeout(()=>{stage.classList.add('blink');setTimeout(()=>{stage.classList.remove('blink');blink()},140)},2200+Math.random()*3200)})();
 const endTalk=()=>{speaking=false;clip=false;mt=0;if(!talking){stage.classList.remove('talking');pose('')}};
 function playClip(url,onDur){const a=audioEl();if(actx&&actx.state==='suspended')actx.resume().catch(()=>{});a.src=url;a.onloadedmetadata=()=>onDur(a.duration);a.onplay=()=>{speaking=true;clip=true;stage.classList.add('talking');kick()};a.onended=a.onerror=a.onpause=endTalk;a.play().catch(()=>endTalk())}
-function speak(text){if(!synth||!voiceOn||!text)return;synth.cancel();const u=new SpeechSynthesisUtterance(forSpeech(text));
+function speak(text){if(!synth||!voiceOn||!text)return;synth.cancel();const u=new SpeechSynthesisUtterance(forSpeech(text));u.volume=vol;
  u.lang='de-DE';const vs=synth.getVoices().filter(v=>/^de/i.test(v.lang));u.voice=vs.find(v=>/natural/i.test(v.name)&&/conrad|killian|florian|ralf/i.test(v.name))||vs.find(v=>/natural|online/i.test(v.name))||vs.find(v=>/google/i.test(v.name))||vs[0]||null;u.pitch=1.05;u.rate=1;
  u.onstart=()=>{speaking=true;stage.classList.add('talking');kick()};u.onend=u.onerror=endTalk;synth.speak(u)}
 function say(html,g){if(talking)talking.finish();const m=add(html,'bot');m.classList.add('typing-out');
@@ -497,6 +497,8 @@ function say(html,g){if(talking)talking.finish();const m=add(html,'bot');m.class
   if(seq.length>1&&now-gt>850){gt=now;gi=(gi+1)%seq.length;pose(seq[gi])}
   if(k>=N)finish();else requestAnimationFrame(step)}
  talking={finish};requestAnimationFrame(step);kick();hush();if(file)playClip(`${D.root}assets/voice/${key}.mp3?v=${D.vv||1}`,d=>{if(d&&isFinite(d))dur=Math.max(700,d*920)});else speak(plain)}
+const volEl=q('.lux-vol');volEl.value=vol;volEl.style.setProperty('--p',vol*100+'%');
+volEl.oninput=()=>{vol=+volEl.value;volEl.style.setProperty('--p',vol*100+'%');if(gain)gain.gain.value=vol;else if(au)au.volume=vol;try{localStorage.setItem('luxVol',vol)}catch(_){}};
 function setVoice(on){voiceOn=on;vbtn.setAttribute('aria-pressed',on);vbtn.classList.toggle('on',on);try{localStorage.setItem('luxVoice',on?'1':'0')}catch(_){}if(on)unlock();else hush()}
 if(!synth)vbtn.hidden=true;else{setVoice(voiceOn);vbtn.onclick=()=>{setVoice(!voiceOn);if(voiceOn)say(VOICEON,'wave')}}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;

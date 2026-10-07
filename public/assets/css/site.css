@@ -765,3 +765,11 @@ html.modal-open .lux,html.player-open .lux{display:none}
 @keyframes fx-lookeye{0%,100%{transform:none}20%,40%{transform:translateX(-2.5px)}60%,80%{transform:translateX(2.5px)}}
 [data-pose=stretch] .fx-l{transform:rotate(165deg)}[data-pose=stretch] .fx-r{transform:rotate(-165deg)}[data-pose=stretch] .fx-head{transform:rotate(-5deg)}
 .lux-stage.sleepy .fx-eyes{transform:scaleY(.25)}
+
+.lux-vol{-webkit-appearance:none;appearance:none;width:74px;height:4px;border-radius:9px;margin:0 2px 0 4px;cursor:pointer;background:linear-gradient(90deg,var(--cyan) var(--p,80%),rgba(255,255,255,.15) var(--p,80%))}
+.lux-vol::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 8px rgba(59,232,255,.8);border:0}
+.lux-vol::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:0}
+.lux-voice:not(.on)~.lux-vol{display:none}
+
+.lux-head small,.lux-voice{white-space:nowrap}
+@media (max-width:380px){.lux-head small{display:none}}
