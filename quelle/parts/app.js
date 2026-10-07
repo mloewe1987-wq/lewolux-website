@@ -429,7 +429,7 @@ const arm=(c,x)=>`<g class="fx-arm ${c}"><rect x="${x-8}" y="134" width="16" hei
 const body=`<svg class="lux-fig" viewBox="0 0 160 250"><defs><linearGradient id="lxb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset=".55" stop-color="#9b5cff"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>
 <ellipse cx="80" cy="243" rx="44" ry="5.5" fill="#000" opacity=".4"/>
 <g class="fx-tail"><path d="M100 196C128 200 146 182 141 156" stroke="#eab676" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="141" cy="150" r="9" fill="url(#lxb)"/></g>
-<g><rect x="61" y="186" width="17" height="48" rx="8.5" fill="#f3bf7c"/><rect x="82" y="186" width="17" height="48" rx="8.5" fill="#f3bf7c"/><ellipse cx="67" cy="236" rx="14" ry="7.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/><ellipse cx="93" cy="236" rx="14" ry="7.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/><path d="M60 233v4M65 232v5M70 233v4M88 233v4M93 232v5M98 233v4" stroke="#d9934f" stroke-width="1.2" stroke-linecap="round"/></g>
+<g class="fx-leg fx-legl"><rect x="61" y="186" width="17" height="48" rx="8.5" fill="#f3bf7c"/><ellipse cx="67" cy="236" rx="14" ry="7.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/><path d="M60 233v4M65 232v5M70 233v4" stroke="#d9934f" stroke-width="1.2" stroke-linecap="round"/></g><g class="fx-leg fx-legr"><rect x="82" y="186" width="17" height="48" rx="8.5" fill="#f3bf7c"/><ellipse cx="93" cy="236" rx="14" ry="7.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/><path d="M88 233v4M93 232v5M98 233v4" stroke="#d9934f" stroke-width="1.2" stroke-linecap="round"/></g>
 <g class="fx-body"><path d="M52 150q0-26 28-26t28 26v34q0 14-14 14H66q-14 0-14-14z" fill="#1c2140" stroke="#3be8ff" stroke-opacity=".55" stroke-width="1.5"/><text x="80" y="172" text-anchor="middle" font-size="15" font-weight="900" font-family="Arial,sans-serif" fill="url(#lxb)">LX</text><path d="M74 132v12M86 132v12" stroke="#cfd8ff" stroke-width="1.4" stroke-linecap="round"/><circle cx="74" cy="145" r="1.6" fill="#cfd8ff"/><circle cx="86" cy="145" r="1.6" fill="#cfd8ff"/></g>
 ${arm('fx-l',55)}
 <g class="fx-head"><g fill="url(#lxb)">${mane2}</g><circle cx="58" cy="66" r="8.5" fill="#ffcf8a"/><circle cx="102" cy="66" r="8.5" fill="#ffcf8a"/><circle cx="58" cy="66" r="4" fill="#f2a65a"/><circle cx="102" cy="66" r="4" fill="#f2a65a"/>
@@ -471,11 +471,11 @@ function audioEl(){if(au)return au;au=new Audio();au.preload='auto';try{actx=new
 const unlock=()=>{if(!voiceOn)return;audioEl();if(actx&&actx.state==='suspended')actx.resume().catch(()=>{})};
 function level(){an.getByteTimeDomainData(abuf);let s=0;for(const v of abuf){const x=(v-128)/128;s+=x*x}return Math.min(1,Math.max(0,(Math.sqrt(s/abuf.length)-.012)*7.5))}
 function hush(){if(synth)synth.cancel();if(au&&!au.paused)au.pause()}
-let ml=0,mt=0,mraf=0,speaking=false,clip=false,talking=null,voiceOn=false;try{voiceOn=localStorage.getItem('luxVoice')==='1'}catch(_){}
+let yawn=false,ml=0,mt=0,mraf=0,speaking=false,clip=false,talking=null,voiceOn=false;try{voiceOn=localStorage.getItem('luxVoice')==='1'}catch(_){}
 const pose=p=>{stage.dataset.pose=p||''};
 function setMouth(l){mouth.setAttribute('transform',`translate(80 105) scale(${(.85+l*.25).toFixed(2)} ${Math.max(l,.001).toFixed(3)}) translate(-80 -105)`);smile.style.opacity=Math.max(0,1-l*1.6).toFixed(2)}
-function mloop(t){if(speaking)mt=clip&&an?level():.2+.7*Math.abs(Math.sin(t/75))*(.55+.45*Math.sin(t/240));ml+=(mt-ml)*.45;setMouth(ml);
- if(talking||speaking||ml>.02)mraf=requestAnimationFrame(mloop);else{ml=0;setMouth(0);mraf=0}}
+function mloop(t){if(yawn)mt=.95;else if(speaking)mt=clip&&an?level():.2+.7*Math.abs(Math.sin(t/75))*(.55+.45*Math.sin(t/240));ml+=(mt-ml)*.45;setMouth(ml);
+ if(talking||speaking||yawn||ml>.02)mraf=requestAnimationFrame(mloop);else{ml=0;setMouth(0);mraf=0}}
 const kick=()=>{if(!mraf)mraf=requestAnimationFrame(mloop)};setMouth(0);
 (function blink(){setTimeout(()=>{stage.classList.add('blink');setTimeout(()=>{stage.classList.remove('blink');blink()},140)},2200+Math.random()*3200)})();
 const endTalk=()=>{speaking=false;clip=false;mt=0;if(!talking){stage.classList.remove('talking');pose('')}};
@@ -585,6 +585,22 @@ function advText(raw){const t=norm(raw);if(/beend|stopp|aufhör|pause|zurück zu
  if(/^(ruine|ruine_falsch)$/.test(A.s)&&/tastatur|keyboard/.test(t))return setTimeout(()=>advGo('ruine_auf'),400);
  const hit=advCur.find(([l])=>{const n=norm(l);return n.includes(t)||t.includes(n)||n.split(' ').some(w=>w.length>4&&t.includes(w))});
  if(hit){chipsEl.innerHTML='';setTimeout(()=>advGo(hit[1]),400);return}say(ADVHELP,'shrug')}
+
+/* Lux bewegt sich ab und zu von selbst: hüpfen, drehen, umschauen, gähnen, ein paar Schritte gehen */
+const wait=ms=>new Promise(r=>setTimeout(r,ms));let busy=false;
+async function act(a){busy=true;const cls=c=>stage.classList.add(c),un=c=>stage.classList.remove(c);
+ if(a==='hop'){pose('jump');cls('a-hop');await wait(800);un('a-hop');pose('')}
+ else if(a==='spin'){cls('a-spin');await wait(1200);un('a-spin')}
+ else if(a==='look'){cls('a-look');await wait(2600);un('a-look')}
+ else if(a==='wave'){pose('wave');await wait(1800);pose('')}
+ else if(a==='yawn'){pose('stretch');cls('sleepy');yawn=true;kick();await wait(1500);yawn=false;un('sleepy');pose('')}
+ else if(a==='walk'){const d=-(45+Math.round(Math.random()*45));cls('walking');stage.style.setProperty('--wx',d+'px');await wait(2600);un('walking');
+  cls('a-look');await wait(2200);un('a-look');cls('walking');stage.style.setProperty('--wx','0px');await wait(2600);un('walking')}
+ busy=false}
+(function idleLoop(){setTimeout(async()=>{const closed=panel.hidden;
+ if(!document.hidden&&!busy&&!talking&&!speaking&&!listening&&!root.classList.contains('duck'))await act(pick(closed?['hop','spin','walk','look','wave','yawn','walk','hop']:['hop','look','spin']));
+ idleLoop()},closed0()?7000+Math.random()*7000:12000+Math.random()*10000)})();
+function closed0(){return panel.hidden}
 let started=false;function open(o){panel.hidden=!o;stage.setAttribute('aria-expanded',o);stage.setAttribute('aria-label',o?'Chat mit Lux schließen':'Chat mit Lux öffnen');root.classList.toggle('open',o);hint.hidden=true;try{sessionStorage.setItem('luxSeen','1')}catch(_){}
  if(!o){if(talking)talking.finish();hush();if(listening&&rec)rec.stop()}
  if(o&&!started){started=true;setTimeout(()=>say(pick(GREET),'wave'),350);chips(D.chips)}if(o)setTimeout(()=>inp.focus({preventScroll:true}),50)}
