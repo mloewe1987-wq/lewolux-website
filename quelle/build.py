@@ -8,7 +8,8 @@ import re
    Anpassen: SITE, EMAIL, LINKS hier oben; Texte in data.py."""
 import base64, html, json, os, shutil, datetime, asyncio, io
 from PIL import Image
-from data import GAMES, SOFTWARE, FAQ, ICONS, PLAY, DL, SEO
+from data import GAMES, SOFTWARE, FAQ, ICONS, PLAY, DL, SEO, TEASERS
+from data import NEWS
 from manuals import MANUALS, SOFTWARE_PAGES
 
 SITE = "https://lewolux.de/"      # <- eigene Domain eintragen (mit / am Ende)
@@ -230,10 +231,14 @@ def head(c, title, desc, path, og, jsonld, robots="index, follow, max-image-prev
 <canvas id="ambient" aria-hidden="true"></canvas>
 '''
 
+def news_items(c):
+    li = lambda hidden: "".join(f'<li{" aria-hidden=\"true\"" if hidden else ""}><a href="{c.root}{u}"{" tabindex=\"-1\"" if hidden else ""}><b>{e(k)}</b>{e(t)}</a></li>' for k, t, u in NEWS)
+    return li(False) + li(True)   # zweimal für eine nahtlose Endlosschleife
+
 def common(c, t):
     rep = {"{{ROOT}}": c.root, "{{EMAIL}}": EMAIL, "{{GAMECOUNT}}": str(len(GAMES)),
-           "{{FOOTGAMES}}": "".join(f'<li><a href="{c.page(g)}">{e(g["short"])}</a></li>' for g in GAMES),
-           "{{IMPRESSUM}}": f"{c.root}impressum/", "{{DATENSCHUTZ}}": f"{c.root}datenschutz/"}
+           "{{FOOTGAMES}}": "".join(f'<li><a href="{c.page(g)}">{e(g["short"])}</a></li>' for g in GAMES) + "".join(f'<li><a href="{c.root}spiele/{t["id"]}/">{e(t["short"])} <small>(bald)</small></a></li>' for t in TEASERS),
+           "{{NEWS}}": news_items(c), "{{IMPRESSUM}}": f"{c.root}impressum/", "{{DATENSCHUTZ}}": f"{c.root}datenschutz/"}
     rep.update({"{{%s}}" % k: v for k, v in LINKS.items()})
     for k, v in rep.items(): t = t.replace(k, v)
     if c.preview:
@@ -243,18 +248,18 @@ def common(c, t):
 
 def tail(c):
     js = f"<script>{part('app.js')}</script>" if c.preview else f'<script src="{c.root}assets/js/app.js" defer></script>'
-    return f'{part("modal.html")}\n<script id="game-data" type="application/json">{game_data(c)}</script>\n{js}\n</body>\n</html>\n'
+    return f'{part("modal.html")}\n<script id="game-data" type="application/json">{game_data(c)}</script>\n<script id="lux-data" type="application/json">{lux_data(c)}</script>\n{js}\n</body>\n</html>\n'
 
 # ---------------------------------------------------------------- community
 KIND_OPTS = [("wunsch", "Wunsch"), ("idee", "Idee"), ("bug", "Fehler gefunden"), ("lob", "Lob")]
 def feedback_form(c, game=None):
-    opts = "".join(f'<option value="{g["id"]}"{" selected" if game == g["id"] else ""}>{e(g["short"])}</option>' for g in GAMES)
+    opts = "".join(f'<option value="{g["id"]}"{" selected" if game == g["id"] else ""}>{e(g["short"])}</option>' for g in GAMES + TEASERS)
     kinds = "".join(f'<label class="kind"><input type="radio" name="kind" value="{k}"{" checked" if i == 0 else ""}><span>{e(t)}</span></label>' for i, (k, t) in enumerate(KIND_OPTS))
     gsel = (f'<input type="hidden" name="game" value="{game}">' if game else
             f'<label class="fld"><span>Worum geht es?</span><select name="game"><option value="allgemein">Allgemein / Website</option>{opts}</select></label>')
     return f'''        <form class="cm-card fb-form" novalidate>
           <p class="cm-k">Feedback</p>
-          <h3>{("Deine Meinung zu " + e(next(g["short"] for g in GAMES if g["id"] == game))) if game else "Wünsche, Ideen, Fehler? Her damit!"}</h3>
+          <h3>{("Deine Meinung zu " + e(next(g["short"] for g in GAMES + TEASERS if g["id"] == game))) if game else "Wünsche, Ideen, Fehler? Her damit!"}</h3>
           <div class="kinds" role="radiogroup" aria-label="Art des Beitrags">{kinds}</div>
           {gsel}
           <label class="fld"><span>Dein Beitrag</span><textarea name="text" rows="4" maxlength="1000" required placeholder="Was wünschst du dir? Was ist dir aufgefallen?"></textarea></label>
@@ -266,7 +271,7 @@ def feedback_form(c, game=None):
         </form>'''
 
 def poll_items(c):
-    return "\n".join(f'''            <li><button type="button" class="poll-opt" data-choice="{g['id']}" style="--accent:{g['accent']}"><span class="po-img"><img src="{c.shot(g['id']+'-1', True)}" alt="" loading="lazy" width="96" height="54"></span><span class="po-name">{e(g['short'])}</span><span class="po-bar"><i></i></span><span class="po-pct"></span></button></li>''' for g in GAMES)
+    return "\n".join(f'''            <li><button type="button" class="poll-opt" data-choice="{g['id']}" style="--accent:{g['accent']}"><span class="po-img"><img src="{c.shot(g['id']+'-1', True)}" alt="" loading="lazy" width="96" height="54"></span><span class="po-name">{e(g['short'])}</span><span class="po-bar"><i></i></span><span class="po-pct"></span></button></li>''' for g in GAMES) + "\n" + "\n".join(f'''            <li><button type="button" class="poll-opt" data-choice="{t['id']}" style="--accent:{t['accent']}"><span class="po-img"><img src="{c.root if not c.preview else './'}assets/teaser/{t['id']}-1-640.webp" alt="" loading="lazy" width="96" height="54"></span><span class="po-name">{e(t['short'])} <em class="po-tag">ab {t['age']} · bald</em></span><span class="po-bar"><i></i></span><span class="po-pct"></span></button></li>''' for t in TEASERS)
 
 def game_feedback(c, g):
     return f'''  <section class="community" aria-labelledby="fb-h" data-api="{API}" style="padding-bottom:0"><div class="sec-head"><div><span class="eyebrow">Community</span><h2 id="fb-h">Wünsche &amp; Feedback zu {e(g['short'])}</h2><p>{e(g['short'])} ist in Entwicklung. Sag uns, was rein soll, was dich stört und was du feierst.</p></div></div>
@@ -394,6 +399,118 @@ def software_page(c, sw_):
 '''
     return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c))
 
+
+# ---------------------------------------------------------------- Vorschau (angekündigte Spiele)
+def teaser_img(c, t, n, small=False):
+    return f"{c.root}assets/teaser/{t['id']}-{n}{'-640' if small else ''}.webp"
+
+def age_badge(t): return f'<span class="age-badge" title="Empfohlen ab {t["age"]} Jahren"><b>{t["age"]}</b><small>Empfohlen</small></span>'
+
+def teaser_card(c, t):
+    genres = "".join(f'<span class="genre">{e(x)}</span>' for x in t["genres"])
+    return f'''        <article class="card wide teaser" id="spiel-{t['id']}" data-cats="exp" style="--accent:{t['accent']};--glow:{t['accent']}99">
+          <a class="media" href="{c.root}spiele/{t['id']}/" aria-label="Vorschau: {e(t['title'])}"><img src="{teaser_img(c, t, 1, True)}" srcset="{teaser_img(c, t, 1, True)} 640w, {teaser_img(c, t, 1)} 1280w" sizes="(max-width:680px) 100vw, 640px" alt="Titelbild von {e(t['title'])}: rote Sonne über einem Haus in der Wüste" width="1280" height="720" loading="lazy" decoding="async"><span class="pill status">{e(t['status'])}</span>{age_badge(t)}</a>
+          <div class="body">
+            <div class="genres">{genres}</div>
+            <h3><a href="{c.root}spiele/{t['id']}/">{e(t['title'])}</a></h3>
+            <p class="tagline">{e(t['tagline'])}</p>
+            <p class="desc">{e(t['desc'])}</p>
+            <p class="teaser-note">Empfohlen ab {t['age']} · noch nicht spielbar</p>
+            <div class="actions"><a class="btn btn-play" href="{c.root}spiele/{t['id']}/">Vorschau ansehen</a><a class="btn btn-dl" href="{c.root}#mitmachen">Dafür abstimmen</a></div>
+          </div>
+        </article>'''
+
+def teaser_page(c, t):
+    url = f"spiele/{t['id']}/"
+    feats = "".join(f"<li>{e(f)}</li>" for f in t["features"]); long = "".join(f"<p>{e(x)}</p>" for x in t["long"])
+    jsonld = [{"@context": "https://schema.org", "@graph": [ORG,
+        {"@type": "VideoGame", "name": t["title"], "description": t["desc"], "url": SITE + url, "image": SITE + f"assets/teaser/{t['id']}-1.jpg", "genre": t["genres"], "author": {"@id": SITE + "#studio"}, "contentRating": f"Empfohlen ab {t['age']} (ohne offizielle Einstufung)", "inLanguage": "de"},
+        {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Start", "item": SITE}, {"@type": "ListItem", "position": 2, "name": "Spiele", "item": SITE + "#spiele"}, {"@type": "ListItem", "position": 3, "name": t["title"], "item": SITE + url}]}]}]
+    h = head(c, f"{t['title']} – Survival-Horror, erscheint bald | Lewolux Studio", f"{t['title']}: {t['desc']} Empfohlen ab {t['age']}.", url, f"assets/teaser/{t['id']}-og.jpg", jsonld)
+    body = f'''<main class="wrap teaser-page" style="--accent:{t['accent']}">
+  <nav aria-label="Brotkrumen"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}#spiele">Spiele</a></li><li aria-current="page">{e(t['title'])}</li></ol></nav>
+  <header class="tp-hero">
+    <img src="{teaser_img(c, t, 1)}" alt="Titelbild von {e(t['title'])}" width="1280" height="720" fetchpriority="high">
+    <div class="tp-over"><span class="eyebrow">{e(t['part'])} · {e(t['status'])}</span><h1>{e(t['title'])}</h1><p class="tp-tag">{e(t['tagline'])}</p><div class="tp-badges">{age_badge(t)}<span class="tp-soon">Noch nicht spielbar</span></div></div>
+  </header>
+  <div class="tp-notice" role="note"><b>Inhaltshinweis:</b> {e(t['notice'])}</div>
+  <div class="g-cols">
+    <article class="prose"><h2>Worum geht es?</h2>{long}</article>
+    <aside class="g-box"><p class="m-h">Das erwartet dich</p><ul class="feats">{feats}</ul><p class="m-h">Status</p><p style="margin:0;color:var(--muted)">In Entwicklung. Sobald das Spiel fertig ist, erscheint es hier mit Download und „Jetzt spielen“.</p></aside>
+  </div>
+  <figure class="tp-shot"><img src="{teaser_img(c, t, 2)}" alt="Szene aus {e(t['title'])}: Silhouette eines Hauses vor einer riesigen roten Sonne" width="1280" height="720" loading="lazy"><figcaption>Die Sonne ist hier dein größter Feind.</figcaption></figure>
+{game_feedback(c, t)}</main>
+'''
+    return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c))
+
+def teaser_assets():
+    out = P("dist/assets/teaser"); os.makedirs(out, exist_ok=True)
+    for t in TEASERS:
+        d = P("teaser-bilder", t["id"])
+        for f in sorted(os.listdir(d)):
+            n = f.rsplit(".", 1)[0]; im = Image.open(os.path.join(d, f)).convert("RGB")
+            w, h_ = im.size; th = int(w * 9 / 16)
+            if th <= h_: im = im.crop((0, (h_ - th) // 2, w, (h_ - th) // 2 + th))
+            im = im.resize((1280, 720), Image.LANCZOS)
+            im.save(os.path.join(out, f"{t['id']}-{n}.webp"), quality=82, method=6); im.save(os.path.join(out, f"{t['id']}-{n}.jpg"), quality=84, optimize=True)
+            sm = im.resize((640, 360), Image.LANCZOS); sm.save(os.path.join(out, f"{t['id']}-{n}-640.webp"), quality=78, method=6)
+        og_image(os.path.join(out, f"{t['id']}-1.jpg"), os.path.join(out, f"{t['id']}-og.jpg"))
+        os.makedirs(P(f"dist/spiele/{t['id']}"), exist_ok=True)
+        open(P(f"dist/spiele/{t['id']}/index.html"), "w", encoding="utf-8").write(teaser_page(Ctx("../../"), t))
+
+
+# ---------------------------------------------------------------- Chat-Begleiter „Lux“
+def lux_data(c):
+    R = c.root
+    link = lambda u, t: f'<a href="{R}{u}">{e(t)}</a>'
+    games = []
+    for g in GAMES:
+        m = MANUALS.get(g["id"], {})
+        keys = {g["short"].lower(), g["title"].lower(), g["id"].replace("-", " ")} | {w for w in g["short"].lower().split() if len(w) > 4}
+        if g["id"] == "wrestling-tcg": keys |= {"wrestling", "karten", "tcg", "packs", "sammelkarten"}
+        if g["id"] == "kasse-oder-zettel": keys |= {"kasse", "zettel", "kellner", "pizzeria", "restaurant"}
+        if g["id"] == "kritzelheld": keys |= {"kinder", "schreiben lernen", "eule", "buchstaben"}
+        if g["id"] == "mandat": keys |= {"politik", "wahl", "partei", "bürgermeister"}
+        if g["id"] == "sternenwurf": keys |= {"rng", "altar", "pets", "sterne"}
+        if g["id"] == "idle-legenden": keys |= {"idle", "goldhafen", "gold"}
+        playable = has_game(g)
+        games.append(dict(id=g["id"], name=g["short"], keys=sorted(keys), tag=g["tagline"], desc=g["desc"], url=f"spiele/{g['id']}/",
+            play=playable, dl=bool(c.dl(g)), pc=[f"{a}: {k}" for a, k in m.get("pc", g["controls"])], mobile=[f"{a}: {k}" for a, k in m.get("mobile", [])],
+            tips=m.get("tips", [])[:3], quick=m.get("quick", [])[:2], save=m.get("save", "")))
+    for t in TEASERS:
+        games.append(dict(id=t["id"], name=t["short"], keys=[t["short"].lower(), "horror", "wüste", "house", "desert", "ab 18"], tag=t["tagline"], desc=t["desc"],
+            url=f"spiele/{t['id']}/", play=False, dl=False, teaser=True, age=t["age"], pc=[], mobile=[], tips=[], quick=[], save=""))
+    lst = ", ".join(link(f"spiele/{g['id']}/", g["short"]) for g in GAMES if has_game(g))
+    intents = [
+        (["hallo", "hi", "hey", "moin", "servus", "guten tag", "na du", "huhu", "grüß"], [f"Rawr! 🦁 Ich bin Lux, der Studio-Löwe von Lewolux. Frag mich alles über unsere Spiele, Downloads oder Software!", "Moin! Lux hier. Suchst du ein Spiel, einen Tipp oder einen Download?"]),
+        (["wer bist du", "dein name", "was bist du", "bist du ein bot", "bist du echt", "ki"], ["Ich bin Lux, ein kleiner Neon-Löwe und der Helfer dieser Seite. Ich bin kein Mensch und keine große KI, sondern kenne mich einfach richtig gut mit allem hier aus. Und ich verrate nichts weiter, was du mir schreibst bleibt in deinem Browser."]),
+        (["kostenlos", "kostet", "preis", "geld", "bezahlen", "gratis", "umsonst", "abo"], ["Alles hier ist kostenlos: alle Spiele, alle Downloads, DeskBoard. Keine Werbung, keine Käufe, kein Abo. Lewolux Studio ist ein privates Hobbyprojekt. 🦁"]),
+        (["download", "herunterladen", "runterladen", "offline", "installieren", "datei"], [f"Fast jedes Spiel gibt es als Download: eine einzige HTML-Datei. Herunterladen, öffnen, spielen, auch offline. Den Knopf „Download“ findest du bei jedem Spiel unter {link('#spiele', 'Spiele')}. Auf dem iPhone spielst du am besten direkt im Browser."]),
+        (["handy", "smartphone", "mobil", "iphone", "android", "tablet", "ipad", "hochkant", "quer"], ["Alle Spiele laufen auch am Handy. „Jetzt spielen“ öffnet sie im Vollbild. Die RPG-Maker-Spiele wollen quer gehalten werden, Ring Legends spielt man hochkant."]),
+        (["account", "anmelden", "registrieren", "konto", "login", "einloggen"], ["Kein Account nötig! Einfach auf „Jetzt spielen“ tippen und los geht's."]),
+        (["spielstand", "speichern", "gespeichert", "save", "fortschritt verloren", "spielstand weg"], ["Spielstände werden nur in deinem Browser auf deinem Gerät gespeichert, nicht bei uns. Wenn du die Browserdaten löschst, ist auch der Spielstand weg. Bei Ring Legends kannst du ihn als Text-Code exportieren."]),
+        (["controller", "gamepad", "xbox", "playstation", "joystick"], ["Die RPG-Maker-Spiele (Mandat, Sternenwurf, Idle Legenden, Kasse oder Zettel) lassen sich auch mit Gamepad steuern."]),
+        (["welche spiele", "was gibt es", "alle spiele", "spiele liste", "was kann ich spielen", "übersicht"], [f"Spielbar sind: {lst}. Und in Arbeit: {link('spiele/house-in-the-desert/', 'House in the Desert')} (empfohlen ab 18)."]),
+        (["empfehl", "was soll ich", "langweilig", "tipp für ein spiel", "überrasch", "zufall", "irgendein spiel"], ["__random__"]),
+        (["software", "programm", "programme", "tools", "app"], [f"Neben Spielen entstehen hier auch Programme: {link('software/deskboard/', 'DeskBoard')} (kostenlos für Windows), {link('software/diktakte/', 'Diktakte')} (Diktierprogramm für Kanzleien) und der {link('software/speisekarte/', 'Speisekarten-Konfigurator')}."]),
+        (["deskboard", "desktop", "startoberfläche", "widgets", "notizblock"], [f"DeskBoard ist eine kostenlose Startoberfläche für Windows: Kacheln, Widgets, Notizblock zum Abreißen. {link('software/deskboard/', 'Hier gibt es den Download')} (Windows 10/11). Falls Windows warnt: „Weitere Informationen“ → „Trotzdem ausführen“."]),
+        (["diktakte", "diktat", "diktier", "anwalt", "kanzlei", "jurist"], [f"Diktakte ist ein Diktierprogramm für Anwälte: Die Spracherkennung läuft lokal, aus „Paragraph 823 Absatz 1 BGB“ wird „§ 823 Abs. 1 BGB“, dazu Akten, Fristen und beA. {link('software/diktakte/', 'Alle Funktionen ansehen')}"]),
+        (["speisekarte", "menükarte", "tageskarte", "gastronomie", "allergene"], [f"Der {link('software/speisekarte/', 'Speisekarten-Konfigurator')} gestaltet Speise-, Tages- und Aktionskarten mit Logo, Allergenen und QR-Code."]),
+        (["horror", "ab 18", "gruselig", "house in the desert", "wüste", "desert", "neues spiel", "was kommt"], [f"Psst… {link('spiele/house-in-the-desert/', 'House in the Desert')} ist in Arbeit: Survival-Horror, bei dem die Sonne dein größter Feind ist. Empfohlen ab 18 und noch nicht spielbar. Du kannst aber schon dafür abstimmen!"]),
+        (["feedback", "wunsch", "idee", "vorschlag", "bug", "fehler", "kaputt", "funktioniert nicht", "geht nicht", "problem"], [f"Ab damit ins {link('#mitmachen', 'Feedback-Formular')}! Wünsche, Ideen und Fehler landen direkt beim Studio. Zu jedem Spiel gibt es auf seiner Seite auch ein eigenes Formular."]),
+        (["umfrage", "abstimmen", "stimme", "vote", "voten", "welches spiel als nächstes"], [f"In der {link('#mitmachen', 'Umfrage')} entscheidest du mit, welches Spiel als Nächstes weiterentwickelt wird. Eine Stimme pro Person, änderbar."]),
+        (["kontakt", "email", "e-mail", "mail", "schreiben", "erreichen"], [f'Schreib einfach an <a href="mailto:{EMAIL}">{EMAIL}</a>. Oder nutze das {link("#mitmachen", "Feedback-Formular")}.']),
+        (["impressum"], [f"Hier entlang: {link('impressum/', 'Impressum')}."]),
+        (["datenschutz", "cookies", "tracking", "daten", "dsgvo"], [f"Keine Cookies, kein Tracking, keine Werbung. Details stehen im {link('datenschutz/', 'Datenschutz')}. Und ich, Lux, laufe komplett in deinem Browser."]),
+        (["wer steckt", "wer macht", "wer hat", "entwickler", "studio", "hinter der seite", "martin"], ["Lewolux Studio ist ein privates Hobbyprojekt aus Schleswig-Holstein. Hier entstehen in der Freizeit Spiele und kleine Programme, alles kostenlos."]),
+        (["lewolux", "name bedeutet", "bedeutung", "warum löwe", "warum heißt"], ["„Lew“ heißt Löwe, „Lux“ heißt Licht. Ein leuchtender Löwe also, genau wie ich! 🦁✨"]),
+        (["witz", "joke", "lustig", "lach", "erzähl was"], ["Warum spielen Löwen nie Karten in der Savanne? Zu viele Geparden. 🐆", "Was macht ein Löwe am Computer? Er klickt auf die Maus. Und frisst sie dann.", "Mein Lieblingsspiel? Natürlich „Brüllen-Simulator“. Gibt's leider noch nicht. Schreib's ins Feedback!", "Ich habe versucht, in Sternenwurf die Krone des Alls zu finden. Nach 10 Millionen Drehs habe ich aufgegeben und ein Nickerchen gemacht."]),
+        (["danke", "dankeschön", "super", "cool", "top", "nice", "geil", "klasse"], ["Gern geschehen! *schnurrt zufrieden* 🦁", "Immer wieder gern. Viel Spaß beim Spielen!"]),
+        (["tschüss", "bye", "ciao", "bis dann", "gute nacht"], ["Bis bald! Ich halte hier die Stellung. 🦁"]),
+    ]
+    return json.dumps({"root": R, "games": games, "intents": [{"k": k, "a": a, "w": (0.5 if k[0] in ("kostenlos", "download", "handy", "account", "spielstand", "feedback", "kontakt", "danke", "software") else 2.5 if k[0] in ("deskboard", "diktakte", "speisekarte", "horror", "umfrage") else 1)} for k, a in intents],
+        "chips": ["Welche Spiele gibt es?", "Was soll ich spielen?", "Kostet das was?", "DeskBoard herunterladen", "Erzähl einen Witz"]}, ensure_ascii=False).replace("</", "<\\/")
+
 # ---------------------------------------------------------------- pages
 def index_page(c):
     feat = GAMES[0]
@@ -402,7 +519,7 @@ def index_page(c):
     if c.preview:
         main = main.replace('<picture><source type="image/webp" srcset="{{ROOT}}assets/img/lewolux-studio-banner.webp"><img src="{{ROOT}}assets/img/lewolux-studio-banner.jpg"', f'<picture><img src="{c.img("lewolux-studio-banner.webp")}"')
         main = main.replace('src="{{ROOT}}assets/screenshots/{{FEAT}}-1.jpg"', f'src="{c.shot(feat["id"]+"-1")}"')
-    main = (main.replace("{{CARDS}}", "\n".join(card(c, g, i) for i, g in enumerate(GAMES)))
+    main = (main.replace("{{CARDS}}", "\n".join(card(c, g, i) for i, g in enumerate(GAMES)) + "\n" + "\n".join(teaser_card(c, t) for t in TEASERS))
                 .replace("{{REEL}}", "\n".join(reel(c, g) for g in GAMES))
                 .replace("{{SOFTWARE}}", "\n".join(sw(c, s) for s in SOFTWARE)).replace("{{FAQ}}", faq)
                 .replace("{{POLL}}", poll_items(c)).replace("{{FEEDBACKFORM}}", feedback_form(c)).replace("{{API}}", API)
@@ -519,6 +636,7 @@ def main():
         og_image(P(f"dist/assets/screenshots/software-{sw_['id']}.jpg"), P(f"dist/assets/og/og-software-{sw_['id']}.jpg"))
         open(P(f"dist/software/{sw_['id']}/index.html"), "w", encoding="utf-8").write(software_page(Ctx("../../"), sw_))
     deskboard_parts()
+    teaser_assets()
     todo = '<p class="todo">Platzhalter: Hier müssen die Pflichtangaben eingetragen werden. Bitte mit einem Generator (z. B. e-recht24.de) oder anwaltlich erstellen lassen.</p>'
     for slug, title in (("impressum", "Impressum"), ("datenschutz", "Datenschutzerklärung")):
         os.makedirs(P(f"dist/{slug}"), exist_ok=True)
@@ -534,6 +652,7 @@ def main():
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
     sm += u("", ["assets/img/lewolux-studio-banner.jpg"] + [f"assets/screenshots/{g['id']}-1.jpg" for g in GAMES], "1.0")
     sm += "".join(u(f"spiele/{g['id']}/", [f"assets/screenshots/{g['id']}-{i+1}.jpg" for i in range(3)], "0.8") for g in GAMES)
+    sm += "".join(u(f"spiele/{t['id']}/", [f"assets/teaser/{t['id']}-1.jpg"], "0.6") for t in TEASERS)
     sm += "".join(u(f"software/{x['id']}/", [f"assets/screenshots/software-{x['id']}.jpg"], "0.7") for x in SOFTWARE)
     open(P("dist/sitemap.xml"), "w").write(sm + "</urlset>\n")
     open(P("dist/robots.txt"), "w").write(f"User-agent: *\nAllow: /\nDisallow: /downloads/\nDisallow: /admin/\n\nSitemap: {SITE}sitemap.xml\n")

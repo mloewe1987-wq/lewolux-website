@@ -420,3 +420,53 @@ const hm=location.hash.match(/^#spiel-([a-z0-9-]+)$/);if(hm&&GAMES.find(g=>g.id=
 }
 
 })();
+
+/* ---------- Chat-Begleiter „Lux“ (läuft komplett im Browser) ---------- */
+(()=>{const src=document.getElementById('lux-data');if(!src||window.LGS_RENDER_ONLY)return;let D;try{D=JSON.parse(src.textContent)}catch(_){return}
+const face=`<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lxm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset=".55" stop-color="#9b5cff"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>
+<g fill="url(#lxm)">${Array.from({length:12},(_,i)=>{const a=i/12*Math.PI*2,x=32+Math.cos(a)*22,y=34+Math.sin(a)*22;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9"/>`}).join('')}</g>
+<circle cx="32" cy="34" r="19" fill="#ffcf8a"/><circle cx="18" cy="19" r="5" fill="#ffcf8a"/><circle cx="46" cy="19" r="5" fill="#ffcf8a"/><circle cx="18" cy="19" r="2.4" fill="#f2a65a"/><circle cx="46" cy="19" r="2.4" fill="#f2a65a"/>
+<ellipse cx="32" cy="42" rx="10" ry="7.5" fill="#fff1dc"/><g class="lx-eyes"><ellipse cx="25" cy="31" rx="2.6" ry="3.3" fill="#1b1430"/><ellipse cx="39" cy="31" rx="2.6" ry="3.3" fill="#1b1430"/><circle cx="25.9" cy="29.8" r=".9" fill="#fff"/><circle cx="39.9" cy="29.8" r=".9" fill="#fff"/></g>
+<path d="M28.5 38.5h7l-3.5 3.6z" fill="#7a3b2e"/><path d="M32 42.2v2.2M32 44.4c-1.6 1.8-3.8 1.8-5 .6M32 44.4c1.6 1.8 3.8 1.8 5 .6" stroke="#7a3b2e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+<circle cx="21" cy="38" r="2.4" fill="#ff9a9a" opacity=".55"/><circle cx="43" cy="38" r="2.4" fill="#ff9a9a" opacity=".55"/></svg>`;
+const root=document.createElement('div');root.className='lux';root.innerHTML=`
+<button class="lux-fab" aria-label="Chat mit Lux öffnen" aria-expanded="false">${face}<span class="lux-dot"></span></button>
+<div class="lux-hint" hidden>Psst! Brauchst du einen Tipp? 🦁</div>
+<section class="lux-panel" role="dialog" aria-label="Chat mit Lux" hidden>
+ <header class="lux-head"><span class="lux-av">${face}</span><div><b>Lux</b><small><i></i>Studio-Löwe · antwortet sofort</small></div><button class="lux-x" aria-label="Chat schließen">✕</button></header>
+ <div class="lux-log" aria-live="polite"></div>
+ <div class="lux-chips"></div>
+ <form class="lux-form"><input class="lux-in" maxlength="200" placeholder="Frag Lux etwas …" aria-label="Nachricht an Lux" autocomplete="off"><button class="lux-send" aria-label="Senden"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg></button></form>
+</section>`;document.body.appendChild(root);
+const q=s=>root.querySelector(s),fab=q('.lux-fab'),panel=q('.lux-panel'),log=q('.lux-log'),chipsEl=q('.lux-chips'),inp=q('.lux-in'),hint=q('.lux-hint');
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const norm=t=>t.toLowerCase().replace(/[ä]/g,'ä').replace(/[^a-z0-9äöüß ]+/g,' ').replace(/\s+/g,' ').trim();
+const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const L=(u,t)=>`<a href="${D.root}${u}">${t}</a>`;
+function add(html,who){const m=document.createElement('div');m.className='lux-msg '+who;m.innerHTML=html;log.appendChild(m);log.scrollTop=log.scrollHeight;return m}
+function chips(list){chipsEl.innerHTML='';list.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>ask(t);chipsEl.appendChild(b)})}
+function gameAnswer(g,t){
+ if(g.teaser)return{a:`<b>${g.name}</b>: ${g.desc} Empfohlen ab ${g.age}, noch nicht spielbar. ${L(g.url,'Zur Vorschau')}`,c:['Welche Spiele gibt es?','Wo kann ich abstimmen?']};
+ const want=k=>k.some(w=>t.includes(w));
+ if(want(['steuer','taste','bedien','control','wie spielt','wie geht']))return{a:`So steuerst du <b>${g.name}</b>:<br>💻 ${g.pc.map(esc).join('<br>💻 ')}${g.mobile.length?'<br>📱 '+g.mobile.map(esc).join('<br>📱 '):''}<br>${L(g.url+'#handbuch','Komplettes Handbuch')}`,c:[`Tipps für ${g.name}`,`${g.name} spielen`]};
+ if(want(['tipp','trick','hilfe','profi','schaffe','komme nicht']))return{a:g.tips.length?`Profi-Tipps für <b>${g.name}</b>:<br>💡 ${g.tips.map(esc).join('<br>💡 ')}`:`Für ${g.name} habe ich noch keine Tipps.`,c:[`Steuerung ${g.name}`,'Was soll ich spielen?']};
+ if(want(['speicher','spielstand']))return{a:esc(g.save||'Der Spielstand liegt in deinem Browser.'),c:[`Tipps für ${g.name}`]};
+ if(want(['start','anfang','einsteig','erste schritt']))return{a:`Schnellstart <b>${g.name}</b>:<br>1. ${g.quick.map(esc).join('<br>2. ')}`,c:[`Steuerung ${g.name}`]};
+ if(want(['download','herunter','runterlad']))return{a:g.dl?`${g.name} gibt es als eine einzige Datei zum Download. ${L(g.url,'Zur Spielseite mit Download')}`:`${g.name} gibt es noch nicht als Download.`,c:[`${g.name} spielen`]};
+ return{a:`<b>${g.name}</b> – ${esc(g.tag)}<br>${esc(g.desc)}<br>${g.play?`<button class="lux-play" data-open="${g.id}" data-mode="demo">▶ Jetzt spielen</button> `:''}${L(g.url,'Mehr Infos & Handbuch')}`,c:[`Steuerung ${g.name}`,`Tipps für ${g.name}`,'Was soll ich spielen?']}}
+function answer(raw){const t=' '+norm(raw)+' ';
+ const g=D.games.find(g=>g.keys.some(k=>t.includes(' '+k)||t.includes(k+' ')||t.includes(k)));if(g)return gameAnswer(g,t);
+ let best=null,score=0;for(const it of D.intents){let s=0;for(const k of it.k)if(t.includes(k))s+=k.length;s*=it.w||1;if(s>score){score=s;best=it}}
+ if(best){let a=pick(best.a);if(a==='__random__'){const p=pick(D.games.filter(x=>x.play));return{a:`Mein Tipp: <b>${p.name}</b>! ${esc(p.tag)} <button class="lux-play" data-open="${p.id}" data-mode="demo">▶ Jetzt spielen</button>`,c:['Noch ein Tipp','Welche Spiele gibt es?']}}return{a,c:D.chips.slice(0,3)}}
+ return{a:pick(['Hm, da muss ich passen. 🦁 Frag mich zu Spielen, Downloads, Steuerung oder Software!','Das weiß selbst ein Löwe nicht. Versuch es mit einem Spielnamen, zum Beispiel „Tipps für Sternenwurf“.','Brüll… ich meine: Das habe ich nicht verstanden. Vielleicht hilft einer dieser Vorschläge?']),c:D.chips}}
+function ask(text){if(!text.trim())return;add(esc(text),'me');inp.value='';chipsEl.innerHTML='';const typing=add('<span class="lux-typing"><i></i><i></i><i></i></span>','bot');
+ setTimeout(()=>{typing.remove();const r=answer(text==='Noch ein Tipp'?'was soll ich spielen':text);add(r.a,'bot');chips(r.c||D.chips)},450+Math.random()*450)}
+let started=false;function open(o){panel.hidden=!o;fab.setAttribute('aria-expanded',o);root.classList.toggle('open',o);hint.hidden=true;try{sessionStorage.setItem('luxSeen','1')}catch(_){}
+ if(o&&!started){started=true;add(pick(['Rawr! 🦁 Ich bin Lux, der Studio-Löwe. Was kann ich für dich tun?','Hey! Ich bin Lux. Frag mich nach Spielen, Tipps oder Downloads!']),'bot');chips(D.chips)}if(o)setTimeout(()=>inp.focus({preventScroll:true}),50)}
+fab.onclick=()=>open(panel.hidden);q('.lux-x').onclick=()=>open(false);hint.onclick=()=>open(true);
+q('.lux-form').onsubmit=e=>{e.preventDefault();ask(inp.value)};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)open(false)});
+log.addEventListener('click',e=>{if(e.target.closest('.lux-play'))open(false)});
+let seen=false;try{seen=!!sessionStorage.getItem('luxSeen')}catch(_){}
+if(!seen)setTimeout(()=>{if(panel.hidden)hint.hidden=false},9000);
+})();

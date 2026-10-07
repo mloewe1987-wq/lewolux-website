@@ -3,7 +3,7 @@
    Läuft unter https://api.lewolux.de/                                       */
 
 const ORIGINS = ["https://lewolux.de", "https://www.lewolux.de"];
-const GAMES = ["mandat", "sternenwurf", "idle-legenden", "wrestling-tcg", "kritzelheld", "kasse-oder-zettel", "ordnungsgilde"];
+const GAMES = ["mandat", "sternenwurf", "idle-legenden", "wrestling-tcg", "kritzelheld", "kasse-oder-zettel", "ordnungsgilde", "house-in-the-desert"];
 const KINDS = ["wunsch", "idee", "bug", "lob"];
 const POLL = "naechstes-spiel";
 

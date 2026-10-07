@@ -155,3 +155,25 @@ SEO = {
         "Mit genug XP steigt dein Held im Level auf und bekommt neue Titel, vom Staubschubser bis zum Glanzgeneral. Streaks belohnen dich, wenn du dranbleibst, und im Shop gibt es Belohnungen für deinen Avatar. So wird Ordnung zur Gewohnheit.",
         "Ordnungsgilde ist ein Prototyp und kostenlos als Web-App für Handy und PC nutzbar."]),
 }
+
+# Angekündigte Spiele (nur Vorschau, nicht spielbar). age = empfohlenes Mindestalter
+TEASERS = [
+ dict(id="house-in-the-desert", title="House in the Desert", short="House in the Desert", age=18, accent="#ff3b3b",
+  tagline="Ein Spiel über Schuld, Durst und das, was die Sonne sieht.",
+  desc="Survival-Horror in der Wüste: Tagsüber ist es zu heiß, um das dunkle Herrenhaus zu verlassen. Nachts gehst du mit der Taschenlampe hinaus.",
+  genres=["Survival-Horror","Story"], status="Erscheint bald", part="Teil 1: Die Glut",
+  long=["Die Sonne ist hier dein größter Feind. Wer am Tag nach draußen geht, verbrennt. Also wartest du im Halbdunkel eines alten Herrenhauses, rationierst Wasser und Licht und lauschst auf das, was durch die Gänge schleicht.",
+        "Erst wenn es dunkel wird, ziehst du mit der Taschenlampe hinaus in die Wüste. Eine große, offene Welt, eine düstere Geschichte mit wenig Worten und viele Stunden Spielzeit."],
+  features=["Tag-und-Nacht-Wechsel: Hitze am Tag, Gefahr in der Nacht","Taschenlampe, Brennstoff und Wasser als knappe Ressourcen","Große Wüstenwelt mit verlassenem Herrenhaus","Erzählt mit Atmosphäre statt langer Texte"],
+  notice="Empfohlen ab 18 Jahren. Horrorspiel mit düsteren, belastenden Themen, Gewalt sowie plötzlichen lauten Geräuschen und Lichteffekten. Ohne offizielle Alterseinstufung."),
+]
+
+# News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
+NEWS = [
+ ("Neu", "DeskBoard 1.7 jetzt kostenlos zum Download", "software/deskboard/"),
+ ("Angekündigt", "House in the Desert – Survival-Horror, empfohlen ab 18", "spiele/house-in-the-desert/"),
+ ("Mitmachen", "Stimm ab, welches Spiel als Nächstes wächst", "#mitmachen"),
+ ("Neu", "Handbücher für alle Spiele: Schnellstart, Steuerung, Profi-Tipps", "spiele/sternenwurf/#handbuch"),
+ ("Software", "Diktakte: Diktieren, ablegen, erledigt. Alle Funktionen im Überblick", "software/diktakte/"),
+ ("Tipp", "Lade dir die Spiele kostenlos herunter. Läuft auch offline", "#spiele"),
+]
