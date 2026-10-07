@@ -429,14 +429,33 @@ const face=`<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id
 <ellipse cx="32" cy="42" rx="10" ry="7.5" fill="#fff1dc"/><g class="lx-eyes"><ellipse cx="25" cy="31" rx="2.6" ry="3.3" fill="#1b1430"/><ellipse cx="39" cy="31" rx="2.6" ry="3.3" fill="#1b1430"/><circle cx="25.9" cy="29.8" r=".9" fill="#fff"/><circle cx="39.9" cy="29.8" r=".9" fill="#fff"/></g>
 <path d="M28.5 38.5h7l-3.5 3.6z" fill="#7a3b2e"/><path d="M32 42.2v2.2M32 44.4c-1.6 1.8-3.8 1.8-5 .6M32 44.4c1.6 1.8 3.8 1.8 5 .6" stroke="#7a3b2e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
 <circle cx="21" cy="38" r="2.4" fill="#ff9a9a" opacity=".55"/><circle cx="43" cy="38" r="2.4" fill="#ff9a9a" opacity=".55"/></svg>`;
+const mane2=Array.from({length:14},(_,i)=>{const a=i/14*Math.PI*2,x=80+Math.cos(a)*30,y=90+Math.sin(a)*30;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="12"/>`}).join('');
+const arm=(c,x)=>`<g class="fx-arm ${c}"><rect x="${x-8}" y="134" width="16" height="42" rx="8" fill="#1c2140" stroke="#3be8ff" stroke-opacity=".55" stroke-width="1.3"/><circle cx="${x}" cy="178" r="9" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.1"/></g>`;
+const body=`<svg class="lux-fig" viewBox="0 0 160 250"><defs><linearGradient id="lxb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset=".55" stop-color="#9b5cff"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>
+<ellipse cx="80" cy="243" rx="44" ry="5.5" fill="#000" opacity=".4"/>
+<g class="fx-tail"><path d="M100 196C128 200 146 182 141 156" stroke="#eab676" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="141" cy="150" r="9" fill="url(#lxb)"/></g>
+<g><rect x="61" y="186" width="17" height="48" rx="8.5" fill="#f3bf7c"/><rect x="82" y="186" width="17" height="48" rx="8.5" fill="#f3bf7c"/><ellipse cx="67" cy="236" rx="14" ry="7.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/><ellipse cx="93" cy="236" rx="14" ry="7.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/><path d="M60 233v4M65 232v5M70 233v4M88 233v4M93 232v5M98 233v4" stroke="#d9934f" stroke-width="1.2" stroke-linecap="round"/></g>
+<g class="fx-body"><path d="M52 150q0-26 28-26t28 26v34q0 14-14 14H66q-14 0-14-14z" fill="#1c2140" stroke="#3be8ff" stroke-opacity=".55" stroke-width="1.5"/><text x="80" y="172" text-anchor="middle" font-size="15" font-weight="900" font-family="Arial,sans-serif" fill="url(#lxb)">LX</text><path d="M74 132v12M86 132v12" stroke="#cfd8ff" stroke-width="1.4" stroke-linecap="round"/><circle cx="74" cy="145" r="1.6" fill="#cfd8ff"/><circle cx="86" cy="145" r="1.6" fill="#cfd8ff"/></g>
+${arm('fx-l',55)}
+<g class="fx-head"><g fill="url(#lxb)">${mane2}</g><circle cx="58" cy="66" r="8.5" fill="#ffcf8a"/><circle cx="102" cy="66" r="8.5" fill="#ffcf8a"/><circle cx="58" cy="66" r="4" fill="#f2a65a"/><circle cx="102" cy="66" r="4" fill="#f2a65a"/>
+<circle cx="80" cy="92" r="27" fill="#ffcf8a"/><ellipse cx="80" cy="105" rx="14" ry="10" fill="#fff1dc"/>
+<g class="fx-eyes"><ellipse cx="70" cy="88" rx="3.3" ry="4.3" fill="#1b1430"/><ellipse cx="90" cy="88" rx="3.3" ry="4.3" fill="#1b1430"/><circle cx="71.2" cy="86.5" r="1.1" fill="#fff"/><circle cx="91.2" cy="86.5" r="1.1" fill="#fff"/></g>
+<path class="fx-happy" d="M66.5 89q3.5-4.5 7 0M86.5 89q3.5-4.5 7 0" stroke="#1b1430" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path class="fx-brows" d="M65 80q5-3 10 0M85 80q5-3 10 0" stroke="#c98545" stroke-width="2" fill="none" stroke-linecap="round"/>
+<circle cx="62" cy="99" r="3.4" fill="#ff9a9a" opacity=".5"/><circle cx="98" cy="99" r="3.4" fill="#ff9a9a" opacity=".5"/>
+<path d="M75.5 98h9l-4.5 4.4z" fill="#7a3b2e"/><path d="M80 102.4v2.4" stroke="#7a3b2e" stroke-width="1.4" stroke-linecap="round"/>
+<path class="fx-smile" d="M73 106q7 5.5 14 0" stroke="#7a3b2e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+<g class="fx-mouth"><ellipse cx="80" cy="109.5" rx="6.5" ry="5" fill="#5a1f2a"/><ellipse cx="80" cy="112.3" rx="4" ry="2" fill="#ff7b8a"/></g></g>
+${arm('fx-r',105)}</svg>`;
 const root=document.createElement('div');root.className='lux';root.innerHTML=`
 <button class="lux-fab" aria-label="Chat mit Lux öffnen" aria-expanded="false">${face}<span class="lux-dot"></span></button>
+<div class="lux-stage" aria-hidden="true">${body}</div>
 <div class="lux-hint" hidden>Psst! Brauchst du einen Tipp? 🦁</div>
 <section class="lux-panel" role="dialog" aria-label="Chat mit Lux" hidden>
- <header class="lux-head"><span class="lux-av">${face}</span><div><b>Lux</b><small><i></i>Studio-Löwe · antwortet sofort</small></div><button class="lux-x" aria-label="Chat schließen">✕</button></header>
+ <header class="lux-head"><span class="lux-av">${face}</span><div><b>Lux</b><small><i></i>Studio-Löwe · antwortet sofort</small></div><button class="lux-voice" type="button" aria-pressed="false" aria-label="Lux spricht seine Antworten vor" title="Lux spricht (Ton an/aus)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="lv-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="lv-off" d="M17 9l5 6M22 9l-5 6"/></svg></button><button class="lux-x" aria-label="Chat schließen">✕</button></header>
  <div class="lux-log" aria-live="polite"></div>
  <div class="lux-chips"></div>
- <form class="lux-form"><input class="lux-in" maxlength="200" placeholder="Frag Lux etwas …" aria-label="Nachricht an Lux" autocomplete="off"><button class="lux-send" aria-label="Senden"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg></button></form>
+ <form class="lux-form"><input class="lux-in" maxlength="200" placeholder="Frag Lux etwas …" aria-label="Nachricht an Lux" autocomplete="off"><button class="lux-mic" type="button" aria-label="Spracheingabe: Frage einsprechen" title="Reinsprechen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button><button class="lux-send" aria-label="Senden"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg></button></form>
 </section>`;document.body.appendChild(root);
 const q=s=>root.querySelector(s),fab=q('.lux-fab'),panel=q('.lux-panel'),log=q('.lux-log'),chipsEl=q('.lux-chips'),inp=q('.lux-in'),hint=q('.lux-hint');
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -444,6 +463,43 @@ const norm=t=>t.toLowerCase().replace(/[ä]/g,'ä').replace(/[^a-z0-9äöüß ]+
 const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const L=(u,t)=>`<a href="${D.root}${u}">${t}</a>`;
 function add(html,who){const m=document.createElement('div');m.className='lux-msg '+who;m.innerHTML=html;log.appendChild(m);log.scrollTop=log.scrollHeight;return m}
+const stage=q('.lux-stage'),mouth=q('.fx-mouth'),smile=q('.fx-smile'),vbtn=q('.lux-voice'),mic=q('.lux-mic'),synth=window.speechSynthesis;
+const GSEQ={talk:['beat','open','','beat','point'],wave:['wave','wave','beat'],laugh:['laugh','laugh','laugh'],point:['point','point','beat'],shrug:['shrug','shrug',''],think:['think','think','beat'],open:['open','beat','open']};
+const GEST={hallo:'wave','tschüss':'wave',danke:'wave',witz:'laugh','wer bist du':'open',lewolux:'open',horror:'think',kostenlos:'open',deskboard:'point',diktakte:'point',speisekarte:'point'};
+let ml=0,mt=0,mraf=0,speaking=false,talking=null,voiceOn=false;try{voiceOn=localStorage.getItem('luxVoice')==='1'}catch(_){}
+const pose=p=>{stage.dataset.pose=p||''};
+function setMouth(l){mouth.setAttribute('transform',`translate(80 105) scale(${(.85+l*.25).toFixed(2)} ${Math.max(l,.001).toFixed(3)}) translate(-80 -105)`);smile.style.opacity=Math.max(0,1-l*1.6).toFixed(2)}
+function mloop(t){if(speaking)mt=.2+.7*Math.abs(Math.sin(t/75))*(.55+.45*Math.sin(t/240));ml+=(mt-ml)*.45;setMouth(ml);
+ if(talking||speaking||ml>.02)mraf=requestAnimationFrame(mloop);else{ml=0;setMouth(0);mraf=0}}
+const kick=()=>{if(!mraf)mraf=requestAnimationFrame(mloop)};setMouth(0);
+(function blink(){setTimeout(()=>{stage.classList.add('blink');setTimeout(()=>{stage.classList.remove('blink');blink()},140)},2200+Math.random()*3200)})();
+function speak(text){if(!synth||!voiceOn)return;synth.cancel();const u=new SpeechSynthesisUtterance(text.replace(/[\u{1F300}-\u{1FAFF}☀-➿▶]/gu,'').replace(/\*[^*]+\*/g,'').replace(/\s+/g,' ').trim());
+ u.lang='de-DE';const vs=synth.getVoices().filter(v=>/^de/i.test(v.lang));u.voice=vs.find(v=>/natural|online|google/i.test(v.name))||vs[0]||null;u.pitch=1.15;u.rate=1.05;
+ u.onstart=()=>{speaking=true;stage.classList.add('talking');kick()};u.onend=u.onerror=()=>{speaking=false;mt=0;if(!talking){stage.classList.remove('talking');pose('')}};synth.speak(u)}
+function say(html,g){if(talking)talking.finish();const m=add(html,'bot');m.classList.add('typing-out');
+ const nodes=[],w=document.createTreeWalker(m,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){nodes.push([n,n.nodeValue]);n.nodeValue=''}
+ const plain=nodes.map(x=>x[1]).join(' '),N=plain.length,dur=Math.min(Math.max(N*(voiceOn?55:30),700),voiceOn?9000:4500),t0=performance.now(),seq=GSEQ[g]||GSEQ.talk;
+ let gi=0,gt=t0,done=false;pose(seq[0]);stage.classList.add('talking');
+ const fill=k=>{for(const[nd,tx]of nodes){const c=Math.min(k,tx.length);nd.nodeValue=tx.slice(0,c);k-=c;if(k<=0&&c<tx.length)break}};
+ const at=k=>{for(const[,tx]of nodes){if(k<=tx.length)return tx[k-1]||' ';k-=tx.length}return' '};
+ function finish(){if(done)return;done=true;fill(1e9);m.classList.remove('typing-out');mt=0;talking=null;log.scrollTop=log.scrollHeight;
+  setTimeout(()=>{if(!talking&&!speaking){stage.classList.remove('talking');pose('')}},g==='wave'||g==='laugh'?1200:700)}
+ function step(now){if(done)return;const k=Math.min(N,Math.round(N*(now-t0)/dur));fill(k);log.scrollTop=log.scrollHeight;
+  if(!speaking){const ch=at(k).toLowerCase();mt=/[aeiouäöüy]/.test(ch)?.95:/[.,!?:;…]/.test(ch)?0:ch===' '?.12:.45}
+  if(seq.length>1&&now-gt>850){gt=now;gi=(gi+1)%seq.length;pose(seq[gi])}
+  if(k>=N)finish();else requestAnimationFrame(step)}
+ talking={finish};requestAnimationFrame(step);kick();speak(plain)}
+function setVoice(on){voiceOn=on;vbtn.setAttribute('aria-pressed',on);vbtn.classList.toggle('on',on);try{localStorage.setItem('luxVoice',on?'1':'0')}catch(_){}if(!on&&synth)synth.cancel()}
+if(!synth)vbtn.hidden=true;else{setVoice(voiceOn);vbtn.onclick=()=>{setVoice(!voiceOn);if(voiceOn)say('Okay, ab jetzt spreche ich mit dir! 🦁','wave')}}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;
+if(!SR)mic.hidden=true;else mic.onclick=()=>{if(listening){rec.stop();return}if(synth)synth.cancel();if(talking)talking.finish();
+ rec=new SR();rec.lang='de-DE';rec.interimResults=true;rec.maxAlternatives=1;let sent=false;
+ rec.onstart=()=>{listening=true;mic.classList.add('on');inp.value='';inp.placeholder='Ich höre zu …';pose('listen')};
+ rec.onresult=e=>{let t='',fin=false;for(const r of e.results){t+=r[0].transcript;if(r.isFinal)fin=true}inp.value=t;if(fin&&!sent){sent=true;rec.stop();ask(t)}};
+ rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error))say('Ich darf dein Mikrofon gerade nicht benutzen. Erlaube es über das Schloss-Symbol neben der Adresse und tipp dann nochmal aufs Mikro.','shrug');else if(e.error==='no-speech')say('Ich habe nichts gehört. Tipp aufs Mikro und sprich einfach los! 🦁','shrug')};
+ rec.onend=()=>{listening=false;mic.classList.remove('on');inp.placeholder='Frag Lux etwas …';if(stage.dataset.pose==='listen')pose('')};
+ try{rec.start()}catch(_){}};
+stage.addEventListener('click',()=>say(pick(['Hihi, das kitzelt! 🦁','Hey, nicht an der Mähne ziehen!','Rawr! Hab ich dich erschreckt?','Ich bin Lux. Stups mich ruhig, ich beiße nur Pixel.']),'laugh'));
 function chips(list){chipsEl.innerHTML='';list.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>ask(t);chipsEl.appendChild(b)})}
 function gameAnswer(g,t){
  if(g.teaser)return{a:`<b>${g.name}</b>: ${g.desc} Empfohlen ab ${g.age}, noch nicht spielbar. ${L(g.url,'Zur Vorschau')}`,c:['Welche Spiele gibt es?','Wo kann ich abstimmen?']};
@@ -455,14 +511,15 @@ function gameAnswer(g,t){
  if(want(['download','herunter','runterlad']))return{a:g.dl?`${g.name} gibt es als eine einzige Datei zum Download. ${L(g.url,'Zur Spielseite mit Download')}`:`${g.name} gibt es noch nicht als Download.`,c:[`${g.name} spielen`]};
  return{a:`<b>${g.name}</b> – ${esc(g.tag)}<br>${esc(g.desc)}<br>${g.play?`<button class="lux-play" data-open="${g.id}" data-mode="demo">▶ Jetzt spielen</button> `:''}${L(g.url,'Mehr Infos & Handbuch')}`,c:[`Steuerung ${g.name}`,`Tipps für ${g.name}`,'Was soll ich spielen?']}}
 function answer(raw){const t=' '+norm(raw)+' ';
- const g=D.games.find(g=>g.keys.some(k=>t.includes(' '+k)||t.includes(k+' ')||t.includes(k)));if(g)return gameAnswer(g,t);
+ const g=D.games.find(g=>g.keys.some(k=>t.includes(' '+k)||t.includes(k+' ')||t.includes(k)));if(g){const r=gameAnswer(g,t);r.g=g.teaser?'think':'point';return r}
  let best=null,score=0;for(const it of D.intents){let s=0;for(const k of it.k)if(t.includes(k))s+=k.length;s*=it.w||1;if(s>score){score=s;best=it}}
- if(best){let a=pick(best.a);if(a==='__random__'){const p=pick(D.games.filter(x=>x.play));return{a:`Mein Tipp: <b>${p.name}</b>! ${esc(p.tag)} <button class="lux-play" data-open="${p.id}" data-mode="demo">▶ Jetzt spielen</button>`,c:['Noch ein Tipp','Welche Spiele gibt es?']}}return{a,c:D.chips.slice(0,3)}}
- return{a:pick(['Hm, da muss ich passen. 🦁 Frag mich zu Spielen, Downloads, Steuerung oder Software!','Das weiß selbst ein Löwe nicht. Versuch es mit einem Spielnamen, zum Beispiel „Tipps für Sternenwurf“.','Brüll… ich meine: Das habe ich nicht verstanden. Vielleicht hilft einer dieser Vorschläge?']),c:D.chips}}
+ if(best){let a=pick(best.a);if(a==='__random__'){const p=pick(D.games.filter(x=>x.play));return{g:'point',a:`Mein Tipp: <b>${p.name}</b>! ${esc(p.tag)} <button class="lux-play" data-open="${p.id}" data-mode="demo">▶ Jetzt spielen</button>`,c:['Noch ein Tipp','Welche Spiele gibt es?']}}return{a,g:GEST[best.k[0]]||'talk',c:D.chips.slice(0,3)}}
+ return{g:'shrug',a:pick(['Hm, da muss ich passen. 🦁 Frag mich zu Spielen, Downloads, Steuerung oder Software!','Das weiß selbst ein Löwe nicht. Versuch es mit einem Spielnamen, zum Beispiel „Tipps für Sternenwurf“.','Brüll… ich meine: Das habe ich nicht verstanden. Vielleicht hilft einer dieser Vorschläge?']),c:D.chips}}
 function ask(text){if(!text.trim())return;add(esc(text),'me');inp.value='';chipsEl.innerHTML='';const typing=add('<span class="lux-typing"><i></i><i></i><i></i></span>','bot');
- setTimeout(()=>{typing.remove();const r=answer(text==='Noch ein Tipp'?'was soll ich spielen':text);add(r.a,'bot');chips(r.c||D.chips)},450+Math.random()*450)}
+ setTimeout(()=>{typing.remove();const r=answer(text==='Noch ein Tipp'?'was soll ich spielen':text);say(r.a,r.g);chips(r.c||D.chips)},450+Math.random()*450)}
 let started=false;function open(o){panel.hidden=!o;fab.setAttribute('aria-expanded',o);root.classList.toggle('open',o);hint.hidden=true;try{sessionStorage.setItem('luxSeen','1')}catch(_){}
- if(o&&!started){started=true;add(pick(['Rawr! 🦁 Ich bin Lux, der Studio-Löwe. Was kann ich für dich tun?','Hey! Ich bin Lux. Frag mich nach Spielen, Tipps oder Downloads!']),'bot');chips(D.chips)}if(o)setTimeout(()=>inp.focus({preventScroll:true}),50)}
+ if(!o){if(talking)talking.finish();if(synth)synth.cancel();if(listening&&rec)rec.stop()}
+ if(o&&!started){started=true;setTimeout(()=>say(pick(['Rawr! 🦁 Ich bin Lux, der Studio-Löwe. Was kann ich für dich tun?','Hey! Ich bin Lux. Frag mich nach Spielen, Tipps oder Downloads! Du kannst auch aufs Mikro tippen und mit mir reden.']),'wave'),350);chips(D.chips)}if(o)setTimeout(()=>inp.focus({preventScroll:true}),50)}
 fab.onclick=()=>open(panel.hidden);q('.lux-x').onclick=()=>open(false);hint.onclick=()=>open(true);
 q('.lux-form').onsubmit=e=>{e.preventDefault();ask(inp.value)};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)open(false)});
