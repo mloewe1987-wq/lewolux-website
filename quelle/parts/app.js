@@ -474,7 +474,7 @@ function mloop(t){if(speaking)mt=.2+.7*Math.abs(Math.sin(t/75))*(.55+.45*Math.si
 const kick=()=>{if(!mraf)mraf=requestAnimationFrame(mloop)};setMouth(0);
 (function blink(){setTimeout(()=>{stage.classList.add('blink');setTimeout(()=>{stage.classList.remove('blink');blink()},140)},2200+Math.random()*3200)})();
 function speak(text){if(!synth||!voiceOn)return;synth.cancel();const u=new SpeechSynthesisUtterance(text.replace(/[\u{1F300}-\u{1FAFF}☀-➿▶]/gu,'').replace(/\*[^*]+\*/g,'').replace(/\s+/g,' ').trim());
- u.lang='de-DE';const vs=synth.getVoices().filter(v=>/^de/i.test(v.lang));u.voice=vs.find(v=>/natural|online|google/i.test(v.name))||vs[0]||null;u.pitch=1.15;u.rate=1.05;
+ u.lang='de-DE';const vs=synth.getVoices().filter(v=>/^de/i.test(v.lang));u.voice=vs.find(v=>/conrad|killian|florian|stefan|markus|yannick/i.test(v.name))||vs.find(v=>/natural|online|google/i.test(v.name))||vs[0]||null;u.pitch=1.15;u.rate=1.05;
  u.onstart=()=>{speaking=true;stage.classList.add('talking');kick()};u.onend=u.onerror=()=>{speaking=false;mt=0;if(!talking){stage.classList.remove('talking');pose('')}};synth.speak(u)}
 function say(html,g){if(talking)talking.finish();const m=add(html,'bot');m.classList.add('typing-out');
  const nodes=[],w=document.createTreeWalker(m,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){nodes.push([n,n.nodeValue]);n.nodeValue=''}
