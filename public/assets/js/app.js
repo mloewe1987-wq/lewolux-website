@@ -603,7 +603,11 @@ async function act(a){busy=true;const cls=c=>stage.classList.add(c),un=c=>stage.
  if(!document.hidden&&!busy&&!talking&&!speaking&&!listening&&!root.classList.contains('duck'))await act(pick(closed?['hop','spin','walk','look','wave','yawn','walk','hop']:['hop','look','spin']));
  idleLoop()},closed0()?7000+Math.random()*7000:12000+Math.random()*10000)})();
 function closed0(){return panel.hidden}
-let started=false;function open(o){panel.hidden=!o;stage.setAttribute('aria-expanded',o);stage.setAttribute('aria-label',o?'Chat mit Lux schließen':'Chat mit Lux öffnen');root.classList.toggle('open',o);hint.hidden=true;try{sessionStorage.setItem('luxSeen','1')}catch(_){}
+/* Handy: Chat füllt den sichtbaren Bereich, auch wenn die Tastatur offen ist */
+const mob=matchMedia('(max-width:520px)'),vv=window.visualViewport;
+function fit(){if(!vv)return;root.style.setProperty('--vvh',vv.height+'px');root.style.setProperty('--vvt',vv.offsetTop+'px');if(!panel.hidden)log.scrollTop=log.scrollHeight}
+if(vv){vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit);fit()}
+let started=false;function open(o){document.documentElement.classList.toggle('lux-lock',o&&mob.matches);fit();panel.hidden=!o;stage.setAttribute('aria-expanded',o);stage.setAttribute('aria-label',o?'Chat mit Lux schließen':'Chat mit Lux öffnen');root.classList.toggle('open',o);hint.hidden=true;try{sessionStorage.setItem('luxSeen','1')}catch(_){}
  if(!o){if(talking)talking.finish();hush();if(listening&&rec)rec.stop()}
  if(o&&!started){started=true;setTimeout(()=>say(pick(GREET),'wave'),350);chips(D.chips)}if(o)setTimeout(()=>inp.focus({preventScroll:true}),50)}
 stage.onclick=()=>{unlock();open(panel.hidden)};q('.lux-x').onclick=()=>open(false);hint.onclick=()=>open(true);

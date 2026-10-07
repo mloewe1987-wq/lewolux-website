@@ -763,3 +763,24 @@ html.modal-open .lux,html.player-open .lux{display:none}
 
 .lux-head small,.lux-voice{white-space:nowrap}
 @media (max-width:380px){.lux-head small{display:none}}
+
+/* Lux am Handy: Vollbild-Chat, Löwe klein oben links, Tastatur-sicher */
+@media (max-width:520px){
+ html.lux-lock,html.lux-lock body{overflow:hidden;overscroll-behavior:none}
+ .lux.open .lux-panel{position:fixed;left:0;right:0;top:var(--vvt,0px);bottom:auto;width:auto;height:var(--vvh,100dvh);border-radius:0;border-width:0 0 0 0;animation:lx-sheet .25s ease-out;box-shadow:none}
+ .lux.open .lux-panel::after{display:none}
+ .lux.open .lux-head{padding:10px 12px 10px 70px;min-height:64px;background:linear-gradient(90deg,rgba(59,232,255,.1),rgba(155,92,255,.12));border-bottom:1px solid var(--line-2)}
+ .lux.open .lux-stage{position:fixed;left:10px;top:calc(var(--vvt,0px) + 2px);width:52px;height:81px;z-index:2;transform:none;animation:none}
+ .lux.open .lux-stage .fx-tail,.lux.open .lux-stage ellipse[rx="44"]{display:none}
+ .lux.open .lux-log{padding:12px}
+ .lux.open .lux-chips{flex-wrap:nowrap;overflow-x:auto;padding:2px 12px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .lux.open .lux-chips::-webkit-scrollbar{display:none}
+ .lux.open .lux-chips button{flex:none;white-space:nowrap;font-size:14px;padding:8px 13px}
+ .lux.open .lux-adv{margin:0 12px 6px}
+ .lux.open .lux-form{padding:8px 10px calc(10px + env(safe-area-inset-bottom,0px));border-radius:0}
+ .lux.open .lux-vol{width:56px}
+ .lux.open .lux-msg{font-size:15px}
+}
+@keyframes lx-sheet{from{transform:translateY(30px);opacity:0}}
+@media (max-width:520px){.lux.open .lux-head small{display:none}}
+@media (max-width:520px){.lux.open{z-index:100}}
