@@ -29,6 +29,9 @@ FONTS = [("Orbitron","orbitron",[600,800,900]),("Plus Jakarta Sans","plus-jakart
 GFONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">'
 SHOTS = [(g["scene"], v, f'{g["id"]}-{v+1}') for g in GAMES for v in range(3)] + [(s["scene"], 0, f'software-{s["id"]}') for s in SOFTWARE]
 GAME_BY_ID = {g["id"]: g for g in GAMES}
+import hashlib as _h
+VER=_h.md5((open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts","style.css"),encoding="utf-8").read()+open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts","app.js"),encoding="utf-8").read()).encode()).hexdigest()[:8]
+
 def standalone(g):
     """Spiel als eine einzige HTML-Datei (lokale Bibliotheken/Schriften eingebettet), damit der Download offline läuft."""
     d = P("spiele-dateien", g["id"]); s = open(os.path.join(d, "index.html"), encoding="utf-8").read()
@@ -190,7 +193,7 @@ ORG = {"@type": "Organization", "@id": SITE + "#studio", "name": "Lewolux Studio
 
 def head(c, title, desc, path, og, jsonld, robots="index, follow, max-image-preview:large", preload=""):
     url = SITE + path
-    css = f'<style>{part("style.css")}</style>' if c.preview else f'<link rel="stylesheet" href="{c.root}assets/css/site.css">'
+    css = f'<style>{part("style.css")}</style>' if c.preview else f'<link rel="stylesheet" href="{c.root}assets/css/site.css?v={VER}">'
     fonts = GFONTS if c.preview else f'<link rel="preload" href="{c.root}assets/fonts/orbitron-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="{c.root}assets/fonts/plus-jakarta-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>'
     return f'''<!doctype html>
 <html lang="de">
@@ -247,7 +250,7 @@ def common(c, t):
     return t
 
 def tail(c):
-    js = f"<script>{part('app.js')}</script>" if c.preview else f'<script src="{c.root}assets/js/app.js" defer></script>'
+    js = f"<script>{part('app.js')}</script>" if c.preview else f'<script src="{c.root}assets/js/app.js?v={VER}" defer></script>'
     return f'{part("modal.html")}\n<script id="game-data" type="application/json">{game_data(c)}</script>\n<script id="lux-data" type="application/json">{lux_data(c)}</script>\n{js}\n</body>\n</html>\n'
 
 # ---------------------------------------------------------------- community
