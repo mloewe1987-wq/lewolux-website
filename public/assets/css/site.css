@@ -685,3 +685,15 @@ html.modal-open .lux,html.player-open .lux{display:none}
 .lux-send{flex:none;width:44px;border:0;border-radius:12px;background:linear-gradient(100deg,var(--cyan),var(--violet));color:#05070c;cursor:pointer}.lux-send svg{width:20px;height:20px}
 @media (max-width:520px){.lux{right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px))}.lux-fab{width:56px;height:56px}.lux-panel{position:fixed;right:8px;left:8px;width:auto;bottom:calc(80px + env(safe-area-inset-bottom,0px));height:min(70vh,560px)}.lux-hint{right:66px}}
 @media (prefers-reduced-motion:reduce){.lux-fab,.lux-eyes{animation:none}}
+/* Guck-Löwe */
+.peek{position:fixed;left:0;top:0;z-index:35;overflow:hidden;pointer-events:none;visibility:hidden;will-change:transform}
+.peek-in{position:absolute;left:50%;top:50%;width:100px;height:81px;will-change:transform}
+.peek svg{display:block;overflow:visible;filter:drop-shadow(0 0 10px rgba(155,92,255,.5)) drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.peek .pk-eyes,.peek .pk-ears,.peek .pk-head{transform-box:fill-box;transform-origin:center;transition:transform .14s}
+.peek.blink .pk-eyes{transform:scaleY(.08)}
+.peek .pk-blush{opacity:0;transition:opacity .25s}.peek.shy .pk-blush{opacity:.75}
+.peek.shy .pk-ears{transform:scale(.85) translateY(2px)}
+.peek .pk-head{transform-origin:50% 100%}.peek.idle .pk-head{animation:pk-tilt 3.2s ease-in-out infinite}
+.peek .pk-brow{transition:transform .2s}.peek.shy .pk-brow{transform:translateY(-2px)}
+@keyframes pk-tilt{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}65%{transform:rotate(6deg)}}
+@media print{.peek{display:none}}

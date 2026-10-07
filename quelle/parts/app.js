@@ -470,3 +470,59 @@ log.addEventListener('click',e=>{if(e.target.closest('.lux-play'))open(false)});
 let seen=false;try{seen=!!sessionStorage.getItem('luxSeen')}catch(_){}
 if(!seen)setTimeout(()=>{if(panel.hidden)hint.hidden=false},9000);
 })();
+
+/* ---------- Guck-Löwe: Lux lugt hinter den Kacheln hervor und folgt der Maus (nur PC) ---------- */
+(()=>{if(window.LGS_RENDER_ONLY)return;
+const fine=matchMedia('(hover:hover) and (pointer:fine)'),calm=matchMedia('(prefers-reduced-motion:reduce)');
+if(!fine.matches||calm.matches)return;
+const SEL='.card,.shot,.keyart,.monitor,.sp-feat,.mn-tile,.mn-panel,.cm-card,.dl-box,.dl-tip,.sp-shot,.sp-fig,.sp-why,.sw,.sw-banner,.stat,.tp-shot,.tp-hero,.sp-hero,.tp-notice,.g-shot';
+const W=100,H=81,HIDE=H+6,html=document.documentElement;
+const mane=Array.from({length:14},(_,i)=>{const a=Math.PI+i/13*Math.PI,x=48+Math.cos(a)*29,y=50+Math.sin(a)*29;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="10"/>`}).join('')+'<circle cx="21" cy="62" r="10"/><circle cx="75" cy="62" r="10"/>';
+const svg=`<svg viewBox="0 0 96 78" width="${W}" height="${H}"><defs><linearGradient id="pkm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset=".55" stop-color="#9b5cff"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>
+<g class="pk-head"><g fill="url(#pkm)">${mane}</g>
+<g class="pk-ears"><circle cx="28" cy="29" r="7" fill="#ffcf8a"/><circle cx="68" cy="29" r="7" fill="#ffcf8a"/><circle cx="28" cy="29" r="3.4" fill="#f2a65a"/><circle cx="68" cy="29" r="3.4" fill="#f2a65a"/></g>
+<circle cx="48" cy="51" r="23" fill="#ffcf8a"/><ellipse cx="48" cy="61" rx="11" ry="8" fill="#fff1dc"/>
+<g class="pk-eyes"><ellipse cx="39.5" cy="47" rx="5.2" ry="6.2" fill="#fff"/><ellipse cx="56.5" cy="47" rx="5.2" ry="6.2" fill="#fff"/>
+<g class="pk-pupil"><circle cx="39.5" cy="47.5" r="3.3" fill="#1b1430"/><circle cx="40.6" cy="46.2" r="1" fill="#fff"/></g><g class="pk-pupil"><circle cx="56.5" cy="47.5" r="3.3" fill="#1b1430"/><circle cx="57.6" cy="46.2" r="1" fill="#fff"/></g></g>
+<path class="pk-brow" d="M34 38.5q5-3 10 0M52 38.5q5-3 10 0" stroke="#c98545" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<g class="pk-blush" fill="#ff8f8f"><circle cx="31" cy="57" r="3.6"/><circle cx="65" cy="57" r="3.6"/></g>
+<path d="M44.5 56h7l-3.5 3.6z" fill="#7a3b2e"/><path d="M48 59.6v2M48 61.6c-1.5 1.7-3.6 1.7-4.8.6M48 61.6c1.5 1.7 3.6 1.7 4.8.6" stroke="#7a3b2e" stroke-width="1.3" fill="none" stroke-linecap="round"/></g>
+<g class="pk-paws" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"><ellipse cx="20" cy="73" rx="10" ry="6.5"/><ellipse cx="76" cy="73" rx="10" ry="6.5"/><path d="M16 70v5M20 69.5v5.5M24 70v5M72 70v5M76 69.5v5.5M80 70v5" fill="none" stroke-linecap="round"/></g></svg>`;
+const box=document.createElement('div');box.className='peek';box.setAttribute('aria-hidden','true');box.innerHTML=`<div class="peek-in">${svg}</div>`;document.body.appendChild(box);
+const inn=box.firstChild,pupils=[...box.querySelectorAll('.pk-pupil')],hdr=document.querySelector('.site-header');
+let els=[],collected=0,mx=-1e4,my=-1e4,moved=0,dirty=true,best=null,el=null,edge=null,rot=0,cx=0,cy=0,tx=0,ty=0,bw=W,bh=H,p=HIDE,pt=HIDE,out=0;
+const clamp=(v,a,b)=>a>b?(a+b)/2:Math.min(b,Math.max(a,v));
+function place(k,r,hb,vw,vh){
+  if(k==='top'||k==='bottom'){if(r.width<W+16)return null;const off=mx<(r.left+r.right)/2?70:-70,x=clamp(mx+off,r.left+W/2+8,r.right-W/2-8),y=k==='top'?r.top-H:r.bottom;
+    if(y<hb||y+H>vh||x-W/2<0||x+W/2>vw)return null;return{x:x-W/2,y,w:W,h:H,rot:k==='top'?0:180}}
+  if(r.height<W+16)return null;const off=my<(r.top+r.bottom)/2?70:-70,y=clamp(my+off,r.top+W/2+8,r.bottom-W/2-8),x=k==='left'?r.left-H:r.right;
+  if(x<0||x+H>vw||y-W/2<hb||y+W/2>vh)return null;return{x,y:y-W/2,w:H,h:W,rot:k==='left'?-90:90}}
+function choose(){const hb=(hdr?hdr.getBoundingClientRect().bottom:0)+6,vw=html.clientWidth,vh=innerHeight;let b=null;const rects=els.map(e=>({e,r:e.getBoundingClientRect()})).filter(o=>o.r.bottom>0&&o.r.top<vh);
+  for(const{e,r}of rects){if(r.width<130||r.height<80||r.bottom<hb||r.top>vh)continue;
+    const d=Math.hypot(Math.max(r.left-mx,0,mx-r.right),Math.max(r.top-my,0,my-r.bottom));if(d>240)continue;
+    const opts=[['top',Math.abs(my-r.top)],['bottom',Math.abs(my-r.bottom)],['left',Math.abs(mx-r.left)],['right',Math.abs(mx-r.right)]].sort((a,c)=>a[1]-c[1]);
+    for(const[k,ed]of opts){const pl=place(k,r,hb,vw,vh);if(!pl)continue;
+      let ov=0;for(const o of rects)if(o.e!==e&&!o.e.contains(e)&&!e.contains(o.e)){const ix=Math.min(pl.x+pl.w,o.r.right)-Math.max(pl.x,o.r.left),iy=Math.min(pl.y+pl.h,o.r.bottom)-Math.max(pl.y,o.r.top);if(ix>0&&iy>0)ov+=ix*iy}
+      const s=d+ed*.4+(ov>pl.w*pl.h*.12?140:0)+(k==='bottom'?60:k==='top'?0:25)-(e===el?40:0)-(e===el&&k===edge?30:0);if(!b||s<b.s)b={e,k,s,...pl}}}
+  return b}
+function tick(){const now=performance.now();
+  if(now-collected>2500){els=[...document.querySelectorAll(SEL)].filter(e=>!e.closest('.lux,.modal,.site-header,.player'));collected=now}
+  const blocked=html.classList.contains('modal-open')||html.classList.contains('player-open')||!!document.querySelector('.lux.open'),idle=now-moved;
+  if(dirty){best=blocked||mx<-1e3?null:choose();dirty=false}
+  let shy=false;
+  if(!best||idle>9000)pt=HIDE;
+  else if(best.e!==el||best.k!==edge){pt=HIDE;if(p>HIDE-3){el=best.e;edge=best.k;rot=best.rot;bw=best.w;bh=best.h;cx=tx=best.x;cy=ty=best.y;out=now+220}}
+  else{tx=best.x;ty=best.y;const hx=cx+bw/2,hy=cy+bh/2;shy=Math.hypot(mx-hx,my-hy)<52;if(now>out)pt=shy?44:idle>2500?3:12}
+  cx+=(tx-cx)*.2;cy+=(ty-cy)*.2;p+=(pt-p)*(pt>p?.3:.13);
+  box.classList.toggle('shy',shy);box.classList.toggle('idle',idle>2500&&idle<9000);
+  box.style.cssText=`width:${bw}px;height:${bh}px;transform:translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px);visibility:${p>HIDE-1?'hidden':'visible'}`;
+  inn.style.transform=`translate(-50%,-50%) rotate(${rot}deg) translateY(${p.toFixed(1)}px)`;
+  const a=-rot*Math.PI/180,vx=mx-(cx+bw/2),vy=my-(cy+bh/2),lx=vx*Math.cos(a)-vy*Math.sin(a),ly=vx*Math.sin(a)+vy*Math.cos(a),len=Math.hypot(lx,ly)||1,m=Math.min(len/60,1)*2.3;
+  pupils.forEach(g=>g.setAttribute('transform',`translate(${(lx/len*m).toFixed(2)} ${(ly/len*m).toFixed(2)})`));
+  requestAnimationFrame(tick)}
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;moved=performance.now();dirty=true},{passive:true});
+addEventListener('scroll',()=>{dirty=true},{passive:true});addEventListener('resize',()=>{collected=0;dirty=true});
+document.addEventListener('mouseout',e=>{if(!e.relatedTarget){mx=my=-1e4;dirty=true}});
+(function blink(){setTimeout(()=>{box.classList.add('blink');setTimeout(()=>{box.classList.remove('blink');blink()},150)},2500+Math.random()*3500)})();
+setInterval(()=>{dirty=true},400);
+requestAnimationFrame(tick)})();
