@@ -53,6 +53,7 @@ GAMES = [
           ("🛡️", "Fair und sicher", "Jedes Pack wird auf dem Server gezogen. Schummeln ist ausgeschlossen, die Drop-Raten stimmen mit den angezeigten überein."),
           ("⚔️", "Ring-Duell & Liga", "Deine Ring-Aufstellung kämpft gegen echte Spieler. 3 Duelle am Tag, Münzen für Siege und eine eigene Duell-Liga."),
           ("🔁", "Karten tauschen", "Karte gegen Karte mit anderen Spielern – fair abgesichert: Treuhand beim Server, nur Duplikate, keine Abzocke."),
+          ("🎯", "Wochen-Events", "Jede Woche ein neues Event – Duell-Woche, Sammel-Jagd oder Grading-Fieber – mit eigener Rangliste und bis zu 10.000 W$ Belohnung."),
           ("🔴", "Live-Ticker", "Sieh live, wer gerade eine Legende zieht oder eine Gem Mint 10 bekommt."),
           ("🔑", "Ohne Pflicht-Anmeldung", "Sofort losspielen, ganz ohne Konto. Mit „Weiter mit Google“ schaltest du Markt und Ranglisten frei und spielst auf jedem Gerät weiter."),
           ("📱", "Bald bei Google Play", "Die Android-App ist in Vorbereitung. Mit Google angemeldet nimmst du deine Sammlung einfach mit.")],
