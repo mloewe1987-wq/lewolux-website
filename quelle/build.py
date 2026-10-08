@@ -649,6 +649,8 @@ def main():
     for slug, title in (("impressum", "Impressum"), ("datenschutz", "Datenschutzerklärung")):
         os.makedirs(P(f"dist/{slug}"), exist_ok=True)
         open(P(f"dist/{slug}/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../"), slug + "/", title, part(f"{slug}.html")))
+    os.makedirs(P("dist/ring-legends/datenschutz"), exist_ok=True)
+    open(P("dist/ring-legends/datenschutz/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../../"), "ring-legends/datenschutz/", "Datenschutz – Ring Legends (App)", part("ring-legends-datenschutz.html")))
     os.makedirs(P("dist/admin"), exist_ok=True)
     open(P("dist/admin/index.html"), "w", encoding="utf-8").write(part("admin.html").replace("{{API}}", API).replace("{{GAMES}}", json.dumps({g["id"]: g["short"] for g in GAMES}, ensure_ascii=False)))
     open(P("dist/404.html"), "w", encoding="utf-8").write(simple_page(Ctx("/"), "404", "Seite nicht gefunden", '<p class="prose">Diese Seite gibt es nicht. <a href="/">Zur Startseite</a> oder direkt zu den <a href="/#spiele">Spielen</a>.</p>').replace('content="noindex, follow"', 'content="noindex"'))
