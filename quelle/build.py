@@ -512,6 +512,17 @@ def teaser_card(c, t):
           </div>
         </article>'''
 
+def teaser_trailer(c, t):
+    """Trailer auf der Teaser-Seite: normale Fassung frei, ungeschnittene Fassung (Jumpscare) nur nach Altersabfrage."""
+    if t["id"] != "house-in-the-desert" or not os.path.isfile(P("video/house-trailer.mp4")): return ""
+    v = f"{c.root}assets/video/"
+    return f'''  <section class="tp-trailer" aria-labelledby="tr-h"><h2 id="tr-h">Trailer</h2>
+    <video src="{v}house-trailer.mp4" poster="{v}house-trailer-poster.jpg" controls playsinline preload="metadata"></video>
+    <h3 class="tp-tr18">Uncut-Trailer <small>ab 18 · mit Jumpscare</small></h3>
+    <div class="age-gate" data-age="18" data-title="Uncut-Trailer: House in the Desert"><template><video src="{v}house-trailer-18.mp4" controls playsinline preload="metadata"></video></template></div>
+  </section>
+'''
+
 def teaser_page(c, t):
     url = f"spiele/{t['id']}/"
     feats = "".join(f"<li>{e(f)}</li>" for f in t["features"]); long = "".join(f"<p>{e(x)}</p>" for x in t["long"])
@@ -530,6 +541,7 @@ def teaser_page(c, t):
     <article class="prose"><h2>Worum geht es?</h2>{long}</article>
     <aside class="g-box"><p class="m-h">Das erwartet dich</p><ul class="feats">{feats}</ul><p class="m-h">Status</p><p style="margin:0;color:var(--muted)">In Entwicklung. Sobald das Spiel fertig ist, erscheint es hier mit Download und „Jetzt spielen“.</p></aside>
   </div>
+{teaser_trailer(c, t)}
   <figure class="tp-shot"><img src="{teaser_img(c, t, 2)}" alt="Szene aus {e(t['title'])}: Silhouette eines Hauses vor einer riesigen roten Sonne" width="1280" height="720" loading="lazy"><figcaption>Die Sonne ist hier dein größter Feind.</figcaption></figure>
 {game_feedback(c, t)}</main>
 '''
