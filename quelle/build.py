@@ -118,11 +118,12 @@ class Ctx:
             return f"data:image/{mime};base64," + base64.b64encode(open(P("dist/assets/img", file), "rb").read()).decode()
         return f"{self.root}assets/img/{file}"
     def page(self, g): return f"#spiel-{g['id']}" if self.preview else f"{self.root}spiele/{g['id']}/"
-    def dl(self, g): return f"{self.root}{g['download']['file']}" if has_game(g) else None
+    def dl(self, g): return f"{self.root}{g['download']['file']}" if has_game(g) and not g.get("online") else None
 
 G_TIP = '''<div class="dl-tip slim"><div><p class="rec-k">★ Empfohlen: der Download</p><ul class="tip-list"><li><b>Startet sofort</b>, ohne Ladezeit</li><li><b>Läuft offline</b>, überall, auch ohne Internet</li><li><b>Eine Datei</b>: nichts installieren, kein Account, keine Werbung</li><li><b>Deine Version gehört dir</b>, dein Spielstand bleibt auf deinem Gerät</li></ul><p class="tip-how">Am PC per Doppelklick öffnen, auf Android über „Downloads“ mit Chrome. Auf dem iPhone spielst du am besten direkt im Browser.</p></div></div>'''
 
 def dl_btn(c, g, label, aria=False):
+    if g.get("online"): return f'<span class="btn btn-dl is-off" aria-disabled="true">{DL}Android-App bald</span>'
     if not c.dl(g): return f'<span class="btn btn-dl is-off" aria-disabled="true">{DL}Download bald</span>'
     fn = g["download"]["file"].split("/")[-1]; a = f' aria-label="{e(g["short"])} kostenlos herunterladen"' if aria else ""
     return f'<a class="btn btn-dl rec" href="{c.dl(g)}" download="{fn}"{a}>{DL}{label}<span class="rec-b">Empfohlen</span></a>'
@@ -488,10 +489,11 @@ def lux_data(c):
         (["hallo", "hi", "hey", "moin", "servus", "guten tag", "na du", "huhu", "grüß"], [f"Rawr! 🦁 Ich bin Lux, der Studio-Löwe von Lewolux. Frag mich alles über unsere Spiele, Downloads oder Software!", "Moin! Lux hier. Suchst du ein Spiel, einen Tipp oder einen Download?"]),
         (["wer bist du", "dein name", "was bist du", "bist du ein bot", "bist du echt", "ki"], ["Ich bin Lux, ein kleiner Neon-Löwe und der Helfer dieser Seite. Ich bin kein Mensch und keine große KI, sondern kenne mich einfach richtig gut mit allem hier aus. Und ich verrate nichts weiter, was du mir schreibst bleibt in deinem Browser."]),
         (["kostenlos", "kostet", "preis", "geld", "bezahlen", "gratis", "umsonst", "abo"], ["Alles hier ist kostenlos: alle Spiele, alle Downloads, DeskBoard. Keine Werbung, keine Käufe, kein Abo. Lewolux Studio ist ein privates Hobbyprojekt. 🦁"]),
-        (["download", "herunterladen", "runterladen", "offline", "installieren", "datei"], [f"Fast jedes Spiel gibt es als Download: eine einzige HTML-Datei. Herunterladen, öffnen, spielen, auch offline. Den Knopf „Download“ findest du bei jedem Spiel unter {link('#spiele', 'Spiele')}. Auf dem iPhone spielst du am besten direkt im Browser."]),
+        (["download", "herunterladen", "runterladen", "offline", "installieren", "datei"], [f"Fast jedes Spiel gibt es als Download: eine einzige HTML-Datei. Herunterladen, öffnen, spielen, auch offline. Den Knopf „Download“ findest du bei jedem Spiel unter {link('#spiele', 'Spiele')}. Ring Legends ist ein Online-Spiel und läuft direkt im Browser, die Android-App folgt."]),
         (["handy", "smartphone", "mobil", "iphone", "android", "tablet", "ipad", "hochkant", "quer"], ["Alle Spiele laufen auch am Handy. „Jetzt spielen“ öffnet sie im Vollbild. Die RPG-Maker-Spiele wollen quer gehalten werden, Ring Legends spielt man hochkant."]),
-        (["account", "anmelden", "registrieren", "konto", "login", "einloggen"], ["Kein Account nötig! Einfach auf „Jetzt spielen“ tippen und los geht's."]),
-        (["spielstand", "speichern", "gespeichert", "save", "fortschritt verloren", "spielstand weg"], ["Spielstände werden nur in deinem Browser auf deinem Gerät gespeichert, nicht bei uns. Wenn du die Browserdaten löschst, ist auch der Spielstand weg. Bei Ring Legends kannst du ihn als Text-Code exportieren."]),
+        (["account", "anmelden", "registrieren", "konto", "login", "einloggen", "google"], ["Kein Account nötig! Einfach auf „Jetzt spielen“ tippen und los geht's. Nur bei Ring Legends kannst du dich freiwillig mit Google anmelden, dann gibt es Markt und Ranglisten, und du spielst auf jedem Gerät weiter."]),
+        (["spielstand", "speichern", "gespeichert", "save", "fortschritt verloren", "spielstand weg"], ["Die meisten Spielstände bleiben nur in deinem Browser auf deinem Gerät. Wenn du die Browserdaten löschst, ist auch der Spielstand weg. Ausnahme ist Ring Legends: Da liegt deine Sammlung sicher auf unserem Server."]),
+        (["markt", "handeln", "tauschen", "rangliste", "online", "großes update", "update", "pop-report"], [f"Großes Update bei {link('spiele/wrestling-tcg/', 'Ring Legends')}: Das Spiel ist jetzt online! Auf dem Markt handelst du Karten mit anderen Spielern, dazu gibt es Ranglisten und den Pop-Report. Losspielen geht ohne Anmeldung, für Markt und Ranglisten meldest du dich mit Google an."]),
         (["controller", "gamepad", "xbox", "playstation", "joystick"], ["Die RPG-Maker-Spiele (Mandat, Sternenwurf, Idle Legenden, Kasse oder Zettel) lassen sich auch mit Gamepad steuern."]),
         (["welche spiele", "was gibt es", "alle spiele", "spiele liste", "was kann ich spielen", "übersicht"], [f"Spielbar sind: {lst}. Und in Arbeit: {link('spiele/house-in-the-desert/', 'House in the Desert')} (empfohlen ab 18)."]),
         (["empfehl", "was soll ich", "langweilig", "tipp für ein spiel", "überrasch", "zufall", "irgendein spiel"], ["__random__"]),
@@ -504,7 +506,7 @@ def lux_data(c):
         (["umfrage", "abstimmen", "stimme", "vote", "voten", "welches spiel als nächstes"], [f"In der {link('#mitmachen', 'Umfrage')} entscheidest du mit, welches Spiel als Nächstes weiterentwickelt wird. Eine Stimme pro Person, änderbar."]),
         (["kontakt", "email", "e-mail", "mail", "schreiben", "erreichen"], [f'Schreib einfach an <a href="mailto:{EMAIL}">{EMAIL}</a>. Oder nutze das {link("#mitmachen", "Feedback-Formular")}.']),
         (["impressum"], [f"Hier entlang: {link('impressum/', 'Impressum')}."]),
-        (["datenschutz", "cookies", "tracking", "daten", "dsgvo"], [f"Keine Cookies, kein Tracking, keine Werbung. Details stehen im {link('datenschutz/', 'Datenschutz')}. Und ich, Lux, laufe komplett in deinem Browser."]),
+        (["datenschutz", "cookies", "tracking", "daten", "dsgvo"], [f"Keine Cookies, kein Tracking, keine Werbung. Details stehen im {link('datenschutz/', 'Datenschutz')}. Und ich, Lux, laufe komplett in deinem Browser. Für das Online-Spiel Ring Legends gibt es eine {link('ring-legends/datenschutz/', 'eigene Datenschutzerklärung')}."]),
         (["wer steckt", "wer macht", "wer hat", "entwickler", "studio", "hinter der seite", "martin"], ["Lewolux Studio ist ein privates Hobbyprojekt aus Schleswig-Holstein. Hier entstehen in der Freizeit Spiele und kleine Programme, alles kostenlos."]),
         (["lewolux", "name bedeutet", "bedeutung", "warum löwe", "warum heißt"], ["„Lew“ heißt Löwe, „Lux“ heißt Licht. Ein leuchtender Löwe also, genau wie ich! 🦁✨"]),
         (["witz", "joke", "lustig", "lach", "erzähl was"], ["Warum spielen Löwen nie Karten in der Savanne? Zu viele Geparden. 🐆", "Was macht ein Löwe am Computer? Er klickt auf die Maus. Und frisst sie dann.", "Mein Lieblingsspiel? Natürlich „Brüllen-Simulator“. Gibt's leider noch nicht. Schreib's ins Feedback!", "Ich habe versucht, in Sternenwurf die Krone des Alls zu finden. Nach 10 Millionen Drehs habe ich aufgegeben und ein Nickerchen gemacht."]),
@@ -513,7 +515,7 @@ def lux_data(c):
     ]
     voice = sorted(f[:-4] for f in os.listdir(P("lux-voice")) if f.endswith(".mp3")) if os.path.isdir(P("lux-voice")) else []
     return json.dumps({"root": R, "voice": voice, "games": games, "intents": [{"k": k, "a": a, "w": (0.5 if k[0] in ("kostenlos", "download", "handy", "account", "spielstand", "feedback", "kontakt", "danke", "software") else 2.5 if k[0] in ("deskboard", "diktakte", "speisekarte", "horror", "umfrage") else 1)} for k, a in intents],
-        "vv": "th2", "chips": ["Ich will mit dir zusammen spielen 🎲", "Welche Spiele gibt es?", "Was soll ich spielen?", "Kostet das was?", "DeskBoard herunterladen", "Erzähl einen Witz"]}, ensure_ascii=False).replace("</", "<\\/")
+        "vv": "th2", "chips": ["Ich will mit dir zusammen spielen 🎲", "Was ist das große Update?", "Welche Spiele gibt es?", "Was soll ich spielen?", "Kostet das was?", "DeskBoard herunterladen", "Erzähl einen Witz"]}, ensure_ascii=False).replace("</", "<\\/")
 
 # ---------------------------------------------------------------- pages
 def index_page(c):
@@ -539,6 +541,13 @@ def index_page(c):
              "", "assets/img/og-lewolux-studio.jpg", jsonld, preload=preload)
     return common(c, h + part("header.html") + "\n" + main + "\n" + part("footer.html") + "\n" + tail(c))
 
+def update_section(c, g):
+    u = g.get("update")
+    if not u: return ""
+    items = "".join(f'<li><span class="up-i" aria-hidden="true">{i}</span><b>{e(t)}</b><span>{e(d)}</span></li>' for i, t, d in u["items"])
+    return f'''  <section class="g-update" id="update" aria-labelledby="up-h"><span class="eyebrow">{e(u["kicker"])}</span><h2 id="up-h">{e(u["title"])}</h2><p class="up-lead">{e(u["lead"])}</p><ul class="up-list">{items}</ul><div class="g-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt online spielen</button></div><p class="up-note">{e(u["note"])}</p></section>
+'''
+
 def game_page(c, g):
     s = SEO[g["id"]]; url = f"spiele/{g['id']}/"
     genres = "".join(f'<span class="genre">{e(x)}</span>' for x in g["genres"])
@@ -549,6 +558,11 @@ def game_page(c, g):
     faq = [(f"Ist {g['short']} kostenlos?", f"Ja. {g['short']} ist während der Entwicklung komplett kostenlos, im Browser und als Early-Access-Download."),
            (f"Kann ich {g['short']} auf dem Handy spielen?", f"Ja. {g['short']} läuft im Browser auf Smartphone, Tablet und PC" + (" und ist als Android-App verfügbar." if "android" in g["plats"] else ".")),
            (f"Wie lade ich {g['short']} herunter?", (f"Über den Button „Kostenlos herunterladen“ erhältst du das komplette Spiel als eine einzige HTML-Datei. Einfach öffnen, schon läuft es im Browser, auch offline, am PC und am Handy. Ein Account ist nicht nötig." if has_game(g) else f"Der Download von {g['short']} folgt, sobald die erste spielbare Version fertig ist."))]
+    if g.get("online"):
+        faq = [(f"Ist {g['short']} kostenlos?", f"Ja. {g['short']} ist kostenlos und kein Pay-to-Win. Alle Packs gibt es mit Münzen aus dem Spiel."),
+               (f"Kann ich {g['short']} auf dem Handy spielen?", f"Ja. {g['short']} läuft im Browser auf Smartphone, Tablet und PC. Die Android-App für Google Play ist in Vorbereitung."),
+               (f"Brauche ich ein Konto für {g['short']}?", "Nein. Du kannst sofort ohne Anmeldung spielen, deine Sammlung wird trotzdem sicher auf dem Server gespeichert. Für Markt und Ranglisten und zum Spielen auf mehreren Geräten meldest du dich freiwillig mit Google an."),
+               (f"Warum ist {g['short']} jetzt online?", "Damit Handeln und Ranglisten fair sind: Jedes Pack wird auf dem Server gezogen, so kann niemand seine Sammlung fälschen.")]
     faqh = "".join(f"<details><summary>{e(q)}</summary><p>{e(a)}</p></details>" for q, a in faq)
     more = "".join(f'<a class="mg" href="{c.page(o)}">{pic(c, o["id"]+"-1", "Screenshot aus "+o["short"], "260px")}<span>{e(o["short"])}</span></a>' for o in GAMES if o["id"] != g["id"])
     long = "".join(f"<p>{p}</p>" for p in s["long"])
@@ -579,7 +593,7 @@ def game_page(c, g):
       {G_TIP if c.dl(g) else ""}
     </div>
   </div>
-  <div class="g-cols">
+{update_section(c, g)}  <div class="g-cols">
     <article class="prose"><h2>Worum geht es in {e(g['short'])}?</h2>{long}<h2>Story</h2><p>{e(g['story'])}</p></article>
     <aside class="g-box"><p class="m-h">Features</p><ul class="feats">{feats}</ul><p class="m-h">Steuerung</p><ul class="keys">{keys}</ul></aside>
   </div>
@@ -622,7 +636,7 @@ def main():
     for g in GAMES:
         if has_game(g):
             shutil.copytree(P("spiele-dateien", g["id"]), P("dist/games", g["id"]))
-            open(P("dist", g["download"]["file"]), "w", encoding="utf-8").write(standalone(g))
+            if not g.get("online"): open(P("dist", g["download"]["file"]), "w", encoding="utf-8").write(standalone(g))
     for g in GAMES:
         os.makedirs(P("dist/games", g["id"]), exist_ok=True)
         if not has_game(g): open(P("dist/games", g["id"], "HIER-WEB-EXPORT-REIN.txt"), "w", encoding="utf-8").write(f"Den Web-Export von {g['title']} hier hineinkopieren (index.html muss direkt in diesem Ordner liegen). Danach ist das Spiel auf der Website sofort spielbar.\n")
@@ -650,7 +664,7 @@ def main():
         os.makedirs(P(f"dist/{slug}"), exist_ok=True)
         open(P(f"dist/{slug}/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../"), slug + "/", title, part(f"{slug}.html")))
     os.makedirs(P("dist/ring-legends/datenschutz"), exist_ok=True)
-    open(P("dist/ring-legends/datenschutz/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../../"), "ring-legends/datenschutz/", "Datenschutz – Ring Legends (App)", part("ring-legends-datenschutz.html")))
+    open(P("dist/ring-legends/datenschutz/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../../"), "ring-legends/datenschutz/", "Datenschutz – Ring Legends (App und Browser)", part("ring-legends-datenschutz.html")))
     os.makedirs(P("dist/admin"), exist_ok=True)
     open(P("dist/admin/index.html"), "w", encoding="utf-8").write(part("admin.html").replace("{{API}}", API).replace("{{GAMES}}", json.dumps({g["id"]: g["short"] for g in GAMES}, ensure_ascii=False)))
     open(P("dist/404.html"), "w", encoding="utf-8").write(simple_page(Ctx("/"), "404", "Seite nicht gefunden", '<p class="prose">Diese Seite gibt es nicht. <a href="/">Zur Startseite</a> oder direkt zu den <a href="/#spiele">Spielen</a>.</p>').replace('content="noindex, follow"', 'content="noindex"'))

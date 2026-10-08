@@ -249,7 +249,7 @@ function mountGame(h,g){
   if(g._ok===undefined){h.innerHTML='';fetch(g.play,{method:'HEAD',cache:'no-store'}).then(r=>{g._ok=r.ok},()=>{g._ok=false}).then(()=>{if(h.dataset.gid===g.id&&!h.hidden){h.innerHTML='';mountGame(h,g)}});return null}
   if(!g._ok){const gp=Object.assign({},g,{play:null});return mountGame(h,gp)}
   const start=el(`<button class="game-start" aria-label="${g.short} starten"><img src="${g.shotImgs[0]}" alt=""><span class="gs-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span class="gs-label">${g.short} starten</span></button>`);
-  start.onclick=()=>{if(touchDev){openPlayer(g);return}const f=document.createElement('iframe');f.src=g.play;f.title=g.title;f.allow='fullscreen; autoplay; gamepad; screen-wake-lock';f.allowFullscreen=true;f.className='game-frame';h.innerHTML='';h.appendChild(f);try{f.focus()}catch(_){}};
+  start.onclick=()=>{if(touchDev){openPlayer(g);return}const f=document.createElement('iframe');f.src=g.play;f.title=g.title;f.allow='fullscreen; autoplay; gamepad; screen-wake-lock; identity-credentials-get';f.allowFullscreen=true;f.className='game-frame';h.innerHTML='';h.appendChild(f);try{f.focus()}catch(_){}};
   h.appendChild(start);return null}
 
 
@@ -273,7 +273,7 @@ function openPlayer(g){
   $('.pl-title',player).textContent=g.short;const d=$('.pl-dl',player);if(g.download.href){d.href=g.download.href;d.setAttribute('download',g.download.href.split('/').pop());d.hidden=false}else d.hidden=true;
   const land=g.orient!=='any'&&g.rnum>1.05;player.dataset.land=land?'1':'0';player.classList.remove('rot-ok');
   const st=$('.pl-stage',player);st.classList.remove('ready');if(plFrame)plFrame.remove();
-  plFrame=document.createElement('iframe');plFrame.src=g.play;plFrame.title=g.title;plFrame.allow='fullscreen; autoplay; gamepad; screen-wake-lock';plFrame.allowFullscreen=true;plFrame.onload=()=>st.classList.add('ready');st.appendChild(plFrame);
+  plFrame=document.createElement('iframe');plFrame.src=g.play;plFrame.title=g.title;plFrame.allow='fullscreen; autoplay; gamepad; screen-wake-lock; identity-credentials-get';plFrame.allowFullscreen=true;plFrame.onload=()=>st.classList.add('ready');st.appendChild(plFrame);
   player.hidden=false;document.documentElement.classList.add('player-open');
   try{history.pushState({lgsPlayer:1},'')}catch(_){}
   const fs=player.requestFullscreen||player.webkitRequestFullscreen;
