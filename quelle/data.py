@@ -106,6 +106,7 @@ SOFTWARE = [
 ]
 
 FAQ = [
+ ("Gibt es auch Spiele für Kinder?","Ja – in Lewolux Kids (lewolux.de/kids). Dort gibt es nur kindgerechte Spiele wie Kritzelheld, ganz ohne Werbung und Käufe. Eltern können den Kids-Modus aktivieren: Dann sind die anderen Bereiche der Website gesperrt, bis ein Erwachsener eine kleine Rechenaufgabe löst."),
  ("Sind die Spiele von Lewolux Studio kostenlos?","Ja. Solange sich ein Spiel in Entwicklung befindet, kannst du es kostenlos im Browser spielen oder als Early Access herunterladen."),
  ("Brauche ich einen Account oder eine Installation?","Nein. Die Browser-Versionen starten direkt per Klick. Die Downloads sind jeweils eine einzige Datei: herunterladen, öffnen, spielen."),
  ("Auf welchen Geräten laufen die Spiele?","Auf PC, Laptop, Tablet und Smartphone in aktuellen Browsern. Die RPG-Maker-Titel unterstützen zusätzlich Gamepads."),
@@ -201,5 +202,19 @@ NEWS = [
 KIDS = [
  dict(id="kritzelheld", title="Kritzelheld", emoji="🦉", c1="#3ec97a", c2="#19a7e0", age="ab 4 Jahren",
   line="Buchstaben und Zahlen malen mit Eule Kritzel",
-  say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn."),
+  say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn.",
+  mascot="owl", crowd=3,        # Figur, die unten auf der Wiese herumläuft (owl, panda, …) und wie viele davon
+  preview="kritzel"),           # animierte Vorschau auf der Karte (Renderer in parts/kids.js); ohne: Screenshot
 ]
+# Alles, was im Kinderbereich vorgelesen wird (feste Sätze). Spielnamen, Beschreibungen und
+# „Los geht's! <Spiel>“ kommen automatisch aus KIDS dazu. build.py nimmt daraus MP3s auf (kids-voice/, Cache).
+KIDS_PHRASES = {
+ "hello": "Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen.",
+ "brand": "Lewolux Kids",
+ "askplay": "Wollen wir spielen?",
+ "lion": "Hihi! Das kitzelt!",
+ "sun": "Hihihi! Hallo, ich bin die Sonne!",
+ "soon": "Bald kommt ein neues Spiel!",
+ "bye": "Tschüss! Bis bald!",
+ "back": "Weiter spielen!",
+}

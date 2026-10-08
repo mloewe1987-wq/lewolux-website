@@ -29,15 +29,21 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="/kids/kids.webmanifest">
 <link rel="preload" href="../assets/fonts/fredoka-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../assets/css/kids.css?v=4985f00e">
+<link rel="stylesheet" href="../assets/css/kids.css?v=a085cbdf">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://lewolux.de/#studio", "name": "Lewolux Studio", "url": "https://lewolux.de/", "logo": "https://lewolux.de/assets/img/lewolux-studio-logo.jpg", "image": "https://lewolux.de/assets/img/lewolux-studio-banner.jpg", "slogan": "Shaping the Future of Play", "email": "hallo@lewolux.de", "areaServed": "DE", "sameAs": []}, {"@type": "CollectionPage", "@id": "https://lewolux.de/kids/", "url": "https://lewolux.de/kids/", "name": "Lewolux Kids – kostenlose Kinderspiele ohne Werbung", "description": "Lewolux Kids: kostenlose Lernspiele für Kinder, ohne Werbung, ohne Käufe, ohne Anmeldung. Große Knöpfe, Vorlesefunktion und Elternsperre. Jetzt: Kritzelheld – Buchstaben und Zahlen malen.", "inLanguage": "de", "isPartOf": {"@type": "WebSite", "url": "https://lewolux.de/", "name": "Lewolux Studio"}, "audience": {"@type": "PeopleAudience", "suggestedMinAge": 4, "suggestedMaxAge": 9}, "mainEntity": {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Kritzelheld", "url": "https://lewolux.de/spiele/kritzelheld/"}]}}]}</script>
 </head>
 <body class="kids">
-<div class="k-sky" aria-hidden="true"><div class="k-sun"></div><div class="k-cloud c1"></div><div class="k-cloud c2"></div><div class="k-cloud c3"></div><div class="k-hills"></div></div>
+<div class="k-sky" aria-hidden="true"><div class="k-cloud c1"></div><div class="k-cloud c2"></div><div class="k-cloud c3"></div></div>
+<button class="k-sunb" id="kSun" type="button" aria-label="Sonne" data-say="Hihihi! Hallo, ich bin die Sonne!"><svg viewBox="0 0 200 200" aria-hidden="true"><g class="ks-rays"><path d="M100 8 L110 34 L90 34 Z" transform="rotate(0 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(30 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(60 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(90 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(120 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(150 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(180 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(210 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(240 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(270 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(300 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(330 100 100)"/></g>
+<circle cx="100" cy="100" r="58" fill="url(#ksg)"/><defs><radialGradient id="ksg" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff6b0"/><stop offset=".6" stop-color="#ffd23f"/><stop offset="1" stop-color="#ffb52e"/></radialGradient></defs>
+<g class="ks-eyes"><ellipse cx="80" cy="90" rx="7" ry="9" fill="#1d2350"/><ellipse cx="120" cy="90" rx="7" ry="9" fill="#1d2350"/><circle cx="82.5" cy="86.5" r="2.6" fill="#fff"/><circle cx="122.5" cy="86.5" r="2.6" fill="#fff"/></g>
+<g fill="#ff8fa3" opacity=".75"><ellipse cx="66" cy="110" rx="9" ry="6"/><ellipse cx="134" cy="110" rx="9" ry="6"/></g>
+<path class="ks-smile" d="M82 114 Q100 128 118 114" stroke="#1d2350" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path class="ks-grin" d="M76 110 Q100 148 124 110 Z" fill="#c2324d" stroke="#1d2350" stroke-width="4" stroke-linejoin="round"/></svg></button>
 <div class="k-wrap">
   <header class="k-top">
     <div class="k-brand" data-say="Lewolux Kids"><img src="../assets/img/kids-icon-192.png" alt="" width="54" height="54"><span class="k-logo">Lewolux<b>Kids</b></span></div>
-    <button class="k-parents" id="kParents" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Für Eltern</button>
+    <button class="k-parents" id="kParents" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span><span class="k-pl">Zurück zum </span>Erwachsenen&shy;bereich</span></button>
   </header>
   <main>
     <div class="k-hello"><svg class="k-owl" viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="112" rx="34" ry="6" fill="rgba(29,35,80,.15)"/>
@@ -48,7 +54,7 @@
 <path d="M18 70q-10 14 4 28q4-16-4-28zM102 70q10 14-4 28q-4-16 4-28z" fill="#7a4fd6"/><path d="M48 108l-4 6M54 109v6M66 109v6M72 108l4 6" stroke="#ffb02e" stroke-width="4" stroke-linecap="round"/></svg><div class="k-bubble"><h1>Hallo! <span>Was spielen wir?</span></h1><button class="k-say" type="button" data-say="Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen." aria-label="Vorlesen"><svg viewBox="0 0 24 24" fill="none" stroke="#1d2350" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="#1d2350"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button></div></div>
     <ul class="k-games">
 <li class="k-card" style="--c1:#3ec97a;--c2:#19a7e0">
-  <button class="k-pic" type="button" data-play="kritzelheld" data-say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn." aria-label="Kritzelheld spielen"><picture><source type="image/webp" srcset="../assets/screenshots/kritzelheld-1-640.webp 640w, ../assets/screenshots/kritzelheld-1.webp 1280w" sizes="(max-width:900px) 100vw, 540px"><img src="../assets/screenshots/kritzelheld-1.jpg" srcset="../assets/screenshots/kritzelheld-1-640.jpg 640w, ../assets/screenshots/kritzelheld-1.jpg 1280w" sizes="(max-width:900px) 100vw, 540px" alt="Bild aus Kritzelheld" width="1280" height="720" fetchpriority="high" decoding="async"></picture><span class="k-age">ab 4 Jahren</span></button>
+  <button class="k-pic" type="button" data-play="kritzelheld" data-say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn." aria-label="Kritzelheld spielen"><canvas class="k-prev" data-preview="kritzel" aria-hidden="true"></canvas><span class="k-age">ab 4 Jahren</span></button>
   <div class="k-name"><h2>Kritzelheld</h2><button class="k-say" type="button" data-say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn." aria-label="Vorlesen"><svg viewBox="0 0 24 24" fill="none" stroke="#1d2350" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="#1d2350"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button></div>
   <p class="k-line">Buchstaben und Zahlen malen mit Eule Kritzel</p>
   <button class="k-play" type="button" data-play="kritzelheld" data-say="Los geht's! Kritzelheld"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.4-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" fill="#fff"/></svg>Spielen</button>
@@ -56,6 +62,9 @@
 <li class="k-card k-soon" data-say="Bald kommt ein neues Spiel!"><span class="k-big" aria-hidden="true">🎁</span><p>Bald kommt ein neues Spiel!</p><small>Schau bald wieder vorbei.</small></li>
     </ul>
   </main>
+</div>
+<section class="k-lawn" id="kLawn" aria-label="Wiese mit Spielfiguren"><div class="k-grass" aria-hidden="true"></div></section>
+<div class="k-under">
   <footer class="k-foot">
     <button class="k-install" id="kInstall" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><rect x="4" y="17" width="16" height="4" rx="1.5"/></svg>Als App installieren</button>
     <span>Kostenlos · ohne Werbung · ohne Käufe</span>
@@ -63,7 +72,7 @@
 </div>
 
 <div class="k-player" id="kPlayer" hidden>
-  <button class="k-close" id="kClose" type="button" aria-label="Spiel schließen" data-say="Tschüss!"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <button class="k-close" id="kClose" type="button" aria-label="Spiel schließen" data-say="Tschüss! Bis bald!"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="k-loading">Lädt …</div>
   <div class="k-stage" id="kStage"></div>
 </div>
@@ -82,7 +91,7 @@
     <p class="k-legal"><a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a></p>
   </div>
 </dialog>
-<script id="kids-data" type="application/json">{"games": [{"id": "kritzelheld", "title": "Kritzelheld", "play": "/games/kritzelheld/index.html"}]}</script>
-<script src="../assets/js/kids.js?v=4985f00e" defer></script>
+<script id="kids-data" type="application/json">{"games": [{"id": "kritzelheld", "title": "Kritzelheld", "play": "/games/kritzelheld/index.html", "mascot": "owl", "crowd": 3, "emoji": "🦉", "say": "Los geht's! Kritzelheld"}], "phrases": {"hello": "Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen.", "brand": "Lewolux Kids", "askplay": "Wollen wir spielen?", "lion": "Hihi! Das kitzelt!", "sun": "Hihihi! Hallo, ich bin die Sonne!", "soon": "Bald kommt ein neues Spiel!", "bye": "Tschüss! Bis bald!", "back": "Weiter spielen!"}, "voice": {"Hihihi! Hallo, ich bin die Sonne!": "/kids/voice/3838eba21f07.mp3", "Lewolux Kids": "/kids/voice/f9dc9900b074.mp3", "Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen.": "/kids/voice/0bbc34c52c62.mp3", "Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn.": "/kids/voice/2f3a745b3139.mp3", "Los geht's! Kritzelheld": "/kids/voice/30afc2b89193.mp3", "Bald kommt ein neues Spiel!": "/kids/voice/b4bb295799f3.mp3", "Tschüss! Bis bald!": "/kids/voice/b48e79099cc2.mp3", "Weiter spielen!": "/kids/voice/b49cef461ead.mp3", "Wollen wir spielen?": "/kids/voice/324ebd45fe23.mp3", "Hihi! Das kitzelt!": "/kids/voice/3a5625557343.mp3"}}</script>
+<script src="../assets/js/kids.js?v=a085cbdf" defer></script>
 </body>
 </html>

@@ -9,7 +9,7 @@ import re
 import base64, html, json, os, shutil, datetime, asyncio, io
 from PIL import Image
 from data import GAMES, SOFTWARE, FAQ, ICONS, PLAY, DL, SEO, TEASERS
-from data import NEWS, KIDS
+from data import NEWS, KIDS, KIDS_PHRASES
 from manuals import MANUALS, SOFTWARE_PAGES
 
 SITE = "https://lewolux.de/"      # <- eigene Domain eintragen (mit / am Ende)
@@ -780,6 +780,41 @@ def kids_icons():
     ic = Image.open(P("dist/assets/img/kids-icon-512.png")).resize((320, 320), Image.LANCZOS); og.paste(ic, (60, 155), ic)
     og.save(P("dist/assets/img/og-kids.jpg"), quality=86, optimize=True)
 
+# Vorlese-Stimme für Lewolux Kids: Piper „Kerstin“ (CC0), mit ffmpeg etwas höher/kindlicher gemacht.
+# Aufnahmen landen im Cache kids-voice/<hash>.mp3 (nur neue Texte werden aufgenommen) und werden nach dist/kids/voice/ kopiert.
+KIDS_VOICE_MODEL = os.environ.get("KIDS_VOICE_MODEL", "/home/claude/tts/de-kerstin-low/de-kerstin-low.onnx")
+KIDS_VOICE_AF = "asetrate=16000*1.12,aresample=44100,atempo=0.93,highpass=f=90,loudnorm=I=-16:TP=-1.5"
+def kids_voice(texts):
+    """Gibt {Text: URL} zurück. Fehlt Piper/ffmpeg, bleibt die Liste leer -> die Seite liest dann mit der Browserstimme vor."""
+    import subprocess, tempfile, wave
+    cache = P("kids-voice"); os.makedirs(cache, exist_ok=True); os.makedirs(P("dist/kids/voice"), exist_ok=True)
+    out, voice = {}, None
+    for t in dict.fromkeys(x.strip() for x in texts if x and x.strip()):
+        h = _h.md5((os.path.basename(KIDS_VOICE_MODEL) + KIDS_VOICE_AF + t).encode()).hexdigest()[:12]; f = os.path.join(cache, h + ".mp3")
+        if not os.path.isfile(f):
+            try:
+                if voice is None:
+                    from piper import PiperVoice
+                    voice = PiperVoice.load(KIDS_VOICE_MODEL)
+                with tempfile.NamedTemporaryFile(suffix=".wav") as tmp:
+                    with wave.open(tmp.name, "wb") as w: voice.synthesize_wav(t, w)
+                    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", tmp.name, "-af", KIDS_VOICE_AF, "-ac", "1", "-b:a", "64k", f], check=True)
+            except Exception as ex:
+                print("Kids-Stimme: keine Aufnahme für", repr(t), "-", ex); continue
+        shutil.copy(f, P("dist/kids/voice", h + ".mp3")); out[t] = f"/kids/voice/{h}.mp3"
+    used = {u.rsplit("/", 1)[1] for u in out.values()}
+    for f in os.listdir(cache):
+        if f.endswith(".mp3") and f not in used: os.remove(os.path.join(cache, f))   # alte Aufnahmen aufräumen
+    return out
+
+KIDS_SUN = '''<svg viewBox="0 0 200 200" aria-hidden="true"><g class="ks-rays">''' + "".join(
+    f'<path d="M100 8 L110 34 L90 34 Z" transform="rotate({i * 30} 100 100)"/>' for i in range(12)) + '''</g>
+<circle cx="100" cy="100" r="58" fill="url(#ksg)"/><defs><radialGradient id="ksg" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff6b0"/><stop offset=".6" stop-color="#ffd23f"/><stop offset="1" stop-color="#ffb52e"/></radialGradient></defs>
+<g class="ks-eyes"><ellipse cx="80" cy="90" rx="7" ry="9" fill="#1d2350"/><ellipse cx="120" cy="90" rx="7" ry="9" fill="#1d2350"/><circle cx="82.5" cy="86.5" r="2.6" fill="#fff"/><circle cx="122.5" cy="86.5" r="2.6" fill="#fff"/></g>
+<g fill="#ff8fa3" opacity=".75"><ellipse cx="66" cy="110" rx="9" ry="6"/><ellipse cx="134" cy="110" rx="9" ry="6"/></g>
+<path class="ks-smile" d="M82 114 Q100 128 118 114" stroke="#1d2350" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path class="ks-grin" d="M76 110 Q100 148 124 110 Z" fill="#c2324d" stroke="#1d2350" stroke-width="4" stroke-linejoin="round"/></svg>'''
+
 def kids_page(c):
     title = "Lewolux Kids – kostenlose Kinderspiele ohne Werbung"
     desc = "Lewolux Kids: kostenlose Lernspiele für Kinder, ohne Werbung, ohne Käufe, ohne Anmeldung. Große Knöpfe, Vorlesefunktion und Elternsperre. Jetzt: Kritzelheld – Buchstaben und Zahlen malen."
@@ -787,8 +822,9 @@ def kids_page(c):
     games, cards = [], []
     for k in KIDS:
         g = GAME_BY_ID.get(k["id"]); play = f"/games/{k['id']}/index.html" if g and has_game(g) else None
-        games.append({"id": k["id"], "title": k["title"], "play": play})
-        img = pic(c, f"{k['id']}-1", f"Bild aus {k['title']}", "(max-width:900px) 100vw, 540px", lazy=False) if g else ""
+        games.append({"id": k["id"], "title": k["title"], "play": play, "mascot": k.get("mascot"), "crowd": k.get("crowd", 1), "emoji": k["emoji"], "say": f"Los geht's! {k['title']}"})
+        img = (f'<canvas class="k-prev" data-preview="{k["preview"]}" aria-hidden="true"></canvas>' if k.get("preview")
+               else pic(c, f"{k['id']}-1", f"Bild aus {k['title']}", "(max-width:900px) 100vw, 540px", lazy=False) if g else "")
         style = f"--c1:{k['c1']};--c2:{k['c2']}"
         btn = (f'<button class="k-play" type="button" data-play="{k["id"]}" data-say="Los geht\'s! {e(k["title"])}">{PLAY_SVG}Spielen</button>' if play
                else f'<button class="k-play is-off" type="button" disabled data-say="{e(k["title"])} kommt bald">Bald</button>')
@@ -798,12 +834,11 @@ def kids_page(c):
   <p class="k-line">{e(k['line'])}</p>
   {btn}
 </li>''')
-    cards.append('<li class="k-card k-soon" data-say="Bald kommt ein neues Spiel!"><span class="k-big" aria-hidden="true">🎁</span><p>Bald kommt ein neues Spiel!</p><small>Schau bald wieder vorbei.</small></li>')
+    cards.append(f'<li class="k-card k-soon" data-say="{e(KIDS_PHRASES["soon"])}"><span class="k-big" aria-hidden="true">🎁</span><p>Bald kommt ein neues Spiel!</p><small>Schau bald wieder vorbei.</small></li>')
     jsonld = [{"@context": "https://schema.org", "@graph": [ORG, {"@type": "CollectionPage", "@id": url, "url": url, "name": title, "description": desc, "inLanguage": "de", "isPartOf": {"@type": "WebSite", "url": SITE, "name": "Lewolux Studio"},
         "audience": {"@type": "PeopleAudience", "suggestedMinAge": 4, "suggestedMaxAge": 9},
         "mainEntity": {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": k["title"], "url": f"{SITE}spiele/{k['id']}/"} for i, k in enumerate(KIDS)]}}]}]
-    data = json.dumps({"games": games}, ensure_ascii=False).replace("</", "<\\/")
-    return f'''<!doctype html>
+    out = f'''<!doctype html>
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -838,18 +873,22 @@ def kids_page(c):
 {ld(jsonld[0])}
 </head>
 <body class="kids">
-<div class="k-sky" aria-hidden="true"><div class="k-sun"></div><div class="k-cloud c1"></div><div class="k-cloud c2"></div><div class="k-cloud c3"></div><div class="k-hills"></div></div>
+<div class="k-sky" aria-hidden="true"><div class="k-cloud c1"></div><div class="k-cloud c2"></div><div class="k-cloud c3"></div></div>
+<button class="k-sunb" id="kSun" type="button" aria-label="Sonne" data-say="{e(KIDS_PHRASES['sun'])}">{KIDS_SUN}</button>
 <div class="k-wrap">
   <header class="k-top">
-    <div class="k-brand" data-say="Lewolux Kids"><img src="{c.root}assets/img/kids-icon-192.png" alt="" width="54" height="54"><span class="k-logo">Lewolux<b>Kids</b></span></div>
-    <button class="k-parents" id="kParents" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Für Eltern</button>
+    <div class="k-brand" data-say="{e(KIDS_PHRASES['brand'])}"><img src="{c.root}assets/img/kids-icon-192.png" alt="" width="54" height="54"><span class="k-logo">Lewolux<b>Kids</b></span></div>
+    <button class="k-parents" id="kParents" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span><span class="k-pl">Zurück zum </span>Erwachsenen&shy;bereich</span></button>
   </header>
   <main>
-    <div class="k-hello">{KIDS_OWL}<div class="k-bubble"><h1>Hallo! <span>Was spielen wir?</span></h1><button class="k-say" type="button" data-say="Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen." aria-label="Vorlesen">{SPEAK_SVG}</button></div></div>
+    <div class="k-hello">{KIDS_OWL}<div class="k-bubble"><h1>Hallo! <span>Was spielen wir?</span></h1><button class="k-say" type="button" data-say="{e(KIDS_PHRASES['hello'])}" aria-label="Vorlesen">{SPEAK_SVG}</button></div></div>
     <ul class="k-games">
 {chr(10).join(cards)}
     </ul>
   </main>
+</div>
+<section class="k-lawn" id="kLawn" aria-label="Wiese mit Spielfiguren"><div class="k-grass" aria-hidden="true"></div></section>
+<div class="k-under">
   <footer class="k-foot">
     <button class="k-install" id="kInstall" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><rect x="4" y="17" width="16" height="4" rx="1.5"/></svg>Als App installieren</button>
     <span>Kostenlos · ohne Werbung · ohne Käufe</span>
@@ -857,7 +896,7 @@ def kids_page(c):
 </div>
 
 <div class="k-player" id="kPlayer" hidden>
-  <button class="k-close" id="kClose" type="button" aria-label="Spiel schließen" data-say="Tschüss!"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <button class="k-close" id="kClose" type="button" aria-label="Spiel schließen" data-say="{e(KIDS_PHRASES['bye'])}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="k-loading">Lädt …</div>
   <div class="k-stage" id="kStage"></div>
 </div>
@@ -871,16 +910,21 @@ def kids_page(c):
       <div class="k-row"><input id="kAns" type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="999" required aria-describedby="kErr"><button class="k-ok" type="submit">OK</button></div>
       <p class="k-err" id="kErr" aria-live="polite"></p>
     </form>
-    <button class="k-back" id="kBack" type="button" data-say="Weiter spielen!">Weiter spielen</button>
+    <button class="k-back" id="kBack" type="button" data-say="{e(KIDS_PHRASES['back'])}">Weiter spielen</button>
     <p class="k-note"><b>Gut zu wissen:</b> Der Kids-Modus sperrt nur die anderen Seiten von lewolux.de in diesem Browser. Er ist keine echte Kindersicherung: Andere Apps, Webseiten oder ein neuer Tab bleiben erreichbar. Um das Gerät wirklich abzusichern, nutzen Sie <b>Google Family Link</b> (Android) oder auf iPhone/iPad <b>Bildschirmzeit</b> bzw. <b>Geführter Zugriff</b>.</p>
     <p class="k-legal"><a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a></p>
   </div>
 </dialog>
-<script id="kids-data" type="application/json">{data}</script>
+<script id="kids-data" type="application/json">__KIDSDATA__</script>
 <script src="{c.root}assets/js/kids.js?v={VER}" defer></script>
 </body>
 </html>
 '''
+    # Vorlesen: jeder Text mit data-say plus die festen Sätze aus data.py wird als MP3 aufgenommen
+    texts = [html.unescape(t) for t in re.findall(r'data-say="([^"]*)"', out)] + list(KIDS_PHRASES.values()) + [g["say"] for g in games]
+    voice = kids_voice(texts)
+    data = json.dumps({"games": games, "phrases": KIDS_PHRASES, "voice": voice}, ensure_ascii=False).replace("</", "<\\/")
+    return out.replace("__KIDSDATA__", data)
 
 def kids_build():
     os.makedirs(P("dist/kids"), exist_ok=True)
