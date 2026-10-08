@@ -678,3 +678,30 @@ document.addEventListener('mouseout',e=>{if(!e.relatedTarget){mx=my=-1e4;dirty=t
 (function blink(){setTimeout(()=>{box.classList.add('blink');setTimeout(()=>{box.classList.remove('blink');blink()},150)},2500+Math.random()*3500)})();
 setInterval(()=>{dirty=true},400);
 requestAnimationFrame(tick)})();
+
+/* ===== Web-App (Installieren) & Besucherzähler ===== */
+(function(){
+  try{ if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('/sw.js').catch(()=>{}); }catch(_){}
+  const btn=document.getElementById('lxInstall'); let deferred=null;
+  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  if(btn&&standalone) btn.hidden=true;
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;});
+  addEventListener('appinstalled',()=>{if(btn)btn.hidden=true;});
+  const help=()=>{
+    const ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document), sam=/SamsungBrowser/.test(ua), ff=/Firefox/.test(ua);
+    const steps=ios?['Unten auf <b>Teilen</b> tippen (Quadrat mit Pfeil).','<b>Zum Home-Bildschirm</b> wählen.','Oben rechts auf <b>Hinzufügen</b> tippen.']
+      :sam?['Unten auf das <b>Menü</b> (☰) tippen.','<b>Seite hinzufügen zu</b> → <b>Startbildschirm</b> wählen.']
+      :ff?['Firefox auf dem PC kann keine Web-Apps installieren. Öffne die Seite in Chrome oder Edge.','Auf dem Handy: Menü (⋮) → <b>Installieren</b>.']
+      :['Im Browser-Menü (⋮ oben rechts) auf <b>App installieren</b> bzw. <b>Zum Startbildschirm hinzufügen</b> tippen.','Oder in Chrome/Edge am PC auf das kleine Bildschirm-Symbol rechts in der Adressleiste klicken.'];
+    const d=document.createElement('div');d.className='install-help';d.innerHTML='<div><h3>Lewolux als App</h3>So kommt das Lewolux-Logo auf deinen Startbildschirm:<ol>'+steps.map(s=>'<li>'+s+'</li>').join('')+'</ol><button type="button">Alles klar</button></div>';
+    d.onclick=ev=>{if(ev.target===d||ev.target.tagName==='BUTTON')d.remove();};document.body.appendChild(d);
+  };
+  if(btn) btn.onclick=async()=>{ if(deferred){ deferred.prompt(); const r=await deferred.userChoice.catch(()=>null); deferred=null; if(r&&r.outcome==='accepted') btn.hidden=true; } else help(); };
+  // Besucherzähler: anonym, ohne Cookies, ohne IP. Zufällige Kennung nur für diesen Tab.
+  const box=document.getElementById('lxStats'); if(!box||location.protocol!=='https:') return;
+  let sid; try{ sid=sessionStorage.getItem('lxSid'); if(!sid){ sid=Math.random().toString(36).slice(2)+Date.now().toString(36); sessionStorage.setItem('lxSid',sid); } }catch(_){ sid=Math.random().toString(36).slice(2,14); }
+  let first=true; try{ first=!sessionStorage.getItem('lxCounted'); sessionStorage.setItem('lxCounted','1'); }catch(_){}
+  const fmt=n=>Number(n||0).toLocaleString('de-DE');
+  const ping=async()=>{ if(document.hidden) return; try{ const r=await fetch('/api/stats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid,first})}); first=false; if(!r.ok) return; const j=await r.json(); document.getElementById('lxOnline').textContent=fmt(j.online); document.getElementById('lxToday').textContent=fmt(j.today); document.getElementById('lxTotal').textContent=fmt(j.total); box.hidden=false; }catch(_){} };
+  ping(); setInterval(ping,30000); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) ping(); });
+})();

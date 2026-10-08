@@ -33,6 +33,18 @@ SHOTS = [(g["scene"], v, f'{g["id"]}-{v+1}') for g in GAMES for v in range(3)] +
 GAME_BY_ID = {g["id"]: g for g in GAMES}
 import hashlib as _h
 VER=_h.md5((open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts","style.css"),encoding="utf-8").read()+open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts","app.js"),encoding="utf-8").read()).encode()).hexdigest()[:8]
+SW_JS = """// Lewolux Studio – Service Worker: macht die Seite installierbar und offline nutzbar.
+// Seiten: erst Netz, sonst Zwischenspeicher. Bilder/Schriften/CSS: Zwischenspeicher zuerst. Spiele und Downloads werden nicht gespeichert.
+const C = "lx-__VER__";
+self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(["/", "/site.webmanifest", "/assets/img/icon-192.png"])).catch(() => {})); self.skipWaiting(); });
+self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener("fetch", e => {
+  const r = e.request, u = new URL(r.url);
+  if (r.method !== "GET" || u.origin !== location.origin || /^\\/(downloads|games|api|admin)\\//.test(u.pathname)) return;
+  if (u.pathname.startsWith("/assets/")) { e.respondWith(caches.match(r).then(m => m || fetch(r).then(res => { if (res.ok) { const cl = res.clone(); caches.open(C).then(c => c.put(r, cl)); } return res; }))); return; }
+  if (r.mode === "navigate") e.respondWith(fetch(r).then(res => { const cl = res.clone(); caches.open(C).then(c => c.put(r, cl)); return res; }).catch(() => caches.match(r).then(m => m || caches.match("/"))));
+});
+"""
 
 def standalone(g):
     """Spiel als eine einzige HTML-Datei (lokale Bibliotheken/Schriften eingebettet), damit der Download offline läuft."""
@@ -777,8 +789,17 @@ def main():
     sm += "".join(u(f"software/{x['id']}/", [f"assets/screenshots/software-{x['id']}.jpg"], "0.7") for x in SOFTWARE)
     open(P("dist/sitemap.xml"), "w").write(sm + "</urlset>\n")
     open(P("dist/robots.txt"), "w").write(f"User-agent: *\nAllow: /\nDisallow: /downloads/\nDisallow: /admin/\n\nSitemap: {SITE}sitemap.xml\n")
-    open(P("dist/site.webmanifest"), "w").write(json.dumps({"name": "Lewolux Studio", "short_name": "Lewolux", "start_url": "/", "display": "standalone", "background_color": "#0a0b10", "theme_color": "#0a0b10",
-        "icons": [{"src": "/assets/img/icon-192.png", "sizes": "192x192", "type": "image/png"}, {"src": "/assets/img/icon-512.png", "sizes": "512x512", "type": "image/png"}]}, indent=1))
+    # Web-App: Manifest mit normalen und "maskable" Icons (Android schneidet die Form selbst zu), Service Worker, IndexNow-Schlüssel
+    lionM = Image.open(P("logo-lion.png")).convert("RGB")
+    for n in (192, 512):
+        bg = Image.new("RGB", (n, n), (10, 11, 16)); k = int(n * 0.72); bg.paste(lionM.resize((k, k), Image.LANCZOS), ((n - k) // 2, (n - k) // 2)); bg.save(P(f"dist/assets/img/icon-maskable-{n}.png"))
+    open(P("dist/site.webmanifest"), "w").write(json.dumps({"id": "/", "name": "Lewolux Studio", "short_name": "Lewolux", "description": "Kostenlose Indie-Games und kleine Programme von Lewolux Studio – direkt im Browser spielbar.",
+        "lang": "de", "start_url": "/?app=1", "scope": "/", "display": "standalone", "orientation": "any", "background_color": "#0a0b10", "theme_color": "#0a0b10", "categories": ["games", "entertainment"],
+        "icons": [{"src": "/assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"}, {"src": "/assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+                  {"src": "/assets/img/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"}, {"src": "/assets/img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}],
+        "shortcuts": [{"name": "Alle Spiele", "url": "/#spiele", "icons": [{"src": "/assets/img/icon-192.png", "sizes": "192x192"}]}, {"name": "Ring Legends", "url": "/spiele/ring-legends/", "icons": [{"src": "/assets/img/icon-192.png", "sizes": "192x192"}]}]}, indent=1))
+    open(P("dist/sw.js"), "w").write(SW_JS.replace("__VER__", VER))
+    open(P("dist/ca25d78b861b4a1aab26dff52d8faf9c.txt"), "w").write("ca25d78b861b4a1aab26dff52d8faf9c")
     open(P("dist/.htaccess"), "w").write("""# Apache: Kompression, Caching, HTTPS, 404
 ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>

@@ -8,8 +8,10 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
-    "run_worker_first": ["/downloads/*.exe"]
+    "run_worker_first": ["/downloads/*.exe", "/api/*"]
   },
+  "durable_objects": { "bindings": [{ "name": "STATS", "class_name": "Stats" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Stats"] }],
   "routes": [
     { "pattern": "lewolux.de", "custom_domain": true },
     { "pattern": "www.lewolux.de", "custom_domain": true }

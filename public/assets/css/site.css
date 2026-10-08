@@ -853,3 +853,16 @@ html.modal-open .lux,html.player-open .lux{display:none}
 .ts-steps .ts-i{font-size:28px}
 .ts-steps b{font-size:17px}
 .ts-steps span:last-child{opacity:.8;font-size:14.5px;line-height:1.5}
+
+/* Web-App installieren & Besucherzähler */
+.app-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:18px}
+.install-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(0,200,255,.22));color:#fff;font:600 14px/1 inherit;cursor:pointer}
+.install-btn:hover{filter:brightness(1.15)}
+.live-stats{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.live-stats b{color:#fff;font-weight:700}
+.live-stats .dot{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 0 0 rgba(61,220,132,.7);animation:lxPulse 2s infinite}
+@keyframes lxPulse{0%{box-shadow:0 0 0 0 rgba(61,220,132,.6)}70%{box-shadow:0 0 0 8px rgba(61,220,132,0)}100%{box-shadow:0 0 0 0 rgba(61,220,132,0)}}
+.install-help{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.install-help>div{background:#14151d;border:1px solid rgba(255,255,255,.12);border-radius:18px;max-width:440px;width:100%;padding:22px;color:#e8e8f0;font-size:15px;line-height:1.5}
+.install-help h3{margin:0 0 8px;font-size:18px}.install-help ol{margin:8px 0 14px;padding-left:20px}
+.install-help button{padding:9px 16px;border-radius:10px;border:0;background:#7c5cff;color:#fff;font-weight:600;cursor:pointer}
