@@ -49,7 +49,7 @@ GAMES = [
    lead="Das bisher größte Update macht aus Ring Legends ein echtes Online-Spiel. Deine Sammlung liegt sicher auf unserem Server, und zum ersten Mal spielst du nicht mehr allein.",
    items=[("🛒", "Markt", "Biete doppelte Karten an und kauf dir die, die dir fehlen. 8 % Gebühr, faire Preisspannen, Angebote laufen 7 Tage."),
           ("🏆", "Ranglisten", "Wer hat das vollste Album, die meisten Gem Mint 10, die meisten Packs? Drei Ranglisten, jeden Tag neu."),
-          ("📊", "Pop-Report", "Wie oft wurde eine Karte weltweit mit der Traumnote 10 bewertet? Je kleiner die Zahl, desto begehrter."),
+          ("📊", "Umlauf-Liste", "Wie viele Exemplare jeder Karte gibt es, roh und je Note? Je seltener im Umlauf, desto höher darf der Preis im Markt sein."),
           ("🛡️", "Fair und sicher", "Jedes Pack wird auf dem Server gezogen. Schummeln ist ausgeschlossen, die Drop-Raten stimmen mit den angezeigten überein."),
           ("🔑", "Ohne Pflicht-Anmeldung", "Sofort losspielen, ganz ohne Konto. Mit „Weiter mit Google“ schaltest du Markt und Ranglisten frei und spielst auf jedem Gerät weiter."),
           ("📱", "Bald bei Google Play", "Die Android-App ist in Vorbereitung. Mit Google angemeldet nimmst du deine Sammlung einfach mit.")],

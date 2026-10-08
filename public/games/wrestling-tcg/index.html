@@ -1089,6 +1089,21 @@ textarea.code { width: 100%; margin: 8px 0; padding: 10px; border-radius: 10px; 
 .rl-online-gate p { margin: 0; }
 .rl-og-icon { font-size: 34px; }
 .rl-gate .rl-google { width: 100%; }
+
+/* Ranglisten-Knopf + Umlauf */
+.rank-btn{position:relative;font-size:20px}
+.rank-badge{position:absolute;right:-6px;top:-6px;min-width:20px;height:18px;padding:0 4px;border-radius:9px;background:#ffd23f;color:#2a1300;font:800 11px/18px var(--body,system-ui);text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.circ-box{background:var(--surface2,rgba(255,255,255,.05));border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:0 0 12px}
+.circ-sum{font-size:15px;margin-bottom:6px}
+.circ-sum b{font-size:20px}
+.circ-bars{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.circ-bars li{display:grid;grid-template-columns:62px 1fr 34px;align-items:center;gap:8px;font-size:13px}
+.circ-bars li.me{font-weight:800;color:var(--ink)}
+.circ-bars li b{text-align:right;font-variant-numeric:tabular-nums}
+.circ-bar{height:10px;border-radius:5px;background:rgba(127,127,127,.18);overflow:hidden}
+.circ-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#3ec6ff,#a855f7)}
+.circ-bars li.me .circ-bar i{background:linear-gradient(90deg,#ffd23f,#ff7a18)}
+.circ-q{flex:1;min-width:0;font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 </style>
 <script>RL_API="https://rl-api.lewolux.de";RL_GOOGLE_CLIENT_ID="876811824743-eflhbkjunrda27aqqt0k45r1cv36tsch.apps.googleusercontent.com"</script>
 </head>
