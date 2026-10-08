@@ -2,6 +2,7 @@
 Aufruf: python3 lux-voice-render.py lines.json   (lines.json: [{h,t,s}] aus /#luxlines)"""
 import json, os, subprocess, sys, wave, tempfile
 from piper import PiperVoice
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); import piper_fix
 from piper.config import SynthesisConfig
 HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, "lux-voice")
 MODEL = os.environ.get("LUX_MODEL", "/home/claude/tts/thorsten-high/de_DE-thorsten-high.onnx")

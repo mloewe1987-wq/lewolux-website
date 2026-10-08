@@ -34,7 +34,8 @@
 
   /* ---- Spiel im Kinderbereich öffnen (Vollbild, ohne die Erwachsenen-Seiten zu verlassen) ---- */
   const pl=$('#kPlayer'), stage=$('#kStage');
-  let frame=null;
+  let frame=null, curId=null;
+  const quit=$('#kQuit');
   function openGame(id,push){
     const g=games[id]; if(!g||!g.play) return;
     if(frame) frame.remove();
@@ -42,6 +43,7 @@
     frame=document.createElement('iframe'); frame.src=g.play; frame.title=g.title;
     frame.allow='fullscreen; autoplay; gamepad; screen-wake-lock'; frame.allowFullscreen=true;
     frame.onload=()=>pl.classList.add('ready');
+    curId=id; $('#kTitle').textContent=g.title; quit.hidden=true;
     stage.appendChild(frame); pl.hidden=false; document.documentElement.classList.add('k-playing');
     if(push!==false) try{ history.pushState({kplay:id},'','#spiel-'+id); }catch(_){}
     try{ const fs=pl.requestFullscreen||pl.webkitRequestFullscreen; if(fs&&!document.fullscreenElement){ const r=fs.call(pl,{navigationUI:'hide'}); if(r&&r.catch) r.catch(()=>{}); } }catch(_){}
@@ -49,14 +51,22 @@
   }
   function closeGame(fromPop){
     if(pl.hidden) return;
-    pl.hidden=true; document.documentElement.classList.remove('k-playing');
+    pl.hidden=true; quit.hidden=true; curId=null; document.documentElement.classList.remove('k-playing');
     if(frame){ frame.remove(); frame=null; }
     try{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(_){}
     if(!fromPop && /^#spiel-/.test(location.hash)) try{ history.back(); }catch(_){}
   }
   document.querySelectorAll('[data-play]').forEach(b=>b.addEventListener('click',()=>openGame(b.dataset.play)));
-  $('#kClose').addEventListener('click',()=>closeGame(false));
-  addEventListener('popstate',()=>{ const m=location.hash.match(/^#spiel-(.+)$/); if(m&&games[m[1]]) openGame(m[1],false); else closeGame(true); });
+  // „Beenden“ fragt erst nach (große Ja/Nein-Knöpfe, vorgelesen), damit Kinder das Spiel nicht aus Versehen schließen
+  const askQuit=()=>{ quit.hidden=false; setTimeout(()=>{ try{ $('#kNo').focus(); }catch(_){} },50); };
+  $('#kClose').addEventListener('click',askQuit);
+  $('#kYes').addEventListener('click',()=>closeGame(false));
+  $('#kNo').addEventListener('click',()=>{ quit.hidden=true; try{ frame&&frame.focus(); }catch(_){} });
+  quit.addEventListener('click',e=>{ if(e.target===quit){ quit.hidden=true; } });
+  // Zurück-Taste/-Geste des Handys während des Spiels: nicht sofort schließen, sondern auch nachfragen
+  addEventListener('popstate',()=>{ const m=location.hash.match(/^#spiel-(.+)$/);
+    if(m&&games[m[1]]){ if(curId!==m[1]) openGame(m[1],false); return; }
+    if(!pl.hidden&&curId){ try{ history.pushState({kplay:curId},'','#spiel-'+curId); }catch(_){} say(P.quit); askQuit(); } });
   { const m=location.hash.match(/^#spiel-(.+)$/); if(m&&games[m[1]]) try{ history.replaceState(null,'',location.pathname+location.search); }catch(_){} }
   const playing=()=>document.hidden||document.documentElement.classList.contains('k-playing');
 
@@ -68,11 +78,13 @@
   const lionMane=Array.from({length:14},(_,i)=>{const a=Math.PI+i/13*Math.PI,x=48+Math.cos(a)*29,y=50+Math.sin(a)*29;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="10"/>`}).join('')+'<circle cx="21" cy="62" r="10"/><circle cx="75" cy="62" r="10"/>';
   const MASCOTS={
     // Lux, der Lewolux-Löwe (gleiche Zeichnung wie der Guck-Löwe in app.js, hier mit Körper zum Laufen)
-    lion:{w:84,h:105,svg:`<svg viewBox="0 0 96 120"><defs><linearGradient id="kpm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset=".55" stop-color="#9b5cff"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>
-<path d="M66 98q20 4 20-16" stroke="#e8a85c" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="86" cy="80" r="6" fill="url(#kpm)"/>
-<g class="lg1"><ellipse cx="38" cy="112" rx="9" ry="6.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/></g><g class="lg2"><ellipse cx="58" cy="112" rx="9" ry="6.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/></g>
-<ellipse cx="48" cy="95" rx="21" ry="18" fill="#ffcf8a"/><ellipse cx="48" cy="99" rx="12" ry="11" fill="#fff1dc"/>
-<g class="wg1"><ellipse cx="28" cy="94" rx="6" ry="10" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/></g><g class="wg2"><ellipse cx="68" cy="94" rx="6" ry="10" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/></g>
+    lion:{w:84,h:98,svg:`<svg viewBox="0 0 96 112"><defs><linearGradient id="kpm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset=".55" stop-color="#9b5cff"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs>
+<path d="M64 92q22 2 21-18" stroke="#e8a85c" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="85" cy="72" r="6" fill="url(#kpm)"/>
+<g class="lg1"><path d="M34 92v12" stroke="#ffcf8a" stroke-width="12" stroke-linecap="round"/><ellipse cx="34" cy="105" rx="9" ry="5.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/></g>
+<g class="lg2"><path d="M62 92v12" stroke="#ffcf8a" stroke-width="12" stroke-linecap="round"/><ellipse cx="62" cy="105" rx="9" ry="5.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"/></g>
+<path d="M27 92q-2-26 21-28q23 2 21 28q-4 8-21 8q-17 0-21-8z" fill="#ffcf8a" stroke="#e5ad6b" stroke-width="1.2"/><ellipse cx="48" cy="86" rx="12" ry="11" fill="#fff1dc"/>
+<g class="wg1"><path d="M31 70q-9 8-8 18" stroke="#ffcf8a" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="23" cy="89" r="5.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.1"/></g>
+<g class="wg2"><path d="M65 70q9 8 8 18" stroke="#ffcf8a" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="73" cy="89" r="5.5" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.1"/></g>
 <g><g fill="url(#kpm)">${lionMane}</g>
 <circle cx="28" cy="29" r="7" fill="#ffcf8a"/><circle cx="68" cy="29" r="7" fill="#ffcf8a"/><circle cx="28" cy="29" r="3.4" fill="#f2a65a"/><circle cx="68" cy="29" r="3.4" fill="#f2a65a"/>
 <circle cx="48" cy="51" r="23" fill="#ffcf8a"/><ellipse cx="48" cy="61" rx="11" ry="8" fill="#fff1dc"/>
@@ -80,16 +92,18 @@
 <path d="M34 38.5q5-3 10 0M52 38.5q5-3 10 0" stroke="#c98545" stroke-width="1.8" fill="none" stroke-linecap="round"/>
 <g fill="#ff8f8f"><circle cx="31" cy="57" r="3.6"/><circle cx="65" cy="57" r="3.6"/></g>
 <path d="M44.5 56h7l-3.5 3.6z" fill="#7a3b2e"/><path d="M48 59.6v2M48 61.6c-1.5 1.7-3.6 1.7-4.8.6M48 61.6c1.5 1.7 3.6 1.7 4.8.6" stroke="#7a3b2e" stroke-width="1.3" fill="none" stroke-linecap="round"/></g></svg>`},
-    // Eule Kritzel aus Kritzelheld
-    owl:{w:70,h:84,svg:`<svg viewBox="0 0 100 120">
-<g class="lg1"><path d="M38 108l-5 8M42 109v8M46 108l4 8" stroke="#ff9f1c" stroke-width="4.5" stroke-linecap="round"/></g><g class="lg2"><path d="M54 108l-4 8M58 109v8M62 108l5 8" stroke="#ff9f1c" stroke-width="4.5" stroke-linecap="round"/></g>
-<path d="M24 34 L28 8 L44 26 Z M76 34 L72 8 L56 26 Z" fill="#8a5530"/>
-<ellipse cx="50" cy="66" rx="34" ry="44" fill="#a8693b"/><ellipse cx="50" cy="80" rx="22" ry="25" fill="#f6dcae"/>
-<path d="M38 76q4 3 8 0M54 76q4 3 8 0M46 88q4 3 8 0" stroke="#d9b07a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-<g class="wg1"><ellipse cx="18" cy="70" rx="9" ry="22" fill="#8a5530"/></g><g class="wg2"><ellipse cx="82" cy="70" rx="9" ry="22" fill="#8a5530"/></g>
-<circle cx="36" cy="44" r="15" fill="#fff"/><circle cx="64" cy="44" r="15" fill="#fff"/>
-<g class="k-eye"><circle cx="38" cy="46" r="8" fill="#1d2350"/><circle cx="62" cy="46" r="8" fill="#1d2350"/><circle cx="41" cy="43" r="3" fill="#fff"/><circle cx="65" cy="43" r="3" fill="#fff"/></g>
-<path d="M44 56 L56 56 L50 66 Z" fill="#ff9f1c"/><g fill="#ff9fb0" opacity=".8"><ellipse cx="24" cy="58" rx="5" ry="3.5"/><ellipse cx="76" cy="58" rx="5" ry="3.5"/></g></svg>`},
+    // Eule Kritzel aus Kritzelheld – Farben wie im Spiel (Flügel sitzen am Körper und schwingen an der Schulter)
+    owl:{w:70,h:80,svg:`<svg viewBox="0 0 100 114">
+<g class="lg1"><path d="M40 102v6M40 108l-5 4M40 108v5M40 108l5 4" stroke="#ff9f1c" stroke-width="4" stroke-linecap="round"/></g><g class="lg2"><path d="M60 102v6M60 108l-5 4M60 108v5M60 108l5 4" stroke="#ff9f1c" stroke-width="4" stroke-linecap="round"/></g>
+<path d="M26 30 L27 6 L44 22 Z M74 30 L73 6 L56 22 Z" fill="#e8484a"/>
+<path d="M50 14c22 0 36 18 36 44c0 28-14 46-36 46S14 86 14 58C14 32 28 14 50 14z" fill="#ff5f5c"/>
+<path d="M50 54c13 0 21 10 21 24c0 14-9 23-21 23s-21-9-21-23c0-14 8-24 21-24z" fill="#ffb7b5"/>
+<path d="M40 72q4 3 8 0M52 72q4 3 8 0M46 84q4 3 8 0" stroke="#f08f8d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<g class="wg1"><path d="M22 50c-8 6-11 20-8 34c1 4 6 5 9 2c4-6 6-18 5-32z" fill="#e8484a"/></g>
+<g class="wg2"><path d="M78 50c8 6 11 20 8 34c-1 4-6 5-9 2c-4-6-6-18-5-32z" fill="#e8484a"/></g>
+<circle cx="36" cy="42" r="15" fill="#fff"/><circle cx="64" cy="42" r="15" fill="#fff"/>
+<g class="k-eye"><circle cx="38" cy="44" r="8" fill="#1d2350"/><circle cx="62" cy="44" r="8" fill="#1d2350"/><circle cx="41" cy="41" r="3" fill="#fff"/><circle cx="65" cy="41" r="3" fill="#fff"/></g>
+<path d="M44 54 L56 54 L50 64 Z" fill="#ff9f1c"/><g fill="#ffd0d0" opacity=".9"><ellipse cx="24" cy="56" rx="5" ry="3.5"/><ellipse cx="76" cy="56" rx="5" ry="3.5"/></g></svg>`},
     // Panda (für das nächste Kinderspiel, erscheint automatisch, sobald ein KIDS-Eintrag mascot="panda" hat)
     panda:{w:78,h:90,svg:`<svg viewBox="0 0 100 116">
 <g class="lg1"><ellipse cx="36" cy="106" rx="11" ry="9" fill="#26263a"/></g><g class="lg2"><ellipse cx="64" cy="106" rx="11" ry="9" fill="#26263a"/></g>
@@ -109,13 +123,16 @@
     const ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
     const W=()=>lawn.clientWidth;
     let openBubble=null;
+    // Jede Figur bekommt einen eigenen Streifen der Wiese (gemischte Reihenfolge), damit sie sich nicht überlagern;
+    // dazu eine leicht unterschiedliche Tiefe (weiter hinten = etwas höher und kleiner).
+    const order=list.map((_,i)=>i).sort(()=>Math.random()-.5);
     const walkers=list.map((m,i)=>{
-      const f=MASCOTS[m.kind]||emojiFig(m.game&&m.game.emoji||'⭐'), big=W()>900?1.3:1, w=f.w*m.scale*big, h=f.h*m.scale*big;
-      const el=document.createElement('div'); el.className='k-walker'+(m.kind==='lion'?' is-lion':''); el.style.width=w+'px'; el.style.height=h+'px';
+      const slot=order[i], depth=(slot%2)*10+Math.random()*6, f=MASCOTS[m.kind]||emojiFig(m.game&&m.game.emoji||'⭐'), big=(W()>900?1.3:1)*(1-depth/120), w=f.w*m.scale*big, h=f.h*m.scale*big;
+      const el=document.createElement('div'); el.className='k-walker'+(m.kind==='lion'?' is-lion':''); el.style.width=w+'px'; el.style.height=h+'px'; el.style.bottom=(10+depth)+'px';
       el.innerHTML='<button type="button" class="k-fig" aria-label="'+(m.game?m.game.title+': Wollen wir spielen?':'Lux, der Löwe')+'">'+f.svg+'</button>';
       lawn.appendChild(el);
-      const o={el,fig:el.firstChild,m,w,h,x:(i+.5)/list.length*Math.max(1,W()-w),x0:0,tx:0,t:0,dur:1,state:'idle',wait:.3+Math.random()*1.5,dir:Math.random()<.5?-1:1,ph:Math.random()*6,hop:0,z:Math.round(h)};
-      el.style.zIndex=String(200-o.z);
+      const o={el,fig:el.firstChild,m,w,h,slot,depth,x:0,x0:0,tx:0,t:0,dur:1,state:'idle',wait:.3+Math.random()*1.5,dir:Math.random()<.5?-1:1,ph:Math.random()*6,hop:0,z:Math.round(h)};
+      el.style.zIndex=String(200-Math.round(depth)); const z=zone(o); o.x=(z[0]+z[1])/2;
       o.fig.addEventListener('click',ev=>{ ev.stopPropagation(); tap(o); });
       return o;
     });
@@ -127,19 +144,20 @@
         p.onclick=ev=>{ ev.stopPropagation(); say(o.m.game.say); closeBubble(); openGame(o.m.game.id); }; b.appendChild(p); }
       lawn.appendChild(b);
       const bw=b.offsetWidth, cx=o.x+o.w/2, left=Math.max(6,Math.min(W()-bw-6,cx-bw/2));
-      b.style.left=left+'px'; b.style.bottom=(14+o.h+8)+'px'; b.style.setProperty('--tail',(cx-left)+'px');
+      b.style.left=left+'px'; b.style.bottom=(10+o.depth+o.h+10)+'px'; b.style.setProperty('--tail',(cx-left)+'px');
       openBubble={b,o,until:performance.now()+(withPlay?7000:2400)};
     }
     function closeBubble(){ if(openBubble){ openBubble.b.remove(); openBubble.o.state='idle'; openBubble.o.wait=.8; openBubble=null; } }
     function tap(o){
       o.state='talk'; o.hop=1; o.el.classList.remove('giggle'); void o.el.offsetWidth; o.el.classList.add('giggle');
       if(o.m.game&&o.m.game.play){ say(P.askplay||'Wollen wir spielen?'); bubble(o,P.askplay||'Wollen wir spielen?',true); }
-      else { say(P.lion||'Hihi!'); bubble(o,P.lion||'Hihi!',false); }
+      else { say(P.lion||'Haha!'); bubble(o,P.lion||'Haha!',false); }
     }
     document.addEventListener('click',e=>{ if(openBubble&&!e.target.closest('.k-wb')) closeBubble(); });
+    function zone(o){ const n=list.length, sw=W()/n, a=o.slot*sw, b=a+sw-o.w; return b>a?[a,b]:[a+(sw-o.w)/2,a+(sw-o.w)/2]; }
     function pick(o){
-      const span=Math.max(1,W()-o.w), d=(.2+Math.random()*.5)*span*(Math.random()<.5?-1:1);
-      o.x0=o.x; o.tx=Math.max(0,Math.min(span,o.x+d)); if(Math.abs(o.tx-o.x)<30) o.tx=o.x<span/2?Math.min(span,o.x+span*.4):Math.max(0,o.x-span*.4);
+      const [a,b]=zone(o); let t=a+Math.random()*(b-a); if(Math.abs(t-o.x)<(b-a)*.25) t=o.x<(a+b)/2?b-Math.random()*(b-a)*.2:a+Math.random()*(b-a)*.2;
+      o.x0=o.x; o.tx=Math.max(a,Math.min(b,t)); if(Math.abs(o.tx-o.x)<4){ o.state='idle'; o.wait=1+Math.random()*2; return; }
       o.dir=o.tx>o.x?1:-1; o.t=0; o.dur=Math.abs(o.tx-o.x)/(48*(o.m.scale<1?1.15:1)); o.state='walk';
     }
     let last=performance.now(), vis=true;
@@ -165,7 +183,7 @@
       requestAnimationFrame(tick);
     }
     walkers.forEach(draw);
-    addEventListener('resize',()=>walkers.forEach(o=>{ o.x=Math.min(o.x,Math.max(0,W()-o.w)); if(o.state==='walk'){ o.state='idle'; o.wait=.2; } draw(o); }));
+    addEventListener('resize',()=>walkers.forEach(o=>{ const z=zone(o); o.x=Math.max(z[0],Math.min(z[1],o.x)); if(o.state==='walk'){ o.state='idle'; o.wait=.2; } draw(o); }));
     if(!calm) requestAnimationFrame(tick);
   }
 
@@ -216,16 +234,16 @@
     c.save(); c.translate(x,y); c.scale(s,s);
     c.fillStyle='rgba(29,35,80,.15)'; c.beginPath(); c.ellipse(0,0,40,8,0,0,7); c.fill();
     c.fillStyle='#ff9f1c'; [-14,14].forEach(dx=>{ c.beginPath(); c.ellipse(dx,-3,9,5,0,0,7); c.fill(); });
-    c.fillStyle='#8a5530'; c.beginPath(); c.moveTo(-30,-110); c.lineTo(-24,-142); c.lineTo(-8,-118); c.fill(); c.beginPath(); c.moveTo(30,-110); c.lineTo(24,-142); c.lineTo(8,-118); c.fill();
-    c.fillStyle='#a8693b'; c.beginPath(); c.ellipse(0,-62,40,58,0,0,7); c.fill();
-    c.fillStyle='#f6dcae'; c.beginPath(); c.ellipse(0,-42,26,32,0,0,7); c.fill();
-    c.fillStyle='#8a5530'; c.beginPath(); c.ellipse(-38,-58,10,26,.25,0,7); c.fill();          // linker Flügel
+    c.fillStyle='#e8484a'; c.beginPath(); c.moveTo(-30,-110); c.lineTo(-24,-142); c.lineTo(-8,-118); c.fill(); c.beginPath(); c.moveTo(30,-110); c.lineTo(24,-142); c.lineTo(8,-118); c.fill();
+    c.fillStyle='#ff5f5c'; c.beginPath(); c.ellipse(0,-62,40,58,0,0,7); c.fill();
+    c.fillStyle='#ffb7b5'; c.beginPath(); c.ellipse(0,-42,26,32,0,0,7); c.fill();
+    c.fillStyle='#e8484a'; c.beginPath(); c.ellipse(-38,-58,10,26,.25,0,7); c.fill();          // linker Flügel
     c.save(); c.translate(34,-76); c.rotate(-1.2+wave); c.beginPath(); c.ellipse(0,-22,10,26,0,0,7); c.fill(); c.restore();   // winkt
     c.fillStyle='#fff'; [-17,17].forEach(dx=>{ c.beginPath(); c.arc(dx,-90,18,0,7); c.fill(); });
     if(blink){ c.strokeStyle='#1d2350'; c.lineWidth=4; c.lineCap='round'; [-17,17].forEach(dx=>{ c.beginPath(); c.moveTo(dx-8,-89); c.quadraticCurveTo(dx,-84,dx+8,-89); c.stroke(); }); }
     else { c.fillStyle='#1d2350'; [-15,19].forEach(dx=>{ c.beginPath(); c.arc(dx,-88,9.5,0,7); c.fill(); }); c.fillStyle='#fff'; [-12,22].forEach(dx=>{ c.beginPath(); c.arc(dx,-92,3.4,0,7); c.fill(); }); }
     c.fillStyle='#ff9f1c'; c.beginPath(); c.moveTo(-7,-74); c.lineTo(7,-74); c.lineTo(0,-62); c.fill();
-    c.fillStyle='rgba(255,140,160,.7)'; [-30,30].forEach(dx=>{ c.beginPath(); c.ellipse(dx,-70,6,4,0,0,7); c.fill(); });
+    c.fillStyle='rgba(255,215,215,.9)'; [-30,30].forEach(dx=>{ c.beginPath(); c.ellipse(dx,-70,6,4,0,0,7); c.fill(); });
     c.restore();
   }
   document.querySelectorAll('canvas.k-prev').forEach(cv=>{

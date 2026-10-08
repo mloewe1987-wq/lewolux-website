@@ -203,7 +203,7 @@ KIDS = [
  dict(id="kritzelheld", title="Kritzelheld", emoji="🦉", c1="#3ec97a", c2="#19a7e0", age="ab 4 Jahren",
   line="Buchstaben und Zahlen malen mit Eule Kritzel",
   say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn.",
-  mascot="owl", crowd=3,        # Figur, die unten auf der Wiese herumläuft (owl, panda, …) und wie viele davon
+  mascot="owl", crowd=1,        # Figur, die unten auf der Wiese herumläuft (owl, panda, …) und wie viele davon
   preview="kritzel"),           # animierte Vorschau auf der Karte (Renderer in parts/kids.js); ohne: Screenshot
 ]
 # Alles, was im Kinderbereich vorgelesen wird (feste Sätze). Spielnamen, Beschreibungen und
@@ -212,9 +212,11 @@ KIDS_PHRASES = {
  "hello": "Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen.",
  "brand": "Lewolux Kids",
  "askplay": "Wollen wir spielen?",
- "lion": "Hihi! Das kitzelt!",
- "sun": "Hihihi! Hallo, ich bin die Sonne!",
+ "lion": "Haha! Hey, das kitzelt!",
+ "sun": "Hallo! Ich bin die Sonne. Haha, das kitzelt!",
  "soon": "Bald kommt ein neues Spiel!",
  "bye": "Tschüss! Bis bald!",
  "back": "Weiter spielen!",
+ "quit": "Spiel beenden?",
+ "no": "Nein, weiterspielen!",
 }

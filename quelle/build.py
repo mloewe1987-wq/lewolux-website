@@ -783,7 +783,7 @@ def kids_icons():
 # Vorlese-Stimme für Lewolux Kids: Piper „Kerstin“ (CC0), mit ffmpeg etwas höher/kindlicher gemacht.
 # Aufnahmen landen im Cache kids-voice/<hash>.mp3 (nur neue Texte werden aufgenommen) und werden nach dist/kids/voice/ kopiert.
 KIDS_VOICE_MODEL = os.environ.get("KIDS_VOICE_MODEL", "/home/claude/tts/de-kerstin-low/de-kerstin-low.onnx")
-KIDS_VOICE_AF = "asetrate=16000*1.12,aresample=44100,atempo=0.93,highpass=f=90,loudnorm=I=-16:TP=-1.5"
+KIDS_VOICE_AF = "asetrate=16000*1.12,aresample=44100,atempo=0.93,highpass=f=90,loudnorm=I=-13:TP=-1"
 def kids_voice(texts):
     """Gibt {Text: URL} zurück. Fehlt Piper/ffmpeg, bleibt die Liste leer -> die Seite liest dann mit der Browserstimme vor."""
     import subprocess, tempfile, wave
@@ -795,6 +795,7 @@ def kids_voice(texts):
             try:
                 if voice is None:
                     from piper import PiperVoice
+                    import piper_fix  # „ç“-Korrektur (ich, nicht …)
                     voice = PiperVoice.load(KIDS_VOICE_MODEL)
                 with tempfile.NamedTemporaryFile(suffix=".wav") as tmp:
                     with wave.open(tmp.name, "wb") as w: voice.synthesize_wav(t, w)
@@ -896,9 +897,15 @@ def kids_page(c):
 </div>
 
 <div class="k-player" id="kPlayer" hidden>
-  <button class="k-close" id="kClose" type="button" aria-label="Spiel schließen" data-say="{e(KIDS_PHRASES['bye'])}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-  <div class="k-loading">Lädt …</div>
-  <div class="k-stage" id="kStage"></div>
+  <div class="k-bar">
+    <button class="k-close" id="kClose" type="button" data-say="{e(KIDS_PHRASES['quit'])}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Beenden</button>
+    <span class="k-bar-t" id="kTitle"></span>
+  </div>
+  <div class="k-stage" id="kStage"><div class="k-loading">Lädt …</div></div>
+  <div class="k-quit" id="kQuit" hidden role="alertdialog" aria-labelledby="kQuitH">
+    <div class="k-quit-in"><p id="kQuitH">Spiel beenden?</p>
+      <div class="k-quit-btns"><button type="button" class="k-yes" id="kYes" data-say="{e(KIDS_PHRASES['bye'])}">Ja</button><button type="button" class="k-no" id="kNo" data-say="{e(KIDS_PHRASES['no'])}">Nein</button></div></div>
+  </div>
 </div>
 
 <dialog class="k-gate" id="kGate" aria-labelledby="kGateH">

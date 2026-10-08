@@ -29,12 +29,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="/kids/kids.webmanifest">
 <link rel="preload" href="../assets/fonts/fredoka-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../assets/css/kids.css?v=a085cbdf">
+<link rel="stylesheet" href="../assets/css/kids.css?v=9ba19202">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://lewolux.de/#studio", "name": "Lewolux Studio", "url": "https://lewolux.de/", "logo": "https://lewolux.de/assets/img/lewolux-studio-logo.jpg", "image": "https://lewolux.de/assets/img/lewolux-studio-banner.jpg", "slogan": "Shaping the Future of Play", "email": "hallo@lewolux.de", "areaServed": "DE", "sameAs": []}, {"@type": "CollectionPage", "@id": "https://lewolux.de/kids/", "url": "https://lewolux.de/kids/", "name": "Lewolux Kids – kostenlose Kinderspiele ohne Werbung", "description": "Lewolux Kids: kostenlose Lernspiele für Kinder, ohne Werbung, ohne Käufe, ohne Anmeldung. Große Knöpfe, Vorlesefunktion und Elternsperre. Jetzt: Kritzelheld – Buchstaben und Zahlen malen.", "inLanguage": "de", "isPartOf": {"@type": "WebSite", "url": "https://lewolux.de/", "name": "Lewolux Studio"}, "audience": {"@type": "PeopleAudience", "suggestedMinAge": 4, "suggestedMaxAge": 9}, "mainEntity": {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Kritzelheld", "url": "https://lewolux.de/spiele/kritzelheld/"}]}}]}</script>
 </head>
 <body class="kids">
 <div class="k-sky" aria-hidden="true"><div class="k-cloud c1"></div><div class="k-cloud c2"></div><div class="k-cloud c3"></div></div>
-<button class="k-sunb" id="kSun" type="button" aria-label="Sonne" data-say="Hihihi! Hallo, ich bin die Sonne!"><svg viewBox="0 0 200 200" aria-hidden="true"><g class="ks-rays"><path d="M100 8 L110 34 L90 34 Z" transform="rotate(0 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(30 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(60 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(90 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(120 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(150 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(180 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(210 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(240 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(270 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(300 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(330 100 100)"/></g>
+<button class="k-sunb" id="kSun" type="button" aria-label="Sonne" data-say="Hallo! Ich bin die Sonne. Haha, das kitzelt!"><svg viewBox="0 0 200 200" aria-hidden="true"><g class="ks-rays"><path d="M100 8 L110 34 L90 34 Z" transform="rotate(0 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(30 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(60 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(90 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(120 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(150 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(180 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(210 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(240 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(270 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(300 100 100)"/><path d="M100 8 L110 34 L90 34 Z" transform="rotate(330 100 100)"/></g>
 <circle cx="100" cy="100" r="58" fill="url(#ksg)"/><defs><radialGradient id="ksg" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff6b0"/><stop offset=".6" stop-color="#ffd23f"/><stop offset="1" stop-color="#ffb52e"/></radialGradient></defs>
 <g class="ks-eyes"><ellipse cx="80" cy="90" rx="7" ry="9" fill="#1d2350"/><ellipse cx="120" cy="90" rx="7" ry="9" fill="#1d2350"/><circle cx="82.5" cy="86.5" r="2.6" fill="#fff"/><circle cx="122.5" cy="86.5" r="2.6" fill="#fff"/></g>
 <g fill="#ff8fa3" opacity=".75"><ellipse cx="66" cy="110" rx="9" ry="6"/><ellipse cx="134" cy="110" rx="9" ry="6"/></g>
@@ -72,9 +72,15 @@
 </div>
 
 <div class="k-player" id="kPlayer" hidden>
-  <button class="k-close" id="kClose" type="button" aria-label="Spiel schließen" data-say="Tschüss! Bis bald!"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-  <div class="k-loading">Lädt …</div>
-  <div class="k-stage" id="kStage"></div>
+  <div class="k-bar">
+    <button class="k-close" id="kClose" type="button" data-say="Spiel beenden?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Beenden</button>
+    <span class="k-bar-t" id="kTitle"></span>
+  </div>
+  <div class="k-stage" id="kStage"><div class="k-loading">Lädt …</div></div>
+  <div class="k-quit" id="kQuit" hidden role="alertdialog" aria-labelledby="kQuitH">
+    <div class="k-quit-in"><p id="kQuitH">Spiel beenden?</p>
+      <div class="k-quit-btns"><button type="button" class="k-yes" id="kYes" data-say="Tschüss! Bis bald!">Ja</button><button type="button" class="k-no" id="kNo" data-say="Nein, weiterspielen!">Nein</button></div></div>
+  </div>
 </div>
 
 <dialog class="k-gate" id="kGate" aria-labelledby="kGateH">
@@ -91,7 +97,7 @@
     <p class="k-legal"><a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a></p>
   </div>
 </dialog>
-<script id="kids-data" type="application/json">{"games": [{"id": "kritzelheld", "title": "Kritzelheld", "play": "/games/kritzelheld/index.html", "mascot": "owl", "crowd": 3, "emoji": "🦉", "say": "Los geht's! Kritzelheld"}], "phrases": {"hello": "Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen.", "brand": "Lewolux Kids", "askplay": "Wollen wir spielen?", "lion": "Hihi! Das kitzelt!", "sun": "Hihihi! Hallo, ich bin die Sonne!", "soon": "Bald kommt ein neues Spiel!", "bye": "Tschüss! Bis bald!", "back": "Weiter spielen!"}, "voice": {"Hihihi! Hallo, ich bin die Sonne!": "/kids/voice/3838eba21f07.mp3", "Lewolux Kids": "/kids/voice/f9dc9900b074.mp3", "Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen.": "/kids/voice/0bbc34c52c62.mp3", "Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn.": "/kids/voice/2f3a745b3139.mp3", "Los geht's! Kritzelheld": "/kids/voice/30afc2b89193.mp3", "Bald kommt ein neues Spiel!": "/kids/voice/b4bb295799f3.mp3", "Tschüss! Bis bald!": "/kids/voice/b48e79099cc2.mp3", "Weiter spielen!": "/kids/voice/b49cef461ead.mp3", "Wollen wir spielen?": "/kids/voice/324ebd45fe23.mp3", "Hihi! Das kitzelt!": "/kids/voice/3a5625557343.mp3"}}</script>
-<script src="../assets/js/kids.js?v=a085cbdf" defer></script>
+<script id="kids-data" type="application/json">{"games": [{"id": "kritzelheld", "title": "Kritzelheld", "play": "/games/kritzelheld/index.html", "mascot": "owl", "crowd": 1, "emoji": "🦉", "say": "Los geht's! Kritzelheld"}], "phrases": {"hello": "Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen.", "brand": "Lewolux Kids", "askplay": "Wollen wir spielen?", "lion": "Haha! Hey, das kitzelt!", "sun": "Hallo! Ich bin die Sonne. Haha, das kitzelt!", "soon": "Bald kommt ein neues Spiel!", "bye": "Tschüss! Bis bald!", "back": "Weiter spielen!", "quit": "Spiel beenden?", "no": "Nein, weiterspielen!"}, "voice": {"Hallo! Ich bin die Sonne. Haha, das kitzelt!": "/kids/voice/5c53aa0bb0ab.mp3", "Lewolux Kids": "/kids/voice/f93b0e487e7d.mp3", "Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen.": "/kids/voice/ca74daa3264f.mp3", "Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn.": "/kids/voice/7bd73f07af03.mp3", "Los geht's! Kritzelheld": "/kids/voice/8397d2210705.mp3", "Bald kommt ein neues Spiel!": "/kids/voice/827b73a49f38.mp3", "Spiel beenden?": "/kids/voice/dc194858d201.mp3", "Tschüss! Bis bald!": "/kids/voice/f20a43053fbe.mp3", "Nein, weiterspielen!": "/kids/voice/cf8fd5310c25.mp3", "Weiter spielen!": "/kids/voice/2163a67fe5a8.mp3", "Wollen wir spielen?": "/kids/voice/12dd8440d5e2.mp3", "Haha! Hey, das kitzelt!": "/kids/voice/99c05b59935c.mp3"}}</script>
+<script src="../assets/js/kids.js?v=9ba19202" defer></script>
 </body>
 </html>
