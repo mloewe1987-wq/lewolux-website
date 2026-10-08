@@ -313,11 +313,25 @@ def tester_page(c):
     h = head(c, "Ring Legends Tester werden – Android-Vorabtest | Lewolux", "Spiel Ring Legends vor allen anderen auf Android: Melde dich als Tester für den Play-Store-Test – kostenlos, 14 Tage, nur ein Google-Konto nötig.", "ring-legends/tester/", "assets/og/og-wrestling-tcg.jpg", jsonld)
     return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c))
 
+def _thumb(c, g): return c.shot(g["id"] + "-1", True)
+def games_rail(c):
+    """Spieleliste: am großen Bildschirm links eingeblendet, sonst als Knopf „Spiele“ unten links (Schublade)."""
+    items = "".join(f'<li><a href="{c.page(g)}" data-gid="{g["id"]}"><img src="{_thumb(c, g)}" alt="" width="64" height="36" loading="lazy" decoding="async"><span><b>{e(g["short"])}</b><small>{e(" · ".join(g["genres"][:2]))}</small></span></a></li>' for g in GAMES)
+    soon = "".join(f'<li class="gr-soon"><a href="{c.root}spiele/{t["id"]}/"><img src="{c.root}assets/teaser/{t["id"]}-1.jpg" alt="" width="64" height="36" loading="lazy" decoding="async"><span><b>{e(t["short"])}</b><small>bald</small></span></a></li>' for t in TEASERS)
+    return f'''<aside class="game-rail" id="gameRail" aria-label="Alle Spiele"><div class="gr-head"><span>🎮 Spiele</span><button type="button" class="gr-close" aria-label="Spieleliste schließen">✕</button></div><ul>{items}{soon}</ul><a class="gr-kids" href="{c.root}kids/">🦉 Lewolux Kids</a></aside>
+<button type="button" class="gr-toggle" id="gameRailBtn" aria-controls="gameRail" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Spiele</button>'''
+def game_marquee(c):
+    """Laufband mit allen Spielen (Bild + Name), anklickbar – ersetzt die Technik-Liste."""
+    chip = lambda g, h: f'<a class="gm-chip" href="{c.page(g)}" style="--acc:{g["accent"]}"{h}><img src="{_thumb(c, g)}" alt="" width="72" height="40" loading="lazy" decoding="async"><b>{e(g["short"])}</b><small>{e(g["genres"][0])}</small></a>'
+    row = "".join(chip(g, "") for g in GAMES) + "".join(chip(g, ' tabindex="-1" aria-hidden="true"') for g in GAMES)
+    return f'<div class="game-marquee" aria-label="Alle Spiele"><div class="gm-track">{row}</div></div>'
+
 def common(c, t):
     rep = {"{{ROOT}}": c.root, "{{EMAIL}}": EMAIL, "{{GAMECOUNT}}": str(len(GAMES)),
            "{{FOOTGAMES}}": "".join(f'<li><a href="{c.page(g)}">{e(g["short"])}</a></li>' for g in GAMES) + "".join(f'<li><a href="{c.root}spiele/{t["id"]}/">{e(t["short"])} <small>(bald)</small></a></li>' for t in TEASERS),
            "{{NEWS}}": news_items(c), "{{IMPRESSUM}}": f"{c.root}impressum/", "{{DATENSCHUTZ}}": f"{c.root}datenschutz/"}
     rep["{{SOCIAL}}"] = social_icons()
+    rep["{{RAIL}}"] = games_rail(c); rep["{{GAMEMARQUEE}}"] = game_marquee(c)
     for k, v in rep.items(): t = t.replace(k, v)
     if c.preview:
         t = t.replace(f'src="{c.root}assets/img/lewolux-studio-logo.jpg"', f'src="{c.img("lewolux-studio-logo.jpg")}"')

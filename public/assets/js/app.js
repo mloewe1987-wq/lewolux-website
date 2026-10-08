@@ -781,3 +781,17 @@ window.lxAgeGate=init;document.querySelectorAll('.age-gate').forEach(init)})();
     document.body.appendChild(d);
   });
 })();
+
+/* ===== Spieleliste (Schublade) & aktiver Bereich im Umschalter ===== */
+(function(){
+  const r=document.getElementById('gameRail'), b=document.getElementById('gameRailBtn'); if(!r||!b) return;
+  const set=o=>{r.classList.toggle('open',o);b.setAttribute('aria-expanded',o?'true':'false');};
+  b.onclick=()=>set(!r.classList.contains('open'));
+  r.querySelector('.gr-close').onclick=()=>set(false);
+  document.addEventListener('click',e=>{if(r.classList.contains('open')&&!r.contains(e.target)&&!b.contains(e.target))set(false);});
+  r.querySelectorAll('a[data-gid]').forEach(a=>{ if(location.pathname.indexOf('/spiele/'+a.dataset.gid+'/')>=0) a.setAttribute('aria-current','page'); });
+  const areas=document.querySelectorAll('.area[data-area]'); const mark=k=>areas.forEach(a=>a.setAttribute('aria-current',a.dataset.area===k?'true':'false'));
+  if(/\/software\//.test(location.pathname)) mark('software'); else if(/\/spiele\//.test(location.pathname)) mark('spiele');
+  const secs=['spiele','software'].map(id=>document.getElementById(id)).filter(Boolean);
+  if(secs.length&&'IntersectionObserver' in window){ const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)mark(en.target.id);}),{rootMargin:'-40% 0px -55% 0px'}); secs.forEach(x=>io.observe(x)); }
+})();
