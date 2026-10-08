@@ -808,3 +808,23 @@ html.modal-open .lux,html.player-open .lux{display:none}
 .up-list span:last-child{color:var(--muted);font-size:14px;line-height:1.45}
 .g-update .g-actions{max-width:360px}
 .up-note{margin:16px 0 0;color:var(--dim);font-size:13.5px;max-width:70ch}
+/* Ring-Legends-Trailer + Startseiten-Werbung */
+.trailer{position:relative;border-radius:18px;overflow:hidden;background:#07051a;border:1px solid color-mix(in srgb,var(--accent,var(--cyan)) 45%,transparent);box-shadow:0 30px 90px -40px var(--accent,var(--cyan))}
+.trailer video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#07051a}
+.trailer.is-p{max-width:min(100%,calc(72vh*9/16));margin-inline:auto}
+.trailer.is-p video{aspect-ratio:9/16}
+.tr-sound{position:absolute;right:12px;bottom:12px;font:700 14px/1 var(--f-body,inherit);color:#fff;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:9px 14px;cursor:pointer;backdrop-filter:blur(6px)}
+.tr-sound:hover{background:rgba(0,0,0,.8)}
+.g-update .trailer{margin:0 0 24px;max-width:880px}
+.promo{padding-block:clamp(36px,6vw,72px)}
+.promo-in{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(22px,4vw,52px);align-items:center}
+@media (max-width:900px){.promo-in{grid-template-columns:minmax(0,1fr)}}
+.promo .eyebrow{color:var(--accent)}
+.promo h2{font:900 clamp(28px,4vw,48px)/1.04 var(--f-display);text-transform:uppercase;margin:12px 0 12px}
+.promo-copy>p{color:var(--muted);font-size:clamp(15.5px,1.4vw,17.5px);margin:0 0 16px}
+.promo-feats{list-style:none;padding:0;margin:0 0 20px;display:flex;flex-wrap:wrap;gap:8px}
+.promo-feats li{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line-2);font-weight:700;font-size:14px}
+.promo-actions{display:flex;flex-wrap:wrap;gap:10px}
+.promo-actions .btn{flex:1 1 180px}
+.promo-soon{margin:16px 0 0;color:var(--dim);font-size:14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.soon-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:#000;border:1px solid rgba(255,255,255,.35);color:#fff;font-weight:700;font-size:14px}

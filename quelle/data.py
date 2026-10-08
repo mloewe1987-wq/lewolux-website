@@ -179,7 +179,8 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
- ("Großes Update", "Ring Legends ist jetzt online: Markt, Ranglisten, Pop-Report", "spiele/wrestling-tcg/#update"),
+ ("Großes Update", "Ring Legends ist jetzt online: Markt, Ranglisten, Pop-Report", "#ring-legends-update"),
+ ("Bald", "Ring Legends kommt als App in den Play Store", "spiele/wrestling-tcg/#update"),
  ("Neu", "DeskBoard 1.7 jetzt kostenlos zum Download", "software/deskboard/"),
  ("Angekündigt", "House in the Desert – Survival-Horror, empfohlen ab 18", "spiele/house-in-the-desert/"),
  ("Mitmachen", "Stimm ab, welches Spiel als Nächstes wächst", "#mitmachen"),

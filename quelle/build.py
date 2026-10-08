@@ -252,7 +252,7 @@ def common(c, t):
 
 def tail(c):
     js = f"<script>{part('app.js')}</script>" if c.preview else f'<script src="{c.root}assets/js/app.js?v={VER}" defer></script>'
-    return f'{part("modal.html")}\n<script id="game-data" type="application/json">{game_data(c)}</script>\n<script id="lux-data" type="application/json">{lux_data(c)}</script>\n{js}\n</body>\n</html>\n'
+    return f'{part("modal.html")}\n<script id="game-data" type="application/json">{game_data(c)}</script>\n<script id="lux-data" type="application/json">{lux_data(c)}</script>\n{js}\n{TRAILER_JS if not c.preview else ""}\n</body>\n</html>\n'
 
 # ---------------------------------------------------------------- community
 KIND_OPTS = [("wunsch", "Wunsch"), ("idee", "Idee"), ("bug", "Fehler gefunden"), ("lob", "Lob")]
@@ -529,7 +529,7 @@ def index_page(c):
                 .replace("{{REEL}}", "\n".join(reel(c, g) for g in GAMES))
                 .replace("{{SOFTWARE}}", "\n".join(sw(c, s) for s in SOFTWARE)).replace("{{FAQ}}", faq)
                 .replace("{{POLL}}", poll_items(c)).replace("{{FEEDBACKFORM}}", feedback_form(c)).replace("{{API}}", API)
-                .replace("{{FEAT}}", feat["id"]).replace("{{FEATNAME}}", e(feat["short"])))
+                .replace("{{FEAT}}", feat["id"]).replace("{{FEATNAME}}", e(feat["short"])).replace("{{PROMO}}", promo(c)))
     jsonld = [{"@context": "https://schema.org", "@graph": [ORG,
         {"@type": "WebSite", "@id": SITE + "#website", "name": "Lewolux Studio", "url": SITE, "inLanguage": "de-DE", "publisher": {"@id": SITE + "#studio"}},
         {"@type": "ItemList", "name": "Kostenlose Spiele von Lewolux Studio", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": f"{SITE}spiele/{g['id']}/", "name": g["title"]} for i, g in enumerate(GAMES)]},
@@ -541,11 +541,40 @@ def index_page(c):
              "", "assets/img/og-lewolux-studio.jpg", jsonld, preload=preload)
     return common(c, h + part("header.html") + "\n" + main + "\n" + part("footer.html") + "\n" + tail(c))
 
+def trailer(c, cls=""):
+    """Ring-Legends-Trailer: Querformat am PC, Hochformat am Handy, stumm mit Ton-Knopf."""
+    if c.preview: return ""
+    v = _h.md5(open(P("video/ring-legends-trailer-l.mp4"), "rb").read()).hexdigest()[:8]
+    b = f"{c.root}assets/video/ring-legends-trailer"
+    return (f'<div class="trailer {cls}"><video muted loop playsinline preload="metadata" poster="{b}-l.jpg?v={v}" data-l="{b}-l.mp4?v={v}" data-p="{b}-p.mp4?v={v}" data-pl="{b}-l.jpg?v={v}" data-pp="{b}-p.jpg?v={v}" aria-label="Trailer zu Ring Legends"></video>'
+            f'<button class="tr-sound" type="button" aria-pressed="false">🔇 Ton an</button></div>')
+
+TRAILER_JS = """<script>(function(){document.querySelectorAll('.trailer').forEach(function(w){var v=w.querySelector('video'),b=w.querySelector('.tr-sound');var p=matchMedia('(max-width:680px)').matches;v.poster=p?v.dataset.pp:v.dataset.pl;v.src=p?v.dataset.p:v.dataset.l;w.classList.toggle('is-p',p);
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var r=v.play();if(r&&r.catch)r.catch(function(){})}else v.pause()})},{threshold:.35});io.observe(v);
+b.onclick=function(){v.muted=!v.muted;if(!v.muted){v.currentTime=0;v.play()}b.textContent=v.muted?'🔇 Ton an':'🔊 Ton aus';b.setAttribute('aria-pressed',String(!v.muted))}})})();</script>"""
+
+def promo(c):
+    g = GAME_BY_ID["wrestling-tcg"]
+    return f'''  <section class="promo" id="ring-legends-update" aria-labelledby="promo-h" style="--accent:{g['accent']}">
+    <div class="wrap promo-in">
+      {trailer(c)}
+      <div class="promo-copy">
+        <span class="eyebrow">Großes Update · Jetzt live</span>
+        <h2 id="promo-h">Ring Legends ist jetzt online!</h2>
+        <p>Packs aufreißen, 316 Wrestler-Karten sammeln und zum ersten Mal mit echten Spielern handeln. Mit Markt, Ranglisten und weltweitem Pop-Report. Kostenlos im Browser, ohne Pflicht-Anmeldung.</p>
+        <ul class="promo-feats"><li>🛒 Markt</li><li>🏆 Ranglisten</li><li>📊 Pop-Report</li><li>🛡️ Fair & sicher</li></ul>
+        <div class="promo-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt spielen</button><a class="btn btn-dl" href="{c.page(g)}#update">Alle Neuerungen</a></div>
+        <p class="promo-soon"><span class="soon-badge">📱 Bald im Play Store</span> Die Android-App ist in Vorbereitung.</p>
+      </div>
+    </div>
+  </section>
+'''
+
 def update_section(c, g):
     u = g.get("update")
     if not u: return ""
     items = "".join(f'<li><span class="up-i" aria-hidden="true">{i}</span><b>{e(t)}</b><span>{e(d)}</span></li>' for i, t, d in u["items"])
-    return f'''  <section class="g-update" id="update" aria-labelledby="up-h"><span class="eyebrow">{e(u["kicker"])}</span><h2 id="up-h">{e(u["title"])}</h2><p class="up-lead">{e(u["lead"])}</p><ul class="up-list">{items}</ul><div class="g-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt online spielen</button></div><p class="up-note">{e(u["note"])}</p></section>
+    return f'''  <section class="g-update" id="update" aria-labelledby="up-h"><span class="eyebrow">{e(u["kicker"])}</span><h2 id="up-h">{e(u["title"])}</h2><p class="up-lead">{e(u["lead"])}</p>{trailer(c, "in-update")}<ul class="up-list">{items}</ul><div class="g-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt online spielen</button></div><p class="up-note">{e(u["note"])}</p></section>
 '''
 
 def game_page(c, g):
@@ -628,6 +657,8 @@ def main():
         for w in ws: shutil.copy(P(f"fontsrc/node_modules/@fontsource/{slug}/files/{slug}-latin-{w}-normal.woff2"), P("dist/assets/fonts"))
     open(P("dist/assets/css/site.css"), "w", encoding="utf-8").write(font_face("../fonts/") + "\n" + part("style.css"))
     open(P("dist/assets/js/app.js"), "w", encoding="utf-8").write(part("app.js"))
+    if os.path.isdir(P("video")):
+        shutil.copytree(P("video"), P("dist/assets/video"), dirs_exist_ok=True)
     if os.path.isdir(P("lux-voice")):
         os.makedirs(P("dist/assets/voice"), exist_ok=True)
         for f in os.listdir(P("lux-voice")):
