@@ -1105,6 +1105,24 @@ textarea.code { width: 100%; margin: 8px 0; padding: 10px; border-radius: 10px; 
 .circ-bars li.me .circ-bar i{background:linear-gradient(90deg,#ffd23f,#ff7a18)}
 .circ-q{flex:1;min-width:0;font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 .mk-hint{color:#d97706;font-weight:600;margin:4px 0}
+
+/* Packs-Seite: Heute-Kasten zuerst, dann die Packs, danach Serie, Karte des Tages, Pay-per-View */
+.packs-screen{display:flex;flex-direction:column}
+.packs-screen>.rl-today{order:-2}
+.packs-screen>.pack-row{order:-1;margin-bottom:16px}
+.rl-today{margin-bottom:14px;padding:12px;border-radius:18px;background:var(--surface);border:2px solid #ffd23f;box-shadow:0 6px 18px rgba(0,0,0,.08);display:grid;gap:8px}
+.rl-today-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.rl-today-h strong{font-family:var(--display);font-weight:400;font-size:20px}
+.rl-today-i{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--surface2,rgba(127,127,127,.08));border:1px solid var(--line);text-align:left;width:100%}
+.rl-today-i .ic{font-size:24px}
+.rl-today-i .tx{display:grid;min-width:0}
+.rl-today-i .tx b{font-size:15.5px}
+.rl-today-i .tx small{color:var(--ink-soft);font-size:13px}
+.rl-today-i .go{font-weight:800;font-size:14px;padding:7px 12px;border-radius:999px;background:#ffd23f;color:#2a1300;white-space:nowrap}
+.rl-today-i.t-sold .go{background:#22c55e;color:#fff}
+.hub-h{font-family:var(--display);font-weight:400;font-size:18px;margin:14px 0 6px}
+.hub-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.hub-actions .btn{flex:1 1 150px}
 </style>
 <script>RL_API="https://rl-api.lewolux.de";RL_GOOGLE_CLIENT_ID="876811824743-eflhbkjunrda27aqqt0k45r1cv36tsch.apps.googleusercontent.com"</script>
 </head>

@@ -84,7 +84,7 @@ MANUALS = {
         ("Grading", "Karte einreichen und eine Note von 1 bis 10 bekommen. Eine Gem Mint 10 ist 8× so viel wert."),
         ("Quests", "Täglich 3 Aufgaben mit 100 bis 200 W$, alle drei geschafft: +150 W$ Bonus. Dazu 21 Erfolge."),
         ("Codes", "Codes aus der Community bringen W$ oder Pack-Gutscheine."),
-        ("Markt", "Karten mit anderen Spielern um W$ handeln. Den Preis legst du selbst fest, 8 % Gebühr, Angebote laufen 7 Tage."),
+        ("Markt", "Karten mit anderen Spielern um W$ handeln. Den Preis wählst du selbst in einer fairen Spanne um den Kartenwert (seltene Karten dürfen teurer sein), 8 % Gebühr, Angebote laufen 7 Tage. Schutz vor Zweitkonten inklusive."),
         ("Ranglisten", "Album, Gem Mint 10 und geöffnete Packs im Vergleich, dazu der weltweite Pop-Report.")],
   pc=[("Pack aufreißen", "Über den Rand wischen / Enter"), ("Karte aufdecken", "Klick / Enter / Leertaste"), ("Einmarsch starten", "Karte im Album gedrückt halten"), ("Dialog schließen", "Esc")],
   mobile=[("Pack aufreißen", "Über den Rand wischen"), ("Karte aufdecken", "Tippen"), ("Holo-Glanz", "Handy neigen (abschaltbar)"), ("Ausrichtung", "Hochformat")],
