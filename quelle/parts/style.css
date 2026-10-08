@@ -818,3 +818,20 @@ html.modal-open .lux,html.player-open .lux{display:none}
 .promo-actions .btn{flex:1 1 180px}
 .promo-soon{margin:16px 0 0;color:var(--dim);font-size:14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .soon-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:#000;border:1px solid rgba(255,255,255,.35);color:#fff;font-weight:700;font-size:14px}
+/* Link-Seite (lewolux.de/links) */
+.links-page{max-width:520px;margin:0 auto;padding:48px 18px 140px;text-align:center}
+.lk-logo{display:block;margin:0 auto;width:112px;height:112px;border-radius:30px;box-shadow:0 0 50px #a855f7aa}
+.links-page h1{font:900 30px/1.1 var(--f-display);text-transform:uppercase;margin:16px 0 6px}
+.lk-sub{color:var(--muted);margin:0 0 24px}
+.lk-list{display:grid;gap:12px;text-align:left}
+.lk{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line-2);text-decoration:none;color:var(--fg);transition:transform .15s,border-color .15s}
+.lk:hover{transform:translateY(-2px);border-color:var(--cyan)}
+.lk.hot{background:linear-gradient(90deg,#ff2d6f,#ff7a18);border:0;box-shadow:0 10px 30px #ff2d6f55}
+.lk-i{font-size:26px}
+.lk-t{display:grid}
+.lk-t small{color:var(--muted);font-size:13.5px}
+.lk.hot .lk-t small{color:#fff}
+.lk-a{font-size:24px;opacity:.6}
+.links-page .socials{justify-content:center;margin-top:24px}
+.lk-foot{margin-top:26px;font-size:13px;color:var(--dim)}
+.lk-foot a{color:var(--muted)}

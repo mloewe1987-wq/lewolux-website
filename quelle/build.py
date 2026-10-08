@@ -18,7 +18,9 @@ EMAIL = "hallo@lewolux.de"
 # DeskBoard-Download: entweder Datei nach software-dateien/deskboard/DeskBoard-Setup.exe legen (max. 25 MB)
 # oder hier den Link eintragen, z. B. GitHub Releases: "https://github.com/NAME/deskboard/releases/latest/download/DeskBoard-Setup.exe"
 DESKBOARD_URL = ""            # <- eigene Adresse eintragen
-LINKS = dict(DISCORD="#", TIKTOK="#", YOUTUBE="#", ITCH="#")
+# Social-Media-Adressen: leer = Symbol wird nicht angezeigt
+LINKS = dict(INSTAGRAM="", FACEBOOK="", TIKTOK="", YOUTUBE="", DISCORD="", ITCH="")
+LINKS_RL = dict(INSTAGRAM="", FACEBOOK="", TIKTOK="")
 HERE = os.path.dirname(os.path.abspath(__file__))
 # Echte Spiele: Web-Export jedes Spiels in  spiele-dateien/<id>/  ablegen (mit index.html darin).
 # Echte Screenshots (optional):            screenshots-echt/<id>-1.png (bzw. .jpg), -2, -3 ersetzen die gezeichneten.
@@ -242,11 +244,34 @@ def news_items(c):
     li = lambda hidden: "".join(f'<li{" aria-hidden=\"true\"" if hidden else ""}><a href="{c.root}{u}"{" tabindex=\"-1\"" if hidden else ""}><b>{e(k)}</b>{e(t)}</a></li>' for k, t, u in NEWS)
     return li(False) + li(True)   # zweimal für eine nahtlose Endlosschleife
 
+IG_SVG = '<a href="{{INSTAGRAM}}" aria-label="Instagram" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>'
+FB_SVG = '<a href="{{FACEBOOK}}" aria-label="Facebook" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3c-2.8 0-4.5 1.8-4.5 4.6V11H7v4h2.5v8h4v-8h3l.5-4h-3.5V8.8c0-.5.3-.8.5-.8z"/></svg></a>'
+def social_icons():
+    icons = json.load(open(P("parts/social-icons.json"), encoding="utf-8")); icons["INSTAGRAM"] = IG_SVG; icons["FACEBOOK"] = FB_SVG
+    out = "".join(icons[k].replace("{{%s}}" % k, v).replace('rel="noopener">', 'rel="noopener" target="_blank">') for k, v in LINKS.items() if v and k in icons)
+    return f'<div class="socials">{out}</div>' if out else ""
+
+def links_page(c):
+    """Link-Seite für Instagram/Facebook/TikTok-Profile (lewolux.de/links)."""
+    rl = GAME_BY_ID["wrestling-tcg"]
+    items = [("🥊", "Ring Legends spielen", "Sammelkarten online – kostenlos im Browser", f"{c.root}games/wrestling-tcg/index.html", True),
+             ("🎬", "Großes Update: Trailer & Neuerungen", "Markt, Ring-Duelle, Tausch, Wochen-Events", f"{c.root}spiele/wrestling-tcg/#update", False),
+             ("🎮", "Alle Spiele von Lewolux", "7 kostenlose Spiele, direkt im Browser", f"{c.root}#spiele", False),
+             ("📱", "Ring Legends im Play Store", "Bald verfügbar – folge uns, dann verpasst du es nicht", f"{c.root}spiele/wrestling-tcg/", False),
+             ("💡", "Wünsch dir was", "Ideen, Fehler, Lob – direkt ans Studio", f"{c.root}#mitmachen", False)]
+    li = "".join(f'<a class="lk{" hot" if hot else ""}" href="{u}"><span class="lk-i">{i}</span><span class="lk-t"><b>{e(t)}</b><small>{e(s)}</small></span><span class="lk-a">›</span></a>' for i, t, s, u, hot in items)
+    soc = social_icons()
+    body = f'''<main class="links-page"><img class="lk-logo" src="{c.root}assets/img/lewolux-studio-logo.jpg" alt="Lewolux Studio" width="112" height="112">
+<h1>Lewolux Studio</h1><p class="lk-sub">Kostenlose Indie-Games aus Schleswig-Holstein 🦁</p>
+<div class="lk-list">{li}</div>{soc}<p class="lk-foot"><a href="{c.root}">lewolux.de</a> · <a href="{c.root}impressum/">Impressum</a> · <a href="{c.root}datenschutz/">Datenschutz</a></p></main>'''
+    h = head(c, "Lewolux Studio – Links", "Alle Links von Lewolux Studio: Ring Legends spielen, Trailer, alle kostenlosen Spiele.", "links/", "assets/img/og-lewolux-studio.jpg", [], robots="noindex, follow")
+    return common(c, h + body + "\n" + tail(c))
+
 def common(c, t):
     rep = {"{{ROOT}}": c.root, "{{EMAIL}}": EMAIL, "{{GAMECOUNT}}": str(len(GAMES)),
            "{{FOOTGAMES}}": "".join(f'<li><a href="{c.page(g)}">{e(g["short"])}</a></li>' for g in GAMES) + "".join(f'<li><a href="{c.root}spiele/{t["id"]}/">{e(t["short"])} <small>(bald)</small></a></li>' for t in TEASERS),
            "{{NEWS}}": news_items(c), "{{IMPRESSUM}}": f"{c.root}impressum/", "{{DATENSCHUTZ}}": f"{c.root}datenschutz/"}
-    rep.update({"{{%s}}" % k: v for k, v in LINKS.items()})
+    rep["{{SOCIAL}}"] = social_icons()
     for k, v in rep.items(): t = t.replace(k, v)
     if c.preview:
         t = t.replace(f'src="{c.root}assets/img/lewolux-studio-logo.jpg"', f'src="{c.img("lewolux-studio-logo.jpg")}"')
@@ -701,6 +726,8 @@ def main():
         os.makedirs(P(f"dist/{slug}"), exist_ok=True)
         open(P(f"dist/{slug}/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../"), slug + "/", title, part(f"{slug}.html")))
     os.makedirs(P("dist/ring-legends/datenschutz"), exist_ok=True)
+    os.makedirs(P("dist/links"), exist_ok=True)
+    open(P("dist/links/index.html"), "w", encoding="utf-8").write(links_page(Ctx("../")))
     open(P("dist/ring-legends/datenschutz/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../../"), "ring-legends/datenschutz/", "Datenschutz – Ring Legends (App und Browser)", part("ring-legends-datenschutz.html")))
     os.makedirs(P("dist/admin"), exist_ok=True)
     open(P("dist/admin/index.html"), "w", encoding="utf-8").write(part("admin.html").replace("{{API}}", API).replace("{{GAMES}}", json.dumps({g["id"]: g["short"] for g in GAMES}, ensure_ascii=False)))
