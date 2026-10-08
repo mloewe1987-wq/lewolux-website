@@ -5,6 +5,10 @@
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (url.pathname === "/api/lions") {
+      if (req.method !== "POST" && req.method !== "GET") return new Response("", { status: 405 });
+      return env.STATS.get(env.STATS.idFromName("lions")).fetch(req);
+    }
     if (url.pathname === "/api/stats") {
       if (req.method !== "POST" && req.method !== "GET") return new Response("", { status: 405 });
       const stub = env.STATS.get(env.STATS.idFromName("lewolux"));
@@ -39,10 +43,11 @@ export default {
   },
 };
 
-// Besucherzähler: zählt Besuche (einmal pro Tab) und wer in den letzten 70 Sekunden aktiv war.
+// Löwenfang: pro Spieler ein Zähler (zufällige ID im Browser), Rangliste der besten 3 mit selbst gewähltem Namen. (einmal pro Tab) und wer in den letzten 70 Sekunden aktiv war.
 export class Stats {
   constructor(state) { this.state = state; this.online = new Map(); }
   async fetch(req) {
+    if (new URL(req.url).pathname === "/api/lions") return this.lions(req);
     const now = Date.now();
     for (const [k, t] of this.online) if (now - t > 70000) this.online.delete(k);
     const day = new Date(now + 2 * 3600e3).toISOString().slice(0, 10);
@@ -57,5 +62,31 @@ export class Stats {
       }
     }
     return new Response(JSON.stringify({ online: Math.max(1, this.online.size), today: s.today, total: s.total }), { headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+  }
+  async lions(req) {
+    const BAD = /(fick|fuck|nazi|hitler|hure|nutte|arsch|wichs|schlampe|penis|vagina|sex|porn|cock|dick|bitch|missgeburt|spast|neger|nigg|heil)/i;
+    let top = (await this.state.storage.get("top")) || [];
+    let pid = "", mine = 0, error = null;
+    if (req.method === "POST") {
+      const b = await req.json().catch(() => ({}));
+      pid = String(b.pid || "");
+      if (/^[a-z0-9]{6,40}$/.test(pid)) {
+        const key = "p:" + pid, now = Date.now();
+        const p = (await this.state.storage.get(key)) || { n: "", c: 0, t: 0 };
+        if (b.catch && now - p.t > 2500) { p.c++; p.t = now; }
+        if (typeof b.name === "string") {
+          const n = b.name.replace(/[^\p{L}\p{N} _.\-!]/gu, "").replace(/\s+/g, " ").trim().slice(0, 16);
+          if (n.length >= 2 && !BAD.test(n.replace(/[^a-zäöüß]/gi, ""))) p.n = n; else if (b.name) error = "name";
+        }
+        await this.state.storage.put(key, p); mine = p.c;
+        if (p.n && p.c > 0) {
+          top = top.filter(x => x.pid !== pid); top.push({ pid, name: p.n, count: p.c });
+          top.sort((a, b) => b.count - a.count); top = top.slice(0, 10);
+          await this.state.storage.put("top", top);
+        }
+      }
+    }
+    const out = top.slice(0, 3).map(x => ({ name: x.name, count: x.count, me: x.pid === pid }));
+    return new Response(JSON.stringify({ top: out, mine, error }), { headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
   }
 }

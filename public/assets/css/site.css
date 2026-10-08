@@ -923,3 +923,45 @@ html.modal-open .lux,html.player-open .lux{display:none}
 .gr-toggle{position:fixed;left:14px;bottom:18px;z-index:31;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(20,21,30,.88);backdrop-filter:blur(10px);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 @media (min-width:1720px){.game-rail{display:block}.gr-toggle{display:none}}
 @media (max-width:1719px){.game-rail.open{display:block;top:auto;bottom:74px;left:12px;right:auto;width:min(300px,calc(100vw - 24px));max-height:70vh;box-shadow:0 20px 50px rgba(0,0,0,.5)}.game-rail.open .gr-close{display:block}}
+
+/* Löwenfang */
+.lion-badge{display:inline-flex;align-items:center;gap:6px;margin-left:14px;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,183,77,.5);background:linear-gradient(135deg,rgba(255,138,61,.18),rgba(155,92,255,.18));color:#fff;font:700 14px var(--f-body);cursor:pointer}
+.lion-badge small{color:var(--muted);font-weight:600;font-size:12px}
+.lion-badge.pop{animation:lbPop .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes lbPop{0%{transform:scale(1)}30%{transform:scale(1.35) rotate(-6deg)}100%{transform:scale(1)}}
+@media (max-width:860px){.lion-badge small{display:none}.lion-badge{margin-left:auto;margin-right:8px;padding:6px 10px}}
+.lion-aua{position:fixed;z-index:9999;transform:translate(-50%,-120%);padding:8px 14px;border-radius:16px;background:#fff;color:#14151d;font:800 16px var(--f-body);pointer-events:none;animation:auaUp 1.4s ease-out forwards;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.lion-aua::after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-7px;border:7px solid transparent;border-top-color:#fff;border-bottom:0}
+@keyframes auaUp{0%{opacity:0;transform:translate(-50%,-60%) scale(.6)}15%{opacity:1;transform:translate(-50%,-120%) scale(1.1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-190%)}}
+.lion-pop{position:fixed;z-index:60;right:16px;top:118px;width:min(340px,calc(100vw - 24px));padding:18px 18px 16px;border-radius:20px;background:linear-gradient(180deg,#1a1d2e,#10121c);border:1px solid rgba(255,183,77,.4);box-shadow:0 24px 60px rgba(0,0,0,.55);color:#e8e8f0;font-size:14px;animation:lx-pop .3s cubic-bezier(.2,1.4,.4,1);transform-origin:90% 0}
+.lion-pop p{margin:6px 0 10px;color:var(--muted)}
+.lp-h{font:800 18px var(--f-display);letter-spacing:.04em}
+.lp-me{margin-bottom:10px}.lp-me b{color:#ffb347;font-size:18px}
+.lion-pop ol{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px}
+.lion-pop li{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05)}
+.lion-pop li.me{outline:1px solid rgba(255,183,77,.6)}
+.lion-pop li em{font-style:normal;font-weight:800;color:#ffb347}
+.lion-pop li small{grid-column:2/4;color:#ffd27a;font-size:11.5px;margin-top:-4px}
+.lion-pop li.empty{display:block;color:var(--muted)}
+.lp-form{display:flex;gap:8px}.lp-form input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;border:1px solid var(--line-2);background:rgba(255,255,255,.06);color:#fff;font:inherit}
+.lp-form button,.lp-name button{padding:9px 14px;border-radius:10px;border:0;background:#ff8a3d;color:#14151d;font-weight:800;cursor:pointer}
+.lp-name button{padding:2px 8px;background:none;color:var(--cyan);text-decoration:underline}
+.lp-x{position:absolute;right:10px;top:10px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer}
+.peek-in{pointer-events:none;cursor:pointer}
+.tpeek{position:fixed;z-index:34;width:100px;height:81px;overflow:hidden;pointer-events:none;opacity:0}
+.tpeek-in{transform:translateY(90px);transition:transform .16s ease-out}
+.tpeek.up{opacity:1;pointer-events:auto}.tpeek.up .tpeek-in{transform:translateY(8px)}
+/* Lux: flüssigere Bewegungen */
+.lux-fig{animation:fx-idle 5.5s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes fx-idle{0%,100%{transform:rotate(0)}30%{transform:rotate(1.2deg) translateY(-.5px)}70%{transform:rotate(-1.2deg)}}
+.lux-stage.walking .fx-legl{animation:fx-step2 .56s cubic-bezier(.45,0,.55,1) infinite}
+.lux-stage.walking .fx-legr{animation:fx-step2 .56s cubic-bezier(.45,0,.55,1) infinite;animation-delay:-.28s}
+.lux-stage.walking .fx-l{animation:fx-arm2 .56s cubic-bezier(.45,0,.55,1) infinite;animation-delay:-.28s}
+.lux-stage.walking .fx-r{animation:fx-arm2r .56s cubic-bezier(.45,0,.55,1) infinite}
+.lux-stage.walking .lux-fig{animation:fx-bob2 .28s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes fx-step2{0%,100%{transform:rotate(15deg)}50%{transform:rotate(-15deg)}}
+@keyframes fx-arm2{0%,100%{transform:rotate(26deg)}50%{transform:rotate(2deg)}}
+@keyframes fx-arm2r{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(-26deg)}}
+@keyframes fx-bob2{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-3px) rotate(.6deg)}}
+.fx-arm{transition:transform .5s cubic-bezier(.34,1.3,.5,1)}.fx-head{transition:transform .45s cubic-bezier(.34,1.2,.5,1)}
+@media (prefers-reduced-motion:reduce){.lux-fig,.lux-stage.walking .lux-fig{animation:none}}

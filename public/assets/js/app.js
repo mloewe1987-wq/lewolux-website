@@ -646,10 +646,56 @@ if(location.hash==='#luxlines'){const tmp=document.createElement('div'),P=h=>{tm
  const seen2=new Set;window.__luxLines=out.map(P).filter(t=>!seen2.has(t)&&seen2.add(t)).map(t=>({h:hash(t),t,s:forSpeech(t)}))}
 })();
 
+/* ---------- Löwenfang: wer Lux erwischt, bekommt einen Punkt. Zähler oben rechts, Rekord + Platz 2 und 3 für alle ---------- */
+window.lxLion=(()=>{if(window.LGS_RENDER_ONLY)return null;
+const badge=document.getElementById('lionBadge'),num=document.getElementById('lionN');
+const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(_){return null}};
+let pid=ls('lxPid');if(!pid){pid=Math.random().toString(36).slice(2,12)+Date.now().toString(36);ls('lxPid',pid)}
+let count=+(ls('lxLion')||0),name=ls('lxLionName')||'',top=[],busy=false;
+const show=()=>{if(!badge)return;if(count>0){badge.hidden=false;num.textContent=count.toLocaleString('de-DE')}};show();
+const api=async(body)=>{if(location.protocol!=='https:')return null;try{const r=await fetch('/api/lions',{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});if(!r.ok)return null;const j=await r.json();if(j.top)top=j.top;return j}catch(_){return null}};
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function panel(){
+  document.querySelectorAll('.lion-pop').forEach(x=>x.remove());
+  const d=document.createElement('div');d.className='lion-pop';
+  const medal=['🥇','🥈','🥉'];
+  const rows=top.length?top.slice(0,3).map((t,i)=>`<li class="${t.me?'me':''}"><span>${medal[i]}</span><b>${esc(t.name)}</b><em>${t.count.toLocaleString('de-DE')}</em>${i===0?'<small>Rekordhalter</small>':''}</li>`).join(''):'<li class="empty">Noch kein Rekord – sei die oder der Erste!</li>';
+  d.innerHTML=`<div class="lp-h">🦁 Löwenfang</div><p>Lux lugt hinter den Kacheln hervor. Erwisch ihn, bevor er sich versteckt!</p><div class="lp-me">Du: <b>${count.toLocaleString('de-DE')}</b>× gefangen</div><ol>${rows}</ol>`+
+   (name?`<p class="lp-name">Du spielst als <b>${esc(name)}</b> · <button type="button" data-rename>ändern</button></p>`:'')+
+   `<form class="lp-form" ${name?'hidden':''}><input maxlength="16" placeholder="Dein Name für die Bestenliste" value="${esc(name)}" autocomplete="nickname"><button>Eintragen</button></form><button type="button" class="lp-x" aria-label="Schließen">✕</button>`;
+  document.body.appendChild(d);
+  const f=d.querySelector('form'),inp=f.querySelector('input');
+  d.querySelector('.lp-x').onclick=()=>d.remove();
+  const rn=d.querySelector('[data-rename]');if(rn)rn.onclick=()=>{f.hidden=false;inp.focus()};
+  f.onsubmit=async e=>{e.preventDefault();const v=inp.value.trim().replace(/\s+/g,' ');if(v.length<2){inp.focus();return}name=v;ls('lxLionName',v);const j=await api({pid,name:v});if(j&&j.error==='name'){name='';ls('lxLionName','');inp.value='';inp.placeholder='Bitte einen anderen Namen wählen';return}panel()};
+  setTimeout(()=>document.addEventListener('click',function off(e){if(!d.contains(e.target)&&e.target!==badge&&!badge.contains(e.target)){d.remove();document.removeEventListener('click',off)}}),0);
+}
+if(badge)badge.onclick=async()=>{panel();await api();if(document.querySelector('.lion-pop'))panel()};
+function bubble(x,y,txt){const b=document.createElement('div');b.className='lion-aua';b.textContent=txt;b.style.left=x+'px';b.style.top=y+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),1400)}
+async function caught(x,y){if(busy)return;busy=true;setTimeout(()=>busy=false,600);
+  count++;ls('lxLion',count);show();badge&&badge.classList.remove('pop');void(badge&&badge.offsetWidth);badge&&badge.classList.add('pop');
+  bubble(x,y,['Aua!','Hey!','Erwischt!','Aua, meine Mähne!','Nicht kitzeln!'][Math.min(4,Math.floor(Math.random()*(count>3?5:2)))]);
+  const j=await api({pid,name:name||undefined,catch:1});
+  if(count===1&&!name)setTimeout(panel,900);
+  else if(j&&j.top&&j.top[0]&&j.top[0].me&&j.mine===j.top[0].count&&count>1){bubble(x,y-40,'Neuer Rekord! 🏆')}
+}
+return{caught};})();
+
+function touchLion(svg){
+  const SEL='.card,.shot,.sw,.sp-shot,.sp-feat,.g-shot,.dl-box,.stat';
+  const box=document.createElement('div');box.className='tpeek';box.innerHTML='<div class="tpeek-in">'+svg+'</div>';
+  const go=()=>{setTimeout(()=>{if(document.hidden||document.documentElement.classList.contains('modal-open')||document.querySelector('.lux.open')){go();return}
+    const vh=innerHeight,c=[...document.querySelectorAll(SEL)].filter(e=>{const r=e.getBoundingClientRect();return r.width>140&&r.top>140&&r.top<vh-120});
+    if(!c.length){go();return}const r=c[Math.floor(Math.random()*c.length)].getBoundingClientRect();
+    box.style.left=(r.left+20+Math.random()*Math.max(0,r.width-140))+'px';box.style.top=(r.top-62)+'px';box.className='tpeek up';
+    setTimeout(()=>{box.className='tpeek';go()},1050+Math.random()*300)},18000+Math.random()*22000)};
+  box.addEventListener('touchstart',e=>{if(!box.classList.contains('up'))return;e.preventDefault();const t=e.touches[0];if(window.lxLion)lxLion.caught(t.clientX,t.clientY);box.className='tpeek';},{passive:false});
+  window.__tpeekBox=box;document.body.appendChild(box);go();
+}
 /* ---------- Guck-Löwe: Lux lugt hinter den Kacheln hervor und folgt der Maus (nur PC) ---------- */
 (()=>{if(window.LGS_RENDER_ONLY)return;
 const fine=matchMedia('(hover:hover) and (pointer:fine)'),calm=matchMedia('(prefers-reduced-motion:reduce)');
-if(!fine.matches)return;
+
 const SEL='.card,.shot,.keyart,.monitor,.sp-feat,.mn-tile,.mn-panel,.cm-card,.dl-box,.dl-tip,.sp-shot,.sp-fig,.sp-why,.sw,.sw-banner,.stat,.tp-shot,.tp-hero,.sp-hero,.tp-notice,.g-shot';
 const W=100,H=81,HIDE=H+6,html=document.documentElement;
 const mane=Array.from({length:14},(_,i)=>{const a=Math.PI+i/13*Math.PI,x=48+Math.cos(a)*29,y=50+Math.sin(a)*29;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="10"/>`}).join('')+'<circle cx="21" cy="62" r="10"/><circle cx="75" cy="62" r="10"/>';
@@ -663,9 +709,10 @@ const svg=`<svg viewBox="0 0 96 78" width="${W}" height="${H}"><defs><linearGrad
 <g class="pk-blush" fill="#ff8f8f"><circle cx="31" cy="57" r="3.6"/><circle cx="65" cy="57" r="3.6"/></g>
 <path d="M44.5 56h7l-3.5 3.6z" fill="#7a3b2e"/><path d="M48 59.6v2M48 61.6c-1.5 1.7-3.6 1.7-4.8.6M48 61.6c1.5 1.7 3.6 1.7 4.8.6" stroke="#7a3b2e" stroke-width="1.3" fill="none" stroke-linecap="round"/></g>
 <g class="pk-paws" fill="#ffcf8a" stroke="#d9934f" stroke-width="1.2"><ellipse cx="20" cy="73" rx="10" ry="6.5"/><ellipse cx="76" cy="73" rx="10" ry="6.5"/><path d="M16 70v5M20 69.5v5.5M24 70v5M72 70v5M76 69.5v5.5M80 70v5" fill="none" stroke-linecap="round"/></g></svg>`;
+if(!fine.matches){touchLion(svg);return;}
 const box=document.createElement('div');box.className='peek';box.setAttribute('aria-hidden','true');box.innerHTML=`<div class="peek-in">${svg}</div>`;document.body.appendChild(box);
 const inn=box.firstChild,pupils=[...box.querySelectorAll('.pk-pupil')],hdr=document.querySelector('.site-header');
-let els=[],collected=0,mx=-1e4,my=-1e4,moved=0,dirty=true,best=null,el=null,edge=null,rot=0,cx=0,cy=0,tx=0,ty=0,bw=W,bh=H,p=HIDE,pt=HIDE,out=0;
+let shyAt=0,coolUntil=0;let els=[],collected=0,mx=-1e4,my=-1e4,moved=0,dirty=true,best=null,el=null,edge=null,rot=0,cx=0,cy=0,tx=0,ty=0,bw=W,bh=H,p=HIDE,pt=HIDE,out=0;
 const clamp=(v,a,b)=>a>b?(a+b)/2:Math.min(b,Math.max(a,v));
 function place(k,r,hb,vw,vh){
   if(k==='top'||k==='bottom'){if(r.width<W+16)return null;const off=mx<(r.left+r.right)/2?70:-70,x=clamp(mx+off,r.left+W/2+8,r.right-W/2-8),y=k==='top'?r.top-H:r.bottom;
@@ -683,18 +730,19 @@ function choose(){const hb=(hdr?hdr.getBoundingClientRect().bottom:0)+6,vw=html.
 function tick(){const now=performance.now();
   if(now-collected>2500){els=[...document.querySelectorAll(SEL)].filter(e=>!e.closest('.lux,.modal,.site-header,.player'));collected=now}
   const blocked=html.classList.contains('modal-open')||html.classList.contains('player-open')||!!document.querySelector('.lux.open'),idle=now-moved;
-  if(dirty){best=blocked||mx<-1e3?null:choose();dirty=false}
+  if(dirty){best=blocked||mx<-1e3||now<coolUntil?null:choose();dirty=false}
   let shy=false;
   if(!best||idle>9000)pt=HIDE;
   else if(best.e!==el||best.k!==edge){pt=HIDE;if(p>HIDE-3){el=best.e;edge=best.k;rot=best.rot;bw=best.w;bh=best.h;cx=tx=best.x;cy=ty=best.y;out=now+220}}
-  else{tx=best.x;ty=best.y;const hx=cx+bw/2,hy=cy+bh/2;shy=Math.hypot(mx-hx,my-hy)<52;if(now>out)pt=shy?44:idle>2500?3:12}
-  cx+=(tx-cx)*.2;cy+=(ty-cy)*.2;p+=(pt-p)*(pt>p?.3:.13);
+  else{tx=best.x;ty=best.y;const hx=cx+bw/2,hy=cy+bh/2;const near=Math.hypot(mx-hx,my-hy)<74;if(near&&!shyAt)shyAt=now;if(!near)shyAt=0;shy=near&&now-shyAt>230;if(now>out)pt=shy?HIDE:idle>2500?3:12}
+  cx+=(tx-cx)*.2;cy+=(ty-cy)*.2;p+=(pt-p)*(pt>p?.42:.13);inn.style.pointerEvents=p<HIDE-14?'auto':'none';
   box.classList.toggle('shy',shy);box.classList.toggle('idle',idle>2500&&idle<9000);
   box.style.cssText=`width:${bw}px;height:${bh}px;transform:translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px);visibility:${p>HIDE-1?'hidden':'visible'}`;
   inn.style.transform=`translate(-50%,-50%) rotate(${rot}deg) translateY(${p.toFixed(1)}px)`;
   const a=-rot*Math.PI/180,vx=mx-(cx+bw/2),vy=my-(cy+bh/2),lx=vx*Math.cos(a)-vy*Math.sin(a),ly=vx*Math.sin(a)+vy*Math.cos(a),len=Math.hypot(lx,ly)||1,m=Math.min(len/60,1)*2.3;
   pupils.forEach(g=>g.setAttribute('transform',`translate(${(lx/len*m).toFixed(2)} ${(ly/len*m).toFixed(2)})`));
   requestAnimationFrame(tick)}
+inn.addEventListener('mousedown',e=>{e.preventDefault();e.stopPropagation();if(window.lxLion)lxLion.caught(e.clientX,e.clientY);pt=HIDE;p=HIDE;best=null;el=null;coolUntil=performance.now()+20000+Math.random()*15000;});
 addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;moved=performance.now();dirty=true},{passive:true});
 addEventListener('scroll',()=>{dirty=true},{passive:true});addEventListener('resize',()=>{collected=0;dirty=true});
 document.addEventListener('mouseout',e=>{if(!e.relatedTarget){mx=my=-1e4;dirty=true}});
