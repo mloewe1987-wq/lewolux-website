@@ -1,0 +1,20 @@
+# Meldet neue und geänderte Seiten an Bing, Yahoo, DuckDuckGo, Ecosia, Yandex & Co. (IndexNow)
+name: IndexNow
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warten, bis Cloudflare die neue Version ausliefert
+        run: sleep 150
+      - name: Alle Adressen aus der Sitemap melden
+        run: |
+          URLS=$(curl -s https://lewolux.de/sitemap.xml | grep -o '<loc>[^<]*</loc>' | sed 's/<[^>]*>//g' | python3 -c 'import sys,json;print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))')
+          echo "$URLS"
+          BODY=$(python3 -c "import json,sys;print(json.dumps({'host':'lewolux.de','key':'ca25d78b861b4a1aab26dff52d8faf9c','keyLocation':'https://lewolux.de/ca25d78b861b4a1aab26dff52d8faf9c.txt','urlList':json.loads(sys.argv[1])}))" "$URLS")
+          for EP in https://api.indexnow.org/indexnow https://www.bing.com/indexnow https://yandex.com/indexnow; do
+            curl -s -o /dev/null -w "$EP %{http_code}\n" -X POST "$EP" -H 'Content-Type: application/json; charset=utf-8' -d "$BODY"
+          done
