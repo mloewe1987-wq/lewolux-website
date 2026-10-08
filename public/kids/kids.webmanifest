@@ -1,0 +1,44 @@
+{
+ "id": "/kids/",
+ "name": "Lewolux Kids",
+ "short_name": "Lewolux Kids",
+ "description": "Kostenlose Kinderspiele ohne Werbung von Lewolux Studio – mit Vorlesefunktion und Elternsperre.",
+ "lang": "de",
+ "start_url": "/kids/?app=1",
+ "scope": "/kids/",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#6fd0ff",
+ "theme_color": "#6fd0ff",
+ "categories": [
+  "kids",
+  "education",
+  "games"
+ ],
+ "icons": [
+  {
+   "src": "/assets/img/kids-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/assets/img/kids-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/assets/img/kids-icon-maskable-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "maskable"
+  },
+  {
+   "src": "/assets/img/kids-icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

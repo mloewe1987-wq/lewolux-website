@@ -9,7 +9,7 @@ import re
 import base64, html, json, os, shutil, datetime, asyncio, io
 from PIL import Image
 from data import GAMES, SOFTWARE, FAQ, ICONS, PLAY, DL, SEO, TEASERS
-from data import NEWS
+from data import NEWS, KIDS
 from manuals import MANUALS, SOFTWARE_PAGES
 
 SITE = "https://lewolux.de/"      # <- eigene Domain eintragen (mit / am Ende)
@@ -32,17 +32,23 @@ GFONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
 SHOTS = [(g["scene"], v, f'{g["id"]}-{v+1}') for g in GAMES for v in range(3)] + [(s["scene"], 0, f'software-{s["id"]}') for s in SOFTWARE]
 GAME_BY_ID = {g["id"]: g for g in GAMES}
 import hashlib as _h
-VER=_h.md5((open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts","style.css"),encoding="utf-8").read()+open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts","app.js"),encoding="utf-8").read()).encode()).hexdigest()[:8]
+VER=_h.md5("".join(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts",f),encoding="utf-8").read() for f in ("style.css","app.js","install.js","kids.css","kids.js")).encode()).hexdigest()[:8]
+KIDS_IDS = {k["id"] for k in KIDS}
+# Kids-Modus-Sperre: steht ganz oben im <head> jeder Seite außerhalb von /kids/ (und in jedem Nicht-Kinder-Spiel unter /games/).
+# Ist der Kids-Modus aktiv (localStorage lxKids=1), wird sofort und ohne Aufblitzen nach /kids/ umgeleitet.
+# Impressum und Datenschutz bleiben erreichbar (Pflichtangaben); jeder Klick von dort führt wieder in den Kinderbereich.
+KIDS_GUARD = "<script>try{if(localStorage.getItem('lxKids')==='1'&&!/^\\/(kids|impressum|datenschutz)\\//.test(location.pathname)){document.documentElement.style.display='none';location.replace('/kids/')}}catch(e){}</script>"
+def app_js(): return part("install.js") + "\n" + part("app.js")
 SW_JS = """// Lewolux Studio – Service Worker: macht die Seite installierbar und offline nutzbar.
 // Seiten: erst Netz, sonst Zwischenspeicher. Bilder/Schriften/CSS: Zwischenspeicher zuerst. Spiele und Downloads werden nicht gespeichert.
 const C = "lx-__VER__";
-self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(["/", "/site.webmanifest", "/assets/img/icon-192.png"])).catch(() => {})); self.skipWaiting(); });
+self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(["/", "/site.webmanifest", "/assets/img/icon-192.png", "/kids/", "/kids/kids.webmanifest"])).catch(() => {})); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
   const r = e.request, u = new URL(r.url);
   if (r.method !== "GET" || u.origin !== location.origin || /^\\/(downloads|games|api|admin)\\//.test(u.pathname)) return;
   if (u.pathname.startsWith("/assets/")) { e.respondWith(caches.match(r).then(m => m || fetch(r).then(res => { if (res.ok) { const cl = res.clone(); caches.open(C).then(c => c.put(r, cl)); } return res; }))); return; }
-  if (r.mode === "navigate") e.respondWith(fetch(r).then(res => { const cl = res.clone(); caches.open(C).then(c => c.put(r, cl)); return res; }).catch(() => caches.match(r).then(m => m || caches.match("/"))));
+  if (r.mode === "navigate") e.respondWith(fetch(r).then(res => { const cl = res.clone(); caches.open(C).then(c => c.put(r, cl)); return res; }).catch(() => caches.match(r).then(m => m || caches.match(u.pathname.startsWith("/kids/") ? "/kids/" : "/"))));
 });
 """
 
@@ -214,6 +220,7 @@ def head(c, title, desc, path, og, jsonld, robots="index, follow, max-image-prev
 <html lang="de">
 <head>
 <meta charset="utf-8">
+{"" if c.preview else KIDS_GUARD}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
@@ -295,7 +302,7 @@ def tester_page(c):
   <nav aria-label="Breadcrumb"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}spiele/wrestling-tcg/">Ring Legends</a></li><li aria-current="page">Tester werden</li></ol></nav>
   <section class="ts-hero"><span class="eyebrow">Android-Vorabtest</span><h1>Werde Ring-Legends-Tester</h1>
   <p class="up-lead">Ring Legends kommt in den Play Store – und du kannst es vor allen anderen auf deinem Handy spielen. Für den Start brauchen wir Tester, die 14 Tage dabei sind.</p>
-  <div class="g-actions"><a class="btn btn-play" href="{TESTER_MAIL}">✉️ Jetzt als Tester melden</a><a class="btn" href="{c.root}games/wrestling-tcg/index.html">Schon mal im Browser spielen</a></div>
+  <div class="g-actions"><a class="btn btn-play" id="testerBtn" href="{TESTER_MAIL}">✉️ Jetzt als Tester melden</a><a class="btn" href="{c.root}games/wrestling-tcg/index.html">Schon mal im Browser spielen</a></div>
   <p class="up-note">Kein Mailprogramm? Schreib einfach an <b>{EMAIL}</b> mit dem Betreff „Ring Legends Tester“ und deiner Gmail-Adresse.</p></section>
   <section aria-labelledby="ts-h"><h2 id="ts-h">So läuft der Test</h2><ol class="ts-steps">{li}</ol></section>
   <section aria-labelledby="tf-h"><h2 id="tf-h">Fragen</h2><div class="faq">{faqh}</div></section>
@@ -318,7 +325,7 @@ def common(c, t):
     return t
 
 def tail(c):
-    js = f"<script>{part('app.js')}</script>" if c.preview else f'<script src="{c.root}assets/js/app.js?v={VER}" defer></script>'
+    js = f"<script>{app_js()}</script>" if c.preview else f'<script src="{c.root}assets/js/app.js?v={VER}" defer></script>'
     return f'{part("modal.html")}\n<script id="game-data" type="application/json">{game_data(c)}</script>\n<script id="lux-data" type="application/json">{lux_data(c)}</script>\n{js}\n{TRAILER_JS if not c.preview else ""}\n</body>\n</html>\n'
 
 # ---------------------------------------------------------------- community
@@ -707,6 +714,176 @@ def simple_page(c, path, title, body_html):
     h = head(c, title + " | Lewolux Studio", title + " von Lewolux Studio.", path, "assets/img/og-lewolux-studio.jpg", [], robots="noindex, follow")
     return common(c, h + part("header.html") + f'\n<main class="wrap legal-page"><h1>{e(title)}</h1>{body_html}</main>\n' + part("footer.html") + "\n" + tail(c))
 
+# ---------------------------------------------------------------- Lewolux Kids
+def guard_game(f):
+    """Kids-Modus-Sperre in ein (Erwachsenen-)Spiel unter /games/ einbauen: direkt nach <head>, sonst ganz an den Anfang."""
+    if not os.path.isfile(f): return
+    s = open(f, encoding="utf-8").read()
+    if "lxKids" in s[:3000]: return
+    m = re.search(r"<head[^>]*>", s, re.I)
+    s = s[:m.end()] + KIDS_GUARD + s[m.end():] if m else KIDS_GUARD + s
+    open(f, "w", encoding="utf-8").write(s)
+
+KIDS_OWL = '''<svg class="k-owl" viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="112" rx="34" ry="6" fill="rgba(29,35,80,.15)"/>
+<path d="M22 40 L30 14 L46 30 Z M98 40 L90 14 L74 30 Z" fill="#7a4fd6"/><ellipse cx="60" cy="66" rx="42" ry="44" fill="#8b5cf6"/>
+<ellipse cx="60" cy="80" rx="27" ry="27" fill="#d9c8ff"/><path d="M42 80q6 4 12 0M56 90q6 4 12 0M66 80q6 4 12 0" stroke="#a98bf0" stroke-width="3" fill="none" stroke-linecap="round"/>
+<circle cx="42" cy="50" r="17" fill="#fff"/><circle cx="78" cy="50" r="17" fill="#fff"/><circle cx="44" cy="52" r="8" fill="#1d2350"/><circle cx="76" cy="52" r="8" fill="#1d2350"/>
+<circle cx="47" cy="49" r="3" fill="#fff"/><circle cx="79" cy="49" r="3" fill="#fff"/><path d="M54 62 L66 62 L60 72 Z" fill="#ffb02e"/>
+<path d="M18 70q-10 14 4 28q4-16-4-28zM102 70q10 14-4 28q-4-16 4-28z" fill="#7a4fd6"/><path d="M48 108l-4 6M54 109v6M66 109v6M72 108l4 6" stroke="#ffb02e" stroke-width="4" stroke-linecap="round"/></svg>'''
+SPEAK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#1d2350" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="#1d2350"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>'
+PLAY_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.4-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" fill="#fff"/></svg>'
+
+def kids_icons():
+    """Icons für die Kinder-App: Löwengesicht im weißen Kreis auf buntem Sonnen-Hintergrund (normal + maskable)."""
+    face = Image.open(P("logo-face.png")).convert("RGB")
+    from PIL import ImageDraw
+    def bg(n, rounded):
+        im = Image.new("RGB", (n, n)); px = im.load()
+        cols = [(255, 111, 174), (255, 138, 61), (255, 210, 63), (62, 201, 122), (25, 167, 224)]
+        for y in range(n):
+            for x in range(n):
+                t = (x + y) / (2 * (n - 1)) * (len(cols) - 1); i = min(int(t), len(cols) - 2); f = t - i
+                a, b = cols[i], cols[i + 1]; px[x, y] = tuple(int(a[k] + (b[k] - a[k]) * f) for k in range(3))
+        if rounded:
+            out = Image.new("RGBA", (n, n), (0, 0, 0, 0)); m = Image.new("L", (n, n), 0)
+            ImageDraw.Draw(m).rounded_rectangle((0, 0, n - 1, n - 1), radius=int(n * .22), fill=255); out.paste(im, (0, 0), m); return out
+        return im.convert("RGBA")
+    def put(im, frac):
+        n = im.width; d = int(n * frac); ring = int(d * .07); o = (n - d) // 2
+        dr = ImageDraw.Draw(im); dr.ellipse((o, o, o + d, o + d), fill=(255, 255, 255, 255))
+        inner = d - 2 * ring; m = Image.new("L", (inner * 4, inner * 4), 0); ImageDraw.Draw(m).ellipse((0, 0, inner * 4 - 1, inner * 4 - 1), fill=255)
+        im.paste(face.resize((inner, inner), Image.LANCZOS), (o + ring, o + ring), m.resize((inner, inner), Image.LANCZOS)); return im
+    for n in (192, 512):
+        put(bg(n, True), .8).save(P(f"dist/assets/img/kids-icon-{n}.png"))
+        put(bg(n, False), .62).convert("RGB").save(P(f"dist/assets/img/kids-icon-maskable-{n}.png"))
+    put(bg(180, False), .78).convert("RGB").save(P("dist/assets/img/kids-apple-touch-icon.png"))
+    # Vorschaubild für Messenger/Suchmaschinen
+    og = bg(1200, False).resize((1200, 630)).convert("RGB")
+    if KIDS and os.path.isfile(P(f"dist/assets/screenshots/{KIDS[0]['id']}-1.jpg")):
+        sh = Image.open(P(f"dist/assets/screenshots/{KIDS[0]['id']}-1.jpg")).convert("RGB").resize((720, 405), Image.LANCZOS)
+        m = Image.new("L", (720, 405), 0); ImageDraw.Draw(m).rounded_rectangle((0, 0, 719, 404), radius=36, fill=255)
+        ImageDraw.Draw(og).rounded_rectangle((424, 103, 1156, 520), radius=42, fill=(255, 255, 255)); og.paste(sh, (430, 109), m)
+    ic = Image.open(P("dist/assets/img/kids-icon-512.png")).resize((320, 320), Image.LANCZOS); og.paste(ic, (60, 155), ic)
+    og.save(P("dist/assets/img/og-kids.jpg"), quality=86, optimize=True)
+
+def kids_page(c):
+    title = "Lewolux Kids – kostenlose Kinderspiele ohne Werbung"
+    desc = "Lewolux Kids: kostenlose Lernspiele für Kinder, ohne Werbung, ohne Käufe, ohne Anmeldung. Große Knöpfe, Vorlesefunktion und Elternsperre. Jetzt: Kritzelheld – Buchstaben und Zahlen malen."
+    url = SITE + "kids/"
+    games, cards = [], []
+    for k in KIDS:
+        g = GAME_BY_ID.get(k["id"]); play = f"/games/{k['id']}/index.html" if g and has_game(g) else None
+        games.append({"id": k["id"], "title": k["title"], "play": play})
+        img = pic(c, f"{k['id']}-1", f"Bild aus {k['title']}", "(max-width:900px) 100vw, 540px", lazy=False) if g else ""
+        style = f"--c1:{k['c1']};--c2:{k['c2']}"
+        btn = (f'<button class="k-play" type="button" data-play="{k["id"]}" data-say="Los geht\'s! {e(k["title"])}">{PLAY_SVG}Spielen</button>' if play
+               else f'<button class="k-play is-off" type="button" disabled data-say="{e(k["title"])} kommt bald">Bald</button>')
+        cards.append(f'''<li class="k-card" style="{style}">
+  <button class="k-pic" type="button" {f'data-play="{k["id"]}" ' if play else ''}data-say="{e(k['say'])}" aria-label="{e(k['title'])} spielen">{img or f'<span class="k-emoji" aria-hidden="true">{k["emoji"]}</span>'}<span class="k-age">{e(k['age'])}</span></button>
+  <div class="k-name"><h2>{e(k['title'])}</h2><button class="k-say" type="button" data-say="{e(k['say'])}" aria-label="Vorlesen">{SPEAK_SVG}</button></div>
+  <p class="k-line">{e(k['line'])}</p>
+  {btn}
+</li>''')
+    cards.append('<li class="k-card k-soon" data-say="Bald kommt ein neues Spiel!"><span class="k-big" aria-hidden="true">🎁</span><p>Bald kommt ein neues Spiel!</p><small>Schau bald wieder vorbei.</small></li>')
+    jsonld = [{"@context": "https://schema.org", "@graph": [ORG, {"@type": "CollectionPage", "@id": url, "url": url, "name": title, "description": desc, "inLanguage": "de", "isPartOf": {"@type": "WebSite", "url": SITE, "name": "Lewolux Studio"},
+        "audience": {"@type": "PeopleAudience", "suggestedMinAge": 4, "suggestedMaxAge": 9},
+        "mainEntity": {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": k["title"], "url": f"{SITE}spiele/{k['id']}/"} for i, k in enumerate(KIDS)]}}]}]
+    data = json.dumps({"games": games}, ensure_ascii=False).replace("</", "<\\/")
+    return f'''<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script>try{{if(localStorage.getItem('lxKids')!=='1'){{localStorage.setItem('lxKids','1');window.__lxKidsNew=1}}}}catch(e){{}}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{e(title)}</title>
+<meta name="description" content="{e(desc)}">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Lewolux Studio">
+<meta name="theme-color" content="#6fd0ff">
+<link rel="canonical" href="{url}">
+<link rel="alternate" hreflang="de" href="{url}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lewolux Kids">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="{e(title)}">
+<meta property="og:description" content="{e(desc)}">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{SITE}assets/img/og-kids.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{SITE}assets/img/og-kids.jpg">
+<link rel="icon" type="image/png" sizes="192x192" href="{c.root}assets/img/kids-icon-192.png">
+<link rel="apple-touch-icon" href="{c.root}assets/img/kids-apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Lewolux Kids">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/kids/kids.webmanifest">
+<link rel="preload" href="{c.root}assets/fonts/fredoka-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{c.root}assets/css/kids.css?v={VER}">
+{ld(jsonld[0])}
+</head>
+<body class="kids">
+<div class="k-sky" aria-hidden="true"><div class="k-sun"></div><div class="k-cloud c1"></div><div class="k-cloud c2"></div><div class="k-cloud c3"></div><div class="k-hills"></div></div>
+<div class="k-wrap">
+  <header class="k-top">
+    <div class="k-brand" data-say="Lewolux Kids"><img src="{c.root}assets/img/kids-icon-192.png" alt="" width="54" height="54"><span class="k-logo">Lewolux<b>Kids</b></span></div>
+    <button class="k-parents" id="kParents" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Für Eltern</button>
+  </header>
+  <main>
+    <div class="k-hello">{KIDS_OWL}<div class="k-bubble"><h1>Hallo! <span>Was spielen wir?</span></h1><button class="k-say" type="button" data-say="Hallo! Was spielen wir heute? Tippe auf den grünen Knopf zum Spielen." aria-label="Vorlesen">{SPEAK_SVG}</button></div></div>
+    <ul class="k-games">
+{chr(10).join(cards)}
+    </ul>
+  </main>
+  <footer class="k-foot">
+    <button class="k-install" id="kInstall" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><rect x="4" y="17" width="16" height="4" rx="1.5"/></svg>Als App installieren</button>
+    <span>Kostenlos · ohne Werbung · ohne Käufe</span>
+  </footer>
+</div>
+
+<div class="k-player" id="kPlayer" hidden>
+  <button class="k-close" id="kClose" type="button" aria-label="Spiel schließen" data-say="Tschüss!"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div class="k-loading">Lädt …</div>
+  <div class="k-stage" id="kStage"></div>
+</div>
+
+<dialog class="k-gate" id="kGate" aria-labelledby="kGateH">
+  <div class="k-gate-in">
+    <h2 id="kGateH">Für Eltern</h2>
+    <p>Kids-Modus beenden? Bitte diese Aufgabe lösen:</p>
+    <form id="kGateForm" autocomplete="off">
+      <label class="k-q" id="kQ" for="kAns">Wie viel ist 7 × 8?</label>
+      <div class="k-row"><input id="kAns" type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="999" required aria-describedby="kErr"><button class="k-ok" type="submit">OK</button></div>
+      <p class="k-err" id="kErr" aria-live="polite"></p>
+    </form>
+    <button class="k-back" id="kBack" type="button" data-say="Weiter spielen!">Weiter spielen</button>
+    <p class="k-note"><b>Gut zu wissen:</b> Der Kids-Modus sperrt nur die anderen Seiten von lewolux.de in diesem Browser. Er ist keine echte Kindersicherung: Andere Apps, Webseiten oder ein neuer Tab bleiben erreichbar. Um das Gerät wirklich abzusichern, nutzen Sie <b>Google Family Link</b> (Android) oder auf iPhone/iPad <b>Bildschirmzeit</b> bzw. <b>Geführter Zugriff</b>.</p>
+    <p class="k-legal"><a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a></p>
+  </div>
+</dialog>
+<script id="kids-data" type="application/json">{data}</script>
+<script src="{c.root}assets/js/kids.js?v={VER}" defer></script>
+</body>
+</html>
+'''
+
+def kids_build():
+    os.makedirs(P("dist/kids"), exist_ok=True)
+    for f in os.listdir(P("parts/kids-fonts")):
+        shutil.copy(P("parts/kids-fonts", f), P("dist/assets/fonts", "Fredoka-OFL-LICENSE.txt" if f.endswith(".txt") else f))
+    ff = "\n".join(f"@font-face{{font-family:'Fredoka';font-style:normal;font-weight:{w};font-display:swap;src:url(../fonts/fredoka-latin-{w}-normal.woff2) format('woff2')}}" for w in (500, 700))
+    open(P("dist/assets/css/kids.css"), "w", encoding="utf-8").write(ff + "\n" + part("kids.css"))
+    open(P("dist/assets/js/kids.js"), "w", encoding="utf-8").write(part("install.js") + "\n" + part("kids.js"))
+    kids_icons()
+    open(P("dist/kids/index.html"), "w", encoding="utf-8").write(kids_page(Ctx("../")))
+    open(P("dist/kids/kids.webmanifest"), "w").write(json.dumps({"id": "/kids/", "name": "Lewolux Kids", "short_name": "Lewolux Kids",
+        "description": "Kostenlose Kinderspiele ohne Werbung von Lewolux Studio – mit Vorlesefunktion und Elternsperre.",
+        "lang": "de", "start_url": "/kids/?app=1", "scope": "/kids/", "display": "standalone", "orientation": "any",
+        "background_color": "#6fd0ff", "theme_color": "#6fd0ff", "categories": ["kids", "education", "games"],
+        "icons": [{"src": f"/assets/img/kids-icon-{n}.png", "sizes": f"{n}x{n}", "type": "image/png", "purpose": "any"} for n in (192, 512)]
+               + [{"src": f"/assets/img/kids-icon-maskable-{n}.png", "sizes": f"{n}x{n}", "type": "image/png", "purpose": "maskable"} for n in (192, 512)]}, indent=1, ensure_ascii=False))
+
 # ---------------------------------------------------------------- build
 def main():
     d = P("dist"); shutil.rmtree(d, ignore_errors=True)
@@ -729,7 +906,7 @@ def main():
     for fam, slug, ws in FONTS:
         for w in ws: shutil.copy(P(f"fontsrc/node_modules/@fontsource/{slug}/files/{slug}-latin-{w}-normal.woff2"), P("dist/assets/fonts"))
     open(P("dist/assets/css/site.css"), "w", encoding="utf-8").write(font_face("../fonts/") + "\n" + part("style.css"))
-    open(P("dist/assets/js/app.js"), "w", encoding="utf-8").write(part("app.js"))
+    open(P("dist/assets/js/app.js"), "w", encoding="utf-8").write(app_js())
     if os.path.isdir(P("video")):
         shutil.copytree(P("video"), P("dist/assets/video"), dirs_exist_ok=True)
     if os.path.isdir(P("lux-voice")):
@@ -740,6 +917,7 @@ def main():
     for g in GAMES:
         if has_game(g):
             shutil.copytree(P("spiele-dateien", g["id"]), P("dist/games", g["id"]))
+            if g["id"] not in KIDS_IDS: guard_game(P("dist/games", g["id"], "index.html"))
             if not g.get("online"): open(P("dist", g["download"]["file"]), "w", encoding="utf-8").write(standalone(g))
     for g in GAMES:
         os.makedirs(P("dist/games", g["id"]), exist_ok=True)
@@ -763,6 +941,7 @@ def main():
         open(P(f"dist/software/{sw_['id']}/index.html"), "w", encoding="utf-8").write(software_page(Ctx("../../"), sw_))
     deskboard_parts()
     teaser_assets()
+    kids_build()
     todo = '<p class="todo">Platzhalter: Hier müssen die Pflichtangaben eingetragen werden. Bitte mit einem Generator (z. B. e-recht24.de) oder anwaltlich erstellen lassen.</p>'
     for slug, title in (("impressum", "Impressum"), ("datenschutz", "Datenschutzerklärung")):
         os.makedirs(P(f"dist/{slug}"), exist_ok=True)
@@ -774,7 +953,7 @@ def main():
     open(P("dist/ring-legends/tester/index.html"), "w", encoding="utf-8").write(tester_page(Ctx("../../")))
     open(P("dist/ring-legends/datenschutz/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../../"), "ring-legends/datenschutz/", "Datenschutz – Ring Legends (App und Browser)", part("ring-legends-datenschutz.html")))
     os.makedirs(P("dist/admin"), exist_ok=True)
-    open(P("dist/admin/index.html"), "w", encoding="utf-8").write(part("admin.html").replace("{{API}}", API).replace("{{GAMES}}", json.dumps({g["id"]: g["short"] for g in GAMES}, ensure_ascii=False)))
+    open(P("dist/admin/index.html"), "w", encoding="utf-8").write(part("admin.html").replace('<meta charset="utf-8">', '<meta charset="utf-8">' + KIDS_GUARD, 1).replace("{{API}}", API).replace("{{GAMES}}", json.dumps({g["id"]: g["short"] for g in GAMES}, ensure_ascii=False)))
     open(P("dist/404.html"), "w", encoding="utf-8").write(simple_page(Ctx("/"), "404", "Seite nicht gefunden", '<p class="prose">Diese Seite gibt es nicht. <a href="/">Zur Startseite</a> oder direkt zu den <a href="/#spiele">Spielen</a>.</p>').replace('content="noindex, follow"', 'content="noindex"'))
     # seo files
     today = datetime.date.today().isoformat()
@@ -786,6 +965,7 @@ def main():
     sm += "".join(u(f"spiele/{g['id']}/", [f"assets/screenshots/{g['id']}-{i+1}.jpg" for i in range(3)], "0.8") for g in GAMES)
     sm += "".join(u(f"spiele/{t['id']}/", [f"assets/teaser/{t['id']}-1.jpg"], "0.6") for t in TEASERS)
     sm += u("ring-legends/tester/", [], "0.6")
+    sm += u("kids/", ["assets/img/og-kids.jpg"] + [f"assets/screenshots/{k['id']}-1.jpg" for k in KIDS], "0.8")
     sm += "".join(u(f"software/{x['id']}/", [f"assets/screenshots/software-{x['id']}.jpg"], "0.7") for x in SOFTWARE)
     open(P("dist/sitemap.xml"), "w").write(sm + "</urlset>\n")
     open(P("dist/robots.txt"), "w").write(f"User-agent: *\nAllow: /\nDisallow: /downloads/\nDisallow: /admin/\n\nSitemap: {SITE}sitemap.xml\n")

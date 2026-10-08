@@ -681,22 +681,8 @@ requestAnimationFrame(tick)})();
 
 /* ===== Web-App (Installieren) & Besucherzähler ===== */
 (function(){
-  try{ if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('/sw.js').catch(()=>{}); }catch(_){}
-  const btn=document.getElementById('lxInstall'); let deferred=null;
-  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
-  if(btn&&standalone) btn.hidden=true;
-  addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;});
-  addEventListener('appinstalled',()=>{if(btn)btn.hidden=true;});
-  const help=()=>{
-    const ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document), sam=/SamsungBrowser/.test(ua), ff=/Firefox/.test(ua);
-    const steps=ios?['Unten auf <b>Teilen</b> tippen (Quadrat mit Pfeil).','<b>Zum Home-Bildschirm</b> wählen.','Oben rechts auf <b>Hinzufügen</b> tippen.']
-      :sam?['Unten auf das <b>Menü</b> (☰) tippen.','<b>Seite hinzufügen zu</b> → <b>Startbildschirm</b> wählen.']
-      :ff?['Firefox auf dem PC kann keine Web-Apps installieren. Öffne die Seite in Chrome oder Edge.','Auf dem Handy: Menü (⋮) → <b>Installieren</b>.']
-      :['Im Browser-Menü (⋮ oben rechts) auf <b>App installieren</b> bzw. <b>Zum Startbildschirm hinzufügen</b> tippen.','Oder in Chrome/Edge am PC auf das kleine Bildschirm-Symbol rechts in der Adressleiste klicken.'];
-    const d=document.createElement('div');d.className='install-help';d.innerHTML='<div><h3>Lewolux als App</h3>So kommt das Lewolux-Logo auf deinen Startbildschirm:<ol>'+steps.map(s=>'<li>'+s+'</li>').join('')+'</ol><button type="button">Alles klar</button></div>';
-    d.onclick=ev=>{if(ev.target===d||ev.target.tagName==='BUTTON')d.remove();};document.body.appendChild(d);
-  };
-  if(btn) btn.onclick=async()=>{ if(deferred){ deferred.prompt(); const r=await deferred.userChoice.catch(()=>null); deferred=null; if(r&&r.outcome==='accepted') btn.hidden=true; } else help(); };
+  if(window.LGS_RENDER_ONLY) return;
+  if(window.lxInstall) lxInstall(document.getElementById('lxInstall'),'Lewolux als App','So kommt das Lewolux-Logo auf deinen Startbildschirm:');
   // Besucherzähler: anonym, ohne Cookies, ohne IP. Zufällige Kennung nur für diesen Tab.
   const box=document.getElementById('lxStats'); if(!box||location.protocol!=='https:') return;
   let sid; try{ sid=sessionStorage.getItem('lxSid'); if(!sid){ sid=Math.random().toString(36).slice(2)+Date.now().toString(36); sessionStorage.setItem('lxSid',sid); } }catch(_){ sid=Math.random().toString(36).slice(2,14); }
@@ -704,4 +690,71 @@ requestAnimationFrame(tick)})();
   const fmt=n=>Number(n||0).toLocaleString('de-DE');
   const ping=async()=>{ if(document.hidden) return; try{ const r=await fetch('/api/stats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid,first})}); first=false; if(!r.ok) return; const j=await r.json(); document.getElementById('lxOnline').textContent=fmt(j.online); document.getElementById('lxToday').textContent=fmt(j.today); document.getElementById('lxTotal').textContent=fmt(j.total); box.hidden=false; }catch(_){} };
   ping(); setInterval(ping,30000); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) ping(); });
+})();
+
+/* ===== Bereichs-Umschalter „Spiele · Software · Kids“ (oben auf jeder Seite) ===== */
+(()=>{if(window.LGS_RENDER_ONLY)return;const nav=document.querySelector('.areas');if(!nav)return;
+const set=k=>nav.querySelectorAll('[data-area]').forEach(a=>{if(a.dataset.area===k)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+const p=location.pathname;
+if(/\/software\//.test(p))return set('software');
+if(/\/(spiele|ring-legends)\//.test(p))return set('spiele');
+const sw=document.getElementById('software'),sp=document.getElementById('spiele');if(!sw||!sp)return;
+set('spiele');let cur='spiele';
+const upd=()=>{const r=sw.getBoundingClientRect(),k=r.top<innerHeight*.45&&r.bottom>innerHeight*.2?'software':'spiele';if(k!==cur){cur=k;set(k)}};
+addEventListener('scroll',upd,{passive:true});upd()})();
+
+/* ===== Altersabfrage (Age Gate) – wiederverwendbare Komponente, noch nirgends eingesetzt =====
+   So wird ein Inhalt ab 18 (z. B. ein Trailer) geschützt:
+
+     <div class="age-gate" data-age="18" data-title="Trailer: House in the Desert">
+       <template>
+         <video src="/assets/video/house-trailer.mp4" controls playsinline preload="metadata"></video>
+       </template>
+     </div>
+
+   - Der Inhalt steht in einem <template> und wird erst nach „Ja“ in die Seite eingefügt.
+     Dadurch lädt der Browser Video/Bild vorher NICHT (kein Vorab-Download, kein Vorschaubild).
+   - Die Antwort „Ja“ wird in localStorage unter 'lxAge18' = '1' gemerkt (gilt dann für alle Age-Gates der Seite).
+   - „Nein“ zeigt nur einen Hinweis; der Inhalt bleibt gesperrt (nicht gespeichert, beim nächsten Besuch wird erneut gefragt).
+   - Im Kids-Modus (localStorage 'lxKids' = '1') ist der Inhalt IMMER gesperrt, ohne Ja/Nein-Knöpfe.
+     (Normalerweise leitet der Kids-Modus ohnehin auf /kids/ um; das hier ist die zweite Sicherung.)
+   - Wird ein Age-Gate später per JavaScript eingefügt: window.lxAgeGate(element) aufrufen. */
+(()=>{if(window.LGS_RENDER_ONLY)return;
+const get=k=>{try{return localStorage.getItem(k)}catch(_){return null}};
+const reveal=g=>{const t=g.querySelector('template');g.classList.add('is-open');g.innerHTML='';if(t)g.appendChild(t.content.cloneNode(true))};
+function init(g){if(!g||g.dataset.agInit)return;g.dataset.agInit='1';
+  const age=g.dataset.age||'18',title=g.dataset.title||'';
+  if(get('lxKids')==='1'){const t=g.querySelector('template');g.innerHTML='';if(t)g.appendChild(t);g.classList.add('is-blocked');
+    g.insertAdjacentHTML('beforeend','<div class="ag-box"><p class="ag-ico" aria-hidden="true">🔒</p><p class="ag-q">Dieser Inhalt ist im Kids-Modus nicht verfügbar.</p></div>');return}
+  if(get('lxAge'+age)==='1')return reveal(g);
+  const box=document.createElement('div');box.className='ag-box';box.setAttribute('role','group');box.setAttribute('aria-label','Altersabfrage');
+  box.innerHTML=(title?'<p class="ag-t"></p>':'')+'<p class="ag-ico" aria-hidden="true">'+age+'+</p><p class="ag-q">Dieser Inhalt ist für Erwachsene. Bist du mindestens '+age+' Jahre alt?</p><div class="ag-btns"><button type="button" class="btn btn-primary ag-yes">Ja, ich bin '+age+' oder älter</button><button type="button" class="btn ag-no">Nein</button></div><p class="ag-msg" aria-live="polite"></p>';
+  if(title)box.querySelector('.ag-t').textContent=title;
+  g.appendChild(box);
+  box.querySelector('.ag-yes').onclick=()=>{try{localStorage.setItem('lxAge'+age,'1')}catch(_){}document.querySelectorAll('.age-gate[data-ag-init]:not(.is-open):not(.is-blocked)').forEach(x=>{if((x.dataset.age||'18')===age)reveal(x)})};
+  box.querySelector('.ag-no').onclick=()=>{box.querySelector('.ag-msg').textContent='Schade! Dieser Inhalt ist nur für Erwachsene. Schau dir gern unsere anderen Spiele an.';box.querySelector('.ag-btns').hidden=true}}
+window.lxAgeGate=init;document.querySelectorAll('.age-gate').forEach(init)})();
+
+/* ===== Tester-Anmeldung: ohne E-Mail-Programm passiert bei mailto: am PC oft nichts -> Auswahl anbieten ===== */
+(function(){
+  const b=document.getElementById('testerBtn'); if(!b) return;
+  const to='hallo@lewolux.de', su='Ring Legends Tester', body='Hallo Lewolux,\n\nich möchte Ring Legends vorab auf Android testen.\n\nMeine Gmail-Adresse für den Play Store: \n\nViele Grüße';
+  b.addEventListener('click',ev=>{
+    ev.preventDefault();
+    const gm='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(to)+'&su='+encodeURIComponent(su)+'&body='+encodeURIComponent(body);
+    const ol='https://outlook.live.com/mail/0/deeplink/compose?to='+encodeURIComponent(to)+'&subject='+encodeURIComponent(su)+'&body='+encodeURIComponent(body);
+    const d=document.createElement('div');d.className='install-help';
+    d.innerHTML='<div><h3>Als Tester melden</h3>Schick uns kurz deine Gmail-Adresse – wähle, womit du schreiben möchtest:'+
+      '<div style="display:grid;gap:10px;margin:14px 0">'+
+      '<a class="btn btn-play" href="'+gm+'" target="_blank" rel="noopener">Mit Gmail schreiben</a>'+
+      '<a class="btn" href="'+ol+'" target="_blank" rel="noopener">Mit Outlook / Hotmail schreiben</a>'+
+      '<a class="btn" href="'+b.getAttribute('href')+'">E-Mail-Programm öffnen</a>'+
+      '<button type="button" class="btn" data-copy>Adresse kopieren: '+to+'</button></div>'+
+      '<button type="button" data-close>Schließen</button></div>';
+    d.addEventListener('click',e=>{const t=e.target;
+      if(t===d||t.hasAttribute('data-close')) d.remove();
+      if(t.hasAttribute('data-copy')){ (navigator.clipboard?navigator.clipboard.writeText(to):Promise.reject()).then(()=>{t.textContent='Kopiert: '+to;}).catch(()=>{t.textContent=to;}); }
+    });
+    document.body.appendChild(d);
+  });
 })();

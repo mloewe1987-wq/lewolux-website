@@ -1072,6 +1072,45 @@ const ITEMS = [
   { id: 'c-gold', slot: 'color', name: 'Gold', price: 120, color: '#E6A800' },
   { id: 'c-galaxy', slot: 'color', name: 'Galaxie', price: 400, color: '#4B2C8C', gradient: ['#2B1055', '#5B3FD1', '#7597DE'] },
   { id: 'c-rainbow', slot: 'color', name: 'Regenbogen', price: 2000, legendary: true, color: '#FF8C42', gradient: ['#FF5E5B', '#FF8C42', '#FFC83D', '#3CCB7F', '#2FA8FF', '#8A6BFF'] },
+
+  // =================== NEU in 3.9 ===================
+  // Hüte
+  { id: 'beanie', slot: 'hat', name: 'Bommelmütze', price: 40, svg: () => P('M29 20C29 -1 71 -1 71 20Z', '#2FA8FF') + P('M32 7Q50 2 68 7L70 11Q50 6 30 11Z', '#FFFFFF') + P('M27 15Q50 10 73 15L73 23Q50 18 27 23Z', '#FFFFFF') + C(50, -3, 6.5, '#FF5E5B') },
+  { id: 'fire', slot: 'hat', name: 'Feuerwehrhelm', price: 85, svg: () => P('M26 21C26 -3 74 -3 74 21Z', '#E63946') + P('M46.5 -2.5H53.5V20H46.5Z', '#C1121F') + P('M16 20Q50 27 84 20L82 25Q50 32 18 25Z', '#C1121F') + P('M43 6H57V14Q50 19 43 14Z', '#FFC83D') + P(starD(50, 10.5, 3.5), '#E63946') },
+  { id: 'tiara', slot: 'hat', name: 'Glitzer-Tiara', price: 95, svg: () => P('M31 21L35 9L42 15L50 1L58 15L65 9L69 21Q50 17 31 21Z', '#EEF1F7', 'stroke="#AFC0D6" stroke-width="1.4"') + C(50, 11, 3, '#FF7EB6') + C(40, 16, 2, '#8A6BFF') + C(60, 16, 2, '#8A6BFF') + C(50, 1, 2.2, '#7FDBFF') + sparkle(28, 8, 3.2) + sparkle(73, 5, 2.6) },
+  { id: 'knight', slot: 'hat', name: 'Ritterhelm', price: 2200, legendary: true, svg: () =>
+    P('M50 4C46 -12 54 -22 64 -19C57 -15 59 -6 54 4Z', '#FF5E5B') + P('M50 4C44 -8 46 -16 40 -20C38 -10 42 -2 46 4Z', '#2FA8FF') +
+    P('M23 27C21 -1 79 -1 77 27L71 25C71 8 29 8 29 25Z', '#F2B705', 'stroke="#B07800" stroke-width="1.5"') + P('M29 25C29 8 71 8 71 25Z', '#FFD54A') +
+    P('M47 6H53V24H47Z', '#D99A00') + C(36, 18, 1.6, '#FFF3C4') + C(64, 18, 1.6, '#FFF3C4') + C(50, 12, 2.4, '#FF5E5B') + sparkle(18, 8, 4) + sparkle(84, 14, 3.2) },
+  // Brillen
+  { id: 'monocle', slot: 'glasses', name: 'Monokel', price: 45, svg: () => C(62, 38, 12, 'rgba(255,255,255,0.25)', 'stroke="#C98A00" stroke-width="2.6"') + L('M73.5 42Q82 56 72 68', '#C98A00', 1.2) + L('M55 32L59 30', 'rgba(255,255,255,0.9)', 2) },
+  { id: 'ski', slot: 'glasses', name: 'Skibrille', price: 70, svg: () => L('M24 37L15 39M76 37L85 39', '#26315A', 4) + P('M24 29H76V44C76 49 72 50 66 48L56 45H44L34 48C28 50 24 49 24 44Z', 'rgba(255,140,66,0.78)', 'stroke="#FFFFFF" stroke-width="3"') + P('M30 33L40 33L33 40Z', 'rgba(255,255,255,0.5)') + P('M56 33L66 33L59 40Z', 'rgba(255,255,255,0.5)') },
+  { id: 'pixel', slot: 'glasses', name: 'Pixelbrille', price: 80, svg: () => P('M23 31H77V35.5H23Z', '#111111') + P('M27 35H48V43H44V47H31V43H27Z', '#111111') + P('M52 35H73V43H69V47H56V43H52Z', '#111111') + P('M30 36.5H34V40H30Z', '#FFFFFF') + P('M55 36.5H59V40H55Z', '#FFFFFF') },
+  // Hals
+  { id: 'pearls', slot: 'neck', name: 'Perlenkette', price: 60, svg: () => Array.from({ length: 11 }, (_, i) => { const t = i / 10, x = 30 + 40 * t, y = 58 + 54 * t * (1 - t); return C(x.toFixed(2), y.toFixed(2), 3, '#FFFFFF', 'stroke="#DDE2EC" stroke-width="0.8"'); }).join('') + C(50, 74, 4.2, '#FF7EB6') },
+  { id: 'lei', slot: 'neck', name: 'Blumenkette', price: 55, svg: () => [0, 1, 2, 3, 4, 5, 6].map((i) => { const t = i / 6, x = 27 + 46 * t, y = 59 + 50 * t * (1 - t); return flower(+x.toFixed(2), +y.toFixed(2), ['#FF7EB6', '#FF5E5B', '#FFFFFF', '#8A6BFF'][i % 4]); }).join('') },
+  { id: 'whistle', slot: 'neck', name: 'Trillerpfeife', price: 35, svg: () => L('M32 58Q50 78 68 58', '#FF5E5B', 2) + P('M44 72H56Q60 72 60 76Q60 80 56 80H50Q44 80 44 76Z', '#FFC83D') + P('M56 72H62V75H56Z', '#E6A800') + C(50, 76, 1.6, '#26315A') },
+  // Trikots
+  J('irl', 'Irland', 60, '#169B62', '#FFFFFF', '#FFFFFF'),
+  J('isl', 'Island', 60, '#02529C', '#DC1E35', '#FFFFFF'),
+  J('sen', 'Senegal', 60, '#FFFFFF', '#00853F', '#00853F'),
+  J('cmr', 'Kamerun', 70, '#007A5E', '#FCD116', '#FCD116', { pattern: 'band', band: ['#007A5E', '#CE1126', '#FCD116'] }),
+  // Bälle
+  { id: 'ball-tennis', slot: 'ball', name: 'Tennisball', price: 35, svg: () => C(82, 86, 11, '#D7F04A') + L('M72 80Q82 86 72 92M92 80Q82 86 92 92', '#FFFFFF', 1.6) },
+  { id: 'ball-volley', slot: 'ball', name: 'Volleyball', price: 50, svg: () => C(82, 86, 11, '#FFFFFF') + P('M82 75Q93 80 92 91Q86 84 82 86Z', '#2FA8FF') + P('M72 91Q71 80 82 75Q78 83 82 86Z', '#FFC83D') + P('M92 91Q82 99 72 91Q78 89 82 86Z', '#2FA8FF') + C(82, 86, 11, 'none', 'stroke="#9AA4B5" stroke-width="1"') },
+  { id: 'ball-bowl', slot: 'ball', name: 'Bowlingkugel', price: 55, svg: () => C(82, 86, 11, '#8A6BFF') + C(79, 81, 1.7, '#26315A') + C(85, 81, 1.7, '#26315A') + C(82, 85.5, 1.7, '#26315A') + P('M75 80Q76 77 79 76', 'none', 'stroke="rgba(255,255,255,.6)" stroke-width="1.6"') },
+  // Umhänge
+  { id: 'cape-flower', slot: 'back', name: 'Blütenumhang', price: 95, ...cape('#FF7EB6', '#FF9DC8', flower(10, 90, '#FFFFFF') + flower(90, 88, '#FFFFFF') + flower(16, 78, '#FFC83D') + flower(85, 76, '#FFC83D')), svg: () => C(30, 60, 3.5, '#FFFFFF') + C(70, 60, 3.5, '#FFFFFF') },
+  { id: 'cape-sea', slot: 'back', name: 'Meeresumhang', price: 95, ...cape('#2EC4B6', '#1E90C8', L('M6 86Q10 82 14 86T22 86M80 88Q84 84 88 88T96 88M10 95Q14 91 18 95T26 95', '#BFE8FF', 1.6)), svg: () => C(30, 60, 3.5, '#BFE8FF') + C(70, 60, 3.5, '#BFE8FF') },
+  { id: 'wings-dragon', slot: 'back', name: 'Drachenflügel', price: 1700, legendary: true,
+    back: () => P('M30 50C20 32 8 24 1 30C4 38 2 46 0.5 54C6 56 5 64 1 72C9 74 17 72 26 66Z', '#2D9C5A') + P('M30 50C20 40 12 36 7 38L11 47L4 54L11 58L6 67C12 67 18 66 25 63Z', '#3CCB7F') +
+      P('M70 50C80 32 92 24 99 30C96 38 98 46 99.5 54C94 56 95 64 99 72C91 74 83 72 74 66Z', '#2D9C5A') + P('M70 50C80 40 88 36 93 38L89 47L96 54L89 58L94 67C88 67 82 66 75 63Z', '#3CCB7F') + sparkle(8, 20, 3.5) + sparkle(92, 18, 3),
+    svg: () => P('M38 4L42 -4L46 4Z M54 4L58 -4L62 4Z', '#FFC83D') },
+  // Farben
+  { id: 'c-orange', slot: 'color', name: 'Orange', price: 40, color: '#FF8C42' },
+  { id: 'c-braun', slot: 'color', name: 'Schokobraun', price: 40, color: '#8B5A2B' },
+  { id: 'c-weiss', slot: 'color', name: 'Schneeweiß', price: 60, color: '#DCE6F2' },
+  { id: 'c-sunset', slot: 'color', name: 'Sonnenuntergang', price: 400, color: '#FF8C42', gradient: ['#FF5E5B', '#FF8C42', '#FFC83D'] },
 ];
 
 const ITEM_MAP = Object.fromEntries(ITEMS.map((it) => [it.id, it]));

@@ -192,3 +192,14 @@ NEWS = [
  ("Software", "Diktakte: Diktieren, ablegen, erledigt. Alle Funktionen im Überblick", "software/diktakte/"),
  ("Tipp", "Lade dir die Spiele kostenlos herunter. Läuft auch offline", "#spiele"),
 ]
+
+# Lewolux Kids (/kids/): Spiele für Kinder. Neues Kinderspiel = einfach hier einen Eintrag ergänzen.
+# id    = Ordner in spiele-dateien/<id>/ (das Spiel läuft im Kinderbereich unter /games/<id>/index.html)
+# say   = Satz, der beim Antippen vorgelesen wird (für Kinder, die noch nicht lesen können)
+# c1/c2 = Farben der Karte, emoji = großes Symbol, age = Altersempfehlung
+# Spiele in dieser Liste werden im Kids-Modus NICHT gesperrt; alle anderen Spiele schon.
+KIDS = [
+ dict(id="kritzelheld", title="Kritzelheld", emoji="🦉", c1="#3ec97a", c2="#19a7e0", age="ab 4 Jahren",
+  line="Buchstaben und Zahlen malen mit Eule Kritzel",
+  say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn."),
+]

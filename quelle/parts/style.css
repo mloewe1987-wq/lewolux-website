@@ -856,3 +856,31 @@ html.modal-open .lux,html.player-open .lux{display:none}
 .install-help>div{background:#14151d;border:1px solid rgba(255,255,255,.12);border-radius:18px;max-width:440px;width:100%;padding:22px;color:#e8e8f0;font-size:15px;line-height:1.5}
 .install-help h3{margin:0 0 8px;font-size:18px}.install-help ol{margin:8px 0 14px;padding-left:20px}
 .install-help button{padding:9px 16px;border-radius:10px;border:0;background:#7c5cff;color:#fff;font-weight:600;cursor:pointer}
+
+/* ===== Bereichs-Umschalter: Spiele · Software · Kids ===== */
+.areas{position:relative;z-index:39;background:linear-gradient(180deg,rgba(10,11,16,.7),rgba(10,11,16,.25));border-bottom:1px solid var(--line)}
+.areas-in{display:flex;justify-content:center;padding-block:10px}
+.area-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;width:min(100%,560px);padding:5px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--line-2)}
+.area{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 10px;border-radius:13px;text-decoration:none;font-weight:800;font-size:15px;letter-spacing:.01em;color:var(--muted);transition:color .2s,background .2s,box-shadow .2s,transform .15s}
+.area svg{width:19px;height:19px;flex:none}
+.area:hover{color:var(--fg);background:rgba(255,255,255,.05)}
+.area[aria-current]{color:var(--fg);background:linear-gradient(135deg,rgba(59,232,255,.16),rgba(155,92,255,.2));box-shadow:inset 0 0 0 1px rgba(59,232,255,.45),0 0 20px rgba(59,232,255,.15)}
+.area[aria-current] svg{color:var(--cyan)}
+.area-kids,.area-kids:hover{color:#fff;background:linear-gradient(100deg,#ff6fae,#ff8a3d 30%,#ffc93f 55%,#3ec97a 78%,#19a7e0);box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 0 18px rgba(255,138,61,.28)}
+.area-kids:hover{transform:translateY(-1px) rotate(-1deg);filter:brightness(1.06)}
+.area-owl{font-size:20px;line-height:1;filter:drop-shadow(0 2px 0 rgba(0,0,0,.2))}
+.area-kw{font-size:17px;font-weight:800;letter-spacing:.04em;text-shadow:0 2px 0 rgba(0,0,0,.22)}
+.area-kw i{font-style:normal;display:inline-block}.area-kw i:nth-child(odd){transform:translateY(-1px) rotate(-6deg)}.area-kw i:nth-child(even){transform:translateY(1px) rotate(5deg)}
+@media (max-width:420px){.areas-in{padding-block:8px}.area{gap:6px;font-size:14px;padding:0 6px;min-height:44px}.area svg{width:17px;height:17px}.area-kw{font-size:16px}}
+
+/* ===== Altersabfrage (Age Gate), siehe app.js ===== */
+.age-gate{position:relative;border-radius:var(--radius);overflow:hidden;background:#07080c;border:1px solid var(--line-2);min-height:220px}
+.age-gate.is-open{min-height:0;border:0;background:none}
+.age-gate.is-open video,.age-gate.is-open img,.age-gate.is-open iframe{display:block;width:100%;border-radius:var(--radius)}
+.ag-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:220px;padding:24px 18px;text-align:center;background:radial-gradient(60% 80% at 50% 0%,rgba(255,59,59,.14),transparent 70%)}
+.ag-t{margin:0;font:700 12px/1 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.ag-ico{margin:0;display:grid;place-items:center;width:58px;height:58px;border-radius:50%;border:2px solid #ff3b3b;color:#ff6b6b;font:800 18px/1 var(--f-display)}
+.is-blocked .ag-ico{border-color:var(--line-2);font-size:24px}
+.ag-q{margin:0;max-width:40ch;font-weight:700;font-size:17px}
+.ag-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.ag-msg{margin:0;max-width:44ch;color:var(--muted);font-size:14.5px}
