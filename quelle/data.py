@@ -69,6 +69,28 @@ GAMES = [
   shots=["Wer spielt heute? Karl und Michel","Buchstaben nachspuren und Torschuss","Lernspiele mit Eule Kritzel"],
   reel=["Family","Lernen, das sich wie Spielen anfühlt","Kinder sehen sofort, wie viel sie geschafft haben."],
   download=dict(file="downloads/kritzelheld.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
+ dict(id="nervbert", orient="any", ratio="16/10", scene="kasse", demo="none", accent="#ff9a3d",
+  title="Hau den Nervbert", short="Nervbert", tagline="Der nervigste Onkel der Welt. Du hast den Boxhandschuh.",
+  desc="Physik-Slapstick im Browser: Spann den Boxhandschuh wie eine Schleuder, schick Nervbert durch Sandburgen, Windmühlen und Gartenzwerge und kauf dir mit den Münzen bessere Handschuhe. 27 Level, kostenlos.",
+  genres=["Arcade","Physik"], cats="arcade", status="Neu",
+  plats=["web","mobile"], tech=["HTML5 Canvas","Ragdoll-Physik","Offline"],
+  story="Onkel Nervbert erklärt dir zum hundertsten Mal, wie man richtig grillt. Zum Glück liegt da ein Boxhandschuh an einem Gummiseil.",
+  controls=[["Zielen & Spannen","Ziehen mit Maus / Finger"],["Zuschlagen","Loslassen"],["Pause","Esc / P"],["Neustart","R"]],
+  features=["27 Level voller Gartenchaos","Ragdoll-Physik und zerstörbare Bauten","Upgrades für Handschuh und Seil","Bis zu 3 Sterne pro Level"],
+  shots=["Spannen, zielen, zuschlagen","Nervbert fliegt durch die Sandburg","Upgrades im Handschuh-Shop"],
+  reel=["Arcade","Slapstick mit Physik","Ein Schlag, viel Chaos."],
+  download=dict(file="downloads/nervbert.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
+ dict(id="pandi", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#7fd6ff",
+  title="Pandi – Blubber, Plopp & Boing!", short="Pandi", tagline="Ein kleiner Panda, viele Seifenblasen.",
+  desc="Kinderspiel ohne Werbung: Panda Pandi wirft Seifenblasen, Luftballons und Bälle und lässt Ziele ploppen. 36 kurze Level, große Knöpfe, ohne Lesen spielbar.",
+  genres=["Kinder","Geschicklichkeit"], cats="family", status="Neu",
+  plats=["web","mobile"], tech=["HTML5 Canvas","Offline"],
+  story="Pandi hat Blubberwasser, Luftballons und einen Ball gefunden. Hilfst du ihm, alles zum Ploppen zu bringen?",
+  controls=[["Werfen","Ziehen und loslassen"],["Pandi kitzeln","Antippen"],["Zurück","Knopf oben links"]],
+  features=["36 kurze Level","Blasen, Ballons und Bälle","Ohne Werbung und ohne Käufe","Für Kinder ab 3 Jahren"],
+  shots=["Pandi wirft Seifenblasen","Ballons zum Ploppen","Level-Karte mit Sternen"],
+  reel=["Family","Blubbern, ploppen, lachen","Ein Panda für die Kleinsten."],
+  download=dict(file="downloads/pandi.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
  dict(id="kasse-oder-zettel", ratio="816/624", scene="kasse", demo="kasse", accent="#3be8ff",
   title="Kasse oder Zettel?", short="Kasse oder Zettel", tagline="Zettel gegen Kasse: Wer schafft den Freitagabend?",
   desc="Bediene ein volles Restaurant und spüre den Unterschied: mobile Kasse gegen Zettelwirtschaft. 8 Level, vom Mittagstisch bis Silvester.",
@@ -156,6 +178,18 @@ SEO = {
   long=["<strong>Kritzelheld</strong> ist eine werbefreie Lern-App, mit der Kinder spielerisch <strong>Buchstaben und Zahlen schreiben lernen</strong>. Das Kind fährt die Zeichen mit dem Finger nach, die App zeigt in Prozent, wie genau es war. Die Schwelle lässt sich für jedes Alter passend einstellen.",
         "Für jede gelungene Übung gibt es Federn. Damit kann die Eule Kritzel im Shop neue Outfits und Accessoires bekommen. Eine Schatzkarte, Erfolge und Minispiele wie Malen nach Zahlen sorgen für Motivation. Mehrere Kinderprofile und eine Elternsperre sind eingebaut.",
         "Kritzelheld funktioniert ohne Internet, sammelt keine Daten und ist kostenlos im Browser und als Download verfügbar."]),
+ "nervbert": dict(
+  title="Hau den Nervbert – kostenloses Physik-Spiel im Browser",
+  meta="Hau den Nervbert: kostenloses Slapstick-Browser-Game mit Ragdoll-Physik. Boxhandschuh spannen, Onkel Nervbert durch Sandburgen schicken, 27 Level, ohne Anmeldung.",
+  long=["<strong>Hau den Nervbert</strong> ist ein kostenloses <strong>Physik-Spiel im Browser</strong>. Onkel Nervbert redet und redet. Du spannst einen Boxhandschuh am Gummiseil wie eine Schleuder, zielst und lässt los. Nervbert fliegt als Ragdoll durch Sandburgen, Windmühlen und Gartenzwerge.",
+        "Für jeden Treffer gibt es Münzen und bis zu drei Sterne. Damit kaufst du stärkere Handschuhe und bessere Seile. 27 Level mit steigendem Chaos warten auf dich.",
+        "Hau den Nervbert läuft ohne Anmeldung und ohne Download direkt im Browser, am PC und auf dem Handy."]),
+ "pandi": dict(
+  title="Pandi – kostenloses Kinderspiel mit Panda",
+  meta="Pandi – Blubber, Plopp & Boing! Kostenloses Kinderspiel ohne Werbung: Der kleine Panda wirft Seifenblasen, Luftballons und Bälle. 36 Level, ab 3 Jahren.",
+  long=["<strong>Pandi – Blubber, Plopp & Boing!</strong> ist ein kostenloses <strong>Kinderspiel ohne Werbung</strong>. Der kleine Panda Pandi wirft Seifenblasen, Luftballons und Bälle und bringt Ziele zum Ploppen.",
+        "36 kurze Level, große Knöpfe und einfache Wischgesten machen das Spiel schon für Kinder ab 3 Jahren leicht. Lesen ist nicht nötig. Wer Pandi antippt, bringt ihn zum Lachen.",
+        "Pandi gehört zu Lewolux Kids: keine Werbung, keine Käufe, keine Anmeldung."]),
  "kasse-oder-zettel": dict(
   title="Kasse oder Zettel? – Gastro-Spiel im Browser",
   meta="Kasse oder Zettel? Schichtsimulator in der Pizzeria: Erlebe spielerisch, wie viel Zeit eine mobile Kasse gegenüber dem Bestellblock spart.",
@@ -205,6 +239,10 @@ KIDS = [
   say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn.",
   mascot="owl", crowd=1,        # Figur, die unten auf der Wiese herumläuft (owl, panda, …) und wie viele davon
   preview="kritzel"),           # animierte Vorschau auf der Karte (Renderer in parts/kids.js); ohne: Screenshot
+ dict(id="pandi", title="Pandi", emoji="🐼", c1="#7fd6ff", c2="#c58bff", age="ab 3 Jahren",
+  line="Seifenblasen, Ballons und Bälle mit Panda Pandi",
+  say="Pandi! Wirf Seifenblasen und Luftballons mit dem kleinen Panda.",
+  mascot="panda", crowd=1),
 ]
 # Alles, was im Kinderbereich vorgelesen wird (feste Sätze). Spielnamen, Beschreibungen und
 # „Los geht's! <Spiel>“ kommen automatisch aus KIDS dazu. build.py nimmt daraus MP3s auf (kids-voice/, Cache).

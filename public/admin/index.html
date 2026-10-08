@@ -48,7 +48,7 @@ button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 16p
   </div>
 </div>
 <script>
-const API="https://api.lewolux.de/",NAMES=Object.assign({"mandat": "Mandat", "sternenwurf": "Sternenwurf", "idle-legenden": "Idle Legenden", "wrestling-tcg": "Ring Legends", "kritzelheld": "Kritzelheld", "kasse-oder-zettel": "Kasse oder Zettel", "ordnungsgilde": "Ordnungsgilde"},{allgemein:"Allgemein"}),KIND={wunsch:"Wunsch",idee:"Idee",bug:"Fehler",lob:"Lob"};
+const API="https://api.lewolux.de/",NAMES=Object.assign({"mandat": "Mandat", "sternenwurf": "Sternenwurf", "idle-legenden": "Idle Legenden", "wrestling-tcg": "Ring Legends", "kritzelheld": "Kritzelheld", "nervbert": "Nervbert", "pandi": "Pandi", "kasse-oder-zettel": "Kasse oder Zettel", "ordnungsgilde": "Ordnungsgilde"},{allgemein:"Allgemein"}),KIND={wunsch:"Wunsch",idee:"Idee",bug:"Fehler",lob:"Lob"};
 let KEY="";try{KEY=localStorage.getItem("lwx_admin")||""}catch(_){}
 let st="pending";const $=s=>document.querySelector(s);
 const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
