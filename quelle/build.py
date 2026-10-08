@@ -222,6 +222,9 @@ def head(c, title, desc, path, og, jsonld, robots="index, follow, max-image-prev
 <meta name="twitter:description" content="{e(desc)}">
 <meta name="twitter:image" content="{SITE}{og}">
 <link rel="icon" href="{c.root}favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="{c.root}favicon-48.png">
+<link rel="icon" type="image/png" sizes="96x96" href="{c.root}favicon-96.png">
+<link rel="icon" type="image/png" sizes="144x144" href="{c.root}favicon-144.png">
 <link rel="icon" type="image/png" sizes="192x192" href="{c.img('icon-192.png') if not c.preview else c.img('icon-192.png')}">
 <link rel="apple-touch-icon" href="{c.root}apple-touch-icon.png">
 <link rel="manifest" href="{c.root}site.webmanifest">
@@ -647,10 +650,13 @@ def main():
     ban.save(P("dist/assets/img/lewolux-studio-banner.jpg"), quality=86, optimize=True, progressive=True)
     ban.save(P("dist/assets/img/lewolux-studio-banner.webp"), quality=82, method=6)
     og_image(P("banner.jpg"), P("dist/assets/img/og-lewolux-studio.jpg"))
-    logo = Image.open(P("logo.jpg")).convert("RGB")
-    logo.save(P("dist/assets/img/lewolux-studio-logo.jpg"), quality=88)
-    logo.resize((192, 192)).save(P("dist/assets/img/icon-192.png")); logo.resize((512, 512), Image.LANCZOS).save(P("dist/assets/img/icon-512.png"))
-    logo.resize((180, 180), Image.LANCZOS).save(P("dist/apple-touch-icon.png")); logo.save(P("dist/favicon.ico"), sizes=[(32, 32), (48, 48)])
+    Image.open(P("logo-lion.png")).convert("RGB").resize((256, 256), Image.LANCZOS).save(P("dist/assets/img/lewolux-studio-logo.jpg"), quality=88)
+    # Icons aus dem großen Löwen im Banner (schärfer als das kleine Logo); fürs Favicon nur das Gesicht, damit es klein lesbar bleibt
+    lion = Image.open(P("logo-lion.png")).convert("RGB"); face = Image.open(P("logo-face.png")).convert("RGB")
+    lion.resize((192, 192), Image.LANCZOS).save(P("dist/assets/img/icon-192.png")); lion.resize((512, 512), Image.LANCZOS).save(P("dist/assets/img/icon-512.png"))
+    lion.resize((180, 180), Image.LANCZOS).save(P("dist/apple-touch-icon.png"))
+    for n in (48, 96, 144): face.resize((n, n), Image.LANCZOS).save(P(f"dist/favicon-{n}.png"))
+    face.save(P("dist/favicon.ico"), sizes=[(16, 16), (32, 32), (48, 48)])
     for g in GAMES: og_image(P(f"dist/assets/screenshots/{g['id']}-1.jpg"), P(f"dist/assets/og/og-{g['id']}.jpg"))
     # fonts, css, js
     for fam, slug, ws in FONTS:
