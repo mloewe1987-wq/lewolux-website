@@ -125,7 +125,7 @@ class Ctx:
 G_TIP = '''<div class="dl-tip slim"><div><p class="rec-k">★ Empfohlen: der Download</p><ul class="tip-list"><li><b>Startet sofort</b>, ohne Ladezeit</li><li><b>Läuft offline</b>, überall, auch ohne Internet</li><li><b>Eine Datei</b>: nichts installieren, kein Account, keine Werbung</li><li><b>Deine Version gehört dir</b>, dein Spielstand bleibt auf deinem Gerät</li></ul><p class="tip-how">Am PC per Doppelklick öffnen, auf Android über „Downloads“ mit Chrome. Auf dem iPhone spielst du am besten direkt im Browser.</p></div></div>'''
 
 def dl_btn(c, g, label, aria=False):
-    if g.get("online"): return f'<span class="btn btn-dl is-off" aria-disabled="true">{DL}Android-App bald</span>'
+    if g.get("online"): return f'<a class="btn btn-dl" href="{c.root}ring-legends/tester/">{DL}Android-Tester werden</a>'
     if not c.dl(g): return f'<span class="btn btn-dl is-off" aria-disabled="true">{DL}Download bald</span>'
     fn = g["download"]["file"].split("/")[-1]; a = f' aria-label="{e(g["short"])} kostenlos herunterladen"' if aria else ""
     return f'<a class="btn btn-dl rec" href="{c.dl(g)}" download="{fn}"{a}>{DL}{label}<span class="rec-b">Empfohlen</span></a>'
@@ -257,7 +257,7 @@ def links_page(c):
     items = [("🥊", "Ring Legends spielen", "Sammelkarten online – kostenlos im Browser", f"{c.root}games/wrestling-tcg/index.html", True),
              ("🎬", "Großes Update: Trailer & Neuerungen", "Markt, Ring-Duelle, Tausch, Wochen-Events", f"{c.root}spiele/wrestling-tcg/#update", False),
              ("🎮", "Alle Spiele von Lewolux", "7 kostenlose Spiele, direkt im Browser", f"{c.root}#spiele", False),
-             ("📱", "Ring Legends im Play Store", "Bald verfügbar – folge uns, dann verpasst du es nicht", f"{c.root}spiele/wrestling-tcg/", False),
+             ("📱", "Android-Tester werden", "Spiel die App vor allen anderen – Plätze frei", f"{c.root}ring-legends/tester/", True),
              ("💡", "Wünsch dir was", "Ideen, Fehler, Lob – direkt ans Studio", f"{c.root}#mitmachen", False)]
     li = "".join(f'<a class="lk{" hot" if hot else ""}" href="{u}"><span class="lk-i">{i}</span><span class="lk-t"><b>{e(t)}</b><small>{e(s)}</small></span><span class="lk-a">›</span></a>' for i, t, s, u, hot in items)
     soc = social_icons()
@@ -266,6 +266,33 @@ def links_page(c):
 <div class="lk-list">{li}</div>{soc}<p class="lk-foot"><a href="{c.root}">lewolux.de</a> · <a href="{c.root}impressum/">Impressum</a> · <a href="{c.root}datenschutz/">Datenschutz</a></p></main>'''
     h = head(c, "Lewolux Studio – Links", "Alle Links von Lewolux Studio: Ring Legends spielen, Trailer, alle kostenlosen Spiele.", "links/", "assets/img/og-lewolux-studio.jpg", [], robots="noindex, follow")
     return common(c, h + body + "\n" + tail(c))
+
+TESTER_MAIL = "mailto:hallo@lewolux.de?subject=" + "Ring%20Legends%20Tester" + "&body=" + "Hallo%20Lewolux%2C%0A%0Aich%20m%C3%B6chte%20Ring%20Legends%20vorab%20auf%20Android%20testen.%0A%0AMeine%20Gmail-Adresse%20f%C3%BCr%20den%20Play%20Store%3A%20%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+def tester_page(c):
+    steps = [("✉️", "Melde dich", "Schick uns kurz deine Gmail-Adresse – das ist die Adresse, mit der du im Play Store angemeldet bist."),
+             ("🔗", "Link bekommen", "Sobald der Test startet, bekommst du von uns einen Einladungslink. Antippen, „Tester werden“, fertig."),
+             ("📲", "App installieren", "Ring Legends ganz normal aus dem Play Store installieren – vor allen anderen."),
+             ("🗓️", "14 Tage dabei bleiben", "Google verlangt, dass Tester die App 14 Tage behalten. Am besten jeden Tag kurz rein – das Gratis-Pack wartet sowieso.")]
+    li = "".join(f'<li><span class="ts-i" aria-hidden="true">{i}</span><b>{e(t)}</b><span>{e(d)}</span></li>' for i, t, d in steps)
+    faq = [("Kostet das etwas?", "Nein. Ring Legends ist kostenlos, auch im Test."),
+           ("Was brauche ich?", "Ein Android-Handy und ein Google-Konto (Gmail). Für iPhone gibt es die Browser-Version auf lewolux.de."),
+           ("Was passiert mit meiner Adresse?", "Wir tragen sie nur in die Testerliste in der Google Play Console ein und nutzen sie für die Einladung. Danach löschen wir die Mail. Mehr dazu in der Datenschutzerklärung."),
+           ("Muss ich Feedback geben?", "Musst du nicht, freut uns aber riesig. Fehler, Ideen und Lob einfach über das Feedback-Formular auf der Spielseite.")]
+    faqh = "".join(f"<details><summary>{e(q)}</summary><p>{e(a)}</p></details>" for q, a in faq)
+    body = f'''<main class="wrap tester-page">
+  <nav aria-label="Breadcrumb"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}spiele/wrestling-tcg/">Ring Legends</a></li><li aria-current="page">Tester werden</li></ol></nav>
+  <section class="ts-hero"><span class="eyebrow">Android-Vorabtest</span><h1>Werde Ring-Legends-Tester</h1>
+  <p class="up-lead">Ring Legends kommt in den Play Store – und du kannst es vor allen anderen auf deinem Handy spielen. Für den Start brauchen wir Tester, die 14 Tage dabei sind.</p>
+  <div class="g-actions"><a class="btn btn-play" href="{TESTER_MAIL}">✉️ Jetzt als Tester melden</a><a class="btn" href="{c.root}games/wrestling-tcg/index.html">Schon mal im Browser spielen</a></div>
+  <p class="up-note">Kein Mailprogramm? Schreib einfach an <b>{EMAIL}</b> mit dem Betreff „Ring Legends Tester“ und deiner Gmail-Adresse.</p></section>
+  <section aria-labelledby="ts-h"><h2 id="ts-h">So läuft der Test</h2><ol class="ts-steps">{li}</ol></section>
+  <section aria-labelledby="tf-h"><h2 id="tf-h">Fragen</h2><div class="faq">{faqh}</div></section>
+</main>
+'''
+    jsonld = [{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Start", "item": SITE},
+        {"@type": "ListItem", "position": 2, "name": "Ring Legends", "item": SITE + "spiele/wrestling-tcg/"}, {"@type": "ListItem", "position": 3, "name": "Tester werden", "item": SITE + "ring-legends/tester/"}]}]
+    h = head(c, "Ring Legends Tester werden – Android-Vorabtest | Lewolux", "Spiel Ring Legends vor allen anderen auf Android: Melde dich als Tester für den Play-Store-Test – kostenlos, 14 Tage, nur ein Google-Konto nötig.", "ring-legends/tester/", "assets/og/og-wrestling-tcg.jpg", jsonld)
+    return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c))
 
 def common(c, t):
     rep = {"{{ROOT}}": c.root, "{{EMAIL}}": EMAIL, "{{GAMECOUNT}}": str(len(GAMES)),
@@ -627,13 +654,16 @@ def game_page(c, g):
     jsonld = [{"@context": "https://schema.org", "@graph": [ORG,
         {"@type": "VideoGame", "@id": SITE + url + "#game", "name": g["title"], "url": SITE + url, "description": s["meta"], "genre": g["genres"],
          "gamePlatform": ["Web-Browser"] + (["Android"] if "android" in g["plats"] else []) + (["Smartphone"] if "mobile" in g["plats"] else []),
-         "applicationCategory": "Game", "operatingSystem": "Web, Windows, macOS, Android", "playMode": "SinglePlayer", "inLanguage": "de",
+         "applicationCategory": "Game", "operatingSystem": "Web, Windows, macOS, Android", "playMode": ["SinglePlayer", "MultiPlayer"] if g.get("online") else "SinglePlayer", "inLanguage": "de",
          "isAccessibleForFree": True, "image": shots_abs[0], "screenshot": [{"@type": "ImageObject", "url": u, "caption": cap} for u, cap in zip(shots_abs, g["shots"])],
          "author": {"@id": SITE + "#studio"}, "publisher": {"@id": SITE + "#studio"},
          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR", "availability": "https://schema.org/InStock", "url": SITE + url}},
         {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Start", "item": SITE},
             {"@type": "ListItem", "position": 2, "name": "Spiele", "item": SITE + "#spiele"}, {"@type": "ListItem", "position": 3, "name": g["short"], "item": SITE + url}]},
-        {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}]}]
+        {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}]
+        + ([{"@type": "VideoObject", "name": g["short"] + " – Trailer zum großen Update", "description": "15 Sekunden Ring Legends: Packs öffnen, Karten graden, Ring-Duelle, Markt und Tausch. Kostenlos im Browser, bald im Play Store.",
+             "thumbnailUrl": SITE + "assets/video/ring-legends-trailer-l.jpg", "contentUrl": SITE + "assets/video/ring-legends-trailer-l.mp4", "uploadDate": "2026-10-08", "duration": "PT15S", "inLanguage": "de",
+             "publisher": {"@id": SITE + "#studio"}, "embedUrl": SITE + url + "#update"}] if g.get("update") and os.path.isfile(P("video/ring-legends-trailer-l.mp4")) else [])}]
     preload = f'<link rel="preload" as="image" href="{c.shot(g["id"]+"-1")}" type="image/webp" fetchpriority="high">'
     h = head(c, s["title"] + " | Lewolux Studio" if len(s["title"]) < 44 else s["title"], s["meta"], url, f"assets/og/og-{g['id']}.jpg", jsonld, preload=preload)
     body = f'''<main class="wrap" style="--accent:{g['accent']}">
@@ -728,6 +758,8 @@ def main():
     os.makedirs(P("dist/ring-legends/datenschutz"), exist_ok=True)
     os.makedirs(P("dist/links"), exist_ok=True)
     open(P("dist/links/index.html"), "w", encoding="utf-8").write(links_page(Ctx("../")))
+    os.makedirs(P("dist/ring-legends/tester"), exist_ok=True)
+    open(P("dist/ring-legends/tester/index.html"), "w", encoding="utf-8").write(tester_page(Ctx("../../")))
     open(P("dist/ring-legends/datenschutz/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../../"), "ring-legends/datenschutz/", "Datenschutz – Ring Legends (App und Browser)", part("ring-legends-datenschutz.html")))
     os.makedirs(P("dist/admin"), exist_ok=True)
     open(P("dist/admin/index.html"), "w", encoding="utf-8").write(part("admin.html").replace("{{API}}", API).replace("{{GAMES}}", json.dumps({g["id"]: g["short"] for g in GAMES}, ensure_ascii=False)))
@@ -741,6 +773,7 @@ def main():
     sm += u("", ["assets/img/lewolux-studio-banner.jpg"] + [f"assets/screenshots/{g['id']}-1.jpg" for g in GAMES], "1.0")
     sm += "".join(u(f"spiele/{g['id']}/", [f"assets/screenshots/{g['id']}-{i+1}.jpg" for i in range(3)], "0.8") for g in GAMES)
     sm += "".join(u(f"spiele/{t['id']}/", [f"assets/teaser/{t['id']}-1.jpg"], "0.6") for t in TEASERS)
+    sm += u("ring-legends/tester/", [], "0.6")
     sm += "".join(u(f"software/{x['id']}/", [f"assets/screenshots/software-{x['id']}.jpg"], "0.7") for x in SOFTWARE)
     open(P("dist/sitemap.xml"), "w").write(sm + "</urlset>\n")
     open(P("dist/robots.txt"), "w").write(f"User-agent: *\nAllow: /\nDisallow: /downloads/\nDisallow: /admin/\n\nSitemap: {SITE}sitemap.xml\n")

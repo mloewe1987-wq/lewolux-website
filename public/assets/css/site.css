@@ -845,3 +845,11 @@ html.modal-open .lux,html.player-open .lux{display:none}
 .links-page .socials{justify-content:center;margin-top:24px}
 .lk-foot{margin-top:26px;font-size:13px;color:var(--dim)}
 .lk-foot a{color:var(--muted)}
+/* Tester-Seite */
+.tester-page .ts-hero{padding:32px 0 8px;max-width:760px}
+.tester-page .ts-hero h1{font-size:clamp(30px,6vw,52px);line-height:1.05;margin:8px 0 12px}
+.ts-steps{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.ts-steps li{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.ts-steps .ts-i{font-size:28px}
+.ts-steps b{font-size:17px}
+.ts-steps span:last-child{opacity:.8;font-size:14.5px;line-height:1.5}
