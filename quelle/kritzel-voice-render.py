@@ -6,7 +6,7 @@ kritzel-voice-phrases.json: [{"t": Text wie im Spiel, "s": was gesprochen wird}]
   Die Liste kommt aus dem Spiel selbst: voicePhrases() + alle Knopf-Beschriftungen
   (Sammel-Skript: node kritzel-voice-collect.js, siehe dort).
 Ergebnis:
-  spiele-dateien/kritzelheld/voice/<id>.mp3   (id = sha1(Text)[:10])
+  spiele-dateien/kritzelheld/voice/<id>.mp3   (id = sha1("v3|" + Text)[:10], Text genau wie im Spiel, z. B. "Spielen!")
   VOICE_MAP in spiele-dateien/kritzelheld/index.html wird neu eingetragen.
 Vorhandene Dateien werden übersprungen, nicht mehr gebrauchte gelöscht.
 Umgebung: KRITZEL_BITRATE (Standard 24k), KRITZEL_RATE (Standard 16000 Hz, das Modell hat 16 kHz), KRITZEL_MODEL.
@@ -22,14 +22,15 @@ OUT = os.path.join(GAME, "voice")
 HTML = os.path.join(GAME, "index.html")
 MODEL = os.environ.get("KRITZEL_MODEL", "/home/claude/tts/de-kerstin-low/de-kerstin-low.onnx")
 BITRATE = os.environ.get("KRITZEL_BITRATE", "24k")
-FILTER = ("silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
-          "silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
-          "asetrate=16000*1.12,aresample=44100,atempo=0.93,highpass=f=90,loudnorm=I=-13:TP=-1")
+FILTER = ("silenceremove=start_periods=1:start_threshold=-60dB,areverse,"
+          "silenceremove=start_periods=1:start_threshold=-60dB,areverse,"
+          "asetrate=16000*1.10,aresample=44100,atempo=0.909,highpass=f=90,loudnorm=I=-13:TP=-1,"
+          "apad=pad_dur=0.12")  # höher (niedlich), aber nicht schneller; 120 ms Luft am Ende
 
 src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "kritzel-voice-phrases.json")
 lines = json.load(open(src, encoding="utf-8"))
 lines = [x for x in lines if re.search(r"[0-9A-Za-zÄÖÜäöüß]", x["t"])]  # nur Sprechbares
-ident = lambda t: hashlib.sha1(t.encode("utf-8")).hexdigest()[:10]
+ident = lambda t: hashlib.sha1(("v3|" + t).encode("utf-8")).hexdigest()[:10]  # v3: neue Namen, damit Handys keine alten Aufnahmen aus dem Zwischenspeicher spielen
 os.makedirs(OUT, exist_ok=True)
 want = {ident(x["t"]): x for x in lines}
 
@@ -50,7 +51,7 @@ for t, phs in missing.items():
     print("FEHLENDE LAUTE", sorted(phs), "in:", t)
 if missing:
     sys.exit("Bitte diese Texte umschreiben (Feld s in der Phrasenliste).")
-cfg = SynthesisConfig(length_scale=1.0, noise_scale=0.6, noise_w_scale=0.8)
+cfg = SynthesisConfig(length_scale=1.3, noise_scale=0.5, noise_w_scale=0.6)  # langsam und deutlich
 done = 0
 for h, x in want.items():
     dst = os.path.join(OUT, h + ".mp3")

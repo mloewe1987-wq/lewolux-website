@@ -35,24 +35,32 @@ window.lxInstall=function(btn,title,lead){
   const calm=matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   /* ---- Vorlesen: aufgenommene MP3s (build.py, Piper-Stimme); nur wenn eine Datei fehlt, die Browserstimme ---- */
+  /* Reihenfolge: 1. deutsche Stimme des Geräts (klingt auf Handys meist am besten), 2. aufgenommene MP3 (Piper),
+     3. nichts. Nie eine englische Stimme. Die Stimmenliste kommt in manchen Browsern erst später (voiceschanged). */
   let voice=null, cur=null; const audios={};
-  const pickVoice=()=>{ try{ const vs=speechSynthesis.getVoices(); voice=vs.find(v=>/^de(-|_)DE/i.test(v.lang))||vs.find(v=>/^de/i.test(v.lang))||null; }catch(_){} };
+  const NICE=/google|samsung|anna|petra|helena|katja|hedda|marlene|vicki|sabine/i;
+  const pickVoice=()=>{ try{
+      const de=speechSynthesis.getVoices().filter(v=>/^de([-_]|$)/i.test(v.lang||''));
+      const score=v=>(/^de[-_]DE/i.test(v.lang)?4:0)+(v.localService?2:0)+(NICE.test(v.name)?3:0)+(v.default?1:0);
+      voice=de.sort((a,b)=>score(b)-score(a))[0]||null;
+    }catch(_){ voice=null; } };
+  try{ pickVoice(); speechSynthesis.addEventListener('voiceschanged',pickVoice); }catch(_){}
   function tts(t){
-    try{ if(!('speechSynthesis' in window)) return; if(!voice) pickVoice(); speechSynthesis.cancel();
-      const u=new SpeechSynthesisUtterance(t); u.lang='de-DE'; if(voice) u.voice=voice; u.rate=.95; u.pitch=1.15; speechSynthesis.speak(u);
-    }catch(_){}
+    try{ if(!voice) pickVoice(); if(!voice) return false; speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(t); u.voice=voice; u.lang=voice.lang; u.rate=.85; u.pitch=1.15; speechSynthesis.speak(u); return true;
+    }catch(_){ return false; }
   }
   const audio=url=>{ let a=audios[url]; if(!a){ a=audios[url]=new Audio(url); a.preload='auto'; } return a; };
   function say(t){
     if(!t) return; t=String(t).trim();
     try{ if(cur){ cur.pause(); cur.currentTime=0; } }catch(_){}
     try{ speechSynthesis.cancel(); }catch(_){}
-    const url=D.voice&&D.voice[t];
-    if(!url) return tts(t);
-    try{ const a=audio(url); cur=a; a.currentTime=0; const r=a.play(); if(r&&r.catch) r.catch(()=>{}); a.onerror=()=>tts(t); }catch(_){ tts(t); }
+    if(tts(t)) return;
+    const url=D.voice&&D.voice[t]; if(!url) return;
+    try{ const a=audio(url); cur=a; a.currentTime=0; const r=a.play(); if(r&&r.catch) r.catch(()=>{}); }catch(_){}
   }
   // Kurze Dateien vorab laden, damit der erste Tipp sofort klingt
-  addEventListener('load',()=>setTimeout(()=>{ try{ Object.values(D.voice||{}).forEach(audio); }catch(_){} },800));
+  addEventListener('load',()=>setTimeout(()=>{ try{ if(!voice) Object.values(D.voice||{}).forEach(audio); }catch(_){} },1500));
   document.addEventListener('click',e=>{ const el=e.target.closest('[data-say]'); if(el) say(el.dataset.say); });
 
   /* ---- Spiel im Kinderbereich öffnen (Vollbild, ohne die Erwachsenen-Seiten zu verlassen) ---- */
@@ -119,11 +127,11 @@ window.lxInstall=function(btn,title,lead){
     owl:{w:70,h:80,svg:`<svg viewBox="0 0 100 114">
 <g class="lg1"><path d="M40 102v6M40 108l-5 4M40 108v5M40 108l5 4" stroke="#ff9f1c" stroke-width="4" stroke-linecap="round"/></g><g class="lg2"><path d="M60 102v6M60 108l-5 4M60 108v5M60 108l5 4" stroke="#ff9f1c" stroke-width="4" stroke-linecap="round"/></g>
 <path d="M26 30 L27 6 L44 22 Z M74 30 L73 6 L56 22 Z" fill="#e8484a"/>
+<g class="wg1"><path d="M24 46c-11 5-16 20-13 36c1 5 7 6 10 2c5-7 8-20 9-36z" fill="#e8484a"/></g><g class="wg2"><path d="M76 46c11 5 16 20 13 36c-1 5-7 6-10 2c-5-7-8-20-9-36z" fill="#e8484a"/></g>
 <path d="M50 14c22 0 36 18 36 44c0 28-14 46-36 46S14 86 14 58C14 32 28 14 50 14z" fill="#ff5f5c"/>
 <path d="M50 54c13 0 21 10 21 24c0 14-9 23-21 23s-21-9-21-23c0-14 8-24 21-24z" fill="#ffb7b5"/>
 <path d="M40 72q4 3 8 0M52 72q4 3 8 0M46 84q4 3 8 0" stroke="#f08f8d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-<g class="wg1"><path d="M22 50c-8 6-11 20-8 34c1 4 6 5 9 2c4-6 6-18 5-32z" fill="#e8484a"/></g>
-<g class="wg2"><path d="M78 50c8 6 11 20 8 34c-1 4-6 5-9 2c-4-6-6-18-5-32z" fill="#e8484a"/></g>
+
 <circle cx="36" cy="42" r="15" fill="#fff"/><circle cx="64" cy="42" r="15" fill="#fff"/>
 <g class="k-eye"><circle cx="38" cy="44" r="8" fill="#1d2350"/><circle cx="62" cy="44" r="8" fill="#1d2350"/><circle cx="41" cy="41" r="3" fill="#fff"/><circle cx="65" cy="41" r="3" fill="#fff"/></g>
 <path d="M44 54 L56 54 L50 64 Z" fill="#ff9f1c"/><g fill="#ffd0d0" opacity=".9"><ellipse cx="24" cy="56" rx="5" ry="3.5"/><ellipse cx="76" cy="56" rx="5" ry="3.5"/></g></svg>`},
@@ -258,10 +266,11 @@ window.lxInstall=function(btn,title,lead){
     c.fillStyle='rgba(29,35,80,.15)'; c.beginPath(); c.ellipse(0,0,40,8,0,0,7); c.fill();
     c.fillStyle='#ff9f1c'; [-14,14].forEach(dx=>{ c.beginPath(); c.ellipse(dx,-3,9,5,0,0,7); c.fill(); });
     c.fillStyle='#e8484a'; c.beginPath(); c.moveTo(-30,-110); c.lineTo(-24,-142); c.lineTo(-8,-118); c.fill(); c.beginPath(); c.moveTo(30,-110); c.lineTo(24,-142); c.lineTo(8,-118); c.fill();
+    // Flügel zuerst (liegen hinter dem Körper, hängen außen an den Schultern); der rechte winkt nach außen/oben
+    c.fillStyle='#e8484a'; c.save(); c.translate(-35,-84); c.rotate(.32); c.beginPath(); c.ellipse(0,24,11,27,0,0,7); c.fill(); c.restore();
+    c.save(); c.translate(35,-84); c.rotate(-.32-(wave+.5)*1.5); c.beginPath(); c.ellipse(0,24,11,27,0,0,7); c.fill(); c.restore();
     c.fillStyle='#ff5f5c'; c.beginPath(); c.ellipse(0,-62,40,58,0,0,7); c.fill();
     c.fillStyle='#ffb7b5'; c.beginPath(); c.ellipse(0,-42,26,32,0,0,7); c.fill();
-    c.fillStyle='#e8484a'; c.beginPath(); c.ellipse(-38,-58,10,26,.25,0,7); c.fill();          // linker Flügel
-    c.save(); c.translate(34,-76); c.rotate(-1.2+wave); c.beginPath(); c.ellipse(0,-22,10,26,0,0,7); c.fill(); c.restore();   // winkt
     c.fillStyle='#fff'; [-17,17].forEach(dx=>{ c.beginPath(); c.arc(dx,-90,18,0,7); c.fill(); });
     if(blink){ c.strokeStyle='#1d2350'; c.lineWidth=4; c.lineCap='round'; [-17,17].forEach(dx=>{ c.beginPath(); c.moveTo(dx-8,-89); c.quadraticCurveTo(dx,-84,dx+8,-89); c.stroke(); }); }
     else { c.fillStyle='#1d2350'; [-15,19].forEach(dx=>{ c.beginPath(); c.arc(dx,-88,9.5,0,7); c.fill(); }); c.fillStyle='#fff'; [-12,22].forEach(dx=>{ c.beginPath(); c.arc(dx,-92,3.4,0,7); c.fill(); }); }

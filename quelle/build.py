@@ -783,22 +783,25 @@ def kids_icons():
 # Vorlese-Stimme für Lewolux Kids: Piper „Kerstin“ (CC0), mit ffmpeg etwas höher/kindlicher gemacht.
 # Aufnahmen landen im Cache kids-voice/<hash>.mp3 (nur neue Texte werden aufgenommen) und werden nach dist/kids/voice/ kopiert.
 KIDS_VOICE_MODEL = os.environ.get("KIDS_VOICE_MODEL", "/home/claude/tts/de-kerstin-low/de-kerstin-low.onnx")
-KIDS_VOICE_AF = "asetrate=16000*1.12,aresample=44100,atempo=0.93,highpass=f=90,loudnorm=I=-13:TP=-1"
+KIDS_VOICE_AF = "asetrate=16000*1.10,aresample=44100,atempo=0.909,highpass=f=90,loudnorm=I=-13:TP=-1"
+KIDS_VOICE_SYN = dict(length_scale=1.3, noise_scale=0.5, noise_w_scale=0.6)   # langsamer und deutlicher
 def kids_voice(texts):
     """Gibt {Text: URL} zurück. Fehlt Piper/ffmpeg, bleibt die Liste leer -> die Seite liest dann mit der Browserstimme vor."""
     import subprocess, tempfile, wave
     cache = P("kids-voice"); os.makedirs(cache, exist_ok=True); os.makedirs(P("dist/kids/voice"), exist_ok=True)
     out, voice = {}, None
     for t in dict.fromkeys(x.strip() for x in texts if x and x.strip()):
-        h = _h.md5((os.path.basename(KIDS_VOICE_MODEL) + KIDS_VOICE_AF + t).encode()).hexdigest()[:12]; f = os.path.join(cache, h + ".mp3")
+        h = _h.md5((os.path.basename(KIDS_VOICE_MODEL) + KIDS_VOICE_AF + json.dumps(KIDS_VOICE_SYN) + t).encode()).hexdigest()[:12]; f = os.path.join(cache, h + ".mp3")
         if not os.path.isfile(f):
             try:
                 if voice is None:
                     from piper import PiperVoice
                     import piper_fix  # „ç“-Korrektur (ich, nicht …)
                     voice = PiperVoice.load(KIDS_VOICE_MODEL)
+                    from piper.config import SynthesisConfig
+                    syn = SynthesisConfig(**KIDS_VOICE_SYN)
                 with tempfile.NamedTemporaryFile(suffix=".wav") as tmp:
-                    with wave.open(tmp.name, "wb") as w: voice.synthesize_wav(t, w)
+                    with wave.open(tmp.name, "wb") as w: voice.synthesize_wav(t, w, syn_config=syn)
                     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", tmp.name, "-af", KIDS_VOICE_AF, "-ac", "1", "-b:a", "64k", f], check=True)
             except Exception as ex:
                 print("Kids-Stimme: keine Aufnahme für", repr(t), "-", ex); continue
