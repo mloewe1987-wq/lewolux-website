@@ -135,6 +135,18 @@ window.lxInstall=function(btn,title,lead){
 <circle cx="36" cy="42" r="15" fill="#fff"/><circle cx="64" cy="42" r="15" fill="#fff"/>
 <g class="k-eye"><circle cx="38" cy="44" r="8" fill="#1d2350"/><circle cx="62" cy="44" r="8" fill="#1d2350"/><circle cx="41" cy="41" r="3" fill="#fff"/><circle cx="65" cy="41" r="3" fill="#fff"/></g>
 <path d="M44 54 L56 54 L50 64 Z" fill="#ff9f1c"/><g fill="#ffd0d0" opacity=".9"><ellipse cx="24" cy="56" rx="5" ry="3.5"/><ellipse cx="76" cy="56" rx="5" ry="3.5"/></g></svg>`},
+    // Schulhofkicker: Kind im Trikot mit Ball
+    kicker:{w:72,h:92,svg:`<svg viewBox="0 0 100 128">
+<g class="lg1"><path d="M40 92v22" stroke="#ffd2b0" stroke-width="9" stroke-linecap="round"/><path d="M40 100v12" stroke="#fff" stroke-width="10" stroke-linecap="round"/><path d="M33 118h13q4 0 4 4H33z" fill="#ff3d6e"/></g>
+<g class="lg2"><path d="M60 92v22" stroke="#ffd2b0" stroke-width="9" stroke-linecap="round"/><path d="M60 100v12" stroke="#fff" stroke-width="10" stroke-linecap="round"/><path d="M54 118h13q4 0 4 4H54z" fill="#ff3d6e"/></g>
+<path d="M33 84h34l3 14H30z" fill="#1d3fa8" stroke="#162f80" stroke-width="1.5"/>
+<g class="wg1"><path d="M32 62q-10 8-11 20" stroke="#ffb020" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="21" cy="84" r="5" fill="#ffd2b0"/></g>
+<g class="wg2"><path d="M68 62q10 8 11 20" stroke="#ffb020" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="79" cy="84" r="5" fill="#ffd2b0"/></g>
+<path d="M30 60q20-8 40 0l-2 28H32z" fill="#ffb020" stroke="#e08a00" stroke-width="1.5"/><text x="50" y="80" font-size="14" font-weight="900" text-anchor="middle" fill="#fff" font-family="Arial">10</text>
+<circle cx="50" cy="36" r="21" fill="#ffd2b0"/><path d="M29 34q2-22 22-22q20 0 21 20q-6-8-14-9q-4 6-14 6q-9 0-15 5z" fill="#5a3418"/>
+<g class="k-eye"><circle cx="42" cy="38" r="3.4" fill="#1d2350"/><circle cx="58" cy="38" r="3.4" fill="#1d2350"/><circle cx="43" cy="36.8" r="1.1" fill="#fff"/><circle cx="59" cy="36.8" r="1.1" fill="#fff"/></g>
+<path d="M43 47q7 6 14 0" stroke="#a0442a" stroke-width="2.4" fill="none" stroke-linecap="round"/><g fill="#ff9d9d" opacity=".8"><circle cx="35" cy="45" r="3.2"/><circle cx="65" cy="45" r="3.2"/></g>
+<g transform="translate(80 112)"><circle r="11" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M0-5l4.8 3.5-1.8 5.6h-6l-1.8-5.6z" fill="#222"/><path d="M0-5V-11M4.8-1.5l6-2M3 4.1l3.8 5.2M-3 4.1l-3.8 5.2M-4.8-1.5l-6-2" stroke="#222" stroke-width="1.3"/></g></svg>`},
     // Panda (für das nächste Kinderspiel, erscheint automatisch, sobald ein KIDS-Eintrag mascot="panda" hat)
     panda:{w:78,h:90,svg:`<svg viewBox="0 0 100 116">
 <g class="lg1"><ellipse cx="36" cy="106" rx="11" ry="9" fill="#26263a"/></g><g class="lg2"><ellipse cx="64" cy="106" rx="11" ry="9" fill="#26263a"/></g>

@@ -833,7 +833,7 @@ KIDS_SUN = '''<svg viewBox="0 0 200 200" aria-hidden="true"><g class="ks-rays">'
 
 def kids_page(c):
     title = "Lewolux Kids – kostenlose Kinderspiele ohne Werbung"
-    desc = "Lewolux Kids: kostenlose Lernspiele für Kinder, ohne Werbung, ohne Käufe, ohne Anmeldung. Große Knöpfe, Vorlesefunktion und Elternsperre. Jetzt: Kritzelheld – Buchstaben und Zahlen malen."
+    desc = "Lewolux Kids: kostenlose Lernspiele für Kinder, ohne Werbung, ohne Käufe, ohne Anmeldung. Große Knöpfe, Vorlesefunktion und Elternsperre. Mit Kritzelheld, Pandi und Schulhofkicker."
     url = SITE + "kids/"
     games, cards = [], []
     for k in KIDS:

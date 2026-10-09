@@ -65,8 +65,8 @@ GAMES = [
   plats=["web","android"], tech=["HTML5 Canvas","Expo","Offline"],
   story="Eule Kritzel hat ihre Federn verloren. Jeder Buchstabe, den du schön nachfährst, bringt eine zurück. Schaffst du alle 96?",
   controls=[["Nachfahren","Finger / Stift / Maus"],["Radieren","Knopf ⌫"],["Nochmal vormachen","Knopf ★"],["Elternbereich","Zahnrad gedrückt halten"]],
-  features=["96 Buchstaben und Zahlen","Auswertung in Prozent, Schwelle einstellbar","14 Minispiele und 78 Eulen-Outfits","Werbefrei, ohne Internet nutzbar"],
-  shots=["Wer spielt heute? Karl und Michel","Buchstaben nachspuren und Torschuss","Lernspiele mit Eule Kritzel"],
+  features=["96 Buchstaben und Zahlen","Auswertung in Prozent, Schwelle einstellbar","Über 18 Minispiele: Eulenschach, Eulen-Schleuder, Eulen-Lauf …","Werbefrei, ohne Internet nutzbar"],
+  shots=["Wer spielt heute? Profil wählen","Buchstaben nachspuren und Torschuss","Lernspiele mit Eule Kritzel"],
   reel=["Family","Lernen, das sich wie Spielen anfühlt","Kinder sehen sofort, wie viel sie geschafft haben."],
   download=dict(file="downloads/kritzelheld.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
  dict(id="nervbert", orient="any", ratio="16/10", scene="kasse", demo="none", accent="#ff9a3d",
@@ -91,6 +91,17 @@ GAMES = [
   shots=["Pandi wirft Seifenblasen","Ballons zum Ploppen","Level-Karte mit Sternen"],
   reel=["Family","Blubbern, ploppen, lachen","Ein Panda für die Kleinsten."],
   download=dict(file="downloads/pandi.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
+ dict(id="schulhofkicker", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#ffb020",
+  title="Schulhofkicker", short="Schulhofkicker", tagline="Sieben Fußballspiele für kleine Kicker.",
+  desc="Kinder-Fußballspiel ohne Werbung: Weitschuss bis ins Wolkenland, Elfmeterschießen gegen 19 verrückte Torhüter, Kopfball-Duell, Spielzüge malen, Trick-Show, Jonglieren und Dribbeln. Mit Umkleide für den eigenen Kicker.",
+  genres=["Kinder","Fußball"], cats="family", status="Neu",
+  plats=["web","mobile","pad"], tech=["HTML5 Canvas","Offline"],
+  story="Große Pause! Der Ball liegt bereit. Schießt du ihn bis über die Berge – oder hältst du den Bagger-Torwart aus?",
+  controls=[["Schießen & Zielen","Ziehen und loslassen"],["Kopfball-Duell","Knöpfe / Pfeiltasten + Leertaste"],["Spielzug","Weg mit dem Finger malen"],["Zurück","Knopf oben links"]],
+  features=["7 Fußballspiele in einem","19 Torhüter-Level, 16 Spielzug-Rätsel","Umkleide mit ca. 100 Teilen","Ohne Werbung und ohne Käufe"],
+  shots=["Der Schulhof mit allen Spielen","Weitschuss über die Stadt","Elfmeter gegen den Feuerwehr-Torwart"],
+  reel=["Family","Fußball für die Pause","Sieben Spiele, ein Ball."],
+  download=dict(file="downloads/schulhofkicker.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
  dict(id="kasse-oder-zettel", ratio="816/624", scene="kasse", demo="kasse", accent="#3be8ff",
   title="Kasse oder Zettel?", short="Kasse oder Zettel", tagline="Zettel gegen Kasse: Wer schafft den Freitagabend?",
   desc="Bediene ein volles Restaurant und spüre den Unterschied: mobile Kasse gegen Zettelwirtschaft. 8 Level, vom Mittagstisch bis Silvester.",
@@ -128,7 +139,7 @@ SOFTWARE = [
 ]
 
 FAQ = [
- ("Gibt es auch Spiele für Kinder?","Ja – in Lewolux Kids (lewolux.de/kids). Dort gibt es nur kindgerechte Spiele wie Kritzelheld, ganz ohne Werbung und Käufe. Eltern können den Kids-Modus aktivieren: Dann sind die anderen Bereiche der Website gesperrt, bis ein Erwachsener eine kleine Rechenaufgabe löst."),
+ ("Gibt es auch Spiele für Kinder?","Ja – in Lewolux Kids (lewolux.de/kids). Dort gibt es nur kindgerechte Spiele wie Kritzelheld, Pandi und Schulhofkicker, ganz ohne Werbung und Käufe. Eltern können den Kids-Modus aktivieren: Dann sind die anderen Bereiche der Website gesperrt, bis ein Erwachsener eine kleine Rechenaufgabe löst."),
  ("Sind die Spiele von Lewolux Studio kostenlos?","Ja. Solange sich ein Spiel in Entwicklung befindet, kannst du es kostenlos im Browser spielen oder als Early Access herunterladen."),
  ("Brauche ich einen Account oder eine Installation?","Nein. Die Browser-Versionen starten direkt per Klick. Die Downloads sind jeweils eine einzige Datei: herunterladen, öffnen, spielen."),
  ("Auf welchen Geräten laufen die Spiele?","Auf PC, Laptop, Tablet und Smartphone in aktuellen Browsern. Die RPG-Maker-Titel unterstützen zusätzlich Gamepads."),
@@ -190,6 +201,12 @@ SEO = {
   long=["<strong>Pandi – Blubber, Plopp & Boing!</strong> ist ein kostenloses <strong>Kinderspiel ohne Werbung</strong>. Der kleine Panda Pandi wirft Seifenblasen, Luftballons und Bälle und bringt Ziele zum Ploppen.",
         "36 kurze Level, große Knöpfe und einfache Wischgesten machen das Spiel schon für Kinder ab 3 Jahren leicht. Lesen ist nicht nötig. Wer Pandi antippt, bringt ihn zum Lachen.",
         "Pandi gehört zu Lewolux Kids: keine Werbung, keine Käufe, keine Anmeldung."]),
+ "schulhofkicker": dict(
+  title="Schulhofkicker – kostenloses Fußballspiel für Kinder",
+  meta="Schulhofkicker: kostenloses Fußballspiel für Kinder ohne Werbung. Weitschuss, Elfmeterschießen, Kopfball-Duell, Spielzüge, Trick-Show und Umkleide. Im Browser, ab 5 Jahren.",
+  long=["<strong>Schulhofkicker</strong> ist ein kostenloses <strong>Fußballspiel für Kinder</strong> mit sieben Spielen in einem. Beim Weitschuss fliegt der Ball über Stadion, Stadt und Berge bis ins Wolkenland, Vögel und Ballons schubsen ihn weiter.",
+        "Im Elfmeterschießen warten 19 Torhüter vom Kita-Torwart bis zum Bagger- und Feuerwehr-Torwart. Dazu kommen Kopfball-Duell, Spielzüge zum Malen, Trick-Show, Jonglieren und Dribbeln.",
+        "Mit den Münzen kleidet das Kind seinen eigenen Kicker in der Umkleide ein. Schulhofkicker gehört zu Lewolux Kids: keine Werbung, keine Käufe, keine Anmeldung."]),
  "kasse-oder-zettel": dict(
   title="Kasse oder Zettel? – Gastro-Spiel im Browser",
   meta="Kasse oder Zettel? Schichtsimulator in der Pizzeria: Erlebe spielerisch, wie viel Zeit eine mobile Kasse gegenüber dem Bestellblock spart.",
@@ -243,6 +260,10 @@ KIDS = [
   line="Seifenblasen, Ballons und Bälle mit Panda Pandi",
   say="Pandi! Wirf Seifenblasen und Luftballons mit dem kleinen Panda.",
   mascot="panda", crowd=1),
+ dict(id="schulhofkicker", title="Schulhofkicker", emoji="⚽", c1="#ffb020", c2="#ff3d6e", age="ab 5 Jahren",
+  line="Schießen, köpfen, Tricks: sieben Fußballspiele",
+  say="Schulhofkicker! Schieß den Ball ganz weit, halte Elfmeter und zeig deine Tricks.",
+  mascot="kicker", crowd=1),
 ]
 # Alles, was im Kinderbereich vorgelesen wird (feste Sätze). Spielnamen, Beschreibungen und
 # „Los geht's! <Spiel>“ kommen automatisch aus KIDS dazu. build.py nimmt daraus MP3s auf (kids-voice/, Cache).
