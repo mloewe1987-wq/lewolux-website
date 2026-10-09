@@ -993,3 +993,5 @@ html.modal-open .lux,html.player-open .lux{display:none}
 
 /* kein seitliches Wackeln auf dem Handy */
 html,body{overflow-x:clip}
+
+.studio-trailer{text-align:center}.studio-trailer .trl-lead{max-width:640px;margin:8px auto 22px;color:var(--muted,#b8b3d6)}.studio-trailer .trailer{max-width:980px;margin:0 auto;--accent:var(--cyan)}

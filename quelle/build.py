@@ -666,7 +666,7 @@ def index_page(c):
                 .replace("{{REEL}}", "\n".join(reel(c, g) for g in GAMES))
                 .replace("{{SOFTWARE}}", "\n".join(sw(c, s) for s in SOFTWARE)).replace("{{FAQ}}", faq)
                 .replace("{{POLL}}", poll_items(c)).replace("{{FEEDBACKFORM}}", feedback_form(c)).replace("{{API}}", API)
-                .replace("{{FEAT}}", feat["id"]).replace("{{FEATNAME}}", e(feat["short"])).replace("{{PROMO}}", promo(c)))
+                .replace("{{FEAT}}", feat["id"]).replace("{{FEATNAME}}", e(feat["short"])).replace("{{PROMO}}", promo(c)).replace("{{STUDIOTRAILER}}", studio_trailer(c)))
     main = main.replace("{{ENTDECKEN}}", discover_section(c))
     nav = [("Kostenlose Browser-Games", "kostenlose-browser-games/"), ("Kostenlose Spiele", "kostenlose-spiele/"), ("Lewolux Kids", "kids/"),
            ("Kinderspiele kostenlos", "kinderspiele-kostenlos/")] + [(s["title"], f"software/{s['id']}/") for s in SOFTWARE]
@@ -684,13 +684,20 @@ def index_page(c):
              "", "assets/img/og-lewolux-studio.jpg", jsonld, preload=preload)
     return common(c, h + part("header.html") + "\n" + main + "\n" + part("footer.html") + "\n" + tail(c))
 
-def trailer(c, cls=""):
-    """Ring-Legends-Trailer: Querformat am PC, Hochformat am Handy, stumm mit Ton-Knopf."""
-    if c.preview: return ""
-    v = _h.md5(open(P("video/ring-legends-trailer-l.mp4"), "rb").read()).hexdigest()[:8]
-    b = f"{c.root}assets/video/ring-legends-trailer"
-    return (f'<div class="trailer {cls}"><video muted loop playsinline preload="metadata" poster="{b}-l.jpg?v={v}" data-l="{b}-l.mp4?v={v}" data-p="{b}-p.mp4?v={v}" data-pl="{b}-l.jpg?v={v}" data-pp="{b}-p.jpg?v={v}" aria-label="Trailer zu Ring Legends"></video>'
+def trailer(c, cls="", slug="ring-legends-trailer", label="Trailer zu Ring Legends"):
+    """Trailer: Querformat am PC, Hochformat am Handy, stumm mit Ton-Knopf."""
+    if c.preview or not os.path.isfile(P(f"video/{slug}-l.mp4")): return ""
+    v = _h.md5(open(P(f"video/{slug}-l.mp4"), "rb").read()).hexdigest()[:8]
+    b = f"{c.root}assets/video/{slug}"
+    return (f'<div class="trailer {cls}"><video muted loop playsinline preload="metadata" poster="{b}-l.jpg?v={v}" data-l="{b}-l.mp4?v={v}" data-p="{b}-p.mp4?v={v}" data-pl="{b}-l.jpg?v={v}" data-pp="{b}-p.jpg?v={v}" aria-label="{label}"></video>'
             f'<button class="tr-sound" type="button" aria-pressed="false">🔇 Ton an</button></div>')
+
+def studio_trailer(c):
+    t = trailer(c, "studio", "lewolux-trailer", "Lewolux-Trailer: kostenlose Spiele direkt im Browser")
+    if not t: return ""
+    return f'''  <section id="trailer" class="studio-trailer" aria-labelledby="trl-h"><span class="eyebrow">Trailer</span><h2 id="trl-h">Das ist Lewolux</h2><p class="trl-lead">Kostenlose Games direkt im Browser – ohne Download, ohne Anmeldung, ohne Werbung. Mit geschütztem Kinderbereich.</p>
+    {t}
+  </section>'''
 
 TRAILER_JS = """<script>(function(){document.querySelectorAll('.trailer').forEach(function(w){var v=w.querySelector('video'),b=w.querySelector('.tr-sound');var p=matchMedia('(max-width:680px)').matches;v.poster=p?v.dataset.pp:v.dataset.pl;v.src=p?v.dataset.p:v.dataset.l;w.classList.toggle('is-p',p);
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var r=v.play();if(r&&r.catch)r.catch(function(){})}else v.pause()})},{threshold:.35});io.observe(v);
