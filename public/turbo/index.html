@@ -22,7 +22,8 @@ button{font:inherit;cursor:pointer}
  background:linear-gradient(90deg,#ff3fd0,#ffb23c,#fff36b,#46e07a,#29f0ff,#a24bff);-webkit-background-clip:text;background-clip:text;color:transparent;
  -webkit-text-stroke:3px var(--ink);filter:drop-shadow(0 6px 0 var(--ink)) drop-shadow(0 0 24px rgba(255,63,208,.6));transform:rotate(-3deg)}
 /* Titel */
-#title{flex-direction:column;align-items:center;justify-content:center;gap:22px;background:linear-gradient(180deg,rgba(20,11,46,.35),rgba(20,11,46,.85)),url(assets/keyart.jpg) center/cover}
+#title{flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;padding-bottom:max(22px,env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(20,11,46,0) 45%,rgba(20,11,46,.92)),url(assets/keyart.jpg) center top/cover}
+#title .logo{display:none}
 #title p{margin:0;opacity:.9;font-weight:700;text-align:center;padding:0 16px}
 #title .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .tag{background:var(--pink);color:#fff;padding:4px 12px;border-radius:99px;font-weight:900;font-size:13px;border:2px solid var(--ink)}

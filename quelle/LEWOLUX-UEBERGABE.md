@@ -148,7 +148,10 @@ Stand: 9. Oktober 2026. Diese Datei fasst zusammen, was ein neuer Chat wissen mu
 - **Technik:** Three.js (WebGL), Gamepad-API, DeviceOrientation (Neigen; iPhone braucht Erlaubnis), Touch-Steuerung, eigene Arcade-Fahrphysik, KI-Gegner.
 
 ### Zeitplan (korrigierte Schätzung)
-1. Entwürfe (Look der Fahrer und einer Strecke, mit Gemini). **← Stand 9.10.: begonnen**
+1. Entwürfe (Look der Fahrer und einer Strecke, mit Gemini). **erledigt 9.10.**
+   - **Prototyp läuft (9.10.):** https://lewolux.de/turbo/ (nicht verlinkt, noindex). Quelle: `quelle/spiele-intern/lewolux-turbo/` (Three.js, Module in `js/`: track, karts, scenery, audio, input, main). build.py kopiert nach `dist/turbo/`.
+   - Inhalt: Strecke Neon-Dschungel, 6 Fahrer (Nervbert, Kritzel, Pandi, Lux, Kicker-Kid, Sonni), Driften mit 3 Turbo-Stufen, 6 Items, KI, 3 Tempoklassen, Grafik-Einstellung (Auto/Hoch/Mittel/Niedrig), Tastatur, Xbox-Controller, Handy (Stick oder Neigen). Test-Modus: `?auto=1&sim=8`.
+   - Noch Platzhalter: Musik/Sounds per WebAudio erzeugt (später Epidemic/ElevenLabs), Stimmen als Plapperlaute.
 2. Spielbarer Prototyp (1 Strecke, 4 Fahrer, Driften, Items, alle Steuerungen): ca. 3–5 Stunden.
 3. Version 1.0 (12 Fahrer, 12 Strecken, alle Modi, Sounds und Stimmen): ca. 1–2 Wochen in mehreren Sitzungen.
 4. Später: mehr Cups, Online-Rennen.
