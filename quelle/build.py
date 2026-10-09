@@ -522,9 +522,9 @@ def teaser_trailer(c, t):
     if t["id"] != "house-in-the-desert" or not os.path.isfile(P("video/house-trailer.mp4")): return ""
     v = f"{c.root}assets/video/"
     return f'''  <section class="tp-trailer" aria-labelledby="tr-h"><h2 id="tr-h">Trailer</h2>
-    <video src="{v}house-trailer.mp4" poster="{v}house-trailer-poster.jpg" controls playsinline preload="metadata"></video>
+    <video src="{v}house-trailer.mp4?v=2" poster="{v}house-trailer-poster.jpg?v=2" controls playsinline preload="metadata"></video>
     <h3 class="tp-tr18">Uncut-Trailer <small>ab 18 · mit Jumpscare</small></h3>
-    <div class="age-gate" data-age="18" data-title="Uncut-Trailer: House in the Desert"><template><video src="{v}house-trailer-18.mp4" controls playsinline preload="metadata"></video></template></div>
+    <div class="age-gate" data-age="18" data-title="Uncut-Trailer: House in the Desert"><template><video src="{v}house-trailer-18.mp4?v=2" controls playsinline preload="metadata"></video></template></div>
   </section>
 '''
 
