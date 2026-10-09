@@ -27,6 +27,8 @@ const DATA = JSON.parse(document.getElementById('game-data').textContent);
 const GAMES = DATA.games, SCENES_ALL = {};
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+/* Ereignisse für community.js: welches Spiel ist offen (lx:modal) bzw. läuft gerade (lx:play) */
+const lxEv=(n,id)=>{try{document.dispatchEvent(new CustomEvent('lx:'+n,{detail:{id:id||null}}))}catch(_){}};
 
 /* ---------- utilities ---------- */
 function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -272,7 +274,7 @@ function mountGame(h,g){
   if(g._ok===undefined){h.innerHTML='';fetch(g.play,{method:'HEAD',cache:'no-store'}).then(r=>{g._ok=r.ok},()=>{g._ok=false}).then(()=>{if(h.dataset.gid===g.id&&!h.hidden){h.innerHTML='';mountGame(h,g)}});return null}
   if(!g._ok){const gp=Object.assign({},g,{play:null});return mountGame(h,gp)}
   const start=el(`<button class="game-start" aria-label="${g.short} starten"><img src="${g.shotImgs[0]}" alt=""><span class="gs-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span class="gs-label">${g.short} starten</span></button>`);
-  start.onclick=()=>{if(touchDev){openPlayer(g);return}const f=document.createElement('iframe');f.src=g.play;f.title=g.title;f.allow='fullscreen; autoplay; gamepad; screen-wake-lock; identity-credentials-get';f.allowFullscreen=true;f.className='game-frame';h.innerHTML='';h.appendChild(f);try{f.focus()}catch(_){}};
+  start.onclick=()=>{if(touchDev){openPlayer(g);return}const f=document.createElement('iframe');f.src=g.play;f.title=g.title;f.allow='fullscreen; autoplay; gamepad; screen-wake-lock; identity-credentials-get';f.allowFullscreen=true;f.className='game-frame';h.innerHTML='';h.appendChild(f);lxEv('play',g.id);try{f.focus()}catch(_){}};
   h.appendChild(start);return null}
 
 
@@ -280,7 +282,7 @@ function mountGame(h,g){
 const touchDev=matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<900;
 let player=null,plFrame=null;
 function updRot(){if(!player||player.hidden)return;const show=false; /* Die Spiele bringen eigene Dreh-Hinweise mit */$('.pl-rotate',player).hidden=!show}
-function closePlayer(){if(!player||player.hidden)return;player.hidden=true;if(plFrame){plFrame.remove();plFrame=null}document.documentElement.classList.remove('player-open');
+function closePlayer(){if(!player||player.hidden)return;player.hidden=true;lxEv('play',null);if(plFrame){plFrame.remove();plFrame=null}document.documentElement.classList.remove('player-open');
   try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock()}catch(_){}
   const fe=document.fullscreenElement||document.webkitFullscreenElement;if(fe){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(_){}}}
 function openPlayer(g){
@@ -297,7 +299,7 @@ function openPlayer(g){
   const land=g.orient!=='any'&&g.rnum>1.05;player.dataset.land=land?'1':'0';player.classList.remove('rot-ok');
   const st=$('.pl-stage',player);st.classList.remove('ready');if(plFrame)plFrame.remove();
   plFrame=document.createElement('iframe');plFrame.src=g.play;plFrame.title=g.title;plFrame.allow='fullscreen; autoplay; gamepad; screen-wake-lock; identity-credentials-get';plFrame.allowFullscreen=true;plFrame.onload=()=>st.classList.add('ready');st.appendChild(plFrame);
-  player.hidden=false;document.documentElement.classList.add('player-open');
+  player.hidden=false;document.documentElement.classList.add('player-open');lxEv('play',g.id);
   try{history.pushState({lgsPlayer:1},'')}catch(_){}
   const fs=player.requestFullscreen||player.webkitRequestFullscreen;
   if(fs){try{const pr=fs.call(player,{navigationUI:'hide'});const lock=()=>{if(land&&screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').then(updRot,()=>{})};pr&&pr.then?pr.then(lock,()=>{}):lock()}catch(_){}}
@@ -426,12 +428,13 @@ function openModal(id,mode,trigger){const g=GAMES.find(x=>x.id===id);if(!g||!mod
   modal.hidden=false;if(!flow)document.documentElement.classList.add('modal-open');panel.scrollTop=0;if(flow)try{modal.scrollIntoView({block:'start',behavior:reduce?'auto':'smooth'})}catch(_){modal.scrollIntoView()}
   requestAnimationFrame(()=>{setShot(0);setMode(mode);$('.icon-btn',modal).focus({preventScroll:true})});
   try{history.replaceState(null,'','#spiel-'+g.id)}catch(_){}
+  lxEv('modal',g.id);
 }
 function setShot(i){curShot=i;if(cur.real){shotImg.src=cur.shotImgs[i];shotImg.alt='Screenshot aus '+cur.title+': '+cur.shots[i];$$('#thumbs button').forEach((b,k)=>b.setAttribute('aria-current',k===i));return}shotCv.dataset.scene=cur.scene;shotCv.dataset.v=i;shotCv.setAttribute('aria-label','Screenshot aus '+cur.title+': '+cur.shots[i]);draw(shotCv,performance.now());$$('#thumbs button').forEach((b,k)=>b.setAttribute('aria-current',k===i))}
 function setMode(m){curMode=m;const demo=m==='demo';stage.style.setProperty('--ratio',cur.ratio);stage.style.setProperty('--rnum',cur.rnum);$('#newTab').hidden=!(cur.play&&cur._ok!==false);if(cur.play)$('#newTab').href=cur.play;$('#modeDemo').setAttribute('aria-pressed',demo);$('#modeShots').setAttribute('aria-pressed',!demo);stage.classList.toggle('demo-mode',demo);$('#thumbs').hidden=demo;host.hidden=!demo;shotCv.hidden=demo||!!cur.real;shotImg.hidden=demo||!cur.real;
-  if(cleanup){cleanup();cleanup=null}host.innerHTML='';
+  if(cleanup){cleanup();cleanup=null}if(host.firstChild)lxEv('play',null);host.innerHTML='';
   if(demo||cur.real){if(demo)cleanup=mountGame(host,cur);stopLive(shotCv);if(!demo)setShot(curShot)}else{draw(shotCv,performance.now());goLive(shotCv)}}
-function closeModal(){if(!modal||modal.hidden)return;if(cleanup){cleanup();cleanup=null}host.innerHTML='';stopLive(shotCv);modal.hidden=true;document.documentElement.classList.remove('modal-open');if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}const wasFlow=modal.classList.contains('flow');lastFocus&&lastFocus.focus&&lastFocus.focus({preventScroll:true});if(wasFlow&&lastFocus&&lastFocus.scrollIntoView)try{lastFocus.scrollIntoView({block:'center'})}catch(_){}}
+function closeModal(){if(!modal||modal.hidden)return;if(cleanup){cleanup();cleanup=null}host.innerHTML='';lxEv('play',null);lxEv('modal',null);stopLive(shotCv);modal.hidden=true;document.documentElement.classList.remove('modal-open');if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}const wasFlow=modal.classList.contains('flow');lastFocus&&lastFocus.focus&&lastFocus.focus({preventScroll:true});if(wasFlow&&lastFocus&&lastFocus.scrollIntoView)try{lastFocus.scrollIntoView({block:'center'})}catch(_){}}
 if(modal){
 $('#modeDemo').onclick=()=>setMode('demo');$('#modeShots').onclick=()=>setMode('shots');
 $$('[data-close]',modal).forEach(b=>b.onclick=closeModal);

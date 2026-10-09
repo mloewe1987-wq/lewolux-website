@@ -144,7 +144,8 @@ SOFTWARE = [
 FAQ = [
  ("Gibt es auch Spiele für Kinder?","Ja – in Lewolux Kids (lewolux.de/kids). Dort gibt es nur kindgerechte Spiele wie Kritzelheld, Pandi und Schulhofkicker, ganz ohne Werbung und Käufe. Eltern können den Kids-Modus aktivieren: Dann sind die anderen Bereiche der Website gesperrt, bis ein Erwachsener eine kleine Rechenaufgabe löst."),
  ("Sind die Spiele von Lewolux Studio kostenlos?","Ja. Solange sich ein Spiel in Entwicklung befindet, kannst du es kostenlos im Browser spielen oder als Early Access herunterladen."),
- ("Brauche ich einen Account oder eine Installation?","Nein. Die Browser-Versionen starten direkt per Klick. Die Downloads sind jeweils eine einzige Datei: herunterladen, öffnen, spielen."),
+ ("Brauche ich einen Account oder eine Installation?","Nein. Die Browser-Versionen starten direkt per Klick. Die Downloads sind jeweils eine einzige Datei: herunterladen, öffnen, spielen. Ein Lewolux-Konto ist freiwillig (siehe nächste Frage)."),
+ ("Wofür gibt es das freiwillige Lewolux-Konto?","Spielen geht immer ohne Konto. Mit einem kostenlosen Konto (Anmeldung mit Google, oben rechts auf „Anmelden“) kannst du Freunde hinzufügen, mit ihnen chatten, sehen, wer gerade was spielt, Freunde zu einem Spiel einladen, Lieblingsspiele merken und sortieren und – nur wenn du es einschaltest – mit deinem Namen in den Bestenlisten der Spiele auftauchen. Gespeichert werden dein Spielername, ein Profilbild aus unserer Auswahl und deine Einstellungen, deine E-Mail-Adresse nur, wenn du den Newsletter möchtest. In den Einstellungen kannst du alle Daten herunterladen und dein Konto jederzeit vollständig löschen. Im Kinderbereich gibt es keine Konten, keinen Chat und keine Statistik."),
  ("Auf welchen Geräten laufen die Spiele?","Auf PC, Laptop, Tablet und Smartphone in aktuellen Browsern. Die RPG-Maker-Titel unterstützen zusätzlich Gamepads."),
  ("Was bedeutet Early Access?","Die Spiele sind spielbar, aber noch nicht fertig. Inhalte, Balancing und Grafik ändern sich mit jedem Update. Dein Feedback fließt direkt in die Entwicklung ein."),
  ("Ist Lewolux Studio ein Unternehmen?","Nein. Lewolux Studio ist ein privates Hobbyprojekt. Alle Spiele und Programme sind kostenlos, es gibt keine Werbung und nichts zu kaufen."),
@@ -298,10 +299,10 @@ GROUPS = [
 
 FAQ_BROWSER = [
  ("Was sind Browser-Games?", "Browser-Games sind Spiele, die direkt im Webbrowser laufen, zum Beispiel in Chrome, Firefox, Safari oder Edge. Du öffnest die Seite, tippst auf „Jetzt spielen“ und das Spiel startet. Ein Programm aus dem App Store oder eine Installation ist nicht nötig."),
- ("Muss ich etwas installieren oder mich anmelden?", "Nein. Alle Spiele auf dieser Seite starten ohne Installation und ohne Anmeldung. Wer möchte, kann die meisten Spiele zusätzlich als einzelne HTML-Datei herunterladen und offline spielen. Nur bei Ring Legends gibt es eine freiwillige Anmeldung mit Google für Markt und Ranglisten."),
+ ("Muss ich etwas installieren oder mich anmelden?", "Nein. Alle Spiele auf dieser Seite starten ohne Installation und ohne Anmeldung. Wer möchte, kann die meisten Spiele zusätzlich als einzelne HTML-Datei herunterladen und offline spielen. Freiwillig gibt es ein Lewolux-Konto für Freunde, Chat, Favoriten und Bestenlisten; Ring Legends hat zusätzlich eine eigene, ebenfalls freiwillige Anmeldung mit Google für Markt und Ranglisten."),
  ("Laufen die Spiele auch auf dem Handy?", "Ja. Alle Spiele laufen in aktuellen Browsern auf Smartphone, Tablet und PC. Die RPG-Maker-Spiele hältst du am besten quer, Ring Legends spielt man hochkant."),
  ("Kosten die Spiele etwas oder gibt es Werbung?", "Nein. Lewolux Studio ist ein privates Hobbyprojekt. Alle Spiele sind kostenlos, es gibt keine Werbung, keine In-App-Käufe und kein Abo."),
- ("Was passiert mit meinen Daten?", "Die Website setzt keine Tracking-Cookies und zeigt keine Werbung. Spielstände bleiben in der Regel im Browser auf deinem Gerät. Ausnahme ist das Online-Spiel Ring Legends: Dort wird deine Sammlung auf unserem Server gespeichert. Details stehen in der Datenschutzerklärung."),
+ ("Was passiert mit meinen Daten?", "Die Website setzt keine Tracking-Cookies und zeigt keine Werbung. Spielstände bleiben in der Regel im Browser auf deinem Gerät. Ausnahme ist das Online-Spiel Ring Legends: Dort wird deine Sammlung auf unserem Server gespeichert. Wer freiwillig ein Lewolux-Konto anlegt, bekommt ein notwendiges Anmelde-Cookie; welche Daten dafür gespeichert werden, steht in der Datenschutzerklärung."),
 ]
 
 FAQ_SPIELE = [

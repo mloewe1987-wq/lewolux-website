@@ -1,10 +1,33 @@
 // lewolux.de – liefert die statische Website aus ./public.
 // Zusätzlich: /api/stats – anonymer Besucherzähler (Durable Object, keine IPs, keine Cookies).
+// /api/c/* – Community (Konten, Freunde, Chat, Favoriten, Spielzeit), siehe community.js und COMMUNITY-README.md.
 // Einzige Aufgabe des Workers: große Downloads (> 25 MB, Cloudflare-Grenze pro Datei)
 // liegen in Teilen unter /downloads/teile/ und werden hier wieder zu einer Datei zusammengesetzt.
+export { Community } from "./community.js";
+
+// Liste der Spiele, die bei der Community mitmachen (ohne Kinderspiele). Erzeugt build.py nach public/assets/community-games.json.
+let gamesCache = { at: 0, ids: "" };
+async function communityGames(env, url) {
+  const now = Date.now();
+  if (gamesCache.ids && now - gamesCache.at < 300e3) return gamesCache.ids;
+  try {
+    const r = await env.ASSETS.fetch(new URL("/assets/community-games.json", url));
+    const j = r.ok ? await r.json() : null;
+    const ids = Object.keys((j && j.games) || {}).filter(id => /^[a-z0-9-]{1,40}$/.test(id) && !(j.kids || []).includes(id));
+    gamesCache = { at: now, ids: ids.join(",") };
+  } catch (_) { gamesCache = { at: now - 240e3, ids: gamesCache.ids }; }
+  return gamesCache.ids;
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (url.pathname.startsWith("/api/c/")) {
+      if (!env.COMMUNITY) return new Response('{"ok":false,"error":"disabled"}', { status: 503, headers: { "Content-Type": "application/json" } });
+      const headers = new Headers(req.headers);
+      headers.set("x-lx-games", await communityGames(env, url));
+      return env.COMMUNITY.get(env.COMMUNITY.idFromName("global")).fetch(new Request(req, { headers }));
+    }
     if (url.pathname === "/api/lions") {
       if (req.method !== "POST" && req.method !== "GET") return new Response("", { status: 405 });
       return env.STATS.get(env.STATS.idFromName("lions")).fetch(req);

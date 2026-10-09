@@ -1,6 +1,6 @@
 // Lewolux Studio – Service Worker: macht die Seite installierbar und offline nutzbar.
 // Seiten: erst Netz, sonst Zwischenspeicher. Bilder/Schriften/CSS: Zwischenspeicher zuerst. Spiele und Downloads werden nicht gespeichert.
-const C = "lx-abd416bf";
+const C = "lx-f6b51100";
 self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(["/", "/site.webmanifest", "/assets/img/icon-192.png", "/kids/", "/kids/kids.webmanifest"])).catch(() => {})); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {

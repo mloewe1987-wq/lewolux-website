@@ -32,7 +32,7 @@ GFONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
 SHOTS = [(g["scene"], v, f'{g["id"]}-{v+1}') for g in GAMES for v in range(3)] + [(s["scene"], 0, f'software-{s["id"]}') for s in SOFTWARE]
 GAME_BY_ID = {g["id"]: g for g in GAMES}
 import hashlib as _h
-VER=_h.md5("".join(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts",f),encoding="utf-8").read() for f in ("style.css","app.js","install.js","kids.css","kids.js")).encode()).hexdigest()[:8]
+VER=_h.md5("".join(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts",f),encoding="utf-8").read() for f in ("style.css","app.js","install.js","kids.css","kids.js","community.js","community.css")).encode()).hexdigest()[:8]
 KIDS_IDS = {k["id"] for k in KIDS}
 # Kids-Modus-Sperre: steht ganz oben im <head> jeder Seite außerhalb von /kids/ (und in jedem Nicht-Kinder-Spiel unter /games/).
 # Ist der Kids-Modus aktiv (localStorage lxKids=1), wird sofort und ohne Aufblitzen nach /kids/ umgeleitet.
@@ -300,7 +300,7 @@ def links_page(c):
 <h1>Lewolux Studio</h1><p class="lk-sub">Kostenlose Indie-Games aus Schleswig-Holstein 🦁</p>
 <div class="lk-list">{li}</div>{soc}<p class="lk-foot"><a href="{c.root}">lewolux.de</a> · <a href="{c.root}impressum/">Impressum</a> · <a href="{c.root}datenschutz/">Datenschutz</a></p></main>'''
     h = head(c, "Lewolux Studio – Links", "Alle Links von Lewolux Studio: Ring Legends spielen, Trailer, alle kostenlosen Spiele.", "links/", "assets/img/og-lewolux-studio.jpg", [], robots="noindex, follow")
-    return common(c, h + body + "\n" + tail(c))
+    return common(c, h + body + "\n" + tail(c, cx=False))
 
 TESTER_MAIL = "mailto:hallo@lewolux.de?subject=" + "Ring%20Legends%20Tester" + "&body=" + "Hallo%20Lewolux%2C%0A%0Aich%20m%C3%B6chte%20Ring%20Legends%20vorab%20auf%20Android%20testen.%0A%0AMeine%20Gmail-Adresse%20f%C3%BCr%20den%20Play%20Store%3A%20%0A%0AViele%20Gr%C3%BC%C3%9Fe"
 def tester_page(c):
@@ -349,14 +349,28 @@ def common(c, t):
     rep["{{FOOTSOFTWARE}}"] = "".join(f'<li><a href="{c.root}software/{x["id"]}/">{e(x["title"])}</a></li>' for x in SOFTWARE)
     rep["{{SOCIAL}}"] = social_icons()
     rep["{{RAIL}}"] = games_rail(c); rep["{{GAMEMARQUEE}}"] = game_marquee(c)
+    rep["{{CXSLOT}}"] = CX_SLOT if "assets/js/community.js" in t else ""
     for k, v in rep.items(): t = t.replace(k, v)
     if c.preview:
         t = t.replace(f'src="{c.root}assets/img/lewolux-studio-logo.jpg"', f'src="{c.img("lewolux-studio-logo.jpg")}"')
     assert "{{" not in t, t[t.index("{{"):t.index("{{") + 60]
     return t
 
-def tail(c):
+# Community (Konto, Freunde, Chat, Favoriten, Spielzeit): nur im Erwachsenen-Bereich. Nie auf /kids/, nie auf Seiten von Kinderspielen.
+# Das Skript lädt verzögert (defer) und holt sein CSS selbst nach, damit der erste Seitenaufbau nicht langsamer wird.
+CX_SLOT = '<div class="cx-slot" id="cxSlot"></div>'
+def cx_js(c):
+    # Kleiner Lader: Ist der Kids-Modus aktiv (z. B. auf Impressum/Datenschutz), wird community.js gar nicht erst geladen.
+    src, css = f"{c.root}assets/js/community.js?v={VER}", f"{c.root}assets/css/community.css?v={VER}"
+    return ("<script>(function(){var k=null;try{k=localStorage.getItem('lxKids')}catch(e){}if(k==='1')return;"
+            f"var s=document.createElement('script');s.src='{src}';s.defer=true;s.dataset.css='{css}';s.dataset.kids='{','.join(sorted(KIDS_IDS))}';"
+            "document.body.appendChild(s)})()</script>")
+def community_games():
+    return json.dumps({"games": {g["id"]: g["short"] for g in GAMES if g["id"] not in KIDS_IDS}, "kids": sorted(KIDS_IDS)}, ensure_ascii=False)
+
+def tail(c, cx=True):
     js = f"<script>{app_js()}</script>" if c.preview else f'<script src="{c.root}assets/js/app.js?v={VER}" defer></script>'
+    if cx and not c.preview: js += "\n" + cx_js(c)
     return f'{part("modal.html")}\n<script id="game-data" type="application/json">{game_data(c)}</script>\n<script id="lux-data" type="application/json">{lux_data(c)}</script>\n{js}\n{TRAILER_JS if not c.preview else ""}\n</body>\n</html>\n'
 
 # ---------------------------------------------------------------- community
@@ -614,7 +628,7 @@ def lux_data(c):
         (["kostenlos", "kostet", "preis", "geld", "bezahlen", "gratis", "umsonst", "abo"], ["Alles hier ist kostenlos: alle Spiele, alle Downloads, DeskBoard. Keine Werbung, keine Käufe, kein Abo. Lewolux Studio ist ein privates Hobbyprojekt. 🦁"]),
         (["download", "herunterladen", "runterladen", "offline", "installieren", "datei"], [f"Fast jedes Spiel gibt es als Download: eine einzige HTML-Datei. Herunterladen, öffnen, spielen, auch offline. Den Knopf „Download“ findest du bei jedem Spiel unter {link('#spiele', 'Spiele')}. Ring Legends ist ein Online-Spiel und läuft direkt im Browser, die Android-App folgt."]),
         (["handy", "smartphone", "mobil", "iphone", "android", "tablet", "ipad", "hochkant", "quer"], ["Alle Spiele laufen auch am Handy. „Jetzt spielen“ öffnet sie im Vollbild. Die RPG-Maker-Spiele wollen quer gehalten werden, Ring Legends spielt man hochkant."]),
-        (["account", "anmelden", "registrieren", "konto", "login", "einloggen", "google"], ["Kein Account nötig! Einfach auf „Jetzt spielen“ tippen und los geht's. Nur bei Ring Legends kannst du dich freiwillig mit Google anmelden, dann gibt es Markt und Ranglisten, und du spielst auf jedem Gerät weiter."]),
+        (["account", "anmelden", "registrieren", "konto", "login", "einloggen", "google"], ["Zum Spielen brauchst du kein Konto! Einfach auf „Jetzt spielen“ tippen und los geht's. Freiwillig kannst du oben rechts auf „Anmelden“ tippen: Mit einem Lewolux-Konto findest du Freunde, chattest mit ihnen, merkst dir Lieblingsspiele und landest, wenn du willst, in den Bestenlisten. Ring Legends hat dazu noch seine eigene Google-Anmeldung für Markt und Ranglisten."]),
         (["spielstand", "speichern", "gespeichert", "save", "fortschritt verloren", "spielstand weg"], ["Die meisten Spielstände bleiben nur in deinem Browser auf deinem Gerät. Wenn du die Browserdaten löschst, ist auch der Spielstand weg. Ausnahme ist Ring Legends: Da liegt deine Sammlung sicher auf unserem Server."]),
         (["markt", "handeln", "tauschen", "rangliste", "online", "großes update", "update", "pop-report"], [f"Großes Update bei {link('spiele/wrestling-tcg/', 'Ring Legends')}: Das Spiel ist jetzt online! Auf dem Markt handelst du Karten mit anderen Spielern, dazu gibt es Ranglisten und den Pop-Report. Losspielen geht ohne Anmeldung, für Markt und Ranglisten meldest du dich mit Google an."]),
         (["controller", "gamepad", "xbox", "playstation", "joystick"], ["Die RPG-Maker-Spiele (Mandat, Sternenwurf, Idle Legenden, Kasse oder Zettel) lassen sich auch mit Gamepad steuern."]),
@@ -629,7 +643,7 @@ def lux_data(c):
         (["umfrage", "abstimmen", "stimme", "vote", "voten", "welches spiel als nächstes"], [f"In der {link('#mitmachen', 'Umfrage')} entscheidest du mit, welches Spiel als Nächstes weiterentwickelt wird. Eine Stimme pro Person, änderbar."]),
         (["kontakt", "email", "e-mail", "mail", "schreiben", "erreichen"], [f'Schreib einfach an <a href="mailto:{EMAIL}">{EMAIL}</a>. Oder nutze das {link("#mitmachen", "Feedback-Formular")}.']),
         (["impressum"], [f"Hier entlang: {link('impressum/', 'Impressum')}."]),
-        (["datenschutz", "cookies", "tracking", "daten", "dsgvo"], [f"Keine Cookies, kein Tracking, keine Werbung. Details stehen im {link('datenschutz/', 'Datenschutz')}. Und ich, Lux, laufe komplett in deinem Browser. Für das Online-Spiel Ring Legends gibt es eine {link('ring-legends/datenschutz/', 'eigene Datenschutzerklärung')}."]),
+        (["datenschutz", "cookies", "tracking", "daten", "dsgvo"], [f"Kein Tracking, keine Werbung, und ohne Konto auch keine Cookies. Nur wer freiwillig ein Lewolux-Konto anlegt, bekommt ein Anmelde-Cookie. Details stehen im {link('datenschutz/', 'Datenschutz')}. Und ich, Lux, laufe komplett in deinem Browser. Für das Online-Spiel Ring Legends gibt es eine {link('ring-legends/datenschutz/', 'eigene Datenschutzerklärung')}."]),
         (["wer steckt", "wer macht", "wer hat", "entwickler", "studio", "hinter der seite", "martin"], ["Lewolux Studio ist ein privates Hobbyprojekt aus Schleswig-Holstein. Hier entstehen in der Freizeit Spiele und kleine Programme, alles kostenlos."]),
         (["lewolux", "name bedeutet", "bedeutung", "warum löwe", "warum heißt"], ["„Lew“ heißt Löwe, „Lux“ heißt Licht. Ein leuchtender Löwe also, genau wie ich! 🦁✨"]),
         (["witz", "joke", "lustig", "lach", "erzähl was"], ["Warum spielen Löwen nie Karten in der Savanne? Zu viele Geparden. 🐆", "Was macht ein Löwe am Computer? Er klickt auf die Maus. Und frisst sie dann.", "Mein Lieblingsspiel? Natürlich „Brüllen-Simulator“. Gibt's leider noch nicht. Schreib's ins Feedback!", "Ich habe versucht, in Sternenwurf die Krone des Alls zu finden. Nach 10 Millionen Drehs habe ich aufgegeben und ein Nickerchen gemacht."]),
@@ -778,7 +792,7 @@ def game_page(c, g):
   <section aria-labelledby="more-h"><div class="sec-head"><div><span class="eyebrow">Mehr spielen</span><h2 id="more-h">Weitere kostenlose Spiele</h2><p>Alle Spiele im Überblick: <a class="lp-inline" href="{c.root}kostenlose-browser-games/">kostenlose Browser-Games ohne Anmeldung</a>{f' · <a class="lp-inline" href="{c.root}kinderspiele-kostenlos/">Kinderspiele ohne Werbung</a>' if g["id"] in KIDS_IDS else ""}</p></div></div><div class="more-games">{more}</div></section>
 </main>
 '''
-    return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c))
+    return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c, cx=g["id"] not in KIDS_IDS))
 
 def simple_page(c, path, title, body_html):
     h = head(c, title + " | Lewolux Studio", title + " von Lewolux Studio.", path, "assets/img/og-lewolux-studio.jpg", [], robots="noindex, follow", canonical=path != "404")
@@ -862,7 +876,7 @@ def landing_page(c, path, title, desc, crumb, eyebrow, h1, lead, facts, content,
   <section aria-labelledby="lmore-h" style="padding-top:0"><div class="sec-head"><div><span class="eyebrow">Mehr entdecken</span><h2 id="lmore-h">Weiter stöbern</h2></div></div><div class="sp-others">{others}</div></section>
 </main>
 '''
-    return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c))
+    return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c, cx=path != "kinderspiele-kostenlos/"))
 
 def page_browser_games(c):
     games = browser_games(); R = c.root
@@ -1243,6 +1257,9 @@ def main():
         for w in ws: shutil.copy(P(f"fontsrc/node_modules/@fontsource/{slug}/files/{slug}-latin-{w}-normal.woff2"), P("dist/assets/fonts"))
     open(P("dist/assets/css/site.css"), "w", encoding="utf-8").write(font_face("../fonts/") + "\n" + part("style.css"))
     open(P("dist/assets/js/app.js"), "w", encoding="utf-8").write(app_js())
+    open(P("dist/assets/js/community.js"), "w", encoding="utf-8").write(part("community.js"))
+    open(P("dist/assets/css/community.css"), "w", encoding="utf-8").write(part("community.css"))
+    open(P("dist/assets/community-games.json"), "w", encoding="utf-8").write(community_games())
     if os.path.isdir(P("pdf-leser-app")):
         shutil.copytree(P("pdf-leser-app"), P("dist/pdf"), dirs_exist_ok=True)
     if os.path.isdir(P("video")):
