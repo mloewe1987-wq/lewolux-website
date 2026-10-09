@@ -36,7 +36,7 @@ export function sfx(name, p = 1) {
   switch (name) {
     case 'beep': tone('square', 520, 0, 0.18, 0.25); break;
     case 'go': tone('square', 1040, 0, 0.5, 0.25); tone('square', 1560, 0, 0.5, 0.12); break;
-    case 'tick': tone('triangle', 900 + Math.random()*600, 0, 0.04, 0.12); break;
+    case 'tick': tone('sine', 1200 + Math.random()*400, 0, 0.035, 0.06); break;
     case 'item': [660, 880, 1320].forEach((f, i) => tone('triangle', f, 0, 0.12, 0.2, i*0.06)); break;
     case 'got': [880, 1175, 1760].forEach((f, i) => tone('sine', f, 0, 0.18, 0.22, i*0.05)); break;
     case 'boost': noise(0.7, 400, 3000, 0.35, 0.8); tone('sawtooth', 120, 480, 0.6, 0.12); break;
@@ -65,7 +65,7 @@ export function voice(pitch, n = 6) {
   if (!ctx || audio.muted) return;
   for (let i = 0; i < n; i++) {
     const f = (220 + Math.random()*140) * pitch, d = 0.055 + Math.random()*0.04;
-    tone(i % 2 ? 'triangle' : 'square', f, f*(0.85 + Math.random()*0.4), d, 0.09, i*0.075);
+    tone(i % 2 ? 'triangle' : 'sine', f, f*(0.85 + Math.random()*0.4), d, 0.08, i*0.075);
   }
 }
 
@@ -73,21 +73,21 @@ export function voice(pitch, n = 6) {
 export function engineStart() {
   if (!ctx || engine) return;
   const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-  o1.type = 'sawtooth'; o2.type = 'square'; o2.detune.value = 12; f.type = 'lowpass'; f.frequency.value = 600; g.gain.value = 0;
+  o1.type = 'triangle'; o2.type = 'sine'; o2.detune.value = 7; f.type = 'lowpass'; f.frequency.value = 300; f.Q.value = 0.4; g.gain.value = 0;
   o1.connect(f); o2.connect(f); f.connect(g); g.connect(sfxBus); o1.start(); o2.start();
   const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.loop = true;
-  const df = ctx.createBiquadFilter(); df.type = 'bandpass'; df.frequency.value = 2400; df.Q.value = 3;
+  const df = ctx.createBiquadFilter(); df.type = 'bandpass'; df.frequency.value = 1400; df.Q.value = 1.2;
   const dg = ctx.createGain(); dg.gain.value = 0; s.connect(df); df.connect(dg); dg.connect(sfxBus); s.start();
   engine = { o1, o2, f, g }; drift = { df, dg };
 }
 export function engineUpdate(speed01, boosting, drifting, lvl, on = true) {
   if (!engine) return; const t = ctx.currentTime;
-  const f = 55 + speed01*150 + (boosting ? 40 : 0);
-  engine.o1.frequency.setTargetAtTime(f, t, 0.06); engine.o2.frequency.setTargetAtTime(f*0.5, t, 0.06);
-  engine.f.frequency.setTargetAtTime(400 + speed01*1400, t, 0.1);
-  engine.g.gain.setTargetAtTime(on ? 0.05 + speed01*0.05 : 0, t, 0.1);
-  drift.dg.gain.setTargetAtTime(drifting && on ? 0.07 : 0, t, 0.05);
-  drift.df.frequency.setTargetAtTime(1800 + lvl*700, t, 0.05);
+  const f = 48 + speed01*95 + (boosting ? 25 : 0);
+  engine.o1.frequency.setTargetAtTime(f, t, 0.12); engine.o2.frequency.setTargetAtTime(f*0.5, t, 0.12);
+  engine.f.frequency.setTargetAtTime(220 + speed01*520 + (boosting ? 200 : 0), t, 0.15);
+  engine.g.gain.setTargetAtTime(on ? 0.035 + speed01*0.03 : 0, t, 0.15);
+  drift.dg.gain.setTargetAtTime(drifting && on ? 0.03 : 0, t, 0.08);
+  drift.df.frequency.setTargetAtTime(1200 + lvl*350, t, 0.08);
 }
 export function engineStop() {
   if (!engine) return; const t = ctx.currentTime;

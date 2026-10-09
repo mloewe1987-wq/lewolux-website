@@ -58,9 +58,9 @@ function canvasTex(w, h, draw, rep) {
 // Band entlang der Strecke zwischen zwei seitlichen Abständen
 function ribbon(tr, l0, l1, y0, y1, vScale, step = 1) {
   const pos = [], uv = [], idx = [];
-  const n = tr.N / step;
+  const n = Math.round(tr.N / step);
   for (let k = 0; k <= n; k++) {
-    const i = (k * step) % tr.N, p = tr.P[i], r = tr.R[i];
+    const i = k === n ? 0 : (k * step) % tr.N, p = tr.P[i], r = tr.R[i];
     pos.push(p.x + r.x*l0, p.y + y0, p.z + r.z*l0, p.x + r.x*l1, p.y + y1, p.z + r.z*l1);
     const v = k * step * tr.seg / vScale; uv.push(0, v, 1, v);
     if (k < n) { const a = k*2; idx.push(a, a+1, a+2, a+1, a+3, a+2); }
@@ -75,12 +75,16 @@ function ribbon(tr, l0, l1, y0, y1, vScale, step = 1) {
 export function buildTrackMeshes(tr, scene, toon) {
   const group = new THREE.Group(); scene.add(group);
   // Fahrbahn
-  const asphalt = canvasTex(256, 256, (g, w, h) => {
-    g.fillStyle = '#2b2346'; g.fillRect(0, 0, w, h);
-    for (let i = 0; i < 2600; i++) { const v = 30 + Math.random()*40|0; g.fillStyle = `rgba(${v+20},${v},${v+45},.5)`; g.fillRect(Math.random()*w, Math.random()*h, 2, 2); }
-    g.fillStyle = 'rgba(255,255,255,.10)'; g.fillRect(w/2 - 3, 0, 6, h*0.5);
+  const asphalt = canvasTex(512, 512, (g, w, h) => {
+    g.fillStyle = '#272043'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 16000; i++) { const v = 25 + Math.random()*45|0; g.fillStyle = `rgba(${v+18},${v+6},${v+50},.55)`; g.fillRect(Math.random()*w, Math.random()*h, 2, 2); }
+    for (let i = 0; i < 9; i++) { g.strokeStyle = 'rgba(10,6,24,.5)'; g.lineWidth = 1.5; g.beginPath(); let x = Math.random()*w, y = Math.random()*h; g.moveTo(x, y); for (let k = 0; k < 6; k++) { x += (Math.random()-.5)*40; y += Math.random()*30; g.lineTo(x, y); } g.stroke(); }
+    g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(w*0.22, 0, w*0.12, h); g.fillRect(w*0.66, 0, w*0.12, h);   // Fahrspuren
+    g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(w*0.035, 0, 7, h); g.fillRect(w*0.965 - 7, 0, 7, h);  // Randlinien
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(w/2 - 4, 0, 8, h*0.45);                             // Mittellinie
   }, true);
-  const road = new THREE.Mesh(ribbon(tr, -HALF, HALF, 0.02, 0.02, 22), new THREE.MeshLambertMaterial({ map: asphalt }));
+  const road = new THREE.Mesh(ribbon(tr, -HALF, HALF, 0.02, 0.02, 26), new THREE.MeshPhongMaterial({ map: asphalt, shininess: 60, specular: 0x4a3a7a }));
+  road.receiveShadow = true;
   group.add(road);
   // Neon-Kanten
   const edgeL = new THREE.Mesh(ribbon(tr, -HALF - 0.6, -HALF + 0.1, 0.05, 0.05, 10), new THREE.MeshBasicMaterial({ color: 0x29f0ff }));
@@ -105,7 +109,7 @@ export function buildTrackMeshes(tr, scene, toon) {
   cg.setAttribute('position', new THREE.Float32BufferAttribute(curbPos, 3)); cg.setAttribute('uv', new THREE.Float32BufferAttribute(curbUv, 2));
   cg.setIndex(curbIdx); fixN(cg);
   const curbMat = new THREE.MeshLambertMaterial({ map: curbTex, side: THREE.DoubleSide });
-  group.add(new THREE.Mesh(cg, curbMat));
+  const curbs = new THREE.Mesh(cg, curbMat); curbs.receiveShadow = true; group.add(curbs);
   // Seitenstreifen (Gras, fällt zum Boden ab)
   const grassTex = canvasTex(128, 128, (g, w, h) => {
     g.fillStyle = '#1d4a3a'; g.fillRect(0, 0, w, h);
@@ -116,7 +120,7 @@ export function buildTrackMeshes(tr, scene, toon) {
     const a = side*(HALF + 0.5), b = side*(WALL + 0.2), c = side*(WALL + 14);
     const g1 = ribbon(tr, a, b, 0.0, -0.05, 6, 2), g2 = ribbon(tr, b, c, -0.05, -6, 6, 2);
     if (side < 0) { flip(g1); flip(g2); }
-    group.add(new THREE.Mesh(g1, grassMat), new THREE.Mesh(g2, grassMat));
+    const m1 = new THREE.Mesh(g1, grassMat), m2 = new THREE.Mesh(g2, grassMat); m1.receiveShadow = m2.receiveShadow = true; group.add(m1, m2);
   }
   // Bande: niedrige Mauer mit Leuchtkante
   const wallMat = new THREE.MeshLambertMaterial({ color: 0x3a1f66 });
@@ -128,7 +132,7 @@ export function buildTrackMeshes(tr, scene, toon) {
   }
   // Start/Ziel: Schachbrett
   const chk = canvasTex(128, 16, (g, w, h) => { for (let x = 0; x < 16; x++) for (let y = 0; y < 2; y++) { g.fillStyle = (x + y) % 2 ? '#fff' : '#111'; g.fillRect(x*8, y*8, 8, 8); } });
-  const sl = new THREE.Mesh(new THREE.PlaneGeometry(HALF*2, 2.2), new THREE.MeshBasicMaterial({ map: chk }));
+  const sl = new THREE.Mesh(new THREE.PlaneGeometry(HALF*2, 2.2), new THREE.MeshLambertMaterial({ map: chk })); sl.receiveShadow = true;
   sl.rotation.x = -Math.PI/2; const holder = new THREE.Group(); holder.add(sl);
   holder.position.copy(tr.P[0]).add(new THREE.Vector3(0, .07, 0)); holder.rotation.y = Math.atan2(-tr.R[0].z, tr.R[0].x);
   group.add(holder);
@@ -154,9 +158,9 @@ export function buildTrackMeshes(tr, scene, toon) {
 
 function flip(g) { const ix = g.index.array; for (let i = 0; i < ix.length; i += 3) { const t = ix[i+1]; ix[i+1] = ix[i+2]; ix[i+2] = t; } fixN(g); }
 function vertical(tr, lat, y0, y1, step) {
-  const pos = [], idx = []; const n = tr.N / step;
+  const pos = [], idx = []; const n = Math.round(tr.N / step);
   for (let k = 0; k <= n; k++) {
-    const i = (k*step) % tr.N, p = tr.P[i], r = tr.R[i];
+    const i = k === n ? 0 : (k*step) % tr.N, p = tr.P[i], r = tr.R[i];
     pos.push(p.x + r.x*lat, p.y + y0, p.z + r.z*lat, p.x + r.x*lat, p.y + y1, p.z + r.z*lat);
     if (k < n) { const a = k*2; idx.push(a, a+2, a+1, a+1, a+2, a+3); }
   }
