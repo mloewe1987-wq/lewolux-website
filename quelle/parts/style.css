@@ -958,3 +958,19 @@ html.modal-open .lux,html.player-open .lux{display:none}
 
 .tp-trailer{margin:28px 0}.tp-trailer video{width:100%;border-radius:18px;border:1px solid var(--line);background:#000;display:block;aspect-ratio:16/9}
 .tp-tr18{margin:22px 0 10px;font-size:18px}.tp-tr18 small{color:#ff6b6b;font-weight:700;font-size:13px;margin-left:6px}
+
+/* Übersichtsseiten (kostenlose-browser-games, kostenlose-spiele, kinderspiele-kostenlos) */
+.lp-hero{max-width:920px;padding:30px 0 6px}
+.lp-hero h1{font:900 clamp(30px,4.8vw,58px)/1.04 var(--f-display);text-transform:uppercase;letter-spacing:-.01em;margin:16px 0 0;overflow-wrap:anywhere;hyphens:auto}
+.lp-lead{font-size:clamp(16px,1.4vw,18px);color:var(--muted);max-width:64ch;margin:18px 0 0}
+.lp-lead a,.lp-inline,.lp .prose a,.lp-note a,.lp-table a,.hero-lead a,.sec-head p a{color:var(--cyan);text-decoration-thickness:1px;text-underline-offset:3px}
+.hero-lead a strong{color:inherit}
+.lp-sec{padding-block:clamp(40px,6vw,80px) 0}
+.lp .lp-sec + section{padding-top:clamp(48px,7vw,96px)}
+.lp-grid .card .media{cursor:pointer}
+.lp-age{margin:0;font-size:14px;color:var(--muted)}.lp-age b{color:var(--accent,var(--cyan))}
+.lp-note{margin:22px 0 0;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--muted);font-size:14.5px;max-width:880px}
+.lp-note b{color:var(--fg)}
+.lp-table{max-width:880px}
+.foot .foot-h2{margin-top:26px}
+.h1-brand{line-height:1.5}

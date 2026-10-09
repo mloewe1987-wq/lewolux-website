@@ -150,9 +150,10 @@ MANUALS = {
 # ---------------------------------------------------------------- Software-Seiten
 SOFTWARE_PAGES = {
  "pdf": dict(
+  title="Kostenloser PDF-Leser ohne Werbung – Lewolux PDF",
   claim="PDFs lesen. Kostenlos. Ohne Werbung.", sub="Ein schneller PDF-Leser für Handy, Tablet und Windows-PC. Läuft im Browser oder als installierte App, auch offline. Deine Dateien bleiben auf deinem Gerät.",
   status="Version 1.0", cta="app",
-  meta="Lewolux PDF: kostenloser PDF-Leser ohne Werbung für Android, iPhone und Windows. Offline nutzbar, Suche, Inhaltsverzeichnis, Nachtmodus, Präsentation. Keine Anmeldung, Dateien bleiben auf dem Gerät.",
+  meta="Lewolux PDF: kostenloser PDF-Leser ohne Werbung für Android, iPhone und Windows. Offline nutzbar, mit Suche und Nachtmodus. Ohne Anmeldung, Dateien bleiben auf dem Gerät.",
   why=[("Wirklich kostenlos", "Keine Werbung, kein Abo, keine Anmeldung, keine versteckten Käufe."),
        ("Deine Dateien bleiben bei dir", "PDFs werden nirgendwo hochgeladen. Alles passiert auf deinem Gerät."),
        ("Überall gleich", "Auf Android, iPhone und Windows dieselbe App, offline nutzbar.")],
@@ -173,6 +174,7 @@ SOFTWARE_PAGES = {
           ("Wie installiere ich die App unter Windows?", "lewolux.de/pdf in Chrome oder Edge öffnen und oben in der Adressleiste auf das Installieren-Symbol klicken. Danach steht Lewolux PDF im Startmenü und kann PDF-Dateien öffnen."),
           ("Funktioniert die App ohne Internet?", "Ja. Nach dem ersten Öffnen läuft sie komplett offline.")]),
  "diktakte": dict(
+  title="Diktakte – Diktierprogramm für Anwälte und Kanzleien",
   claim="Diktieren. Ablegen. Erledigt.", sub="Diktierprogramm für Anwältinnen und Anwälte: juristische Schreibweise, Aktenverwaltung, Fristen und E-Mail-Versand in einem Programm. Die Spracherkennung läuft komplett auf dem eigenen PC.",
   status="Hobbyprojekt · Version 0.7", cta="feedback",
   meta="Diktakte: Diktierprogramm für Anwälte mit lokaler Spracherkennung, juristischer Schreibweise, Aktenverwaltung, Fristenberechnung und beA-Versand.",
@@ -198,6 +200,7 @@ SOFTWARE_PAGES = {
           ("Ersetzt Diktakte die Fristenkontrolle?", "Nein. Die Berechnung ersetzt nicht die eigene Prüfung jeder Frist. Deshalb gibt es die Fristenliste zum Ausdrucken mit Kontroll-Spalte."),
           ("Kann ich Diktakte bekommen?", "Diktakte ist ein privates Hobbyprojekt und derzeit nicht öffentlich verfügbar. Feedback und Ideen sind trotzdem willkommen.")]),
  "deskboard": dict(
+  title="DeskBoard – kostenlose Startoberfläche für Windows",
   claim="Dein Desktop. Endlich aufgeräumt.", sub="Eine eigene Startoberfläche für Windows: Kacheln für Programme und Webseiten, Reiter für Privat und Arbeit, Widgets und ein Notizblock zum Abreißen. Kostenlos für alle.",
   status="Kostenlos · Version 1.7", cta="download",
   meta="DeskBoard: kostenlose Desktop-Oberfläche für Windows mit Programm- und Webseiten-Kacheln, Widgets, Reitern und Notizblock. Jetzt gratis herunterladen.",
@@ -223,6 +226,7 @@ SOFTWARE_PAGES = {
           ("Wo werden meine Einstellungen gespeichert?", "Lokal auf deinem PC unter %APPDATA%\\DeskBoard, mit automatischer Sicherungskopie."),
           ("Wünsche?", "Sag uns unten im Feedback, welches Widget als Nächstes kommen soll.")]),
  "speisekarte": dict(
+  title="Speisekarte selbst gestalten – Speisekarten-Konfigurator",
   claim="Die Karte, die nach dir aussieht.", sub="Speise-, Getränke-, Tages-, Menü- und Aktionskarten selbst gestalten und drucken. Mit eigenem Logo, Allergenen und QR-Code, in Minuten.",
   status="Hobbyprojekt · in Entwicklung", cta="feedback",
   meta="Speisekarten-Konfigurator: Speisekarte, Tageskarte, Menü- und Aktionskarte selbst gestalten. 9 Vorlagen, Allergene, Logo-Werkstatt, QR-Code, Druck als PDF.",

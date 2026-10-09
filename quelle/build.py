@@ -9,7 +9,7 @@ import re
 import base64, html, json, os, shutil, datetime, asyncio, io
 from PIL import Image
 from data import GAMES, SOFTWARE, FAQ, ICONS, PLAY, DL, SEO, TEASERS
-from data import NEWS, KIDS, KIDS_PHRASES
+from data import NEWS, KIDS, KIDS_PHRASES, GROUPS, FAQ_BROWSER, FAQ_SPIELE, FAQ_KINDER
 from manuals import MANUALS, SOFTWARE_PAGES
 
 SITE = "https://lewolux.de/"      # <- eigene Domain eintragen (mit / am Ende)
@@ -209,13 +209,28 @@ def game_data(c):
 
 def ld(obj): return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False).replace("</", "<\\/") + "</script>"
 
-ORG = {"@type": "Organization", "@id": SITE + "#studio", "name": "Lewolux Studio", "url": SITE,
-       "logo": SITE + "assets/img/lewolux-studio-logo.jpg", "image": SITE + "assets/img/lewolux-studio-banner.jpg",
-       "slogan": "Shaping the Future of Play", "email": EMAIL, "areaServed": "DE",
-       "sameAs": [u for u in LINKS.values() if u.startswith("http")]}
+ORG = {"@type": "Organization", "@id": SITE + "#studio", "name": "Lewolux Studio", "alternateName": "Lewolux", "url": SITE,
+       "logo": {"@type": "ImageObject", "url": SITE + "assets/img/lewolux-studio-logo.jpg", "width": 256, "height": 256},
+       "image": SITE + "assets/img/lewolux-studio-banner.jpg",
+       "description": "Privates Hobby-Studio aus Schleswig-Holstein: kostenlose Browser-Games, Kinderspiele (Lewolux Kids) und kleine Programme, ohne Werbung und ohne Käufe.",
+       "slogan": "Shaping the Future of Play", "email": EMAIL, "areaServed": "DE"}
+_SAME = [u for u in list(LINKS.values()) + list(LINKS_RL.values()) if u.startswith("http")]
+if _SAME: ORG["sameAs"] = _SAME   # nur echte, eingetragene Profile (LINKS oben)
 
-def head(c, title, desc, path, og, jsonld, robots="index, follow, max-image-preview:large", preload=""):
+def ptitle(t, brand=" | Lewolux"):
+    """Seitentitel: Marke anhängen, solange der Titel kurz genug bleibt (Google kürzt ab ~60–65 Zeichen)."""
+    return t if "Lewolux" in t or len(t + brand) > 66 else t + brand
+
+def crumbs_ld(*items):
+    return {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": n, "item": SITE + u} for i, (n, u) in enumerate(items)]}
+
+def hub_of(gid):
+    """Übergeordnete Übersichtsseite eines Spiels (für Brotkrumen)."""
+    return ("Kinderspiele kostenlos", "kinderspiele-kostenlos/") if gid in KIDS_IDS else ("Kostenlose Spiele", "kostenlose-spiele/")
+
+def head(c, title, desc, path, og, jsonld, robots="index, follow, max-image-preview:large", preload="", canonical=True):
     url = SITE + path
+    canon = f'<link rel="canonical" href="{url}">\n<link rel="alternate" hreflang="de" href="{url}">' if canonical else ""
     css = f'<style>{part("style.css")}</style>' if c.preview else f'<link rel="stylesheet" href="{c.root}assets/css/site.css?v={VER}">'
     fonts = GFONTS if c.preview else f'<link rel="preload" href="{c.root}assets/fonts/orbitron-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="{c.root}assets/fonts/plus-jakarta-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>'
     return f'''<!doctype html>
@@ -229,8 +244,7 @@ def head(c, title, desc, path, og, jsonld, robots="index, follow, max-image-prev
 <meta name="robots" content="{robots}">
 <meta name="author" content="Lewolux Studio">
 <meta name="theme-color" content="#0a0b10">
-<link rel="canonical" href="{url}">
-<link rel="alternate" hreflang="de" href="{url}">
+{canon}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Lewolux Studio">
 <meta property="og:locale" content="de_DE">
@@ -277,7 +291,7 @@ def links_page(c):
     rl = GAME_BY_ID["wrestling-tcg"]
     items = [("🥊", "Ring Legends spielen", "Sammelkarten online – kostenlos im Browser", f"{c.root}games/wrestling-tcg/index.html", True),
              ("🎬", "Großes Update: Trailer & Neuerungen", "Markt, Ring-Duelle, Tausch, Wochen-Events", f"{c.root}spiele/wrestling-tcg/#update", False),
-             ("🎮", "Alle Spiele von Lewolux", "7 kostenlose Spiele, direkt im Browser", f"{c.root}#spiele", False),
+             ("🎮", "Alle Spiele von Lewolux", f"{sum(1 for g in GAMES if has_game(g))} kostenlose Spiele, direkt im Browser", f"{c.root}kostenlose-browser-games/", False),
              ("📱", "Android-Tester werden", "Spiel die App vor allen anderen – Plätze frei", f"{c.root}ring-legends/tester/", True),
              ("💡", "Wünsch dir was", "Ideen, Fehler, Lob – direkt ans Studio", f"{c.root}#mitmachen", False)]
     li = "".join(f'<a class="lk{" hot" if hot else ""}" href="{u}"><span class="lk-i">{i}</span><span class="lk-t"><b>{e(t)}</b><small>{e(s)}</small></span><span class="lk-a">›</span></a>' for i, t, s, u, hot in items)
@@ -332,6 +346,7 @@ def common(c, t):
     rep = {"{{ROOT}}": c.root, "{{EMAIL}}": EMAIL, "{{GAMECOUNT}}": str(len(GAMES)),
            "{{FOOTGAMES}}": "".join(f'<li><a href="{c.page(g)}">{e(g["short"])}</a></li>' for g in GAMES) + "".join(f'<li><a href="{c.root}spiele/{t["id"]}/">{e(t["short"])} <small>(bald)</small></a></li>' for t in TEASERS),
            "{{NEWS}}": news_items(c), "{{IMPRESSUM}}": f"{c.root}impressum/", "{{DATENSCHUTZ}}": f"{c.root}datenschutz/"}
+    rep["{{FOOTSOFTWARE}}"] = "".join(f'<li><a href="{c.root}software/{x["id"]}/">{e(x["title"])}</a></li>' for x in SOFTWARE)
     rep["{{SOCIAL}}"] = social_icons()
     rep["{{RAIL}}"] = games_rail(c); rep["{{GAMEMARQUEE}}"] = game_marquee(c)
     for k, v in rep.items(): t = t.replace(k, v)
@@ -460,7 +475,10 @@ def software_page(c, sw_):
     feats = "".join(f'<details class="sp-feat"><summary><span class="sp-ico">{SICO[ic]}</span><span class="sp-ft"><b>{e(t)}</b><span>{e(st)}</span></span><span class="sp-plus" aria-hidden="true"></span></summary><p>{e(d)}</p></details>' for ic, t, st, d in sp["feats"])
     gal = ""
     if sp.get("gallery"):
-        figs = "".join(f'<figure class="sp-fig"><a href="{c.root}assets/software/{sid}/{f.rsplit(".",1)[0]}.webp" target="_blank" rel="noopener"><img src="{c.root}assets/software/{sid}/{f.rsplit(".",1)[0]}.webp" alt="{e(cap)}" loading="lazy" decoding="async"></a><figcaption>{e(cap)}</figcaption></figure>' for f, cap in sp["gallery"])
+        def dims(f):   # Breite/Höhe ins <img>, damit beim Laden nichts springt (CLS)
+            try: w, h_ = Image.open(P(f"dist/assets/software/{sid}/{f.rsplit('.',1)[0]}.webp")).size; return f' width="{w}" height="{h_}"'
+            except Exception: return ""
+        figs = "".join(f'<figure class="sp-fig"><a href="{c.root}assets/software/{sid}/{f.rsplit(".",1)[0]}.webp" target="_blank" rel="noopener"><img src="{c.root}assets/software/{sid}/{f.rsplit(".",1)[0]}.webp" alt="{e(cap)}"{dims(f)} loading="lazy" decoding="async"></a><figcaption>{e(cap)}</figcaption></figure>' for f, cap in sp["gallery"])
         gal = f'<section aria-labelledby="ga-h"><div class="sec-head"><div><span class="eyebrow">Einblicke</span><h2 id="ga-h">So sieht {e(sw_["title"])} aus</h2></div></div><div class="sp-gal">{figs}</div></section>'
     road = ""
     if sp.get("roadmap"):
@@ -468,7 +486,7 @@ def software_page(c, sw_):
     <ul class="sp-road">{"".join(f"<li>{e(r)}</li>" for r in sp["roadmap"])}</ul></section>'''
     man = "".join(f"<details><summary>{e(q)}</summary><p>{e(a)}</p></details>" for q, a in sp["manual"])
     others = "".join(f'<a class="sp-other" href="{c.root}software/{o["id"]}/"><span class="sw-cat">{e(o["cat"])}</span><b>{e(o["title"])}</b><span>{e(SOFTWARE_PAGES[o["id"]]["claim"])}</span></a>' for o in SOFTWARE if o["id"] != sid)
-    app = {"@type": "SoftwareApplication", "name": sw_["title"], "description": sp["meta"], "url": SITE + url, "image": f"{SITE}assets/screenshots/software-{sid}.jpg",
+    app = {"@type": "SoftwareApplication", "@id": SITE + url + "#app", "name": sw_["title"], "description": sp["meta"], "url": SITE + url, "image": f"{SITE}assets/screenshots/software-{sid}.jpg",
            "applicationCategory": "BusinessApplication" if sid != "deskboard" else "UtilitiesApplication", "operatingSystem": "Windows" if "Windows" in sw_["cat"] else "Web",
            "author": {"@id": SITE + "#studio"}, "inLanguage": "de"}
     if sid == "pdf": app.update({"applicationCategory": "UtilitiesApplication", "operatingSystem": "Android, iOS, Windows, Web", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "installUrl": SITE + "pdf/"})
@@ -477,7 +495,7 @@ def software_page(c, sw_):
     jsonld = [{"@context": "https://schema.org", "@graph": [ORG, app,
         {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Start", "item": SITE}, {"@type": "ListItem", "position": 2, "name": "Software", "item": SITE + "#software"}, {"@type": "ListItem", "position": 3, "name": sw_["title"], "item": SITE + url}]},
         {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in sp["manual"]]}]}]
-    h = head(c, f'{sw_["title"]} – {sp["claim"].rstrip(".")} | Lewolux Studio', sp["meta"], url, f"assets/og/og-software-{sid}.jpg", jsonld)
+    h = head(c, ptitle(sp.get("title") or f'{sw_["title"]} – {sp["claim"].rstrip(".")}'), sp["meta"], url, f"assets/og/og-software-{sid}.jpg", jsonld)
     body = f'''<main class="sp wrap">
   <nav aria-label="Brotkrumen"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}#software">Software</a></li><li aria-current="page">{e(sw_["title"])}</li></ol></nav>
   <header class="sp-hero">
@@ -533,10 +551,10 @@ def teaser_page(c, t):
     feats = "".join(f"<li>{e(f)}</li>" for f in t["features"]); long = "".join(f"<p>{e(x)}</p>" for x in t["long"])
     jsonld = [{"@context": "https://schema.org", "@graph": [ORG,
         {"@type": "VideoGame", "name": t["title"], "description": t["desc"], "url": SITE + url, "image": SITE + f"assets/teaser/{t['id']}-1.jpg", "genre": t["genres"], "author": {"@id": SITE + "#studio"}, "contentRating": f"Empfohlen ab {t['age']} (ohne offizielle Einstufung)", "inLanguage": "de"},
-        {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Start", "item": SITE}, {"@type": "ListItem", "position": 2, "name": "Spiele", "item": SITE + "#spiele"}, {"@type": "ListItem", "position": 3, "name": t["title"], "item": SITE + url}]}]}]
-    h = head(c, f"{t['title']} – Survival-Horror, erscheint bald | Lewolux Studio", f"{t['title']}: {t['desc']} Empfohlen ab {t['age']}.", url, f"assets/teaser/{t['id']}-og.jpg", jsonld)
+        crumbs_ld(("Start", ""), ("Kostenlose Spiele", "kostenlose-spiele/"), (t["title"], url))]}]
+    h = head(c, ptitle(f"{t['title']} – Survival-Horror, erscheint bald"), f"{t['title']}: {t['desc']} Empfohlen ab {t['age']}.", url, f"assets/teaser/{t['id']}-og.jpg", jsonld)
     body = f'''<main class="wrap teaser-page" style="--accent:{t['accent']}">
-  <nav aria-label="Brotkrumen"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}#spiele">Spiele</a></li><li aria-current="page">{e(t['title'])}</li></ol></nav>
+  <nav aria-label="Brotkrumen"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}kostenlose-spiele/">Kostenlose Spiele</a></li><li aria-current="page">{e(t['title'])}</li></ol></nav>
   <header class="tp-hero">
     <img src="{teaser_img(c, t, 1)}" alt="Titelbild von {e(t['title'])}" width="1280" height="720" fetchpriority="high">
     <div class="tp-over"><span class="eyebrow">{e(t['part'])} · {e(t['status'])}</span><h1>{e(t['title'])}</h1><p class="tp-tag">{e(t['tagline'])}</p><div class="tp-badges">{age_badge(t)}<span class="tp-soon">Noch nicht spielbar</span></div></div>
@@ -635,14 +653,20 @@ def index_page(c):
                 .replace("{{SOFTWARE}}", "\n".join(sw(c, s) for s in SOFTWARE)).replace("{{FAQ}}", faq)
                 .replace("{{POLL}}", poll_items(c)).replace("{{FEEDBACKFORM}}", feedback_form(c)).replace("{{API}}", API)
                 .replace("{{FEAT}}", feat["id"]).replace("{{FEATNAME}}", e(feat["short"])).replace("{{PROMO}}", promo(c)))
+    main = main.replace("{{ENTDECKEN}}", discover_section(c))
+    nav = [("Kostenlose Browser-Games", "kostenlose-browser-games/"), ("Kostenlose Spiele", "kostenlose-spiele/"), ("Lewolux Kids", "kids/"),
+           ("Kinderspiele kostenlos", "kinderspiele-kostenlos/")] + [(s["title"], f"software/{s['id']}/") for s in SOFTWARE]
     jsonld = [{"@context": "https://schema.org", "@graph": [ORG,
-        {"@type": "WebSite", "@id": SITE + "#website", "name": "Lewolux Studio", "url": SITE, "inLanguage": "de-DE", "publisher": {"@id": SITE + "#studio"}},
+        {"@type": "WebSite", "@id": SITE + "#website", "name": "Lewolux Studio", "alternateName": ["Lewolux", "lewolux.de"], "url": SITE, "inLanguage": "de",
+         "description": "Kostenlose Browser-Games, Kinderspiele und Software von Lewolux Studio – ohne Werbung, ohne Anmeldung.", "publisher": {"@id": SITE + "#studio"}},
+        {"@type": "WebPage", "@id": SITE + "#webpage", "url": SITE, "name": "Kostenlose Browser-Games & Indie-Spiele | Lewolux Studio", "isPartOf": {"@id": SITE + "#website"},
+         "about": {"@id": SITE + "#studio"}, "primaryImageOfPage": SITE + "assets/img/lewolux-studio-banner.jpg", "inLanguage": "de"},
         {"@type": "ItemList", "name": "Kostenlose Spiele von Lewolux Studio", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": f"{SITE}spiele/{g['id']}/", "name": g["title"]} for i, g in enumerate(GAMES)]},
-        {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in FAQ]}]
-        + [{"@type": "SoftwareApplication", "name": s["title"], "description": s["desc"], "applicationCategory": "BusinessApplication", "operatingSystem": "Windows" if "Windows" in s["cat"] else "Web", "author": {"@id": SITE + "#studio"}, "url": f"{SITE}#sw-{s['id']}"} for s in SOFTWARE]}]
+        {"@type": "ItemList", "name": "Bereiche", "itemListElement": [{"@type": "SiteNavigationElement", "position": i + 1, "name": n, "url": SITE + u} for i, (n, u) in enumerate(nav)]},
+        {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in FAQ]}]}]
     preload = "" if c.preview else f'<link rel="preload" as="image" href="{c.root}assets/img/lewolux-studio-banner.webp" type="image/webp" fetchpriority="high">'
-    h = head(c, "Lewolux Studio – Kostenlose Browserspiele & Indie-Games",
-             "Kostenlose Browserspiele und Indie-Games von Lewolux Studio: Polit-RPG, Idle-RPG, Sammelkarten und Lern-App. Direkt online spielen oder gratis herunterladen.",
+    h = head(c, "Kostenlose Browser-Games & Indie-Spiele | Lewolux Studio",
+             "Kostenlose Browser-Games ohne Anmeldung und ohne Werbung: Polit-RPG, Idle-RPG, Sammelkarten und Kinderspiele von Lewolux Studio. Online spielen, auch am Handy.",
              "", "assets/img/og-lewolux-studio.jpg", jsonld, preload=preload)
     return common(c, h + part("header.html") + "\n" + main + "\n" + part("footer.html") + "\n" + tail(c))
 
@@ -682,6 +706,28 @@ def update_section(c, g):
     return f'''  <section class="g-update" id="update" aria-labelledby="up-h"><span class="eyebrow">{e(u["kicker"])}</span><h2 id="up-h">{e(u["title"])}</h2><p class="up-lead">{e(u["lead"])}</p>{trailer(c, "in-update")}<ul class="up-list">{items}</ul><div class="g-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt online spielen</button></div><p class="up-note">{e(u["note"])}</p></section>
 '''
 
+KIDS_BY_ID = {k["id"]: k for k in KIDS}
+def kid_age(gid):
+    m = re.search(r"\d+", KIDS_BY_ID[gid]["age"]) if gid in KIDS_BY_ID else None
+    return int(m.group()) if m else None
+
+def video_game(g, desc=None, full=False):
+    """schema.org/VideoGame für ein Spiel. full=True: komplette Angaben (Spielseite), sonst kompakt (Listen auf Übersichtsseiten).
+       Bewusst ohne aggregateRating – es gibt keine echten Bewertungen."""
+    url = SITE + f"spiele/{g['id']}/"
+    shots_abs = [f"{SITE}assets/screenshots/{g['id']}-{i+1}.jpg" for i in range(3)]
+    vg = {"@type": "VideoGame", "@id": url + "#game", "name": g["title"], "url": url, "description": desc or SEO.get(g["id"], {}).get("meta", g["desc"]),
+          "genre": g["genres"], "gamePlatform": ["Web-Browser", "PC"] + (["Smartphone", "Tablet"] if "mobile" in g["plats"] or "pad" in g["plats"] else []) + (["Android"] if "android" in g["plats"] else []),
+          "applicationCategory": "Game", "inLanguage": "de", "isAccessibleForFree": True, "image": shots_abs[0],
+          "author": {"@id": SITE + "#studio"}, "publisher": {"@id": SITE + "#studio"},
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR", "url": url, **({"availability": "https://schema.org/InStock"} if has_game(g) else {})}}
+    age = kid_age(g["id"])
+    if age: vg["audience"] = {"@type": "PeopleAudience", "suggestedMinAge": age}
+    if full:
+        vg.update({"operatingSystem": "Web, Windows, macOS, Android, iOS", "playMode": ["SinglePlayer", "MultiPlayer"] if g.get("online") else "SinglePlayer",
+                   "screenshot": [{"@type": "ImageObject", "url": u, "caption": cap} for u, cap in zip(shots_abs, g["shots"])]})
+    return vg
+
 def game_page(c, g):
     s = SEO[g["id"]]; url = f"spiele/{g['id']}/"
     genres = "".join(f'<span class="genre">{e(x)}</span>' for x in g["genres"])
@@ -700,24 +746,17 @@ def game_page(c, g):
     faqh = "".join(f"<details><summary>{e(q)}</summary><p>{e(a)}</p></details>" for q, a in faq)
     more = "".join(f'<a class="mg" href="{c.page(o)}">{pic(c, o["id"]+"-1", "Screenshot aus "+o["short"], "260px")}<span>{e(o["short"])}</span></a>' for o in GAMES if o["id"] != g["id"])
     long = "".join(f"<p>{p}</p>" for p in s["long"])
-    shots_abs = [f"{SITE}assets/screenshots/{g['id']}-{i+1}.jpg" for i in range(3)]
-    jsonld = [{"@context": "https://schema.org", "@graph": [ORG,
-        {"@type": "VideoGame", "@id": SITE + url + "#game", "name": g["title"], "url": SITE + url, "description": s["meta"], "genre": g["genres"],
-         "gamePlatform": ["Web-Browser"] + (["Android"] if "android" in g["plats"] else []) + (["Smartphone"] if "mobile" in g["plats"] else []),
-         "applicationCategory": "Game", "operatingSystem": "Web, Windows, macOS, Android", "playMode": ["SinglePlayer", "MultiPlayer"] if g.get("online") else "SinglePlayer", "inLanguage": "de",
-         "isAccessibleForFree": True, "image": shots_abs[0], "screenshot": [{"@type": "ImageObject", "url": u, "caption": cap} for u, cap in zip(shots_abs, g["shots"])],
-         "author": {"@id": SITE + "#studio"}, "publisher": {"@id": SITE + "#studio"},
-         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR", "availability": "https://schema.org/InStock", "url": SITE + url}},
-        {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Start", "item": SITE},
-            {"@type": "ListItem", "position": 2, "name": "Spiele", "item": SITE + "#spiele"}, {"@type": "ListItem", "position": 3, "name": g["short"], "item": SITE + url}]},
+    hub = hub_of(g["id"])
+    jsonld = [{"@context": "https://schema.org", "@graph": [ORG, video_game(g, s["meta"], full=True), crumbs_ld(("Start", ""), hub, (g["short"], url)),
         {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}]
         + ([{"@type": "VideoObject", "name": g["short"] + " – Trailer zum großen Update", "description": "15 Sekunden Ring Legends: Packs öffnen, Karten graden, Ring-Duelle, Markt und Tausch. Kostenlos im Browser, bald im Play Store.",
              "thumbnailUrl": SITE + "assets/video/ring-legends-trailer-l.jpg", "contentUrl": SITE + "assets/video/ring-legends-trailer-l.mp4", "uploadDate": "2026-10-08", "duration": "PT15S", "inLanguage": "de",
              "publisher": {"@id": SITE + "#studio"}, "embedUrl": SITE + url + "#update"}] if g.get("update") and os.path.isfile(P("video/ring-legends-trailer-l.mp4")) else [])}]
-    preload = f'<link rel="preload" as="image" href="{c.shot(g["id"]+"-1")}" type="image/webp" fetchpriority="high">'
-    h = head(c, s["title"] + " | Lewolux Studio" if len(s["title"]) < 44 else s["title"], s["meta"], url, f"assets/og/og-{g['id']}.jpg", jsonld, preload=preload)
+    # LCP-Bild vorladen – mit denselben srcset/sizes wie das <picture> im Kopf, sonst lädt das Handy das Bild doppelt
+    preload = f'<link rel="preload" as="image" type="image/webp" imagesrcset="{c.shot(g["id"]+"-1", True)} 640w, {c.shot(g["id"]+"-1")} 1280w" imagesizes="(max-width:900px) 100vw, 720px" fetchpriority="high">'
+    h = head(c, ptitle(s["title"]), s["meta"], url, f"assets/og/og-{g['id']}.jpg", jsonld, preload=preload)
     body = f'''<main class="wrap" style="--accent:{g['accent']}">
-  <nav aria-label="Breadcrumb"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}#spiele">Spiele</a></li><li aria-current="page">{e(g['short'])}</li></ol></nav>
+  <nav aria-label="Breadcrumb"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}{hub[1]}">{e(hub[0])}</a></li><li aria-current="page">{e(g['short'])}</li></ol></nav>
   <div class="g-hero">
     <div class="g-shot">{pic(c, g['id']+'-1', 'Screenshot aus '+g['short']+': '+g['shots'][0], '(max-width:900px) 100vw, 720px', lazy=False)}</div>
     <div>
@@ -736,14 +775,172 @@ def game_page(c, g):
   </div>
 {manual_section(c, g)}  <section aria-labelledby="sh-h" style="padding-bottom:0"><div class="sec-head"><div><span class="eyebrow">Screenshots</span><h2 id="sh-h">{e(g['short'])} in Bildern</h2></div></div><ul class="gallery">{gallery}</ul></section>
 {game_feedback(c, g)}  <section aria-labelledby="faq-h" style="padding-bottom:0"><div class="sec-head"><div><span class="eyebrow">FAQ</span><h2 id="faq-h">Fragen zu {e(g['short'])}</h2></div></div><div class="faq">{faqh}</div></section>
-  <section aria-labelledby="more-h"><div class="sec-head"><div><span class="eyebrow">Mehr spielen</span><h2 id="more-h">Weitere kostenlose Spiele</h2></div></div><div class="more-games">{more}</div></section>
+  <section aria-labelledby="more-h"><div class="sec-head"><div><span class="eyebrow">Mehr spielen</span><h2 id="more-h">Weitere kostenlose Spiele</h2><p>Alle Spiele im Überblick: <a class="lp-inline" href="{c.root}kostenlose-browser-games/">kostenlose Browser-Games ohne Anmeldung</a>{f' · <a class="lp-inline" href="{c.root}kinderspiele-kostenlos/">Kinderspiele ohne Werbung</a>' if g["id"] in KIDS_IDS else ""}</p></div></div><div class="more-games">{more}</div></section>
 </main>
 '''
     return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c))
 
 def simple_page(c, path, title, body_html):
-    h = head(c, title + " | Lewolux Studio", title + " von Lewolux Studio.", path, "assets/img/og-lewolux-studio.jpg", [], robots="noindex, follow")
+    h = head(c, title + " | Lewolux Studio", title + " von Lewolux Studio.", path, "assets/img/og-lewolux-studio.jpg", [], robots="noindex, follow", canonical=path != "404")
     return common(c, h + part("header.html") + f'\n<main class="wrap legal-page"><h1>{e(title)}</h1>{body_html}</main>\n' + part("footer.html") + "\n" + tail(c))
+
+# ---------------------------------------------------------------- Übersichtsseiten (SEO-Landingpages)
+# Inhalte kommen aus data.py (GAMES, KIDS, GROUPS, FAQ_*), neue Spiele erscheinen automatisch.
+LANDINGS = [  # (Pfad, Kurzname für Links, Untertitel)
+    ("kostenlose-browser-games/", "Kostenlose Browser-Games", "Alle Spiele, die sofort im Browser starten – ohne Anmeldung"),
+    ("kostenlose-spiele/", "Kostenlose Spiele für PC & Handy", "Nach Genre sortiert: Strategie, Sammelkarten, Arcade, Kinder"),
+    ("kinderspiele-kostenlos/", "Kinderspiele ohne Werbung", "Für Eltern: Altersempfehlung, Lernspiele, Datenschutz"),
+]
+
+def browser_games(): return [g for g in GAMES if has_game(g)]
+
+def group_of(g):
+    if g.get("group"): return g["group"]
+    cats = g["cats"].split()
+    return "kinder" if g["id"] in KIDS_IDS or "family" in cats else "strategie" if "rpg" in cats else "arcade" if "arcade" in cats else "alltag"
+
+def lp_card(c, g, i, mode="browser"):
+    """Spielkarte für Übersichtsseiten (gleiches Design wie auf der Startseite). „Jetzt spielen“ führt zur Spielseite."""
+    plats = "".join(f'<li>{ICONS[p][0]}{ICONS[p][1]}</li>' for p in g["plats"])
+    genres = "".join(f'<span class="genre">{e(x)}</span>' for x in g["genres"])
+    page = c.page(g); playable = has_game(g)
+    if mode == "kids":
+        k = KIDS_BY_ID[g["id"]]
+        acts = (f'<a class="btn btn-play" href="{c.root}kids/">{PLAY}In Lewolux Kids spielen</a><a class="btn btn-dl" href="{page}">Infos für Eltern</a>')
+        extra = f'<p class="lp-age"><b>{e(k["age"])}</b>{" · " + e(k["learn"]) if k.get("learn") else ""}</p>'
+    else:
+        play = f'<a class="btn btn-play" href="{page}">{PLAY}Jetzt spielen</a>' if playable else f'<a class="btn btn-play" href="{page}">Details ansehen</a>'
+        acts = play + (dl_btn(c, g, "Download", True) if mode == "all" else f'<a class="more-link" href="{page}#handbuch">Handbuch &amp; Details →</a>')
+        extra = ""
+    return f'''        <article class="card" style="--accent:{g['accent']};--glow:{g['accent']}99">
+          <a class="media" href="{page}" tabindex="-1" aria-hidden="true">{pic(c, g['id']+'-1', 'Screenshot aus '+g['short']+': '+g['shots'][0], '(max-width:680px) 100vw, (max-width:1100px) 50vw, 420px', lazy=i>1)}<span class="pill status">{e(g['status'])}</span><span class="pill free">Free</span></a>
+          <div class="body">
+            <div class="genres">{genres}</div>
+            <h3><a href="{page}">{e(g['title'])}</a></h3>
+            <p class="desc">{e(g['desc'])}</p>{extra}
+            <ul class="plats" aria-label="Plattformen">{plats}</ul>
+            <div class="actions">{acts}</div>
+          </div>
+        </article>'''
+
+def discover_section(c):
+    """Startseite: Links zu den Übersichtsseiten, Lewolux Kids und dem PDF-Leser."""
+    items = [(LANDINGS[0][0], "Browser-Games", "Kostenlose Browser-Games ohne Anmeldung", f"{len(browser_games())} Spiele, die sofort im Browser starten – am PC und auf dem Handy."),
+             (LANDINGS[1][0], "Alle Spiele", "Kostenlose Spiele für PC und Handy", "Nach Genre sortiert, im Browser oder als Download."),
+             ("kids/", "Für Kinder", "Lewolux Kids", "Der Kinderbereich mit großen Knöpfen, Vorlesefunktion und Elternsperre."),
+             (LANDINGS[2][0], "Für Eltern", "Kinderspiele ohne Werbung", "Altersempfehlungen, Lernspiele und was mit den Daten passiert."),
+             ("software/pdf/", "Software", "Kostenloser PDF-Leser ohne Werbung", "Lewolux PDF für Android, iPhone und Windows.")]
+    cards = "".join(f'<a class="sp-other" href="{c.root}{u}"><span class="sw-cat">{e(k)}</span><b>{e(t)}</b><span>{e(d)}</span></a>' for u, k, t, d in items)
+    return f'''  <section id="entdecken" aria-labelledby="ent-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head"><div><span class="eyebrow">Entdecken</span><h2 id="ent-h">Kostenlos spielen &amp; entdecken</h2><p>Alles auf einen Blick: Browser-Games ohne Anmeldung, Kinderspiele ohne Werbung und kostenlose Software.</p></div></div>
+      <div class="sp-others">{cards}</div>
+    </div>
+  </section>
+'''
+
+def faq_html(faq): return "".join(f"<details><summary>{e(q)}</summary><p>{e(a)}</p></details>" for q, a in faq)
+def faq_ld(faq): return {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
+
+def landing_page(c, path, title, desc, crumb, eyebrow, h1, lead, facts, content, faq, games, og, page_type="CollectionPage"):
+    url = SITE + path
+    others = "".join(f'<a class="sp-other" href="{c.root}{u}"><span class="sw-cat">Übersicht</span><b>{e(n)}</b><span>{e(d)}</span></a>' for u, n, d in LANDINGS if u != path)
+    others += f'<a class="sp-other" href="{c.root}kids/"><span class="sw-cat">Kinderbereich</span><b>Lewolux Kids</b><span>Kinderspiele mit Vorlesefunktion und Elternsperre</span></a>'
+    jsonld = [{"@context": "https://schema.org", "@graph": [ORG,
+        {"@type": page_type, "@id": url + "#page", "url": url, "name": title, "description": desc, "inLanguage": "de",
+         "isPartOf": {"@type": "WebSite", "@id": SITE + "#website", "name": "Lewolux Studio", "url": SITE}, "publisher": {"@id": SITE + "#studio"},
+         "mainEntity": {"@type": "ItemList", "name": h1, "numberOfItems": len(games),
+                        "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": SITE + f"spiele/{g['id']}/", "item": video_game(g)} for i, g in enumerate(games)]}},
+        faq_ld(faq), crumbs_ld(("Start", ""), (crumb, path))]}]
+    h = head(c, ptitle(title), desc, path, og, jsonld)
+    fl = "".join(f"<li>{e(f)}</li>" for f in facts)
+    body = f'''<main class="wrap lp">
+  <nav aria-label="Brotkrumen"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li aria-current="page">{e(crumb)}</li></ol></nav>
+  <header class="lp-hero"><span class="eyebrow">{e(eyebrow)}</span><h1>{e(h1)}</h1><p class="lp-lead">{lead}</p><ul class="hero-facts">{fl}</ul></header>
+{content}
+  <section aria-labelledby="lfaq-h"><div class="sec-head"><div><span class="eyebrow">FAQ</span><h2 id="lfaq-h">Häufige Fragen</h2></div></div><div class="faq">{faq_html(faq)}</div></section>
+  <section aria-labelledby="lmore-h" style="padding-top:0"><div class="sec-head"><div><span class="eyebrow">Mehr entdecken</span><h2 id="lmore-h">Weiter stöbern</h2></div></div><div class="sp-others">{others}</div></section>
+</main>
+'''
+    return common(c, h + part("header.html") + "\n" + body + part("footer.html") + "\n" + tail(c))
+
+def page_browser_games(c):
+    games = browser_games(); R = c.root
+    grid = "\n".join(lp_card(c, g, i, "browser") for i, g in enumerate(games))
+    content = f'''  <section aria-labelledby="bg-h" class="lp-sec"><div class="sec-head"><div><span class="eyebrow">Sofort spielbar</span><h2 id="bg-h">Alle {len(games)} Browser-Games</h2><p>Tippe auf „Jetzt spielen“: Auf der Spielseite startet das Spiel mit einem Klick direkt im Browser, im Vollbild auch auf dem Handy.</p></div></div>
+    <div class="grid lp-grid">
+{grid}
+    </div></section>
+  <section aria-labelledby="bgt-h" class="lp-sec" style="padding-top:0"><div class="prose">
+    <h2 id="bgt-h">Online-Spiele kostenlos – ohne Haken</h2>
+    <p>Lewolux Studio ist ein privates Hobbyprojekt aus Schleswig-Holstein. Deshalb sind alle Spiele <strong>kostenlos</strong>, ohne Werbung, ohne In-App-Käufe und ohne Abo. Viele Spiele sind noch in Entwicklung (Early Access) und bekommen regelmäßig Updates. Dein <a href="{R}#mitmachen">Feedback</a> fließt direkt in die Entwicklung ein.</p>
+    <p>Die meisten Spiele kannst du zusätzlich als <strong>einzelne HTML-Datei herunterladen</strong>. Die Datei startet per Doppelklick im Browser und läuft dann auch offline. Ring Legends ist ein echtes Online-Spiel mit Markt und Ranglisten; spielen kannst du es trotzdem sofort und ohne Anmeldung.</p>
+    <p>Suchst du etwas für Kinder? Kritzelheld, Pandi und Schulhofkicker findest du im Kinderbereich <a href="{R}kids/">Lewolux Kids</a>, Infos für Eltern auf der Seite <a href="{R}kinderspiele-kostenlos/">Kinderspiele ohne Werbung</a>. Alle Spiele inklusive Download-Versionen, nach Genre sortiert, gibt es unter <a href="{R}kostenlose-spiele/">Kostenlose Spiele für PC und Handy</a>.</p>
+  </div></section>
+'''
+    return landing_page(c, "kostenlose-browser-games/", "Kostenlose Browser-Games ohne Anmeldung",
+        "Kostenlose Browser-Games ohne Anmeldung und ohne Werbung: Rollenspiele, Sammelkarten, Arcade und Kinderspiele. Sofort online spielen, am PC und auf dem Handy.",
+        "Kostenlose Browser-Games", "Browser-Games · ohne Download", "Kostenlose Browser-Games ohne Anmeldung",
+        "Hier findest du alle Spiele von Lewolux Studio, die direkt im Browser laufen. Kein Download, kein Konto, keine Werbung: Spiel aussuchen, auf „Jetzt spielen“ tippen und loslegen – am PC, auf dem Tablet oder auf dem Handy.",
+        [f"{len(games)} Spiele im Browser", "Ohne Anmeldung", "Ohne Werbung & Käufe", "PC, Tablet & Handy"], content, FAQ_BROWSER, games, "assets/img/og-lewolux-studio.jpg")
+
+def page_all_games(c):
+    R = c.root; secs = []; n = 0; ordered = []
+    known = [k for k, _, _ in GROUPS]
+    for key, name, intro in GROUPS + [("_rest", "Weitere Spiele", "")]:
+        gs = [g for g in GAMES if (group_of(g) == key) or (key == "_rest" and group_of(g) not in known)]
+        if not gs: continue
+        ordered += gs
+        cards = "\n".join(lp_card(c, g, n + i, "all") for i, g in enumerate(gs)); n += len(gs)
+        more = f' <a class="lp-inline" href="{R}kinderspiele-kostenlos/">Infos für Eltern →</a>' if key == "kinder" else ""
+        secs.append(f'''  <section aria-labelledby="gr-{key}" class="lp-sec"><div class="sec-head"><div><span class="eyebrow">{len(gs)} {"Spiel" if len(gs) == 1 else "Spiele"}</span><h2 id="gr-{key}">{e(name)}</h2><p>{e(intro)}{more}</p></div></div>
+    <div class="grid lp-grid">
+{cards}
+    </div></section>''')
+    if TEASERS:
+        secs.append(f'''  <section aria-labelledby="gr-bald" class="lp-sec"><div class="sec-head"><div><span class="eyebrow">Demnächst</span><h2 id="gr-bald">In Arbeit</h2><p>Diese Spiele sind angekündigt, aber noch nicht spielbar.</p></div></div>
+    <div class="grid lp-grid">
+{chr(10).join(teaser_card(c, t) for t in TEASERS)}
+    </div></section>''')
+    content = "\n".join(secs) + f'''
+  <section aria-labelledby="ag-h" class="lp-sec" style="padding-top:0"><div class="prose">
+    <h2 id="ag-h">Im Browser oder als Download?</h2>
+    <p>Jedes Spiel startet <strong>direkt im Browser</strong>, ohne Installation und ohne Anmeldung (siehe <a href="{R}kostenlose-browser-games/">kostenlose Browser-Games</a>). Für unterwegs gibt es die meisten Spiele zusätzlich als <strong>Download</strong>: eine einzige HTML-Datei, die du am PC per Doppelklick und auf Android über „Downloads“ mit Chrome öffnest. Danach läuft das Spiel auch ohne Internet, dein Spielstand bleibt auf deinem Gerät.</p>
+    <p>Auf dem iPhone spielst du am besten direkt im Browser. Für Kinder gibt es mit <a href="{R}kids/">Lewolux Kids</a> einen eigenen Bereich mit großen Knöpfen und Vorlesefunktion.</p>
+  </div></section>
+'''
+    return landing_page(c, "kostenlose-spiele/", "Kostenlose Spiele für PC und Handy",
+        "Kostenlose Spiele für PC und Handy, sortiert nach Genre: Strategie & RPG, Sammelkarten, Arcade und Kinderspiele. Im Browser spielen oder gratis herunterladen.",
+        "Kostenlose Spiele", "Alle Spiele · nach Genre", "Kostenlose Spiele für PC und Handy",
+        "Alle Spiele von Lewolux Studio auf einer Seite, nach Genre sortiert. Ob Polit-RPG, Sammelkartenspiel, Physik-Spaß oder Lernspiel für Kinder: Alles ist kostenlos, ohne Werbung und ohne In-App-Käufe – im Browser oder als Download.",
+        [f"{len(GAMES)} Spiele", "Browser & Download", "Ohne Werbung & Käufe", "PC, Tablet & Handy"], content, FAQ_SPIELE, ordered, "assets/img/og-lewolux-studio.jpg")
+
+def page_kids_games(c):
+    R = c.root; games = [GAME_BY_ID[k["id"]] for k in KIDS if k["id"] in GAME_BY_ID]
+    grid = "\n".join(lp_card(c, g, i, "kids") for i, g in enumerate(games))
+    why = [("Keine Werbung, keine Käufe", "Keine Banner, keine Lootboxen, keine In-App-Käufe und keine Chats. Es gibt nichts, worauf Kinder versehentlich tippen und bezahlen können."),
+           ("Ohne Anmeldung", "Kein Konto, keine E-Mail-Adresse. Spielstände bleiben im Browser auf dem Gerät."),
+           ("Kids-Modus mit Elternsperre", "Im Kinderbereich sind die anderen Seiten von lewolux.de gesperrt, bis ein Erwachsener eine Rechenaufgabe löst."),
+           ("Spielen ohne Lesen", "Große Knöpfe und Bilder. Spielnamen und Hinweise werden vorgelesen."),
+           ("Lernen nebenbei", "Kritzelheld übt Buchstaben und Zahlen, die anderen Spiele Zielen, Timing und Geschicklichkeit."),
+           ("Auch als App", "Lewolux Kids lässt sich auf Handy und Tablet als App auf den Startbildschirm legen.")]
+    whyh = "".join(f'<div class="sp-why"><h3>{e(t)}</h3><p>{e(d)}</p></div>' for t, d in why)
+    rows = "".join(f'<tr><td><a href="{c.page(GAME_BY_ID[k["id"]])}">{e(k["title"])}</a></td><td>{e(k["age"])}</td><td>{e(k.get("learn", "–"))}</td></tr>' for k in KIDS if k["id"] in GAME_BY_ID)
+    content = f'''  <section aria-labelledby="kw-h" class="lp-sec"><div class="sec-head"><div><span class="eyebrow">Für Eltern</span><h2 id="kw-h">Was Eltern wissen sollten</h2></div></div><div class="sp-whys">{whyh}</div></section>
+  <section aria-labelledby="kg-h" class="lp-sec"><div class="sec-head"><div><span class="eyebrow">Lewolux Kids</span><h2 id="kg-h">Unsere Kinderspiele</h2><p>Alle Spiele laufen im Browser auf Tablet, Handy und PC. Gespielt wird im Kinderbereich <a class="lp-inline" href="{R}kids/">Lewolux Kids</a>.</p></div></div>
+    <div class="grid lp-grid">
+{grid}
+    </div>
+    <p class="lp-note"><b>Gut zu wissen:</b> Beim Öffnen von Lewolux Kids wird in diesem Browser der Kids-Modus eingeschaltet. Zurück geht es über den Knopf „Erwachsenenbereich“ und eine kleine Rechenaufgabe. Der Kids-Modus ist keine vollwertige Kindersicherung – dafür eignen sich Google Family Link (Android) oder die Bildschirmzeit (iPhone/iPad).</p>
+  </section>
+  <section aria-labelledby="ka-h" class="lp-sec" style="padding-top:0"><div class="sec-head"><div><span class="eyebrow">Altersempfehlung</span><h2 id="ka-h">Welches Spiel passt zu welchem Alter?</h2><p>Eigene Empfehlungen, keine offizielle USK-Einstufung.</p></div></div>
+    <div class="mn-table lp-table"><table><thead><tr><th>Spiel</th><th>Empfohlen</th><th>Das wird geübt</th></tr></thead><tbody>{rows}</tbody></table></div></section>
+'''
+    return landing_page(c, "kinderspiele-kostenlos/", "Kinderspiele kostenlos & ohne Werbung – Infos für Eltern",
+        "Kostenlose Kinderspiele ohne Werbung und ohne In-App-Käufe: Kritzelheld, Pandi und Schulhofkicker. Lernspiele ab 3 Jahren mit Vorlesefunktion und Elternsperre.",
+        "Kinderspiele kostenlos", "Für Eltern · Lewolux Kids", "Kostenlose Kinderspiele ohne Werbung",
+        f"Kinderspiele, die wirklich kostenlos sind: ohne Werbung, ohne In-App-Käufe und ohne Anmeldung. Hier finden Eltern alle Spiele aus <a href=\"{R}kids/\">Lewolux Kids</a> mit Altersempfehlung, Lerninhalten und Hinweisen zum Datenschutz.",
+        [f"{len(games)} Kinderspiele", f"Ab {min(a for a in (kid_age(g['id']) for g in games) if a) if any(kid_age(g['id']) for g in games) else 3} Jahren", "Ohne Werbung & Käufe", "Mit Elternsperre"], content, FAQ_KINDER, games, "assets/img/og-kids.jpg")
 
 # ---------------------------------------------------------------- Lewolux Kids
 def guard_game(f):
@@ -882,6 +1079,8 @@ def kids_page(c):
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{e(title)}">
+<meta name="twitter:description" content="{e(desc)}">
 <meta name="twitter:image" content="{SITE}assets/img/og-kids.jpg">
 <link rel="icon" type="image/png" sizes="192x192" href="{c.root}assets/img/kids-icon-192.png">
 <link rel="apple-touch-icon" href="{c.root}assets/img/kids-apple-touch-icon.png">
@@ -969,6 +1168,58 @@ def kids_build():
         "icons": [{"src": f"/assets/img/kids-icon-{n}.png", "sizes": f"{n}x{n}", "type": "image/png", "purpose": "any"} for n in (192, 512)]
                + [{"src": f"/assets/img/kids-icon-maskable-{n}.png", "sizes": f"{n}x{n}", "type": "image/png", "purpose": "maskable"} for n in (192, 512)]}, indent=1, ensure_ascii=False))
 
+# ---------------------------------------------------------------- SEO-Hilfen
+class Lastmod:
+    """<lastmod> in der Sitemap nur ändern, wenn sich der Inhalt einer Seite wirklich geändert hat
+       (Hash über Titel, Beschreibung und <main>; Stand in sitemap-lastmod.json neben build.py)."""
+    F = P("sitemap-lastmod.json")
+    def __init__(self):
+        try: self.old = json.load(open(self.F, encoding="utf-8"))
+        except Exception: self.old = {}
+        self.new, self.today = {}, datetime.date.today().isoformat()
+    def __call__(self, loc):
+        f = P("dist", loc, "index.html")
+        try: s = open(f, encoding="utf-8").read()
+        except OSError: return self.today
+        s = re.sub(r"\?v=[0-9a-f]{8}", "", s)
+        key = "".join(re.findall(r"<title>.*?</title>|<meta name=\"description\"[^>]*>", s)) + (s[s.find("<main"):s.rfind("</main>")] if "<main" in s else s)
+        h = _h.md5(key.encode()).hexdigest()
+        o = self.old.get(loc)
+        self.new[loc] = o if o and o["h"] == h else {"h": h, "d": self.today}
+        return self.new[loc]["d"]
+    def save(self): json.dump(self.new, open(self.F, "w", encoding="utf-8"), indent=0, sort_keys=True)
+
+def pdf_seo():
+    """/pdf/ (die PDF-App) bekommt Canonical, Open Graph und strukturierte Daten – die App selbst bleibt unverändert."""
+    f = P("dist/pdf/index.html")
+    if not os.path.isfile(f): return
+    s = open(f, encoding="utf-8").read()
+    if 'rel="canonical"' in s: return
+    url = SITE + "pdf/"; desc = "Lewolux PDF im Browser öffnen: kostenloser PDF-Leser ohne Werbung und ohne Anmeldung. Als App installierbar, offline nutzbar, Dateien bleiben auf dem Gerät."
+    s = re.sub(r"<title>.*?</title>", "<title>Lewolux PDF – PDF-Dateien kostenlos im Browser öffnen</title>", s, count=1, flags=re.S)
+    s = re.sub(r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{e(desc)}">', s, count=1)
+    app = {"@context": "https://schema.org", "@type": "WebApplication", "@id": url + "#app", "name": "Lewolux PDF", "url": url, "description": desc,
+           "applicationCategory": "UtilitiesApplication", "operatingSystem": "Android, iOS, Windows, Web", "browserRequirements": "Aktueller Browser (Chrome, Edge, Safari, Firefox)",
+           "inLanguage": "de", "isAccessibleForFree": True, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+           "image": SITE + "assets/og/og-software-pdf.jpg", "author": {"@type": "Organization", "@id": SITE + "#studio", "name": "Lewolux Studio", "url": SITE},
+           "mainEntityOfPage": url}
+    tags = f'''<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="{url}">
+<link rel="alternate" hreflang="de" href="{url}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lewolux Studio">
+<meta property="og:locale" content="de_DE">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{SITE}assets/og/og-software-pdf.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{SITE}assets/og/og-software-pdf.jpg">
+{ld(app)}
+'''
+    s = s.replace("</head>", tags + "</head>", 1)
+    open(f, "w", encoding="utf-8").write(s)
+
 # ---------------------------------------------------------------- build
 def main():
     d = P("dist"); shutil.rmtree(d, ignore_errors=True)
@@ -1029,6 +1280,10 @@ def main():
     deskboard_parts()
     teaser_assets()
     kids_build()
+    for path, fn in (("kostenlose-browser-games", page_browser_games), ("kostenlose-spiele", page_all_games), ("kinderspiele-kostenlos", page_kids_games)):
+        os.makedirs(P("dist", path), exist_ok=True)
+        open(P("dist", path, "index.html"), "w", encoding="utf-8").write(fn(Ctx("../")))
+    pdf_seo()
     todo = '<p class="todo">Platzhalter: Hier müssen die Pflichtangaben eingetragen werden. Bitte mit einem Generator (z. B. e-recht24.de) oder anwaltlich erstellen lassen.</p>'
     for slug, title in (("impressum", "Impressum"), ("datenschutz", "Datenschutzerklärung")):
         os.makedirs(P(f"dist/{slug}"), exist_ok=True)
@@ -1043,10 +1298,10 @@ def main():
     open(P("dist/admin/index.html"), "w", encoding="utf-8").write(part("admin.html").replace('<meta charset="utf-8">', '<meta charset="utf-8">' + KIDS_GUARD, 1).replace("{{API}}", API).replace("{{GAMES}}", json.dumps({g["id"]: g["short"] for g in GAMES}, ensure_ascii=False)))
     open(P("dist/404.html"), "w", encoding="utf-8").write(simple_page(Ctx("/"), "404", "Seite nicht gefunden", '<p class="prose">Diese Seite gibt es nicht. <a href="/">Zur Startseite</a> oder direkt zu den <a href="/#spiele">Spielen</a>.</p>').replace('content="noindex, follow"', 'content="noindex"'))
     # seo files
-    today = datetime.date.today().isoformat()
+    lastmod = Lastmod()
     def u(loc, imgs, prio):
         im = "".join(f"<image:image><image:loc>{SITE}{i}</image:loc></image:image>" for i in imgs)
-        return f"  <url><loc>{SITE}{loc}</loc><lastmod>{today}</lastmod><changefreq>weekly</changefreq><priority>{prio}</priority>{im}</url>\n"
+        return f"  <url><loc>{SITE}{loc}</loc><lastmod>{lastmod(loc)}</lastmod><changefreq>weekly</changefreq><priority>{prio}</priority>{im}</url>\n"
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
     sm += u("", ["assets/img/lewolux-studio-banner.jpg"] + [f"assets/screenshots/{g['id']}-1.jpg" for g in GAMES], "1.0")
     sm += "".join(u(f"spiele/{g['id']}/", [f"assets/screenshots/{g['id']}-{i+1}.jpg" for i in range(3)], "0.8") for g in GAMES)
@@ -1054,7 +1309,10 @@ def main():
     sm += u("ring-legends/tester/", [], "0.6")
     sm += u("kids/", ["assets/img/og-kids.jpg"] + [f"assets/screenshots/{k['id']}-1.jpg" for k in KIDS], "0.8")
     sm += "".join(u(f"software/{x['id']}/", [f"assets/screenshots/software-{x['id']}.jpg"], "0.7") for x in SOFTWARE)
+    if os.path.isfile(P("dist/pdf/index.html")): sm += u("pdf/", [], "0.6")
+    sm += "".join(u(path, [], "0.9") for path, _, _ in LANDINGS)
     open(P("dist/sitemap.xml"), "w").write(sm + "</urlset>\n")
+    lastmod.save()
     open(P("dist/robots.txt"), "w").write(f"User-agent: *\nAllow: /\nDisallow: /downloads/\nDisallow: /admin/\n\nSitemap: {SITE}sitemap.xml\n")
     # Web-App: Manifest mit normalen und "maskable" Icons (Android schneidet die Form selbst zu), Service Worker, IndexNow-Schlüssel
     lionM = Image.open(P("logo-lion.png")).convert("RGB")
@@ -1098,6 +1356,8 @@ AddType application/manifest+json .webmanifest
   Cache-Control: public, max-age=86400
 /downloads/*
   Content-Disposition: attachment
+  X-Robots-Tag: noindex
+/games/*
   X-Robots-Tag: noindex
 /*
   X-Content-Type-Options: nosniff

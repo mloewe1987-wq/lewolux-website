@@ -1,7 +1,7 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
- dict(id="mandat", ratio="816/624", scene="mandat", demo="mandat", wide=True, accent="#3be8ff",
+ dict(id="mandat", group="strategie", ratio="816/624", scene="mandat", demo="mandat", wide=True, accent="#3be8ff",
   title="Mandat – Vom Dorf ins Kanzleramt", short="Mandat", tagline="Vom Gemeinderat bis in den Bundestag.",
   desc="Starte mit 18 im Dorf, gründe deine eigene Partei oder tritt einer bei. Tägliche Umfragen, Wahlprognosen, Bürgerwünsche in Prozent und Entscheidungen, die wehtun.",
   genres=["Polit-RPG","Strategie"], cats="rpg retro", status="In Entwicklung",
@@ -12,7 +12,7 @@ GAMES = [
   shots=["Eine vertrauliche Akte: Neubaugebiet Sonnenhang","Wer bist du? Deine Figur für den Weg in die Politik","Lindenbrück: hier beginnt deine Karriere"],
   reel=["Innovation","Politik als Rollenspiel","Jeder Tag bringt neue Umfragen und Schlagzeilen."],
   download=dict(file="downloads/mandat.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
- dict(id="sternenwurf", ratio="816/624", scene="stern", demo="stern", accent="#ffcf4a",
+ dict(id="sternenwurf", group="strategie", ratio="816/624", scene="stern", demo="stern", accent="#ffcf4a",
   title="Sternenwurf", short="Sternenwurf", tagline="Ein Wurf kann alles ändern.",
   desc="Dreh am Altar der Sterne und jage 120 Ausrüstungsteile bis 1 zu 10.000.000. Verschmelze, bezwinge den Prüfungsturm, brüte 50 Pets aus und erobere 5 Welten.",
   genres=["RNG","Idle"], cats="arcade exp", status="In Entwicklung",
@@ -23,7 +23,7 @@ GAMES = [
   shots=["Das Glück fällt vom Himmel","Sternseherin Lyra im Sternenfall-Tal","Sternenwurf: das Titelbild"],
   reel=["Neu","1 zu 10.000.000","Die Krone des Alls wurde noch nie gefunden. Noch nicht."],
   download=dict(file="downloads/sternenwurf.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
- dict(id="idle-legenden", ratio="816/624", scene="idle", demo="idle", accent="#ff8a3d",
+ dict(id="idle-legenden", group="strategie", ratio="816/624", scene="idle", demo="idle", accent="#ff8a3d",
   title="Idle Legenden", short="Idle Legenden", tagline="Die Loot-Spirale dreht sich auch, wenn du schläfst.",
   desc="Düsteres Idle-RPG mit Loot, Charakter-Progression und Base-Building. Baue Goldhafen vom Lager zur Handelsstadt aus und schick deine Helden immer tiefer.",
   genres=["Idle-RPG","Dark Fantasy"], cats="rpg retro", status="In Entwicklung",
@@ -34,7 +34,7 @@ GAMES = [
   shots=["Ratgeberin Elara: Bring Goldhafen zum Leuchten","Goldhafen unter dem Grauen Schleier","Idle Legenden: das Titelbild"],
   reel=["Gameplay","Zahlen, die explodieren","Von 10 Gold bis 47 Milliarden."],
   download=dict(file="downloads/idle-legenden.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
- dict(id="wrestling-tcg", ratio="9/16", scene="wrestle", demo="wrestle", accent="#ff5ad1",
+ dict(id="wrestling-tcg", group="sammeln", ratio="9/16", scene="wrestle", demo="wrestle", accent="#ff5ad1",
   title="Ring Legends", short="Ring Legends", tagline="Reiß das Pack auf. Hol dir den Titel.",
   desc="Online-Sammelkartenspiel mit fiktiven Wrestlern: Packs aufreißen, 316 Karten sammeln, graden und auf dem Markt mit anderen Spielern handeln. Kein Pay-to-Win.",
   genres=["Sammelkarten","Online","Pack-Opening"], cats="arcade", status="Großes Update", online=True,
@@ -58,7 +58,7 @@ GAMES = [
           ("🔑", "Ohne Pflicht-Anmeldung", "Sofort losspielen, ganz ohne Konto. Mit „Weiter mit Google“ schaltest du Markt und Ranglisten frei und spielst auf jedem Gerät weiter."),
           ("📱", "Bald bei Google Play", "Die Android-App ist in Vorbereitung. Mit Google angemeldet nimmst du deine Sammlung einfach mit.")],
    note="Wichtig für alle, die schon gespielt haben: Die neue Version startet mit einer frischen Sammlung auf dem Server. Alte Spielstände aus dem Browser lassen sich nicht übernehmen, weil sie nicht fälschungssicher sind.")),
- dict(id="kritzelheld", orient="any", ratio="16/10", scene="kritzel", demo="kritzel", accent="#7dff9e",
+ dict(id="kritzelheld", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="kritzel", accent="#7dff9e",
   title="Kritzelheld", short="Kritzelheld", tagline="Schreiben lernen mit Eule Kritzel.",
   desc="Werbefreie Lern-App für Kinder: Buchstaben und Zahlen nachfahren, Federn sammeln und die Eule im Shop einkleiden. Mit Schatzkarte, Minispielen und Elternsperre.",
   genres=["Lernen","Kinder"], cats="family exp", status="Beta",
@@ -69,7 +69,7 @@ GAMES = [
   shots=["Wer spielt heute? Profil wählen","Buchstaben nachspuren und Torschuss","Lernspiele mit Eule Kritzel"],
   reel=["Family","Lernen, das sich wie Spielen anfühlt","Kinder sehen sofort, wie viel sie geschafft haben."],
   download=dict(file="downloads/kritzelheld.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
- dict(id="nervbert", orient="any", ratio="16/10", scene="kasse", demo="none", accent="#ff9a3d",
+ dict(id="nervbert", group="arcade", orient="any", ratio="16/10", scene="kasse", demo="none", accent="#ff9a3d",
   title="Hau den Nervbert", short="Nervbert", tagline="Der nervigste Onkel der Welt. Du hast den Boxhandschuh.",
   desc="Physik-Slapstick im Browser: Spann den Boxhandschuh wie eine Schleuder, schick Nervbert durch Sandburgen, Windmühlen und Gartenzwerge und kauf dir mit den Münzen bessere Handschuhe. 27 Level, kostenlos.",
   genres=["Arcade","Physik"], cats="arcade", status="Neu",
@@ -80,7 +80,7 @@ GAMES = [
   shots=["Spannen, zielen, zuschlagen","Nervbert fliegt durch die Sandburg","Upgrades im Handschuh-Shop"],
   reel=["Arcade","Slapstick mit Physik","Ein Schlag, viel Chaos."],
   download=dict(file="downloads/nervbert.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
- dict(id="pandi", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#7fd6ff",
+ dict(id="pandi", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#7fd6ff",
   title="Pandi – Blubber, Plopp & Boing!", short="Pandi", tagline="Ein kleiner Panda, viele Seifenblasen.",
   desc="Kinderspiel ohne Werbung: Panda Pandi wirft Seifenblasen, Luftballons und Bälle und lässt Ziele ploppen. 36 kurze Level, große Knöpfe, ohne Lesen spielbar.",
   genres=["Kinder","Geschicklichkeit"], cats="family", status="Neu",
@@ -91,7 +91,7 @@ GAMES = [
   shots=["Pandi wirft Seifenblasen","Ballons zum Ploppen","Level-Karte mit Sternen"],
   reel=["Family","Blubbern, ploppen, lachen","Ein Panda für die Kleinsten."],
   download=dict(file="downloads/pandi.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
- dict(id="schulhofkicker", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#ffb020",
+ dict(id="schulhofkicker", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#ffb020",
   title="Schulhofkicker", short="Schulhofkicker", tagline="Sieben Fußballspiele für kleine Kicker.",
   desc="Kinder-Fußballspiel ohne Werbung: Weitschuss bis ins Wolkenland, Elfmeterschießen gegen 19 verrückte Torhüter, Kopfball-Duell, Spielzüge malen, Trick-Show, Jonglieren und Dribbeln. Mit Umkleide für den eigenen Kicker.",
   genres=["Kinder","Fußball"], cats="family", status="Neu",
@@ -102,7 +102,7 @@ GAMES = [
   shots=["Der Schulhof mit allen Spielen","Weitschuss über die Stadt","Elfmeter gegen den Feuerwehr-Torwart"],
   reel=["Family","Fußball für die Pause","Sieben Spiele, ein Ball."],
   download=dict(file="downloads/schulhofkicker.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
- dict(id="kasse-oder-zettel", ratio="816/624", scene="kasse", demo="kasse", accent="#3be8ff",
+ dict(id="kasse-oder-zettel", group="arcade", ratio="816/624", scene="kasse", demo="kasse", accent="#3be8ff",
   title="Kasse oder Zettel?", short="Kasse oder Zettel", tagline="Zettel gegen Kasse: Wer schafft den Freitagabend?",
   desc="Bediene ein volles Restaurant und spüre den Unterschied: mobile Kasse gegen Zettelwirtschaft. 8 Level, vom Mittagstisch bis Silvester.",
   genres=["Simulation","Arcade"], cats="arcade retro", status="Spielbar",
@@ -113,7 +113,7 @@ GAMES = [
   shots=["Schicht in der Pizzeria: Tisch 1 will bestellen","Kasse oder Zettel? Das Titelbild","8 Level von Mittagstisch bis Silvester"],
   reel=["Simulation","Spielend verstehen","Zeigt, was eine Kasse im Service verändert."],
   download=dict(file="downloads/kasse-oder-zettel.html", format="HTML · 1 Datei, offline spielbar (PC & Handy)")),
- dict(id="ordnungsgilde", ratio="9/16", scene="ordnung", demo="ordnung", wide=True, accent="#9b5cff",
+ dict(id="ordnungsgilde", group="alltag", ratio="9/16", scene="ordnung", demo="ordnung", wide=True, accent="#9b5cff",
   title="Ordnungsgilde", short="Ordnungsgilde", tagline="Aufräumen als Rollenspiel.",
   desc="Die Wohnung als Abenteuer: tägliche Quests, XP, Level, Streaks und ein Shop für deinen Avatar. Plötzlich macht Staubsaugen Spaß.",
   genres=["Gamification","Lifestyle"], cats="family exp", status="Prototyp",
@@ -169,13 +169,13 @@ SEO = {
         "Jeden Tag gibt es neue <strong>Umfragen und Wahlprognosen</strong> mit Diagrammen, Nachrichten über die anderen Parteien und Bürgerwünsche in Prozent. Aktuelle Themen wie Klimaschutz, Migration und Infrastruktur sorgen für Events mit harten Entscheidungen, bei denen es selten eine Lösung gibt, die alle glücklich macht. Das Spiel erklärt dabei viel und führt dich verständlich durch das politische System.",
         "Mandat läuft kostenlos direkt im Browser, auf dem Handy im Vollbild und unterstützt Gamepads. Während der Entwicklung kannst du das Spiel außerdem gratis als Early Access herunterladen."]),
  "sternenwurf": dict(
-  title="Sternenwurf – RNG-Spiel kostenlos im Browser",
+  title="Sternenwurf – kostenloses RNG-Spiel im Browser",
   meta="Sternenwurf: Dreh am Altar, jage 120 Teile bis 1 zu 10.000.000, brüte 50 Pets aus und erobere 5 Welten. Kostenloses RNG- und Idle-Spiel.",
   long=["<strong>Sternenwurf</strong> ist ein RNG-Sammelspiel im Stil beliebter Glücksspiele ohne echtes Geld: Am Altar der Sterne drehst du um Ausrüstung und hoffst auf die seltensten Funde. 120 Teile in fünf Seltenheiten von Gewöhnlich bis Kosmisch warten, das seltenste ist die <strong>Krone des Alls mit 1 zu 10.000.000</strong>.",
         "Gleiche Teile verschmilzt du zu stärkeren Versionen, mit deinem Gearscore bezwingst du die 30 Etagen des Prüfungsturms und schaltest fünf Welten mit immer mehr Glück frei. Im Sternengarten brütest du <strong>50 Pets</strong> aus, Holzfäller und Bergleute bringen Gold, auch während Auto-Roll für dich dreht. Die Dreh-Animation lässt sich jederzeit überspringen.",
         "Sternenwurf ist kostenlos, braucht keinen Account und läuft im Browser auf PC, Tablet und Smartphone."]),
  "idle-legenden": dict(
-  title="Idle Legenden – Idle-RPG kostenlos spielen",
+  title="Idle Legenden – kostenloses Idle-RPG im Browser",
   meta="Idle Legenden: düsteres Idle-RPG mit Loot-Spirale, Charakter-Progression und Base-Building. Kostenlos im Browser oder als Early Access.",
   long=["<strong>Idle Legenden</strong> ist ein Idle- und Incremental-RPG mit düsterer Fantasy-Welt. Deine Helden kämpfen auch dann weiter, wenn du gerade nicht spielst, sammeln Gold und finden immer bessere Ausrüstung. Die Loot-Spirale sorgt dafür, dass jeder Kampf ein bisschen stärker macht.",
         "Neben den Kämpfen in vier Portalen bis zum Boss baust du die Stadt <strong>Goldhafen</strong> aus: Minenarbeiter, Farmen, Goldgolems und Bankiers bringen Gold pro Sekunde, jede der fünf Stadtstufen vertreibt ein Stück des Grauen Schleiers. Mit der Goldenen Wiedergeburt startest du neu und wirst mit jedem Durchlauf dauerhaft stärker.",
@@ -187,7 +187,7 @@ SEO = {
         "Mit dem <strong>großen Update</strong> ist Ring Legends ein echtes Online-Spiel: Deine Sammlung liegt sicher auf unserem Server, jedes Pack wird dort gezogen, Schummeln ist ausgeschlossen. Auf dem <strong>Markt</strong> handelst du Karten mit anderen Spielern um W$, in den <strong>Ranglisten</strong> vergleichst du dein Album, und der <strong>Pop-Report</strong> zeigt, wie oft eine Karte weltweit die Traumnote 10 bekommen hat.",
         "Du kannst sofort ohne Anmeldung losspielen. Markt und Ranglisten schaltest du mit „Weiter mit Google“ frei, dann spielst du auch auf jedem Gerät weiter. Ring Legends ist fair und kein Pay-to-Win. Die Android-App für Google Play ist in Vorbereitung."]),
  "kritzelheld": dict(
-  title="Kritzelheld – Schreiben lernen App für Kinder",
+  title="Kritzelheld – kostenlose Schreiblern-App für Kinder",
   meta="Kritzelheld: werbefreie Lern-App, mit der Kinder Buchstaben und Zahlen schreiben lernen. Mit Eule Kritzel, Federn, Shop und Minispielen.",
   long=["<strong>Kritzelheld</strong> ist eine werbefreie Lern-App, mit der Kinder spielerisch <strong>Buchstaben und Zahlen schreiben lernen</strong>. Das Kind fährt die Zeichen mit dem Finger nach, die App zeigt in Prozent, wie genau es war. Die Schwelle lässt sich für jedes Alter passend einstellen.",
         "Für jede gelungene Übung gibt es Federn. Damit kann die Eule Kritzel im Shop neue Outfits und Accessoires bekommen. Eine Schatzkarte, Erfolge und Minispiele wie Malen nach Zahlen sorgen für Motivation. Mehrere Kinderprofile und eine Elternsperre sind eingebaut.",
@@ -199,7 +199,7 @@ SEO = {
         "Für jeden Treffer gibt es Münzen und bis zu drei Sterne. Damit kaufst du stärkere Handschuhe und bessere Seile. 27 Level mit steigendem Chaos warten auf dich.",
         "Hau den Nervbert läuft ohne Anmeldung und ohne Download direkt im Browser, am PC und auf dem Handy."]),
  "pandi": dict(
-  title="Pandi – kostenloses Kinderspiel mit Panda",
+  title="Pandi – kostenloses Kinderspiel im Browser",
   meta="Pandi – Blubber, Plopp & Boing! Kostenloses Kinderspiel ohne Werbung: Der kleine Panda wirft Seifenblasen, Luftballons und Bälle. 36 Level, ab 3 Jahren.",
   long=["<strong>Pandi – Blubber, Plopp & Boing!</strong> ist ein kostenloses <strong>Kinderspiel ohne Werbung</strong>. Der kleine Panda Pandi wirft Seifenblasen, Luftballons und Bälle und bringt Ziele zum Ploppen.",
         "36 kurze Level, große Knöpfe und einfache Wischgesten machen das Spiel schon für Kinder ab 3 Jahren leicht. Lesen ist nicht nötig. Wer Pandi antippt, bringt ihn zum Lachen.",
@@ -211,7 +211,7 @@ SEO = {
         "Im Elfmeterschießen warten 19 Torhüter vom Kita-Torwart bis zum Bagger- und Feuerwehr-Torwart. Dazu kommen Kopfball-Duell, Spielzüge zum Malen, Trick-Show, Jonglieren und Dribbeln.",
         "Mit den Münzen kleidet das Kind seinen eigenen Kicker in der Umkleide ein. Schulhofkicker gehört zu Lewolux Kids: keine Werbung, keine Käufe, keine Anmeldung."]),
  "kasse-oder-zettel": dict(
-  title="Kasse oder Zettel? – Gastro-Spiel im Browser",
+  title="Kasse oder Zettel? – Gastro-Spiel kostenlos im Browser",
   meta="Kasse oder Zettel? Schichtsimulator in der Pizzeria: Erlebe spielerisch, wie viel Zeit eine mobile Kasse gegenüber dem Bestellblock spart.",
   long=["<strong>Kasse oder Zettel?</strong> ist ein Schichtsimulator in der Gastronomie. Du bedienst ein volles Restaurant und erlebst direkt den Unterschied zwischen dem klassischen Bestellblock und einer <strong>mobilen Kasse</strong>, die Bestellungen sofort in die Küche schickt.",
         "8 Level mit steigendem Tempo, vom ruhigen Mittagstisch bis zur Silvesternacht, machen den Vergleich greifbar. Jedes Level spielst du zweimal mit denselben Gästen, erst mit Zettel, dann mit Kasse, und siehst am Ende Umsatz, Trinkgeld und Sterne im direkten Vergleich. Auf dem Handy läuft das Spiel im echten Vollbild.",
@@ -256,15 +256,18 @@ NEWS = [
 KIDS = [
  dict(id="kritzelheld", title="Kritzelheld", emoji="🦉", c1="#3ec97a", c2="#19a7e0", age="ab 4 Jahren",
   line="Buchstaben und Zahlen malen mit Eule Kritzel",
+  learn="Buchstaben und Zahlen schreiben, Feinmotorik",   # für Eltern (Übersichtsseite /kinderspiele-kostenlos/)
   say="Kritzelheld! Male Buchstaben und Zahlen mit Eule Kritzel und sammle Federn.",
   mascot="owl", crowd=1,        # Figur, die unten auf der Wiese herumläuft (owl, panda, …) und wie viele davon
   preview="kritzel"),           # animierte Vorschau auf der Karte (Renderer in parts/kids.js); ohne: Screenshot
  dict(id="pandi", title="Pandi", emoji="🐼", c1="#7fd6ff", c2="#c58bff", age="ab 3 Jahren",
   line="Seifenblasen, Ballons und Bälle mit Panda Pandi",
+  learn="Zielen, Hand-Auge-Koordination",
   say="Pandi! Wirf Seifenblasen und Luftballons mit dem kleinen Panda.",
   mascot="panda", crowd=1),
  dict(id="schulhofkicker", title="Schulhofkicker", emoji="⚽", c1="#ffb020", c2="#ff3d6e", age="ab 5 Jahren",
   line="Schießen, köpfen, Tricks: sieben Fußballspiele",
+  learn="Zielen, Timing, Reaktion",
   say="Schulhofkicker! Schieß den Ball ganz weit, halte Elfmeter und zeig deine Tricks.",
   mascot="kicker", crowd=1),
 ]
@@ -282,3 +285,35 @@ KIDS_PHRASES = {
  "quit": "Spiel beenden?",
  "no": "Nein, weiterspielen!",
 }
+
+# ---------------------------------------------------------------- Übersichtsseiten (SEO-Landingpages)
+# Gruppen für /kostenlose-spiele/. Neues Spiel: group="..." im GAMES-Eintrag setzen (sonst wird es über cats einsortiert).
+GROUPS = [
+ ("strategie", "Strategie, Rollenspiel & Idle", "Spiele zum Planen, Sammeln und Aufleveln. Ideal für zwischendurch, der Fortschritt bleibt im Browser gespeichert."),
+ ("sammeln", "Sammelkarten & Online", "Packs öffnen, Karten sammeln und mit anderen Spielern handeln."),
+ ("arcade", "Arcade, Physik & Simulation", "Kurze Runden, schnelle Reaktionen und viel Chaos."),
+ ("kinder", "Kinder & Familie", "Werbefreie Spiele für Kinder, mit großen Knöpfen und ohne Käufe. Alle auch im Kinderbereich Lewolux Kids."),
+ ("alltag", "Alltag & Experimente", "Kleine Prototypen, die aus Alltagsaufgaben ein Spiel machen."),
+]
+
+FAQ_BROWSER = [
+ ("Was sind Browser-Games?", "Browser-Games sind Spiele, die direkt im Webbrowser laufen, zum Beispiel in Chrome, Firefox, Safari oder Edge. Du öffnest die Seite, tippst auf „Jetzt spielen“ und das Spiel startet. Ein Programm aus dem App Store oder eine Installation ist nicht nötig."),
+ ("Muss ich etwas installieren oder mich anmelden?", "Nein. Alle Spiele auf dieser Seite starten ohne Installation und ohne Anmeldung. Wer möchte, kann die meisten Spiele zusätzlich als einzelne HTML-Datei herunterladen und offline spielen. Nur bei Ring Legends gibt es eine freiwillige Anmeldung mit Google für Markt und Ranglisten."),
+ ("Laufen die Spiele auch auf dem Handy?", "Ja. Alle Spiele laufen in aktuellen Browsern auf Smartphone, Tablet und PC. Die RPG-Maker-Spiele hältst du am besten quer, Ring Legends spielt man hochkant."),
+ ("Kosten die Spiele etwas oder gibt es Werbung?", "Nein. Lewolux Studio ist ein privates Hobbyprojekt. Alle Spiele sind kostenlos, es gibt keine Werbung, keine In-App-Käufe und kein Abo."),
+ ("Was passiert mit meinen Daten?", "Die Website setzt keine Tracking-Cookies und zeigt keine Werbung. Spielstände bleiben in der Regel im Browser auf deinem Gerät. Ausnahme ist das Online-Spiel Ring Legends: Dort wird deine Sammlung auf unserem Server gespeichert. Details stehen in der Datenschutzerklärung."),
+]
+
+FAQ_SPIELE = [
+ ("Sind die Spiele wirklich kostenlos?", "Ja. Alle Spiele von Lewolux Studio sind kostenlos, ohne Werbung und ohne In-App-Käufe. Viele Spiele sind noch in Entwicklung (Early Access) und werden laufend erweitert."),
+ ("Kann ich die Spiele herunterladen?", "Die meisten Spiele gibt es als Download: eine einzige HTML-Datei, die du am PC per Doppelklick oder auf Android mit Chrome öffnest. Sie läuft danach auch offline. Ring Legends ist ein Online-Spiel und läuft im Browser, eine Android-App ist in Vorbereitung."),
+ ("Welche Spiele eignen sich für Kinder?", "Kritzelheld, Pandi und Schulhofkicker sind für Kinder gemacht. Du findest sie gesammelt im Kinderbereich Lewolux Kids und auf der Seite „Kostenlose Kinderspiele ohne Werbung“ mit Hinweisen für Eltern."),
+]
+
+FAQ_KINDER = [
+ ("Sind die Kinderspiele wirklich ohne Werbung?", "Ja. In keinem Spiel von Lewolux Kids gibt es Werbung, In-App-Käufe, Lootboxen oder Chats. Es gibt auch kein Konto und keine Anmeldung."),
+ ("Ab welchem Alter sind die Spiele geeignet?", "Unsere Empfehlung: Pandi ab 3 Jahren, Kritzelheld ab 4 Jahren, Schulhofkicker ab 5 Jahren. Das sind eigene Empfehlungen, keine offizielle USK-Einstufung."),
+ ("Braucht mein Kind lesen zu können?", "Nein. Die Spiele kommen mit großen Symbolen aus, im Kinderbereich werden Spielnamen und Hinweise vorgelesen."),
+ ("Was ist der Kids-Modus?", "Sobald Lewolux Kids geöffnet wird, ist in diesem Browser der Kids-Modus aktiv: Die anderen Bereiche von lewolux.de sind dann gesperrt, bis ein Erwachsener eine kleine Rechenaufgabe löst. Das ist keine vollwertige Kindersicherung. Andere Apps und Webseiten sichern Sie mit Google Family Link (Android) oder der Bildschirmzeit (iPhone/iPad)."),
+ ("Werden Daten meines Kindes gespeichert?", "Spielstände bleiben im Browser auf dem Gerät. Die Kinderspiele brauchen kein Konto, setzen keine Tracking-Cookies und senden keine Spieldaten an uns."),
+]
