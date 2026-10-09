@@ -1288,6 +1288,9 @@ def main():
     for g in GAMES:
         os.makedirs(P("dist/games", g["id"]), exist_ok=True)
         if not has_game(g): open(P("dist/games", g["id"], "HIER-WEB-EXPORT-REIN.txt"), "w", encoding="utf-8").write(f"Den Web-Export von {g['title']} hier hineinkopieren (index.html muss direkt in diesem Ordner liegen). Danach ist das Spiel auf der Website sofort spielbar.\n")
+    # Prototyp Lewolux Turbo (nicht verlinkt, noindex)
+    if os.path.isfile(P("spiele-intern/lewolux-turbo/index.html")):
+        shutil.copytree(P("spiele-intern/lewolux-turbo"), P("dist/turbo"), dirs_exist_ok=True)
     print("Spiele im Browser:", [g["id"] for g in GAMES if has_game(g)] or "noch keine (Ordner spiele-dateien/ füllen)")
     # pages
     open(P("dist/index.html"), "w", encoding="utf-8").write(index_page(Ctx("./")))
