@@ -1024,8 +1024,12 @@ def kids_voice(texts):
     """Gibt {Text: URL} zurück. Fehlt Piper/ffmpeg, bleibt die Liste leer -> die Seite liest dann mit der Browserstimme vor."""
     import subprocess, tempfile, wave
     cache = P("kids-voice"); os.makedirs(cache, exist_ok=True); os.makedirs(P("dist/kids/voice"), exist_ok=True)
+    json.dump(list(dict.fromkeys(x.strip() for x in texts if x and x.strip())), open(P("kids-voice-texts.json"), "w"), ensure_ascii=False, indent=0)
     out, voice = {}, None
     for t in dict.fromkeys(x.strip() for x in texts if x and x.strip()):
+        el = P("kids-voice-el", _h.md5(("el|" + t).encode()).hexdigest()[:12] + ".mp3")  # ElevenLabs-Aufnahme (Eule Kritzel), falls vorhanden
+        if os.path.isfile(el):
+            h = "e" + os.path.basename(el)[:-4]; shutil.copy(el, P("dist/kids/voice", h + ".mp3")); out[t] = f"/kids/voice/{h}.mp3"; continue
         h = _h.md5((os.path.basename(KIDS_VOICE_MODEL) + KIDS_VOICE_AF + json.dumps(KIDS_VOICE_SYN) + t).encode()).hexdigest()[:12]; f = os.path.join(cache, h + ".mp3")
         if not os.path.isfile(f):
             try:

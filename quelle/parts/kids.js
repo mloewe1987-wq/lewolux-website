@@ -32,12 +32,12 @@
     if(!t) return; t=String(t).trim();
     try{ if(cur){ cur.pause(); cur.currentTime=0; } }catch(_){}
     try{ speechSynthesis.cancel(); }catch(_){}
-    if(tts(t)) return;
-    const url=D.voice&&D.voice[t]; if(!url) return;
-    try{ const a=audio(url); cur=a; a.currentTime=0; const r=a.play(); if(r&&r.catch) r.catch(()=>{}); }catch(_){}
+    const url=D.voice&&D.voice[t];
+    if(!url){ tts(t); return; }
+    try{ const a=audio(url); cur=a; a.currentTime=0; const r=a.play(); if(r&&r.catch) r.catch(()=>tts(t)); }catch(_){ tts(t); }
   }
   // Kurze Dateien vorab laden, damit der erste Tipp sofort klingt
-  addEventListener('load',()=>setTimeout(()=>{ try{ if(!voice) Object.values(D.voice||{}).forEach(audio); }catch(_){} },1500));
+  addEventListener('load',()=>setTimeout(()=>{ try{ Object.values(D.voice||{}).forEach(audio); }catch(_){} },1500));
   document.addEventListener('click',e=>{ const el=e.target.closest('[data-say]'); if(el) say(el.dataset.say); });
 
   /* ---- Spiel im Kinderbereich öffnen (Vollbild, ohne die Erwachsenen-Seiten zu verlassen) ---- */
