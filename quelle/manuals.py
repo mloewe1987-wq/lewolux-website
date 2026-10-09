@@ -149,6 +149,29 @@ MANUALS = {
 
 # ---------------------------------------------------------------- Software-Seiten
 SOFTWARE_PAGES = {
+ "pdf": dict(
+  claim="PDFs lesen. Kostenlos. Ohne Werbung.", sub="Ein schneller PDF-Leser für Handy, Tablet und Windows-PC. Läuft im Browser oder als installierte App, auch offline. Deine Dateien bleiben auf deinem Gerät.",
+  status="Version 1.0", cta="app",
+  meta="Lewolux PDF: kostenloser PDF-Leser ohne Werbung für Android, iPhone und Windows. Offline nutzbar, Suche, Inhaltsverzeichnis, Nachtmodus, Präsentation. Keine Anmeldung, Dateien bleiben auf dem Gerät.",
+  why=[("Wirklich kostenlos", "Keine Werbung, kein Abo, keine Anmeldung, keine versteckten Käufe."),
+       ("Deine Dateien bleiben bei dir", "PDFs werden nirgendwo hochgeladen. Alles passiert auf deinem Gerät."),
+       ("Überall gleich", "Auf Android, iPhone und Windows dieselbe App, offline nutzbar.")],
+  steps=[("Öffnen", "lewolux.de/pdf aufrufen."),
+         ("Installieren", "Auf „App installieren“ tippen (Android, Windows) oder im iPhone-Teilen-Menü „Zum Home-Bildschirm“ wählen."),
+         ("PDF wählen", "Datei öffnen, hineinziehen oder auf Android aus einer anderen App teilen."),
+         ("Lesen", "Zoomen, suchen, springen. Beim nächsten Mal geht es auf der letzten Seite weiter.")],
+  feats=[("file", "Schnell auch bei großen PDFs", "Hunderte Seiten ohne Ruckeln", "Es werden nur die sichtbaren Seiten gezeichnet. Zoom mit zwei Fingern, Doppeltipp, Strg + Mausrad oder Knöpfen."),
+         ("eye", "Suche & Inhaltsverzeichnis", "Treffer werden markiert", "Volltextsuche mit Hervorhebung, Seitenvorschau am Rand, Inhaltsverzeichnis und klickbare Links."),
+         ("toggle", "Nachtmodus & Sepia", "Angenehm lesen am Abend", "Helles oder dunkles Design, dazu Lesemodi Normal, Sepia und Nacht."),
+         ("grid", "Präsentation", "Seite für Seite wischen", "Vollbild-Präsentation, Drehen, Seitenzahl eingeben und direkt springen."),
+         ("folder", "Zuletzt geöffnet", "Mit Vorschaubild und Fortschritt", "Die letzten Dateien bleiben auf dem Gerät gespeichert und öffnen an der zuletzt gelesenen Seite."),
+         ("win", "Standard-App unter Windows", "Nach der Installation", "Installiert über Chrome oder Edge kann Lewolux PDF als Programm für PDF-Dateien gewählt werden."),
+         ("print", "Drucken & Teilen", "Auch passwortgeschützte PDFs", "Drucken, herunterladen, teilen und Dokumentinfos ansehen. Geschützte PDFs fragen nach dem Passwort.")],
+  manual=[("Ist Lewolux PDF wirklich kostenlos?", "Ja. Ohne Werbung, ohne Abo und ohne Anmeldung."),
+          ("Werden meine PDFs hochgeladen?", "Nein. Die Dateien werden nur auf deinem Gerät geöffnet und gespeichert. Es gibt keinen Server, der sie sieht."),
+          ("Wie installiere ich die App auf dem Handy?", "Android: lewolux.de/pdf in Chrome öffnen und „App installieren“ tippen. iPhone: in Safari auf Teilen tippen und „Zum Home-Bildschirm“ wählen."),
+          ("Wie installiere ich die App unter Windows?", "lewolux.de/pdf in Chrome oder Edge öffnen und oben in der Adressleiste auf das Installieren-Symbol klicken. Danach steht Lewolux PDF im Startmenü und kann PDF-Dateien öffnen."),
+          ("Funktioniert die App ohne Internet?", "Ja. Nach dem ersten Öffnen läuft sie komplett offline.")]),
  "diktakte": dict(
   claim="Diktieren. Ablegen. Erledigt.", sub="Diktierprogramm für Anwältinnen und Anwälte: juristische Schreibweise, Aktenverwaltung, Fristen und E-Mail-Versand in einem Programm. Die Spracherkennung läuft komplett auf dem eigenen PC.",
   status="Hobbyprojekt · Version 0.7", cta="feedback",

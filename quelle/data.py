@@ -127,6 +127,9 @@ GAMES = [
 ]
 
 SOFTWARE = [
+ dict(id="pdf", scene="desk", title="Lewolux PDF", cat="PDF-Leser · Handy & Windows · Kostenlos",
+  desc="Kostenloser PDF-Leser ohne Werbung für Android, iPhone und Windows. Schnell, offline nutzbar, mit Suche, Inhaltsverzeichnis und Nachtmodus. Deine Dateien bleiben auf deinem Gerät.",
+  feats=["Ohne Werbung, ohne Anmeldung","Suche, Inhaltsverzeichnis, Nachtmodus","Offline nutzbar, als App installierbar","Dateien bleiben auf dem Gerät"], tech=["Web-App","Android","Windows"]),
  dict(id="diktakte", scene="kanzlei", title="Diktakte", cat="Kanzlei-Software · Windows",
   desc="Diktieren. Ablegen. Erledigt. Diktierprogramm für Anwälte mit juristischer Schreibweise, Aktenverwaltung, Fristen und E-Mail-Versand. Die Spracherkennung läuft komplett lokal.",
   feats=["Spracherkennung lokal, ohne Cloud","§ 823 Abs. 1 BGB statt „Paragraph achthundert…“","Fristen nach BGB und ZPO mit Vorfrist","Briefe, PDF/A, E-Mail und beA-Versand"], tech=["Windows",".NET 8","Whisper"]),

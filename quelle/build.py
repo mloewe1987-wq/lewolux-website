@@ -186,6 +186,8 @@ def reel(c, g):
 
 def sw_actions(c, s):
     more = f'<a class="btn btn-play" href="{"#sw-" + s["id"] if c.preview else c.root + "software/" + s["id"] + "/"}">Mehr erfahren</a>'
+    if s["id"] == "pdf":
+        return more + f'<a class="btn btn-dl rec" href="{c.root}pdf/" target="_blank" rel="noopener">Jetzt öffnen<span class="rec-b">Gratis</span></a>'
     if s["id"] == "deskboard":
         dl = deskboard_dl(c)
         return more + (f'<a class="btn btn-dl rec" href="{dl}">{DL}Kostenlos laden<span class="rec-b">Gratis</span></a>' if dl else f'<span class="btn btn-dl is-off" aria-disabled="true">{DL}Download bald</span>')
@@ -449,6 +451,8 @@ def software_page(c, sw_):
     if sp["cta"] == "download":
         cta = (f'<a class="btn btn-primary btn-lg" href="{dl}"{" download" if dl.startswith(c.root) else ""}>{DL}Kostenlos herunterladen</a><span class="sw-note">Für Windows 10 und 11 · kostenlos, ohne Werbung</span>' if dl
                else f'<span class="btn btn-primary btn-lg is-off" aria-disabled="true">{DL}Download in Kürze</span><span class="sw-note">Kostenlos für Windows · die Setup-Datei folgt in Kürze</span>')
+    elif sp["cta"] == "app":
+        cta = f'<a class="btn btn-primary btn-lg" href="{c.root}pdf/">Lewolux PDF öffnen</a><span class="sw-note">Kostenlos für Android, iPhone und Windows · dort „App installieren“ wählen</span>'
     else:
         cta = f'<a class="btn btn-primary btn-lg" href="{c.root}#mitmachen">Feedback geben</a><span class="sw-note">Privates Hobbyprojekt · nicht käuflich</span>'
     why = "".join(f'<div class="sp-why"><h3>{e(t)}</h3><p>{e(d)}</p></div>' for t, d in sp["why"])
@@ -467,6 +471,7 @@ def software_page(c, sw_):
     app = {"@type": "SoftwareApplication", "name": sw_["title"], "description": sp["meta"], "url": SITE + url, "image": f"{SITE}assets/screenshots/software-{sid}.jpg",
            "applicationCategory": "BusinessApplication" if sid != "deskboard" else "UtilitiesApplication", "operatingSystem": "Windows" if "Windows" in sw_["cat"] else "Web",
            "author": {"@id": SITE + "#studio"}, "inLanguage": "de"}
+    if sid == "pdf": app.update({"applicationCategory": "UtilitiesApplication", "operatingSystem": "Android, iOS, Windows, Web", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "installUrl": SITE + "pdf/"})
     if sid == "deskboard": app["offers"] = {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}
     if dl and sid == "deskboard": app["downloadUrl"] = dl if dl.startswith("http") else SITE + "downloads/" + deskboard_setup()
     jsonld = [{"@context": "https://schema.org", "@graph": [ORG, app,
@@ -987,6 +992,8 @@ def main():
         for w in ws: shutil.copy(P(f"fontsrc/node_modules/@fontsource/{slug}/files/{slug}-latin-{w}-normal.woff2"), P("dist/assets/fonts"))
     open(P("dist/assets/css/site.css"), "w", encoding="utf-8").write(font_face("../fonts/") + "\n" + part("style.css"))
     open(P("dist/assets/js/app.js"), "w", encoding="utf-8").write(app_js())
+    if os.path.isdir(P("pdf-leser-app")):
+        shutil.copytree(P("pdf-leser-app"), P("dist/pdf"), dirs_exist_ok=True)
     if os.path.isdir(P("video")):
         shutil.copytree(P("video"), P("dist/assets/video"), dirs_exist_ok=True)
     if os.path.isdir(P("lux-voice")):

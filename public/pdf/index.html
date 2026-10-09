@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="de" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lewolux PDF – kostenloser PDF-Leser ohne Werbung</title>
+<meta name="description" content="Lewolux PDF: schneller, kostenloser PDF-Leser als App – ohne Werbung, ohne Anmeldung, funktioniert offline. Deine Dateien bleiben auf deinem Gerät.">
+<meta name="theme-color" content="#0b0c12">
+<meta name="color-scheme" content="dark light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lewolux PDF">
+<meta property="og:title" content="Lewolux PDF – kostenloser PDF-Leser">
+<meta property="og:description" content="Ohne Werbung, ohne Anmeldung, offline nutzbar. Deine Dateien bleiben auf deinem Gerät.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preload" href="fonts/jakarta-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jakarta-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="modulepreload" href="lib/pdfjs/pdf.min.js">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Unter /pdf (ohne Schrägstrich) würden relative Pfade brechen – daher normalisieren.
+  (function () {
+    var p = location.pathname;
+    if (!/\/$/.test(p) && !/\.[a-z0-9]+$/i.test(p)) location.replace(p + '/' + location.search + location.hash);
+    try {
+      var t = localStorage.getItem('lpdf.theme');
+      if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-brand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3be8ff"/><stop offset="1" stop-color="#9b5cff"/></linearGradient>
+  </defs>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M4 20h16a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-7.5L10 5H4a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1z"/><path d="M12 11v6M9 14l3-3 3 3"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M10 8.5v5l4-2.5zM8 21h8M12 17v4"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+  <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-fitw" viewBox="0 0 24 24"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></symbol>
+  <symbol id="i-fitp" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M12 7v10M10 9l2-2 2 2M10 15l2 2 2-2"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="3" width="7" height="9" rx="1"/><rect x="13" y="3" width="7" height="9" rx="1"/><rect x="4" y="14" width="7" height="7" rx="1"/><rect x="13" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-install" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M2 8.5a15 15 0 0 1 4.2-2.6M9.5 5.2A15 15 0 0 1 22 8.5M5 12a10 10 0 0 1 3.5-2.2M15.5 10a10 10 0 0 1 3.5 2M8.5 15.5a5 5 0 0 1 7 0M12 19h.01M3 3l18 18"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.5-.8 1.5-1.6 0-1-.8-1.4-.8-2.4 0-1 .8-1.6 1.8-1.6H17a4 4 0 0 0 4-4c0-4.7-4-8.4-9-8.4z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7" r="1"/><circle cx="15.5" cy="7.5" r="1"/></symbol>
+</svg>
+
+<!-- ============ STARTSEITE ============ -->
+<section id="home" class="home" aria-label="Startseite">
+  <div class="home-glow" aria-hidden="true"></div>
+  <header class="home-head">
+    <div class="brand">
+      <img src="icons/icon-192.png" alt="" width="40" height="40">
+      <div class="brand-text"><strong>Lewolux PDF</strong><span>PDF-Leser</span></div>
+    </div>
+    <div class="home-head-actions">
+      <button class="btn ghost small" id="installBtn" hidden><svg class="ic"><use href="#i-install"/></svg><span>App installieren</span></button>
+      <button class="icon-btn" id="homeThemeBtn" aria-label="Design wechseln" title="Hell/Dunkel"><svg class="ic"><use href="#i-sun"/></svg></button>
+      <button class="icon-btn" id="homeAboutBtn" aria-label="Über Lewolux PDF" title="Über"><svg class="ic"><use href="#i-info"/></svg></button>
+    </div>
+  </header>
+
+  <main class="home-main">
+    <div class="hero">
+      <h1>PDFs lesen.<br><span class="grad">Schnell. Kostenlos. Privat.</span></h1>
+      <p class="hero-sub">Ohne Werbung, ohne Anmeldung – und auch offline.</p>
+
+      <div class="dropzone" id="dropzone">
+        <div class="dz-icon" aria-hidden="true"><svg class="ic"><use href="#i-file"/></svg></div>
+        <button class="btn primary big" id="openBtn"><svg class="ic"><use href="#i-open"/></svg><span>PDF öffnen</span></button>
+        <p class="dz-hint"><span class="only-fine">oder Datei hierher ziehen</span><span class="only-coarse">aus Dateien, Downloads oder per „Teilen“</span></p>
+      </div>
+
+      <p class="privacy"><svg class="ic"><use href="#i-shield"/></svg><span><strong>Deine Dateien bleiben auf deinem Gerät.</strong> Nichts wird hochgeladen.</span></p>
+      <p class="ios-hint" id="iosHint" hidden>Tipp für iPhone/iPad: In Safari auf <strong>Teilen</strong> → <strong>Zum Home-Bildschirm</strong> tippen, um Lewolux PDF wie eine App zu nutzen.</p>
+    </div>
+
+    <section class="recents" id="recents" hidden aria-labelledby="recentsTitle">
+      <div class="recents-head">
+        <h2 id="recentsTitle">Zuletzt geöffnet</h2>
+        <button class="link-btn" id="clearRecentsBtn">Verlauf leeren</button>
+      </div>
+      <ul class="recent-grid" id="recentList"></ul>
+      <p class="recents-note"><svg class="ic"><use href="#i-lock"/></svg>Nur lokal auf diesem Gerät gespeichert.</p>
+    </section>
+
+    <ul class="features" aria-label="Funktionen">
+      <li><svg class="ic"><use href="#i-bolt"/></svg><div><strong>Blitzschnell</strong><span>Auch bei Dokumenten mit hunderten Seiten.</span></div></li>
+      <li><svg class="ic"><use href="#i-wifi-off"/></svg><div><strong>Offline</strong><span>Einmal geladen, funktioniert alles ohne Internet.</span></div></li>
+      <li><svg class="ic"><use href="#i-moon"/></svg><div><strong>Nachtmodus</strong><span>Angenehm lesen – auch spät abends.</span></div></li>
+      <li><svg class="ic"><use href="#i-search"/></svg><div><strong>Suche &amp; Inhalt</strong><span>Volltextsuche, Lesezeichen und Miniaturen.</span></div></li>
+    </ul>
+  </main>
+
+  <footer class="home-foot">
+    <span>Kostenlos von <a href="https://lewolux.de/" target="_blank" rel="noopener">Lewolux Studio</a></span>
+    <span aria-hidden="true">·</span>
+    <button class="link-btn" id="homeAboutLink">Über</button>
+  </footer>
+</section>
+
+<!-- ============ BETRACHTER ============ -->
+<section id="viewer" class="viewer" hidden aria-label="PDF-Betrachter">
+  <header class="topbar" id="topbar">
+    <div class="tb-left">
+      <button class="icon-btn" id="closeDocBtn" aria-label="Zurück zur Startseite" title="Zurück"><svg class="ic"><use href="#i-back"/></svg></button>
+      <button class="icon-btn hide-mobile" id="sidebarBtn" aria-label="Seitenleiste ein-/ausblenden" title="Seitenleiste (S)" aria-pressed="false"><svg class="ic"><use href="#i-sidebar"/></svg></button>
+      <div class="doc-title" id="docTitle" title="">Dokument</div>
+    </div>
+    <div class="tb-center hide-mobile">
+      <div class="seg">
+        <button class="icon-btn" id="prevBtn" aria-label="Vorherige Seite" title="Vorherige Seite (K)"><svg class="ic"><use href="#i-up"/></svg></button>
+        <label class="page-field"><span class="sr">Seite</span><input id="pageInput" inputmode="numeric" autocomplete="off" aria-label="Seitennummer" value="1"><span class="page-total" id="pageTotal">/ 1</span></label>
+        <button class="icon-btn" id="nextBtn" aria-label="Nächste Seite" title="Nächste Seite (J)"><svg class="ic"><use href="#i-down"/></svg></button>
+      </div>
+      <div class="seg">
+        <button class="icon-btn" id="zoomOutBtn" aria-label="Verkleinern" title="Verkleinern (−)"><svg class="ic"><use href="#i-minus"/></svg></button>
+        <select id="zoomSelect" aria-label="Zoomstufe">
+          <option value="auto">Automatisch</option>
+          <option value="width">Seitenbreite</option>
+          <option value="page">Ganze Seite</option>
+          <option value="0.5">50 %</option><option value="0.75">75 %</option><option value="1">100 %</option>
+          <option value="1.25">125 %</option><option value="1.5">150 %</option><option value="2">200 %</option>
+          <option value="3">300 %</option><option value="4">400 %</option>
+          <option value="custom" id="zoomCustom" hidden>100 %</option>
+        </select>
+        <button class="icon-btn" id="zoomInBtn" aria-label="Vergrößern" title="Vergrößern (+)"><svg class="ic"><use href="#i-plus"/></svg></button>
+      </div>
+    </div>
+    <div class="tb-right">
+      <button class="icon-btn hide-narrow" id="rotateBtn" aria-label="Drehen" title="Drehen (R)"><svg class="ic"><use href="#i-rotate"/></svg></button>
+      <button class="icon-btn hide-narrow" id="presentBtn" aria-label="Präsentationsmodus" title="Präsentation (P)"><svg class="ic"><use href="#i-play"/></svg></button>
+      <button class="icon-btn hide-narrow" id="printBtn" aria-label="Drucken" title="Drucken (Strg+P)"><svg class="ic"><use href="#i-print"/></svg></button>
+      <button class="icon-btn hide-narrow" id="downloadBtn" aria-label="Herunterladen" title="Speichern (Strg+S)"><svg class="ic"><use href="#i-download"/></svg></button>
+      <span class="tb-sep hide-narrow" aria-hidden="true"></span>
+      <button class="icon-btn" id="searchBtn" aria-label="Im Dokument suchen" title="Suchen (Strg+F)"><svg class="ic"><use href="#i-search"/></svg></button>
+      <button class="icon-btn hide-mobile" id="nightBtn" aria-label="Nachtmodus" title="Nachtmodus (D)" aria-pressed="false"><svg class="ic"><use href="#i-moon"/></svg></button>
+      <button class="icon-btn" id="menuBtn" aria-label="Weitere Optionen" title="Mehr" aria-haspopup="menu" aria-expanded="false"><svg class="ic"><use href="#i-more"/></svg></button>
+    </div>
+    <div class="progress" id="loadProgress" aria-hidden="true"><i></i></div>
+  </header>
+
+  <div class="searchbar" id="searchbar" hidden role="search">
+    <svg class="ic sb-ic" aria-hidden="true"><use href="#i-search"/></svg>
+    <input id="searchInput" type="search" placeholder="Im Dokument suchen" aria-label="Suchbegriff" autocomplete="off" enterkeyhint="search">
+    <span class="search-count" id="searchCount" aria-live="polite"></span>
+    <button class="icon-btn" id="searchPrevBtn" aria-label="Vorheriger Treffer" title="Vorheriger Treffer (Umschalt+Enter)"><svg class="ic"><use href="#i-up"/></svg></button>
+    <button class="icon-btn" id="searchNextBtn" aria-label="Nächster Treffer" title="Nächster Treffer (Enter)"><svg class="ic"><use href="#i-down"/></svg></button>
+    <button class="icon-btn" id="searchCloseBtn" aria-label="Suche schließen" title="Schließen (Esc)"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="viewer-body">
+    <aside class="sidebar" id="sidebar" aria-label="Seitenleiste">
+      <div class="sb-tabs" role="tablist">
+        <button role="tab" id="tabThumbs" aria-selected="true" aria-controls="thumbs"><svg class="ic"><use href="#i-grid"/></svg>Seiten</button>
+        <button role="tab" id="tabOutline" aria-selected="false" aria-controls="outline"><svg class="ic"><use href="#i-list"/></svg>Inhalt</button>
+        <button class="icon-btn sb-close" id="sidebarCloseBtn" aria-label="Seitenleiste schließen"><svg class="ic"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="thumbs" id="thumbs" role="tabpanel" aria-labelledby="tabThumbs"></div>
+      <div class="outline" id="outline" role="tabpanel" aria-labelledby="tabOutline" hidden></div>
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+    <main class="scroller" id="scroller" tabindex="-1" aria-label="Dokumentseiten">
+      <div class="pages" id="pages"></div>
+    </main>
+    <div class="scrub" id="scrub" aria-hidden="true"><div class="scrub-thumb" id="scrubThumb"><span id="scrubLabel">1</span></div></div>
+    <div class="page-pill" id="pagePill" aria-hidden="true">1 / 1</div>
+  </div>
+
+  <nav class="bottombar" id="bottombar" aria-label="Werkzeuge">
+    <button class="icon-btn" id="bbSidebarBtn" aria-label="Seiten und Inhalt"><svg class="ic"><use href="#i-grid"/></svg></button>
+    <button class="icon-btn" id="bbZoomOutBtn" aria-label="Verkleinern"><svg class="ic"><use href="#i-minus"/></svg></button>
+    <button class="bb-page" id="bbPageBtn" aria-label="Zu Seite springen"><span id="bbPage">1</span><small id="bbTotal">/ 1</small></button>
+    <button class="icon-btn" id="bbZoomInBtn" aria-label="Vergrößern"><svg class="ic"><use href="#i-plus"/></svg></button>
+    <button class="icon-btn" id="bbNightBtn" aria-label="Nachtmodus" aria-pressed="false"><svg class="ic"><use href="#i-moon"/></svg></button>
+  </nav>
+
+  <div class="loading" id="loading" hidden><div class="spinner" aria-hidden="true"></div><p id="loadingText">Wird geöffnet …</p></div>
+</section>
+
+<!-- Menü -->
+<div class="menu" id="menu" role="menu" hidden aria-label="Weitere Optionen">
+  <div class="menu-grip" aria-hidden="true"></div>
+  <div class="menu-row seg-row" role="group" aria-label="Ansicht">
+    <button role="menuitem" data-act="fit-width"><svg class="ic"><use href="#i-fitw"/></svg><span>Seitenbreite</span></button>
+    <button role="menuitem" data-act="fit-page"><svg class="ic"><use href="#i-fitp"/></svg><span>Ganze Seite</span></button>
+    <button role="menuitem" data-act="rotate"><svg class="ic"><use href="#i-rotate"/></svg><span>Drehen</span></button>
+  </div>
+  <div class="menu-row seg-row" role="group" aria-label="Lesemodus">
+    <button role="menuitemradio" data-read="normal"><span class="swatch sw-normal"></span><span>Normal</span></button>
+    <button role="menuitemradio" data-read="sepia"><span class="swatch sw-sepia"></span><span>Sepia</span></button>
+    <button role="menuitemradio" data-read="night"><span class="swatch sw-night"></span><span>Nacht</span></button>
+  </div>
+  <button role="menuitem" data-act="present"><svg class="ic"><use href="#i-play"/></svg><span>Präsentation</span><kbd>P</kbd></button>
+  <button role="menuitem" data-act="fullscreen"><svg class="ic"><use href="#i-expand"/></svg><span>Vollbild</span><kbd>F</kbd></button>
+  <button role="menuitem" data-act="goto"><svg class="ic"><use href="#i-right"/></svg><span>Gehe zu Seite …</span><kbd>Strg+G</kbd></button>
+  <hr>
+  <button role="menuitem" data-act="print"><svg class="ic"><use href="#i-print"/></svg><span>Drucken</span><kbd>Strg+P</kbd></button>
+  <button role="menuitem" data-act="download"><svg class="ic"><use href="#i-download"/></svg><span>Herunterladen</span><kbd>Strg+S</kbd></button>
+  <button role="menuitem" data-act="share" id="menuShare"><svg class="ic"><use href="#i-share"/></svg><span>Teilen …</span></button>
+  <button role="menuitem" data-act="open"><svg class="ic"><use href="#i-open"/></svg><span>Andere Datei öffnen</span><kbd>Strg+O</kbd></button>
+  <hr>
+  <button role="menuitem" data-act="info"><svg class="ic"><use href="#i-file"/></svg><span>Dokument-Infos</span></button>
+  <button role="menuitem" data-act="theme"><svg class="ic"><use href="#i-palette"/></svg><span id="themeLabel">Helles Design</span></button>
+  <button role="menuitem" data-act="keys" class="only-fine-flex"><svg class="ic"><use href="#i-keyboard"/></svg><span>Tastenkürzel</span><kbd>?</kbd></button>
+  <button role="menuitem" data-act="about"><svg class="ic"><use href="#i-info"/></svg><span>Über Lewolux PDF</span></button>
+</div>
+<div class="menu-scrim" id="menuScrim" hidden></div>
+
+<!-- Präsentation -->
+<div class="present" id="present" hidden role="dialog" aria-label="Präsentationsmodus">
+  <div class="present-stage" id="presentStage"></div>
+  <div class="present-ui" id="presentUi">
+    <button class="icon-btn" id="presentPrev" aria-label="Vorherige Seite"><svg class="ic"><use href="#i-back"/></svg></button>
+    <span id="presentCount">1 / 1</span>
+    <button class="icon-btn" id="presentNext" aria-label="Nächste Seite"><svg class="ic"><use href="#i-right"/></svg></button>
+    <button class="icon-btn" id="presentClose" aria-label="Präsentation beenden"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+</div>
+
+<!-- Dialoge -->
+<dialog id="aboutDlg" class="dlg" aria-labelledby="aboutTitle">
+  <form method="dialog">
+    <div class="about-hero">
+      <img src="icons/icon-192.png" alt="" width="72" height="72">
+      <h2 id="aboutTitle">Lewolux PDF</h2>
+      <p class="muted">Version <span id="appVersion">1.0</span></p>
+    </div>
+    <p class="about-claim">Kostenlos, ohne Werbung, ohne Anmeldung.</p>
+    <ul class="about-list">
+      <li><svg class="ic"><use href="#i-shield"/></svg>Deine Dateien bleiben auf deinem Gerät – es wird nichts hochgeladen, kein Tracking.</li>
+      <li><svg class="ic"><use href="#i-wifi-off"/></svg>Funktioniert nach dem ersten Laden komplett offline.</li>
+      <li><svg class="ic"><use href="#i-install"/></svg>Installierbar auf Android, iPhone und Windows.</li>
+    </ul>
+    <a class="studio" href="https://lewolux.de/" target="_blank" rel="noopener">
+      <img src="icons/lewolux-lion.webp" alt="" width="40" height="40">
+      <span>Von <strong>Lewolux Studio</strong> – lewolux.de</span>
+    </a>
+    <p class="fineprint">PDF-Darstellung mit pdf.js (Mozilla, Apache-2.0-Lizenz).</p>
+    <div class="dlg-actions"><button class="btn primary" value="ok">Schließen</button></div>
+  </form>
+</dialog>
+
+<dialog id="pwDlg" class="dlg" aria-labelledby="pwTitle">
+  <form method="dialog" id="pwForm">
+    <div class="dlg-icon"><svg class="ic"><use href="#i-lock"/></svg></div>
+    <h2 id="pwTitle">Passwort erforderlich</h2>
+    <p class="muted" id="pwText">Dieses Dokument ist geschützt. Bitte gib das Passwort ein.</p>
+    <input type="password" id="pwInput" autocomplete="off" aria-label="Passwort" placeholder="Passwort">
+    <p class="err" id="pwErr" hidden>Falsches Passwort. Bitte erneut versuchen.</p>
+    <div class="dlg-actions">
+      <button class="btn ghost" value="cancel" formnovalidate>Abbrechen</button>
+      <button class="btn primary" value="ok" id="pwOk">Öffnen</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="gotoDlg" class="dlg" aria-labelledby="gotoTitle">
+  <form method="dialog" id="gotoForm">
+    <h2 id="gotoTitle">Gehe zu Seite</h2>
+    <input type="number" id="gotoInput" min="1" inputmode="numeric" aria-label="Seitennummer">
+    <p class="muted small" id="gotoHint">1 – 1</p>
+    <div class="dlg-actions">
+      <button class="btn ghost" value="cancel" formnovalidate>Abbrechen</button>
+      <button class="btn primary" value="ok">Springen</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="infoDlg" class="dlg" aria-labelledby="infoTitle">
+  <form method="dialog">
+    <h2 id="infoTitle">Dokument-Infos</h2>
+    <dl class="info-list" id="infoList"></dl>
+    <div class="dlg-actions"><button class="btn primary" value="ok">Schließen</button></div>
+  </form>
+</dialog>
+
+<dialog id="keysDlg" class="dlg wide" aria-labelledby="keysTitle">
+  <form method="dialog">
+    <h2 id="keysTitle">Tastenkürzel</h2>
+    <div class="keys">
+      <div><kbd>Strg</kbd>+<kbd>O</kbd><span>Datei öffnen</span></div>
+      <div><kbd>Strg</kbd>+<kbd>F</kbd> / <kbd>/</kbd><span>Suchen</span></div>
+      <div><kbd>Enter</kbd> / <kbd>⇧</kbd>+<kbd>Enter</kbd><span>Nächster / vorheriger Treffer</span></div>
+      <div><kbd>Strg</kbd>+<kbd>G</kbd><span>Gehe zu Seite</span></div>
+      <div><kbd>J</kbd> / <kbd>K</kbd><span>Nächste / vorherige Seite</span></div>
+      <div><kbd>Pos1</kbd> / <kbd>Ende</kbd><span>Erste / letzte Seite</span></div>
+      <div><kbd>+</kbd> / <kbd>−</kbd><span>Vergrößern / verkleinern</span></div>
+      <div><kbd>Strg</kbd>+<kbd>Mausrad</kbd><span>Stufenlos zoomen</span></div>
+      <div><kbd>0</kbd><span>Zoom 100 %</span></div>
+      <div><kbd>W</kbd> / <kbd>E</kbd><span>Seitenbreite / ganze Seite</span></div>
+      <div><kbd>R</kbd><span>Drehen (⇧+R zurück)</span></div>
+      <div><kbd>S</kbd><span>Seitenleiste</span></div>
+      <div><kbd>D</kbd><span>Nachtmodus</span></div>
+      <div><kbd>P</kbd><span>Präsentation</span></div>
+      <div><kbd>F</kbd><span>Vollbild</span></div>
+      <div><kbd>Strg</kbd>+<kbd>P</kbd><span>Drucken</span></div>
+      <div><kbd>Strg</kbd>+<kbd>S</kbd><span>Herunterladen</span></div>
+      <div><kbd>Esc</kbd><span>Schließen</span></div>
+    </div>
+    <div class="dlg-actions"><button class="btn primary" value="ok">Alles klar</button></div>
+  </form>
+</dialog>
+
+<dialog id="printDlg" class="dlg" aria-labelledby="printTitle">
+  <form method="dialog">
+    <h2 id="printTitle">Druck wird vorbereitet</h2>
+    <p class="muted" id="printText">Seite 0 von 0</p>
+    <div class="bar"><i id="printBar"></i></div>
+    <div class="dlg-actions"><button class="btn ghost" value="cancel">Abbrechen</button></div>
+  </form>
+</dialog>
+
+<div class="drop-overlay" id="dropOverlay" hidden><div><svg class="ic"><use href="#i-file"/></svg><p>PDF hier ablegen</p></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<input type="file" id="fileInput" accept="application/pdf,.pdf" hidden>
+<div id="printArea" aria-hidden="true"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
