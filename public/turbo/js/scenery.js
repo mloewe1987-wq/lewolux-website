@@ -196,16 +196,29 @@ export function buildScenery(scene, tr, toon, quality = 1) {
   let wi = 0, cx = 0, cz = 0, bestD = -1;
   for (let f = 0; f < 1; f += 0.04) for (const sd of [-1, 1]) { const ii = Math.round(f*tr.N), x = tr.P[ii].x + tr.R[ii].x*sd*74, z = tr.P[ii].z + tr.R[ii].z*sd*74; const d = distTo(x, z); if (d > bestD && d < 80) { bestD = d; wi = ii; cx = x; cz = z; } }
   const wp = tr.P[wi]; const dir = new THREE.Vector3(wp.x - cx, 0, wp.z - cz).normalize();
-  const rockM = toon(0x4a2a72);
-  for (let k = 0; k < 14; k++) { const rk = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 1), rockM); const a = (k/14 - 0.5)*2.2; const off = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(Math.sin(a)*34);
-    rk.position.set(cx + off.x - dir.x*Math.cos(a)*6, rnd(5, 40), cz + off.z - dir.z*Math.cos(a)*6); rk.scale.set(rnd(10, 18), rnd(14, 26), rnd(10, 16)); rk.rotation.set(rnd(0, 3), rnd(0, 3), 0); scene.add(rk); }
+  // Felsklippe: verformter Block, Vorderseite zur Strecke
+  const rockM = toon(0x4a2a72), side2 = new THREE.Vector3(-dir.z, 0, dir.x);
+  const cliffG = new THREE.BoxGeometry(64, 54, 34, 24, 20, 12);
+  { const p = cliffG.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+      const n = Math.sin(x*0.31 + y*0.17)*1.6 + Math.sin(y*0.43 - z*0.21)*1.3 + Math.sin(x*0.11 + z*0.37)*2.2;
+      const front = z > 16.9 && Math.abs(x) < 12 ? 0.25 : 1; const top = y > 26 ? 1.8 : 1;
+      p.setXYZ(i, x + n*0.6*front, y + (y > 26 ? Math.abs(n)*top : 0), z + n*front); }
+    cliffG.computeVertexNormals(); }
+  const cliff = new THREE.Mesh(cliffG, rockM); cliff.position.set(cx, 21, cz); cliff.lookAt(cx + dir.x, 21, cz + dir.z); cliff.castShadow = true; scene.add(cliff);
+  const frontX = cx + dir.x*17.3, frontZ = cz + dir.z*17.3;
+  for (let k = 0; k < 10; k++) { const rk = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 1), rockM); const sd = k % 2 ? 1 : -1, a = rnd(13, 30);
+    rk.position.set(frontX + side2.x*sd*a + dir.x*rnd(0, 6), rnd(-4, 4), frontZ + side2.z*sd*a + dir.z*rnd(0, 6)); rk.scale.set(rnd(5, 10), rnd(5, 12), rnd(5, 9)); rk.rotation.set(rnd(0, 3), rnd(0, 3), 0); scene.add(rk); }
+  for (let k = 0; k < 12; k++) { const tf = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 1), toon(0x1f9a7a, 0x06302a)); tf.position.set(cx + side2.x*rnd(-30, 30) + dir.x*rnd(-14, 14), 47 + rnd(0, 3), cz + side2.z*rnd(-30, 30) + dir.z*rnd(-14, 14)); tf.scale.set(rnd(5, 9), rnd(3, 5), rnd(5, 9)); scene.add(tf); }
   const wtex = ctex(64, 256, g => { g.fillStyle = '#7fe8ff'; g.fillRect(0, 0, 64, 256); for (let i = 0; i < 120; i++) { g.fillStyle = Math.random() < .5 ? 'rgba(255,255,255,.85)' : 'rgba(40,160,255,.6)'; g.fillRect(Math.random()*64, Math.random()*256, 2 + Math.random()*3, 20 + Math.random()*50); } });
   wtex.wrapS = wtex.wrapT = THREE.RepeatWrapping;
-  const fall = new THREE.Mesh(new THREE.PlaneGeometry(20, 52), new THREE.MeshBasicMaterial({ map: wtex, transparent: true, opacity: 0.92, color: 0xcfefff }));
-  fall.position.set(cx + dir.x*12, 21, cz + dir.z*12); fall.lookAt(wp.x, 21, wp.z); scene.add(fall);
-  const pool = new THREE.Mesh(new THREE.CircleGeometry(22, 32), new THREE.MeshBasicMaterial({ color: 0x3fd6ff, transparent: true, opacity: 0.8 }));
-  pool.rotation.x = -Math.PI/2; pool.position.set(cx + dir.x*24, -5.2, cz + dir.z*24); scene.add(pool);
-  const mist = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloT, color: 0xbff4ff, transparent: true, opacity: 0.5, depthWrite: false })); mist.position.set(cx + dir.x*18, -2, cz + dir.z*18); mist.scale.set(40, 14, 1); scene.add(mist);
+  // Wasser: oben eine Kante, dann senkrecht runter in den Teich
+  const fall = new THREE.Mesh(new THREE.PlaneGeometry(18, 52), new THREE.MeshBasicMaterial({ map: wtex, transparent: true, opacity: 0.93, color: 0xcfefff }));
+  fall.position.set(frontX + dir.x*1.2, 21, frontZ + dir.z*1.2); fall.lookAt(frontX + dir.x*10, 21, frontZ + dir.z*10); scene.add(fall);
+  const lip = new THREE.Mesh(new THREE.CapsuleGeometry(0.9, 17, 4, 10), new THREE.MeshBasicMaterial({ color: 0xe8fbff })); lip.position.set(frontX + dir.x*1.0, 47, frontZ + dir.z*1.0); lip.lookAt(lip.position.clone().add(side2)); lip.rotateX(Math.PI/2); scene.add(lip);
+  const river = new THREE.Mesh(new THREE.PlaneGeometry(18, 30), new THREE.MeshBasicMaterial({ map: wtex, color: 0x9fe6ff })); river.rotation.x = -Math.PI/2; river.position.set(cx, 47.6, cz); river.rotation.z = Math.atan2(dir.x, dir.z); scene.add(river);
+  const pool = new THREE.Mesh(new THREE.CircleGeometry(16, 32), new THREE.MeshBasicMaterial({ color: 0x3fd6ff, transparent: true, opacity: 0.85 }));
+  pool.rotation.x = -Math.PI/2; pool.position.set(frontX + dir.x*10, -5.2, frontZ + dir.z*10); scene.add(pool);
+  const mist = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloT, color: 0xbff4ff, transparent: true, opacity: 0.5, depthWrite: false })); mist.position.set(frontX + dir.x*5, -1, frontZ + dir.z*5); mist.scale.set(36, 12, 1); scene.add(mist);
   upd.push((t, dt) => { wtex.offset.y += dt*1.8; mist.material.opacity = 0.4 + Math.sin(t*2)*0.1; });
 
   return {

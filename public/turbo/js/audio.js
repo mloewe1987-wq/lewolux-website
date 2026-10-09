@@ -56,6 +56,10 @@ export function sfx(name, p = 1) {
     case 'finish': [523, 659, 784, 1046, 1318, 1568].forEach((f, i) => { tone('square', f, 0, 0.25, 0.15, i*0.11); tone('triangle', f/2, 0, 0.3, 0.15, i*0.11); }); break;
     case 'hop': tone('sine', 300, 600, 0.08, 0.15); break;
     case 'land': noise(0.1, 500, 200, 0.2, 0.7, 'lowpass'); break;
+    case 'coin': tone('square', 988, 0, 0.06, 0.12); tone('square', 1319, 0, 0.18, 0.12, 0.06); break;
+    case 'roar': noise(0.9, 300, 90, 0.6, 0.6, 'lowpass'); tone('sawtooth', 110, 60, 0.8, 0.25); tone('sawtooth', 165, 70, 0.7, 0.15); break;
+    case 'trick': [700, 1050, 1400].forEach((f, i) => tone('triangle', f, 0, 0.1, 0.15, i*0.05)); break;
+    case 'ramp': noise(0.25, 300, 1200, 0.25, 0.8); break;
     case 'click': tone('triangle', 1400, 0, 0.05, 0.15); break;
   }
 }
