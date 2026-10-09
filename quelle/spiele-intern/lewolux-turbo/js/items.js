@@ -60,7 +60,7 @@ export function createItems(ctx) {
   const bagMat = new THREE.MeshToonMaterial({ map: bagT, emissive: 0x2a1040 });
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xfff36b });
   const pickups = [];
-  for (const f of [0.2, 0.5, 0.76]) {
+  for (const f of ctx.def.pickups) {
     const i = Math.round(f*tr.N);
     for (let k = -2; k <= 2; k++) {
       const g = new THREE.Group();
@@ -75,7 +75,7 @@ export function createItems(ctx) {
   const coinGeo = new THREE.CylinderGeometry(0.62, 0.62, 0.16, 24); coinGeo.rotateX(Math.PI/2);
   const coinMat = [new THREE.MeshToonMaterial({ color: 0xffc928, emissive: 0x6a3a00 }), new THREE.MeshToonMaterial({ map: coinT, emissive: 0x3a2000 })];
   const coins = [];
-  for (const [f, lat] of [[0.035, 6], [0.3, -4], [0.55, 4], [0.67, -6], [0.9, 0]]) {
+  for (const [f, lat] of ctx.def.coins) {
     const i0 = Math.round(f*tr.N);
     for (let k = 0; k < 6; k++) { const i = (i0 + k*5) % tr.N; const m = withOutline(new THREE.Mesh(coinGeo, [coinMat[0], coinMat[1], coinMat[1]]), 1.1);
       m.position.copy(tr.P[i]).addScaledVector(tr.R[i], lat); m.position.y += 1.2; scene.add(m); coins.push({ m, t: 0, base: m.position.y, ph: k*0.5 }); }
@@ -97,7 +97,7 @@ export function createItems(ctx) {
   }
   function checkCoins(k) {
     for (const c of coins) if (c.t <= 0) { const dx = c.m.position.x - k.pos.x, dz = c.m.position.z - k.pos.z;
-      if (dx*dx + dz*dz < 2.2*2.2) { c.t = 9; c.m.visible = false; if ((k.coins || 0) < 10) k.coins = (k.coins || 0) + 1; if (k.isPlayer) { sfx('coin'); ctx.onCoins(k.coins); } } }
+      if (dx*dx + dz*dz < 2.2*2.2) { c.t = 9; c.m.visible = false; for (let n = 0; n < 8; n++) sparks.emit(c.m.position.x, c.m.position.y, c.m.position.z, (Math.random() - .5)*6, Math.random()*5, (Math.random() - .5)*6, COL.yellow, 0.4); if ((k.coins || 0) < 10) k.coins = (k.coins || 0) + 1; if (k.isPlayer) { sfx('coin'); ctx.onCoins(k.coins, true); } } }
   }
   function loseCoins(k, n = 3) { const lost = Math.min(k.coins || 0, n); k.coins = (k.coins || 0) - lost; if (lost && k.isPlayer) { ctx.onCoins(k.coins); }
     for (let i = 0; i < lost*4; i++) sparks.emit(k.pos.x, k.y + 1.5, k.pos.z, (Math.random() - .5)*10, 6 + Math.random()*4, (Math.random() - .5)*10, COL.yellow, 0.8); }
@@ -151,12 +151,12 @@ export function createItems(ctx) {
         const pos = spawnAt(k, -3.6), L = tr.locate(pos, k.loc.i); m.position.set(pos.x, L.y + 0.06, pos.z);
         addEnt({ type: 'creme', m, owner: k, pos, life: 35, grace: 0.6, r: 2.2 }); if (near) sfx('ink'); break; }
       case 'roar': { const m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.35, 8, 40), new THREE.MeshBasicMaterial({ color: 0xffa53a, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })); m.rotation.x = Math.PI/2;
-        m.position.set(k.pos.x, k.y + 1, k.pos.z); addEnt({ type: 'roar', m, owner: k, pos: k.pos.clone(), t: 0, hit: new Set() }); sfx('roar'); ctx.say(k, 'roar'); break; }
+        m.position.set(k.pos.x, k.y + 1, k.pos.z); addEnt({ type: 'roar', m, owner: k, pos: k.pos.clone(), t: 0, hit: new Set() }); sfx('roar'); ctx.say(k, k.def.id === 'lux' ? 'roar' : 'item'); break; }
       case 'cloud': { const others = ctx.getRacers().filter(r => r !== k && !r.finished).sort((a, b) => b.prog - a.prog); const target = others[0]; if (!target) break;
         const g = new THREE.Group(); for (let i = 0; i < 7; i++) { const s = new THREE.Mesh(new THREE.SphereGeometry(1.2 + Math.random()*0.8, 12, 10), toon(0x4a4a66)); s.position.set((i - 3)*1.0, Math.random()*0.6, (Math.random() - .5)*1.2); g.add(s); }
         const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.4, 7, 5), new THREE.MeshBasicMaterial({ color: 0xfff36b })); bolt.position.y = -3.8; bolt.visible = false; g.add(bolt);
         addEnt({ type: 'cloud', m: g, bolt, owner: k, target, prog: k.prog, lat: k.loc.lat, phase: 'chase', t: 0 }); sfx('thunder');
-        if (target.isPlayer && !target.auto) ctx.showWarn('⛈️ Eine Gewitterwolke kommt! Gleich ausweichen!'); break; }
+        if (target.isPlayer && !target.auto) { ctx.showWarn('⛈️ Eine Gewitterwolke kommt! Gleich ausweichen!'); ctx.ann && ctx.ann(15); } break; }
       case 'ink': sfx('ink'); for (const r of ctx.getRacers()) if (r !== k && r.prog > k.prog && !r.finished) { if (r.isPlayer && !r.auto) ctx.inkScreen(4.5); else r.ink = 3.5; } if (k.isPlayer) ctx.say(k, 'hit'); break;
     }
   }
@@ -231,7 +231,7 @@ export function createItems(ctx) {
           e.m.children.forEach((c, j) => { if (c !== e.bolt) c.material = toon(Math.sin(e.t*20 + j) > 0.6 ? 0x8a8ab0 : 0x4a4a66); });
           if (e.t > 1.5 && !e.struck) { e.struck = true; e.bolt.visible = true; if (ctx.near(tg)) sfx('zap');
             if (Math.abs(tg.loc.lat - e.lat) < 3.2) { if (hitKart(tg, e.owner, 1.6, 'tumble') === true) tg.shrink = 4; }
-            else if (tg.isPlayer && !tg.auto) ctx.showMsg('Ausgewichen!', 1.0); }
+            else if (tg.isPlayer && !tg.auto) { ctx.showMsg('Ausgewichen!', 1.0); ctx.ann && ctx.ann(11); } }
           if (e.t > 1.9) dead = true;
         }
       }

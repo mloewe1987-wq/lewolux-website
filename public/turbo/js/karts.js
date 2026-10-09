@@ -21,6 +21,21 @@ export const DRIVERS = [
   { id: 'sonni', name: 'Sonni', from: 'House in the Desert', ride: 'Dünen-Buggy', icon: '🤠', color: '#ffb23c', pitch: 1.1,
     st: { speed: 4, accel: 3, handling: 4, weight: 3 },
     say: { start: 'Sonnencreme drauf und los!', hit: 'Volltreffer!', ouch: 'Mein Hut! Mein Hut!', pass: 'Heiß, heißer, Sonni!', win: 'Sonnenschein-Sieg!', item: 'Ein Fundstück!' } },
+  { id: 'berta', name: 'Bürgermeisterin Berta', short: 'Berta', from: 'Mandat', ride: 'Rathaus-Cabrio', icon: '👵', color: '#2a5ad6', pitch: 1.05,
+    st: { speed: 4, accel: 2, handling: 3, weight: 5 },
+    say: { start: 'Die Sitzung ist eröffnet!', hit: 'Antrag abgelehnt!', ouch: 'Das gibt eine Beschwerde!', pass: 'Vorfahrt fürs Rathaus!', win: 'Einstimmig gewonnen!', item: 'Wird sofort beschlossen!' } },
+  { id: 'brecher', name: 'Brecher', from: 'Ring Legends', ride: 'Ring-Raser', icon: '🤼', color: '#e52a2a', pitch: 0.7,
+    st: { speed: 5, accel: 2, handling: 2, weight: 6 },
+    say: { start: 'Ding ding ding!', hit: 'Bodyslam!', ouch: 'Das war unfair, Schiri!', pass: 'Aus dem Weg, Champion kommt!', win: 'Der Gürtel bleibt bei mir!', item: 'Jetzt wird’s wild!' } },
+  { id: 'elara', name: 'Elara', from: 'Idle Legenden', ride: 'Kristall-Gleiter', icon: '🧝', color: '#b36bff', pitch: 1.45,
+    st: { speed: 3, accel: 4, handling: 5, weight: 2 },
+    say: { start: 'Magie, entfache dich!', hit: 'Zauber trifft!', ouch: 'Mein Umhang!', pass: 'Schneller als ein Zauberspruch!', win: 'Eine Legende ist geboren!', item: 'Ein magischer Fund!' } },
+  { id: 'karl', name: 'Kellner Karl', short: 'Karl', from: 'Kasse oder Zettel', ride: 'Turbo-Einkaufswagen', icon: '🤵', color: '#3ad4c0', pitch: 1.0,
+    st: { speed: 3, accel: 5, handling: 4, weight: 2 },
+    say: { start: 'Ihre Bestellung kommt sofort!', hit: 'Die Rechnung, bitte!', ouch: 'Mein Tablett!', pass: 'Bitte Platz machen, heiß und fettig!', win: 'Stimmt so!', item: 'Mit Bon, bitte!' } },
+  { id: 'goldfuchs', name: 'Goldfuchs', from: 'Lewolux-Geheimnis', ride: 'Goldflitzer', icon: '🦊', color: '#ffc928', pitch: 1.2, locked: true,
+    st: { speed: 4, accel: 4, handling: 4, weight: 2 },
+    say: { start: 'Schlau gewinnt!', hit: 'Ausgefuchst!', ouch: 'Mein goldenes Fell!', pass: 'Fuchsschnell vorbei!', win: 'Gold gehört mir!', item: 'Ein Schatz!' } },
 ];
 
 // ---------- Materialien ----------
@@ -28,7 +43,7 @@ const grad = (() => { const d = new Uint8Array([70, 150, 215, 255]); const t = n
 const mats = new Map();
 export function toon(color, emissive, map) {
   const k = color + '|' + (emissive || 0) + '|' + (map ? map.uuid : '');
-  if (!mats.has(k)) mats.set(k, new THREE.MeshToonMaterial({ color: map ? 0xffffff : color, gradientMap: grad, emissive: emissive || 0, map: map || null }));
+  if (!mats.has(k)) mats.set(k, new THREE.MeshToonMaterial({ color: map ? (color || 0xffffff) : color, gradientMap: grad, emissive: emissive || 0, map: map || null }));
   return mats.get(k);
 }
 const glowMats = new Map();
@@ -45,7 +60,9 @@ const C = (r1, r2, h, n = 18) => G(`c${r1},${r2},${h},${n}`, () => new THREE.Cyl
 const TOR = (r, t, a = Math.PI*2) => G(`t${r},${t},${a}`, () => new THREE.TorusGeometry(r, t, 10, 24, a));
 const CONE = (r, h, n = 10) => G(`k${r},${h},${n}`, () => new THREE.ConeGeometry(r, h, n));
 
+let PMAP = null, WSTYLE = 'std';
 function add(parent, geo, color, x, y, z, o = {}) {
+  if (PMAP && PMAP.has(color)) { const c = PMAP.get(color); color = c.c; if (c.em && !o.em) o.em = c.em; }
   const m = new THREE.Mesh(geo, o.mat || toon(color, o.em, o.map));
   m.position.set(x, y, z);
   if (o.rx) m.rotation.x = o.rx; if (o.ry) m.rotation.y = o.ry; if (o.rz) m.rotation.z = o.rz;
@@ -62,6 +79,9 @@ const tube = (parent, pts, r, color, o = {}) => {
 
 // Rad: Drehgruppe (Lenkung) > Rollgruppe > Reifen + Felge + Profil
 function wheel(car, x, y, z, r, w, o = {}) {
+  if (WSTYLE === 'monster') { const k = 1.35; y += r*(k - 1); r *= k; w *= 1.25; o = { ...o, tire: 0x1a1414, rim: 0xff5a3c }; }
+  else if (WSTYLE === 'slick') { w *= 0.8; o = { ...o, tire: 0x111111, rim: 0xdfe6f0 }; }
+  else if (WSTYLE === 'glow') { o = { ...o, rim: 0x29f0ff, rimGlow: true }; }
   const pivot = new THREE.Group(); pivot.position.set(x, y, z); car.body.add(pivot);
   const roll = new THREE.Group(); pivot.add(roll);
   add(roll, C(r, r, w, 22), o.tire || 0x1d1826, 0, 0, 0, { rz: Math.PI/2, ol: 0.05 });
@@ -85,7 +105,7 @@ function steering(car, x, y, z, tilt, color = 0x222230, hands = 0xf1b48a, armFro
   car.steer = sw;
   if (armFrom) for (const s of [-1, 1]) {
     const wp = new THREE.Vector3(s*0.3, 0, 0).applyEuler(g.rotation).add(g.position);
-    tube(car.body, [[s*armFrom[0], armFrom[1], armFrom[2]], [s*(armFrom[0] + 0.05), (armFrom[1] + wp.y)/2 - 0.05, (armFrom[2] + wp.z)/2], [wp.x, wp.y, wp.z]], 0.11, armFrom[3]);
+    const arm = tube(car.driver, [[s*armFrom[0], armFrom[1], armFrom[2]], [s*(armFrom[0] + 0.05), (armFrom[1] + wp.y)/2 - 0.05, (armFrom[2] + wp.z)/2], [wp.x, wp.y, wp.z]], 0.11, armFrom[3]); arm.userData.arm = true;
   }
   return sw;
 }
@@ -126,7 +146,25 @@ function feathers() { return T.f ||= tex(128, 128, (g, w, h) => { g.fillStyle = 
 function net() { return T.n ||= (() => { const t = tex(64, 64, (g, w, h) => { g.clearRect(0, 0, w, h); g.strokeStyle = '#ffffff'; g.lineWidth = 3; for (let i = 0; i <= w; i += 16) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, h); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(w, i); g.stroke(); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 2); return t; })(); }
 
 // ---------- Fahrer + Fahrzeug ----------
-export function buildRacer(id) {
+const PALETTES = {
+  nervbert: { base: [0xd8322a, 0xe8463a], p2: [0x2a6ad6, 0x3a7ae6], p3: [0x2fae52, 0x40c062], p4: [0x2a2a34, 0x3a3a46] },
+  kritzel: { base: [0x2b6fd6, 0x3a8ae0], p2: [0xff5aa8, 0xff7ab8], p3: [0xffb21a, 0xffc84a], p4: [0x2fc0a0, 0x40d0b0] },
+  pandi: { base: [0xf6f8ff], p2: [0xffb0d0], p3: [0xa8f0d8], p4: [0xd0b4ff] },
+  lux: { base: [0x2a1a5a], p2: [0x6a0a1a], p3: [0x0a4a5a], p4: [0xe8e8f0] },
+  kicker: { base: [0xffffff], p2: [0x9ab8ff], p3: [0xffb0b0], p4: [0xffe08a] },
+  sonni: { base: [0xffb23c, 0xe89a2a], p2: [0x3ac8a0, 0x2ab090], p3: [0xff6a6a, 0xe85a5a], p4: [0x8a8aff, 0x7a7ae8] },
+  berta: { base: [0x2a5ad6, 0x1a3a8a], p2: [0xd83a5a, 0x8a1a3a], p3: [0x2a8a5a, 0x1a5a3a], p4: [0xe8e8f0, 0xa0a0b0] },
+  brecher: { base: [0xe52a2a, 0x2a2a3a], p2: [0x2a6ae5, 0x2a2a3a], p3: [0x1a1a22, 0xffc928], p4: [0x3ad46a, 0x1a1a22] },
+  elara: { base: [0xb36bff, 0x6a3ab0], p2: [0x29c8f0, 0x1a6a9a], p3: [0xff6ab8, 0xa03a7a], p4: [0x6ae0a0, 0x2a8a5a] },
+  karl: { base: [0x3ad4c0, 0xd0d8e0], p2: [0xff8a3c, 0xd0d8e0], p3: [0xa24bff, 0xd0d8e0], p4: [0xff3fd0, 0xd0d8e0] },
+  goldfuchs: { base: [0xffc928, 0xffe08a], p2: [0xe8e8f8, 0xffffff], p3: [0xff5a3c, 0xffb08a], p4: [0x2a2a40, 0x5a5a80] },
+};
+export function paintColor(id, paint) { const P = PALETTES[id] || PALETTES.nervbert; return paint === 'gold' ? 0xffc928 : (P[paint] || P.base)[0]; }
+export function buildRacer(id, cfg = {}) {
+  const pal = PALETTES[id] || PALETTES.nervbert, paint = cfg.paint || 'p1';
+  PMAP = null;
+  if (paint !== 'p1') { PMAP = new Map(); const tgt = paint === 'gold' ? pal.base.map((_, i) => i ? 0xffd84a : 0xffc928) : pal[paint]; pal.base.forEach((c, i) => PMAP.set(c, { c: tgt[i] ?? tgt[0], em: paint === 'gold' ? 0x553300 : 0 })); }
+  WSTYLE = cfg.wheels || 'std';
   const root = new THREE.Group();
   const susp = new THREE.Group(); root.add(susp);          // Federung (hoch/runter, Kippen)
   const body = new THREE.Group(); susp.add(body);
@@ -200,7 +238,7 @@ export function buildRacer(id) {
   } else if (id === 'pandi') {
     // Löwenfuß-Badewanne
     const prof = [[0, 0.35], [0.75, 0.38], [0.98, 0.6], [1.06, 1.0], [1.1, 1.38], [1.2, 1.45], [1.12, 1.5], [0.98, 1.42]].map(p => new THREE.Vector2(...p));
-    const tub = add(body, new THREE.LatheGeometry(prof, 28), 0, 0, 0, 0, { s: [0.9, 1, 1.38], outline: false, mat: new THREE.MeshToonMaterial({ color: 0xf6f8ff, gradientMap: grad, side: THREE.DoubleSide }) });
+    const tub = add(body, new THREE.LatheGeometry(prof, 28), 0, 0, 0, 0, { s: [0.9, 1, 1.38], outline: false, mat: new THREE.MeshToonMaterial({ color: PMAP ? PMAP.get(0xf6f8ff).c : 0xf6f8ff, emissive: paint === 'gold' ? 0x553300 : 0, gradientMap: grad, side: THREE.DoubleSide }) });
     add(tub, TOR(1.12, 0.07), 0xffcf4a, 0, 1.46, 0, { rx: Math.PI/2, em: 0x332200 });
     add(body, C(1.0, 1.0, 0.05, 28), 0x7fd6ff, 0, 1.28, 0, { s: [0.88, 1, 1.32], em: 0x103850, outline: false });
     for (let i = 0; i < 16; i++) { const a = Math.random()*Math.PI*2, r = Math.random()*0.8; add(body, S(0.12 + Math.random()*0.16, 10, 8), 0xffffff, Math.cos(a)*r*0.85, 1.36, Math.sin(a)*r*1.25, { outline: false, em: 0x444466 }); }
@@ -224,7 +262,7 @@ export function buildRacer(id) {
     const sw = new THREE.Group(); sw.position.set(0, 1.85, 0.55); sw.rotation.x = -0.5; body.add(sw);
     add(sw, TOR(0.35, 0.05), 0x8a5a2a, 0, 0, 0); for (let i = 0; i < 6; i++) add(sw, C(0.035, 0.035, 0.95, 6), 0x8a5a2a, 0, 0, 0, { rz: i/6*Math.PI, outline: false });
     car.steer = sw;
-    for (const s of [-1, 1]) { add(sw, S(0.17, 10, 8), 0x1a1a1a, s*0.32, 0.05, 0.05); tube(body, [[s*0.62, 1.6, -0.3], [s*0.5, 1.75, 0.15], [s*0.32, 1.88, 0.55]], 0.14, 0x1a1a1a); }
+    for (const s of [-1, 1]) { add(sw, S(0.17, 10, 8), 0x1a1a1a, s*0.32, 0.05, 0.05); tube(driver, [[s*0.62, 1.6, -0.3], [s*0.5, 1.75, 0.15], [s*0.32, 1.88, 0.55]], 0.14, 0x1a1a1a).userData.arm = true; }
   } else if (id === 'lux') {
     // Neon-Flitzer (Keil-Form)
     const sh = new THREE.Shape(); sh.moveTo(-1.6, 0); sh.lineTo(1.75, 0); sh.lineTo(1.8, 0.2); sh.quadraticCurveTo(0.9, 0.45, 0.4, 0.65); sh.lineTo(-1.2, 0.75); sh.lineTo(-1.6, 0.6); sh.closePath();
@@ -264,7 +302,7 @@ export function buildRacer(id) {
     steering(car, 0, 1.55, 0.45, -1.0, 0x1a1a2a, 0xffa53a, [0.55, 1.85, -0.45, 0xffa53a]);
   } else if (id === 'kicker') {
     // Bolzplatz-Buggy
-    add(body, RB(1.7, 0.4, 2.8, 0.15), 0, 0, 0.7, 0, { mat: toon(0, 0, pitch()) });
+    add(body, RB(1.7, 0.4, 2.8, 0.15), 0, 0, 0.7, 0, { mat: toon(PMAP ? PMAP.get(0xffffff).c : 0, PMAP && paint === 'gold' ? 0x553300 : 0, pitch()) });
     add(body, RB(1.0, 0.25, 0.8, 0.12), 0x222230, 0, 1.0, -0.4);
     add(body, S(0.6, 18, 14), 0xffffff, 0, 0.85, 1.55);
     for (let i = 0; i < 6; i++) { const a = i*1.05; add(body, C(0.16, 0.16, 0.04, 5), 0x111111, Math.cos(a)*0.38, 0.85 + Math.sin(a)*0.38, 2.08, { rx: Math.PI/2, outline: false }); }
@@ -318,6 +356,123 @@ export function buildRacer(id) {
     add(h, TOR(0.12, 0.03, Math.PI), 0x7a2a1a, 0, -0.2, 0.45, { rz: Math.PI, outline: false });
     steering(car, 0, 1.5, 0.45, -1.0, 0x3a2a1a, 0xf3c49a, [0.5, 1.9, -0.4, 0xc8b080]);
   }
+  if (id === 'berta') {
+    // Rathaus-Cabrio
+    add(body, RB(1.85, 0.55, 3.1, 0.25), 0x2a5ad6, 0, 0.75, 0);
+    add(body, RB(1.7, 0.35, 1.0, 0.18), 0x2a5ad6, 0, 1.05, 1.15, { rx: 0.1 });
+    add(body, RB(1.7, 0.45, 0.8, 0.18), 0x1a3a8a, 0, 1.15, -1.2);
+    add(body, RB(1.5, 0.08, 0.4, 0.04), 0xaee8ff, 0, 1.5, 0.55, { rx: -0.9, em: 0x224455 });
+    add(body, RB(1.2, 0.3, 0.9, 0.14), 0xf0e6d0, 0, 1.12, -0.45);
+    for (let i = 0; i < 5; i++) add(body, RB(1.4, 0.04, 0.03, 0.01), 0xd0d0d8, 0, 0.62 + i*0.07, 1.58, { outline: false });
+    headlights(car, 0.6, 0.9, 1.56); exhaust(car, [[0.5, 0.55, -1.6]]);
+    for (const s of [-1, 1]) { add(body, C(0.025, 0.025, 0.8, 6), 0xdddddd, s*0.8, 1.45, 1.4, { outline: false }); add(body, new THREE.PlaneGeometry(0.45, 0.3), 0, s*0.8 + s*0.22, 1.72, 1.4, { mat: new THREE.MeshBasicMaterial({ map: stripes('#1a1a1a', '#ffc928', 3), side: THREE.DoubleSide }), outline: false }); }
+    wheel(car, -0.98, 0.42, 1.1, 0.42, 0.36, { front: true }); wheel(car, 0.98, 0.42, 1.1, 0.42, 0.36, { front: true }); wheel(car, -0.98, 0.42, -1.1, 0.42, 0.36); wheel(car, 0.98, 0.42, -1.1, 0.42, 0.36);
+    plate(car, '🏛️', '#2a5ad6', 0, 0.7, -1.62, Math.PI);
+    add(driver, C(0.45, 0.6, 1.0, 16), 0xd83a3a, 0, 1.75, -0.45);
+    add(driver, TOR(0.42, 0.06), 0xffc928, 0, 2.15, -0.38, { rx: 1.1, em: 0x443300 });
+    add(driver, C(0.18, 0.18, 0.05, 14), 0xffc928, 0, 1.85, -0.02, { rx: 1.4, em: 0x443300 });
+    const h = add(driver, S(0.52), 0xf3c8a8, 0, 2.6, -0.4); car.head = h;
+    add(h, S(0.55, 16, 10), 0xc8c8d0, 0, 0.12, -0.1, { s: [1, 0.75, 1] }); add(h, S(0.3, 12, 10), 0xc8c8d0, 0, 0.45, -0.38);
+    eyes(h, 0.05, 0.42, 0.18, 0.12, 0x4a6aaa);
+    for (const s of [-1, 1]) add(h, TOR(0.13, 0.025), 0x8a3a8a, s*0.18, 0.05, 0.5, { outline: false });
+    add(h, RB(0.12, 0.025, 0.02, 0.01), 0x8a3a8a, 0, 0.07, 0.52, { outline: false });
+    add(h, TOR(0.12, 0.03, Math.PI), 0xb03a4a, 0, -0.2, 0.45, { rz: Math.PI, outline: false });
+    steering(car, 0, 1.6, 0.4, -1.0, 0xf0e6d0, 0xf3c8a8, [0.55, 2.05, -0.45, 0xd83a3a]);
+  } else if (id === 'brecher') {
+    // Ring-Raser: Fahrzeug wie eine Ringecke mit Seilen
+    add(body, RB(2.0, 0.5, 2.9, 0.15), 0x2a2a3a, 0, 0.7, 0);
+    add(body, RB(1.9, 0.12, 2.8, 0.05), 0xe8e8f0, 0, 0.98, 0);
+    for (const [x, z] of [[-0.9, 1.3], [0.9, 1.3], [-0.9, -1.3], [0.9, -1.3]]) add(body, C(0.08, 0.08, 1.1, 8), 0xc8c8d0, x, 1.5, z);
+    for (const [y, c] of [[1.3, 0xe52a2a], [1.6, 0xffffff], [1.9, 0x2a6ae5]]) for (const s of [-1, 1]) { add(body, C(0.035, 0.035, 2.6, 6), c, s*0.9, y, 0, { rx: Math.PI/2, outline: false }); add(body, C(0.035, 0.035, 1.8, 6), c, 0, y, s*1.3, { rz: Math.PI/2, outline: false }); }
+    exhaust(car, [[-0.5, 0.6, -1.5], [0.5, 0.6, -1.5]]);
+    wheel(car, -1.05, 0.5, 1.05, 0.5, 0.45, { front: true, rim: 0xffc928 }); wheel(car, 1.05, 0.5, 1.05, 0.5, 0.45, { front: true, rim: 0xffc928 }); wheel(car, -1.1, 0.55, -1.05, 0.55, 0.55, { rim: 0xffc928 }); wheel(car, 1.1, 0.55, -1.05, 0.55, 0.55, { rim: 0xffc928 });
+    plate(car, '🤼', '#e52a2a', 0, 0.75, -1.47, Math.PI);
+    const torso = add(driver, S(0.85), 0xd8966a, 0, 1.85, -0.35, { s: [1.25, 1, 0.9] });
+    add(driver, C(0.82, 0.82, 0.32, 20), 0xffc928, 0, 1.35, -0.35, { em: 0x553300 }); add(driver, RB(0.6, 0.4, 0.12, 0.05), 0xffe88a, 0, 1.35, 0.4, { em: 0x664400 });
+    for (const s of [-1, 1]) add(driver, S(0.4, 12, 10), 0xd8966a, s*1.0, 2.25, -0.3);
+    const h = add(driver, S(0.56), 0xe52a2a, 0, 2.95, -0.25); car.head = h;
+    for (const s of [-1, 1]) { add(h, S(0.2, 12, 10), 0xffffff, s*0.2, 0.06, 0.45, { s: [1.2, 0.8, 0.5], outline: false }); }
+    eyes(h, 0.06, 0.48, 0.2, 0.1, 0x2a2a2a);
+    add(h, RB(0.5, 0.06, 0.05, 0.02), 0xffc928, 0, 0.32, 0.5, { outline: false });
+    add(h, S(0.18, 10, 8), 0xd8966a, 0, -0.3, 0.42, { s: [1.4, 0.7, 0.6], outline: false });
+    void torso;
+    steering(car, 0, 1.75, 0.6, -1.0, 0x2a2a3a, 0xd8966a, [0.95, 2.2, -0.3, 0xd8966a]);
+  } else if (id === 'elara') {
+    // Kristall-Gleiter (schwebt)
+    add(body, S(1.1, 22, 14), 0x6a3ab0, 0, 0.85, 0, { s: [0.95, 0.4, 1.6] });
+    add(body, RB(1.2, 0.25, 1.2, 0.12), 0xb36bff, 0, 1.05, -0.35);
+    for (const [x, z, sc] of [[0, 1.6, 1], [-0.7, -1.2, 0.8], [0.7, -1.2, 0.8], [0, -1.6, 0.7]]) add(body, new THREE.OctahedronGeometry(0.35*sc), 0, x, 1.2, z, { mat: glow(0x9af0ff), s: [1, 1.8, 1] });
+    for (const [x, z] of [[-0.8, 0.9], [0.8, 0.9], [-0.8, -0.9], [0.8, -0.9]]) add(body, C(0.35, 0.25, 0.12, 16), 0, x, 0.4, z, { mat: glow(0xd0a0ff), outline: false });
+    exhaust(car, [[0, 0.8, -1.75]]); car.hover = true;
+    plate(car, '🧝', '#b36bff', 0, 0.85, -1.72, Math.PI);
+    add(driver, CONE(0.75, 1.5, 16), 0xb36bff, 0, 1.85, -0.4);
+    const h = add(driver, S(0.48), 0xffe0d0, 0, 2.62, -0.35); car.head = h;
+    add(h, S(0.52, 16, 10), 0xffe9a0, 0, 0.1, -0.12, { s: [1, 0.9, 1] });
+    for (let i = 0; i < 5; i++) add(h, CONE(0.14, 0.9, 6), 0xffe9a0, (i - 2)*0.14, -0.35, -0.38, { rx: 0.2, outline: false });
+    for (const s of [-1, 1]) add(h, CONE(0.09, 0.5, 6), 0xffe0d0, s*0.5, 0.1, -0.05, { rz: -s*1.2 });
+    eyes(h, 0.0, 0.4, 0.17, 0.12, 0x2ad070);
+    add(h, CONE(0.55, 0.9, 16), 0x6a3ab0, 0, 0.62, -0.12, { rx: -0.25 });
+    add(h, C(0.6, 0.6, 0.06, 20), 0x6a3ab0, 0, 0.2, -0.05);
+    // Zauberstab
+    add(driver, C(0.04, 0.05, 1.8, 8), 0x8a5a2a, 0.7, 2.2, 0.0, { rx: 0.4, rz: -0.25 });
+    car.orb = add(driver, new THREE.OctahedronGeometry(0.2), 0, 0.93, 3.05, 0.35, { mat: glow(0xff9af0) });
+    for (const s of [-1, 1]) add(driver, S(0.12, 10, 8), 0xffe0d0, s*0.55, 2.05, 0.15);
+  } else if (id === 'karl') {
+    // Turbo-Einkaufswagen
+    const wt = net().clone(); wt.repeat.set(8, 4); wt.needsUpdate = true;
+    const wire = new THREE.MeshToonMaterial({ color: 0xd0d8e0, map: wt, alphaTest: 0.4, side: THREE.DoubleSide, gradientMap: grad });
+    add(body, RB(1.5, 0.12, 2.3, 0.05), 0xd0d8e0, 0, 0.75, 0.1);
+    for (const s of [-1, 1]) { add(body, RB(0.06, 1.0, 2.4, 0.02), 0, s*0.78, 1.3, 0.1, { mat: wire, outline: false }); }
+    add(body, RB(1.6, 1.0, 0.06, 0.02), 0, 0, 1.3, 1.3, { mat: wire, outline: false });
+    for (const s of [-1, 1]) { add(body, RB(0.06, 0.06, 2.4, 0.02), 0xd0d8e0, s*0.78, 1.8, 0.1); add(body, RB(0.06, 0.06, 2.4, 0.02), 0xd0d8e0, s*0.78, 0.82, 0.1); }
+    add(body, RB(1.6, 0.08, 0.08, 0.03), 0x3ad4c0, 0, 1.85, 1.3, { em: 0x0a3a30 });
+    add(body, RB(1.7, 0.12, 0.12, 0.04), 0x3ad4c0, 0, 2.0, -1.1, { em: 0x0a3a30 });
+    for (const s of [-1, 1]) add(body, C(0.04, 0.04, 1.1, 6), 0xd0d8e0, s*0.75, 1.55, -1.0, { rx: -0.4 });
+    for (let i = 0; i < 4; i++) add(body, RB(0.4, 0.4, 0.4, 0.06), [0xffe14a, 0xff5a3c, 0x46e07a, 0xffffff][i], -0.4 + (i % 2)*0.8, 1.05, 0.7 + (i > 1 ? 0.35 : 0), { ry: i });
+    add(body, RB(0.7, 0.5, 0.6, 0.1), 0x555566, 0, 0.55, -1.2);
+    exhaust(car, [[0, 0.55, -1.55]]);
+    for (const [x, z] of [[-0.7, 1.1], [0.7, 1.1], [-0.7, -0.9], [0.7, -0.9]]) wheel(car, x, 0.3, z, 0.3, 0.2, { front: z > 0, tire: 0x2a2a30, rim: 0x3ad4c0 });
+    plate(car, '🧾', '#3ad4c0', 0, 0.6, -1.5, Math.PI);
+    add(driver, C(0.42, 0.5, 1.0, 16), 0x1a1a24, 0, 1.6, -0.55);
+    add(driver, RB(0.35, 0.6, 0.05, 0.02), 0xffffff, 0, 1.75, -0.08);
+    add(driver, RB(0.3, 0.12, 0.08, 0.03), 0xd02a2a, 0, 2.03, -0.04);
+    const h = add(driver, S(0.5), 0xf3c8a8, 0, 2.48, -0.5); car.head = h;
+    add(h, S(0.52, 16, 10), 0x1a1a1a, 0, 0.16, -0.06, { s: [1, 0.55, 1] });
+    eyes(h, 0.02, 0.42, 0.17, 0.11, 0x3a2a1a);
+    add(h, RB(0.36, 0.05, 0.05, 0.02), 0x1a1a1a, 0, -0.17, 0.46, { outline: false });
+    // Tablett mit Getränk (linke Hand)
+    const tray = new THREE.Group(); tray.position.set(-0.65, 2.55, -0.2); driver.add(tray); car.tray = tray;
+    add(tray, C(0.45, 0.45, 0.04, 20), 0xd0d8e0, 0, 0, 0); add(tray, C(0.1, 0.08, 0.32, 10), 0xffcf4a, 0.1, 0.18, 0, { em: 0x332200 }); add(tray, S(0.12, 10, 8), 0xffffff, 0.1, 0.36, 0, { outline: false });
+    add(driver, S(0.12, 10, 8), 0xffffff, -0.65, 2.45, -0.2);
+    steering(car, 0.15, 1.95, -0.9, -0.5, 0x3ad4c0, 0xffffff, null);
+  } else if (id === 'goldfuchs') {
+    // Goldflitzer
+    const gold = 0xffc928;
+    add(body, RB(1.8, 0.45, 3.0, 0.2), gold, 0, 0.65, 0, { em: 0x553300 });
+    add(body, RB(1.4, 0.35, 1.0, 0.16), gold, 0, 0.85, 1.35, { em: 0x553300, rx: 0.15 });
+    add(body, RB(1.2, 0.3, 0.9, 0.14), 0x8a1a2a, 0, 1.0, -0.45);
+    for (let i = 0; i < 5; i++) add(body, CONE(0.1, 0.32, 6), gold, -0.4 + i*0.2, 1.25, 1.75, { em: 0x553300 });
+    add(body, RB(2.0, 0.08, 0.5, 0.03), 0xffe08a, 0, 1.55, -1.6, { em: 0x664400 });
+    for (const s of [-1, 1]) add(body, RB(0.1, 0.55, 0.3, 0.04), gold, s*0.75, 1.25, -1.6);
+    exhaust(car, [[-0.35, 0.6, -1.6], [0.35, 0.6, -1.6]]);
+    wheel(car, -1.0, 0.45, 1.1, 0.42, 0.38, { front: true, rim: 0xffe08a, rimGlow: true }); wheel(car, 1.0, 0.45, 1.1, 0.42, 0.38, { front: true, rim: 0xffe08a, rimGlow: true });
+    wheel(car, -1.05, 0.5, -1.1, 0.5, 0.48, { rim: 0xffe08a, rimGlow: true }); wheel(car, 1.05, 0.5, -1.1, 0.5, 0.48, { rim: 0xffe08a, rimGlow: true });
+    underglow(car, 0xffc928); plate(car, '🦊', '#ffc928', 0, 0.55, -1.52, Math.PI);
+    add(driver, S(0.55), 0xff9a3a, 0, 1.6, -0.5, { s: [1, 1.1, 0.9] });
+    add(driver, S(0.4), 0xffffff, 0, 1.6, -0.1, { s: [1, 1.1, 0.5], outline: false });
+    const h = add(driver, S(0.52), 0xff9a3a, 0, 2.38, -0.4); car.head = h;
+    add(h, CONE(0.3, 0.6, 12), 0xff9a3a, 0, -0.12, 0.55, { rx: Math.PI/2 }); add(h, S(0.09, 8, 6), 0x1a1a1a, 0, -0.12, 0.85, { outline: false });
+    add(h, S(0.3, 12, 10), 0xffffff, 0, -0.22, 0.3, { s: [1.2, 0.6, 0.8], outline: false });
+    for (const s of [-1, 1]) { add(h, CONE(0.2, 0.5, 8), 0xff9a3a, s*0.32, 0.55, -0.05, { rz: -s*0.3 }); add(h, CONE(0.1, 0.28, 6), 0x1a1a1a, s*0.33, 0.66, 0.0, { rz: -s*0.3, outline: false }); }
+    eyes(h, 0.12, 0.42, 0.2, 0.12, 0x2a8a3a);
+    car.tail = tube(driver, [[0, 1.3, -0.95], [0.3, 1.2, -1.5], [0.1, 1.7, -2.0]], 0.22, 0xff9a3a);
+    add(driver, S(0.28, 10, 8), 0xffffff, 0.1, 1.85, -2.05);
+    steering(car, 0, 1.55, 0.45, -1.0, 0x8a1a2a, 0xffffff, [0.5, 1.85, -0.5, 0xff9a3a]);
+  }
+  car.headR = { nervbert: 0.58, kritzel: 0.8, pandi: 0.74, lux: 0.55, kicker: 0.5, sonni: 0.5, goldfuchs: 0.55, berta: 0.52, brecher: 0.56, elara: 0.48, karl: 0.5 }[id] || 0.55;
+  if (cfg.vehicle && cfg.vehicle !== 'sig') genericVehicle(car, id, cfg.vehicle, paintColor(id, paint), paint === 'gold');
+  if (cfg.outfit && cfg.outfit !== 'none' && car.head) outfit(car, cfg.outfit, id);
+  PMAP = null; WSTYLE = 'std';
   // Auspuff-Flammen
   car.flames = [];
   for (const [x, y, z] of car.exhaust) {
@@ -348,4 +503,69 @@ export function sanitize(obj) {
     const n = g.attributes.normal.array; let bad = 0;
     for (let i = 0; i < n.length; i += 3) { const l = Math.hypot(n[i], n[i+1], n[i+2]); if (!(l > 1e-6)) { n[i] = 0; n[i+1] = 1; n[i+2] = 0; bad++; } else if (Math.abs(l - 1) > 1e-3) { n[i] /= l; n[i+1] /= l; n[i+2] /= l; } }
     if (bad) { g.attributes.normal.needsUpdate = true; if (window.__nanLog) window.__nanLog.push(g.type + ':' + bad); } });
+}
+
+// ---------- Allgemeine Fahrzeuge (für alle Fahrer) ----------
+const HANDS = { nervbert: 0xf1b48a, kritzel: 0x3a8ae0, pandi: 0x1a1a1a, lux: 0xffa53a, kicker: 0xf1c09a, sonni: 0xf3c49a, goldfuchs: 0xffffff, berta: 0xf3c8a8, brecher: 0xd8966a, elara: 0xffe0d0, karl: 0xffffff };
+function genericVehicle(car, id, type, col, gold) {
+  const { body, driver } = car;
+  for (const c of [...body.children]) if (c !== driver) body.remove(c);
+  for (const c of [...driver.children]) if (c.userData.arm) driver.remove(c);
+  car.wheels = []; car.fronts = []; car.steer = null; car.flag = car.umbrella = car.bobble = null; car.glow = null;
+  // Fahrer auf neue Sitzhöhe setzen
+  driver.updateMatrixWorld(true); const bb = new THREE.Box3().setFromObject(driver);
+  const em = gold ? 0x553300 : 0, dark = 0x22222e;
+  let seatY = 1.0, seatZ = -0.4, wheelZ = 1.2;
+  if (type === 'kart') {
+    add(body, RB(1.5, 0.22, 3.0, 0.1), dark, 0, 0.42, 0);
+    add(body, RB(1.3, 0.4, 1.1, 0.18), col, 0, 0.62, 1.25, { em, rx: 0.12 });
+    add(body, RB(0.9, 0.3, 0.6, 0.12), col, 0, 0.55, 1.95, { em });
+    for (const s of [-1, 1]) add(body, RB(0.38, 0.42, 1.5, 0.15), col, s*0.82, 0.6, -0.2, { em });
+    add(body, RB(1.0, 0.6, 0.7, 0.15), 0x444455, 0, 0.75, -1.35);
+    add(body, RB(1.7, 0.08, 0.45, 0.03), col, 0, 1.25, -1.75, { em });
+    for (const s of [-1, 1]) add(body, RB(0.08, 0.5, 0.3, 0.02), dark, s*0.7, 1.0, -1.75);
+    exhaust(car, [[0.3, 0.7, -1.8], [-0.3, 0.7, -1.8]]);
+    add(body, RB(0.9, 0.5, 0.7, 0.15), 0x1a1a24, 0, 0.75, -0.55);
+    wheel(car, -0.95, 0.38, 1.15, 0.36, 0.34, { front: true }); wheel(car, 0.95, 0.38, 1.15, 0.36, 0.34, { front: true });
+    wheel(car, -1.0, 0.48, -1.1, 0.48, 0.5); wheel(car, 1.0, 0.48, -1.1, 0.48, 0.5);
+    seatY = 0.95; seatZ = -0.5; steering(car, 0, 1.25, 0.55, -1.1, dark, HANDS[id]);
+  } else if (type === 'bike') {
+    add(body, S(0.7), col, 0, 1.0, 0.2, { s: [0.7, 0.7, 1.9], em });
+    add(body, RB(0.55, 0.15, 1.1, 0.07), 0x1a1a24, 0, 1.4, -0.45);
+    add(body, C(0.06, 0.06, 1.1, 8), 0xcccccc, 0, 1.6, 1.15, { rx: -0.35 });
+    add(body, RB(1.3, 0.1, 0.1, 0.04), dark, 0, 2.1, 1.35);
+    add(body, S(0.18, 12, 10), 0, 0, 1.75, 1.45, { mat: glow(0xfff6d0) });
+    add(body, TOR(0.48, 0.07, Math.PI), col, 0, 0.5, 1.2, { ry: Math.PI/2, em });
+    exhaust(car, [[0.3, 0.65, -1.2]]);
+    wheel(car, 0, 0.45, 1.2, 0.45, 0.32, { front: true }); wheel(car, 0, 0.45, -1.1, 0.45, 0.34);
+    seatY = 1.45; seatZ = -0.45; car.lean = true;
+    const sw = new THREE.Group(); sw.position.set(0, 2.1, 1.35); body.add(sw); car.steer = null;
+    for (const s of [-1, 1]) add(body, S(0.13, 10, 8), HANDS[id], s*0.6, 2.12, 1.33);
+  } else if (type === 'sofa') {
+    add(body, RB(2.1, 0.6, 1.6, 0.25), col, 0, 0.75, -0.2, { em });
+    add(body, RB(2.1, 1.1, 0.45, 0.2), col, 0, 1.3, -0.95, { em, rx: -0.1 });
+    for (const s of [-1, 1]) add(body, RB(0.4, 0.75, 1.6, 0.18), col, s*1.1, 1.05, -0.2, { em });
+    for (const s of [-1, 1]) add(body, RB(0.85, 0.22, 1.2, 0.1), 0xfff0d8, s*0.45, 1.12, -0.1);
+    add(body, S(0.28, 12, 8), 0xffe14a, -0.7, 1.45, -0.6, { s: [1, 0.6, 1] });
+    add(body, C(0.05, 0.05, 1.3, 6), 0x8a5a2a, 0, 1.1, 0.75, { rx: 0.7 });
+    add(body, RB(1.2, 0.15, 0.6, 0.05), 0x8a5a2a, 0, 0.55, 1.0);
+    const lamp = add(body, C(0.25, 0.4, 0.4, 12), 0xffe9a8, 0.95, 2.3, -0.9, { em: 0x664400 }); add(body, C(0.03, 0.03, 1.3, 6), 0x555555, 0.95, 1.6, -0.9);
+    exhaust(car, [[0.6, 0.6, -1.2]]); void lamp;
+    for (const [x, z] of [[-0.9, 0.9], [0.9, 0.9], [-0.9, -0.9], [0.9, -0.9]]) wheel(car, x, 0.3, z, 0.3, 0.25, { front: z > 0, rim: 0xffcf4a });
+    seatY = 1.15; seatZ = -0.35; steering(car, 0, 1.55, 0.55, -0.9, 0x8a5a2a, HANDS[id]);
+  }
+  driver.position.set(0, seatY - bb.min.y - 0.15 + (type === 'bike' ? 0 : 0), seatZ - (bb.min.z + bb.max.z)/2);
+  void wheelZ;
+}
+// ---------- Outfits (Kopfschmuck) ----------
+function outfit(car, type, id) {
+  const h = car.head, r = car.headR, g = new THREE.Group(); h.add(g); g.position.y = r*0.82;
+  if (id === 'sonni') g.position.y = r*0.82 + 0.75;
+  if (type === 'party') { const c = add(g, CONE(r*0.55, r*1.4, 16), 0, 0, r*0.6, 0, { mat: new THREE.MeshToonMaterial({ map: stripes('#ff3fd0', '#ffe14a', 8), gradientMap: grad }) }); c.rotation.z = 0.15; add(g, S(r*0.18, 10, 8), 0x29f0ff, 0.1, r*1.35, 0); }
+  else if (type === 'phones') { g.position.y = 0; add(g, TOR(r*1.02, r*0.09, Math.PI), 0x222230, 0, 0, 0); for (const s of [-1, 1]) add(g, C(r*0.32, r*0.32, r*0.28, 16), 0xff3fd0, s*r*1.0, 0, 0, { rz: Math.PI/2, em: 0x330a22 }); }
+  else if (type === 'tophat') { add(g, C(r*0.95, r*0.95, r*0.08, 20), 0x1a1a22, 0, 0, 0); add(g, C(r*0.62, r*0.62, r*1.05, 20), 0x1a1a22, 0, r*0.55, 0); add(g, C(r*0.64, r*0.64, r*0.18, 20), 0xd0402a, 0, r*0.15, 0, { outline: false }); }
+  else if (type === 'shades') { g.position.y = r*0.15; g.position.z = r*0.82; for (const s of [-1, 1]) add(g, RB(r*0.6, r*0.36, r*0.08, 0.05), 0x111122, s*r*0.36, 0, 0, { em: 0x1a0a3a }); add(g, RB(r*0.3, r*0.08, r*0.05, 0.02), 0x111122, 0, r*0.08, 0); }
+  else if (type === 'viking') { add(g, S(r*0.85, 18, 10), 0xa0a8b8, 0, -r*0.1, 0, { s: [1, 0.75, 1] }); for (const s of [-1, 1]) { const horn = add(g, CONE(r*0.18, r*0.9, 10), 0xfff0d8, s*r*0.85, r*0.3, 0); horn.rotation.z = -s*0.9; } add(g, TOR(r*0.86, r*0.07), 0xffcf4a, 0, -r*0.25, 0, { rx: Math.PI/2 }); }
+  else if (type === 'crown') { add(g, C(r*0.62, r*0.55, r*0.4, 16, 1, true), 0xffc928, 0, r*0.2, 0, { em: 0x553300 }); for (let i = 0; i < 6; i++) { const a = i/6*Math.PI*2; add(g, CONE(r*0.14, r*0.38, 6), 0xffc928, Math.cos(a)*r*0.58, r*0.55, Math.sin(a)*r*0.58, { em: 0x553300 }); add(g, S(r*0.07, 8, 6), 0, Math.cos(a)*r*0.6, r*0.25, Math.sin(a)*r*0.6, { mat: glow([0xff3fd0, 0x29f0ff, 0x46e07a][i % 3]), outline: false }); } }
+  else if (type === 'halo') { const ring = add(g, TOR(r*0.6, r*0.08), 0, 0, r*0.55, 0, { mat: glow(0xfff6b0), outline: false }); ring.rotation.x = Math.PI/2; car.halo = ring; }
 }

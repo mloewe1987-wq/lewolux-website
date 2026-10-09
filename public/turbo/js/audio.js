@@ -1,5 +1,5 @@
 // Klang: Motor, Effekte und Musik, komplett im Browser erzeugt (WebAudio)
-let ctx = null, master, sfxBus, musicBus, noiseBuf;
+let ctx = null, master, sfxBus, musicBus, voiceBus, noiseBuf;
 let engine = null, drift = null, musicTimer = null, nextBeat = 0, beat = 0;
 export const audio = { muted: false, musicOn: true };
 
@@ -11,6 +11,7 @@ export function initAudio() {
   const comp = ctx.createDynamicsCompressor(); comp.connect(master);
   sfxBus = ctx.createGain(); sfxBus.gain.value = 0.9; sfxBus.connect(comp);
   musicBus = ctx.createGain(); musicBus.gain.value = 0.32; musicBus.connect(comp);
+  voiceBus = ctx.createGain(); voiceBus.gain.value = 1.0; voiceBus.connect(comp); preloadSfx();
   noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 1.5, ctx.sampleRate);
   const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
 }
@@ -31,8 +32,31 @@ function noise(dur, f0, f1, vol = 0.3, q = 1, type = 'bandpass', delay = 0, bus 
   s.connect(f); f.connect(g); g.connect(bus); s.start(t); s.stop(t + dur + 0.05);
 }
 
+// ---------- Echte Aufnahmen (Epidemic Sound / ElevenLabs) ----------
+const BUF = {}, LOADING = {};
+const SFX_FILES = { item: 'pickup', got: null, boost: 'boost', honk: 'honk', hit: 'bonk', punch: 'punch', pop: 'pop', bubble: 'pop', kick: 'kick', zap: 'zap', thunder: 'thunder', roar: 'roar', coin: 'coin', splash: 'splash', crowd: 'crowd', firework: 'firework', ink: 'splat', slip: 'slip', bump: 'thud', trick: 'trick', confetti: 'confetti' };
+const SFX_VOL = { item: 0.55, boost: 0.5, honk: 0.6, hit: 0.6, punch: 0.6, pop: 0.6, bubble: 0.5, kick: 0.6, zap: 0.55, thunder: 0.6, roar: 0.75, coin: 0.4, splash: 0.4, crowd: 0.5, firework: 0.5, ink: 0.6, slip: 0.55, bump: 0.25, trick: 0.5, confetti: 0.55 };
+export function loadBuf(key, url) {
+  if (BUF[key] || LOADING[key] || !ctx) return;
+  LOADING[key] = fetch(url).then(r => r.ok ? r.arrayBuffer() : Promise.reject(r.status)).then(b => ctx.decodeAudioData(b)).then(d => { BUF[key] = d; }).catch(() => { BUF[key] = null; });
+}
+export function preloadSfx() { for (const f of new Set(Object.values(SFX_FILES).filter(Boolean))) loadBuf('sfx:' + f, 'assets/sfx/' + f + '.mp3'); }
+function playBuf(key, vol = 1, rate = 1, bus = sfxBus) {
+  const b = BUF[key]; if (!b || !ctx) return false;
+  const s = ctx.createBufferSource(); s.buffer = b; s.playbackRate.value = rate; const g = ctx.createGain(); g.gain.value = vol; s.connect(g); g.connect(bus); s.start(); return true;
+}
+// Sprachclips: assets/voice/<id>_<n>.mp3
+let voiceBusy = 0;
+export function say(id, n, vol = 1) {
+  if (!ctx || audio.muted) return false; const key = 'v:' + id + '_' + n;
+  if (BUF[key]) { if (ctx.currentTime < voiceBusy - 0.3 && id !== 'ann') return true; playBuf(key, vol*(id === 'ann' ? 1.1 : 1), 1, voiceBus); voiceBusy = ctx.currentTime + BUF[key].duration; return true; }
+  loadBuf(key, 'assets/voice/' + id + '_' + n + '.mp3'); return false;
+}
+export function preloadVoices(ids, n = 11) { if (!ctx) return; for (const id of ids) for (let i = 0; i < n; i++) loadBuf('v:' + id + '_' + i, 'assets/voice/' + id + '_' + i + '.mp3'); }
+
 export function sfx(name, p = 1) {
   if (!ctx || audio.muted) return;
+  const f = SFX_FILES[name]; if (f && BUF['sfx:' + f] && playBuf('sfx:' + f, (SFX_VOL[name] || 0.5)*p, name === 'bubble' ? 1.3 : 1)) { if (name !== 'boost' && name !== 'item') return; }
   switch (name) {
     case 'beep': tone('square', 520, 0, 0.18, 0.25); break;
     case 'go': tone('square', 1040, 0, 0.5, 0.25); tone('square', 1560, 0, 0.5, 0.12); break;
@@ -104,6 +128,23 @@ export function engineStop() {
 const BPM = 132, STEP = 60 / BPM / 4;
 const CH = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+let musicEl = null, musicSrc = null, musicGain = null, musicName = null;
+export function playMusic(name, fast = false) {
+  if (!ctx || !audio.musicOn) return;
+  if (musicName !== name) {
+    stopMusicEl();
+    const el = new Audio('assets/music/' + name + '.mp3'); el.loop = true; el.crossOrigin = 'anonymous'; el.preload = 'auto';
+    try { musicSrc = ctx.createMediaElementSource(el); musicGain = ctx.createGain(); musicGain.gain.value = 0; musicSrc.connect(musicGain); musicGain.connect(master); } catch (_) { musicSrc = null; }
+    musicEl = el; musicName = name;
+    el.addEventListener('error', () => { if (musicEl === el) { stopMusicEl(); musicStart(fast); } });
+    el.play().catch(() => {});
+    if (musicGain) musicGain.gain.setTargetAtTime(audio.muted ? 0 : 0.42, ctx.currentTime, 0.4);
+  } else if (musicEl && musicEl.paused) musicEl.play().catch(() => {});
+  if (musicEl) { musicEl.playbackRate = fast ? 1.08 : 1; musicEl.preservesPitch = false; }
+}
+function stopMusicEl() { if (musicEl) { try { musicEl.pause(); musicEl.src = ''; } catch (_) {} } if (musicSrc) try { musicSrc.disconnect(); } catch (_) {} musicEl = null; musicSrc = null; musicName = null; }
+export function pauseMusic() { if (musicEl) musicEl.pause(); musicStop(); }
+export function stopMusic() { stopMusicEl(); musicStop(); }
 export function musicStart(fast = false) {
   if (!ctx || musicTimer || !audio.musicOn) return;
   nextBeat = ctx.currentTime + 0.1; beat = 0;

@@ -147,6 +147,15 @@ Stand: 9. Oktober 2026. Diese Datei fasst zusammen, was ein neuer Chat wissen mu
 - **Look:** stilisiert, knallbunt, Comic-Kanten, auch auf dem Handy flüssig.
 - **Technik:** Three.js (WebGL), Gamepad-API, DeviceOrientation (Neigen; iPhone braucht Erlaubnis), Touch-Steuerung, eigene Arcade-Fahrphysik, KI-Gegner.
 
+### Fortschritt (Martins Wunsch, 9.10.)
+- **Fahrer-Level 1–30** (XP aus Platzierung, Überholen, Treffern, Tricks, Münzen). Level schalten nur frei, machen **nicht stärker**: Outfits/Farben, 3 Fahrzeuge pro Fahrer, Räder, Flammen-/Spurfarben, Hupen, Siegerposen, Sprüche.
+- **Balancing:** Fahrzeuge/Teile sind Seitwärts-Upgrades (Summe der Werte bleibt gleich).
+- **Quests** (täglich/wöchentlich) → XP + **Lewolux-Taler** für den **Shop** (nur Spielwährung).
+- **Grand Prix:** 3 Cups × 4 Strecken, Punkte 15-12-10-8-7-6, Gesamtwertung, Pokal-Zeremonie, Cups nacheinander freischalten.
+- **Speichern:** erst localStorage, später über den Login auf lewolux.de.
+- **Reihenfolge:** 1. Sounds/Stimmen/Musik → 2. Grand Prix + Strecke 2 → 3. Level/Quests/Shop → 4. weitere Strecken; Balancing laufend.
+- **Items (Stand 9.10.):** Turbo-Tröte (auch 3×), Boxhandschuh-Rakete, Fußball, Seifenblase, Tintenklecks, Wahlplakat, Sonnencreme-Pfütze, Löwengebrüll, Karten-Schild, Sternschnuppe, Gewitterwolke. Wundertüten statt Kisten, Lewolux-Münzen, 2 Schanzen mit Trick-Turbo.
+
 ### Zeitplan (korrigierte Schätzung)
 1. Entwürfe (Look der Fahrer und einer Strecke, mit Gemini). **erledigt 9.10.**
    - **Prototyp läuft (9.10.):** https://lewolux.de/turbo/ (nicht verlinkt, noindex). Quelle: `quelle/spiele-intern/lewolux-turbo/` (Three.js, Module in `js/`: track, karts, scenery, audio, input, main). build.py kopiert nach `dist/turbo/`.
