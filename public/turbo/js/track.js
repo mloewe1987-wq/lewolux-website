@@ -103,7 +103,7 @@ export function buildTrackMeshes(tr, scene, toon) {
   }
   const cg = new THREE.BufferGeometry();
   cg.setAttribute('position', new THREE.Float32BufferAttribute(curbPos, 3)); cg.setAttribute('uv', new THREE.Float32BufferAttribute(curbUv, 2));
-  cg.setIndex(curbIdx); cfixN(g);
+  cg.setIndex(curbIdx); fixN(cg);
   const curbMat = new THREE.MeshLambertMaterial({ map: curbTex, side: THREE.DoubleSide });
   group.add(new THREE.Mesh(cg, curbMat));
   // Seitenstreifen (Gras, fällt zum Boden ab)
