@@ -68,7 +68,7 @@ function ribbon(tr, l0, l1, y0, y1, vScale, step = 1) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  g.setIndex(idx); g.computeVertexNormals();
+  g.setIndex(idx); fixN(g);
   return g;
 }
 
@@ -103,7 +103,7 @@ export function buildTrackMeshes(tr, scene, toon) {
   }
   const cg = new THREE.BufferGeometry();
   cg.setAttribute('position', new THREE.Float32BufferAttribute(curbPos, 3)); cg.setAttribute('uv', new THREE.Float32BufferAttribute(curbUv, 2));
-  cg.setIndex(curbIdx); cg.computeVertexNormals();
+  cg.setIndex(curbIdx); cfixN(g);
   const curbMat = new THREE.MeshLambertMaterial({ map: curbTex, side: THREE.DoubleSide });
   group.add(new THREE.Mesh(cg, curbMat));
   // Seitenstreifen (Gras, fällt zum Boden ab)
@@ -152,7 +152,7 @@ export function buildTrackMeshes(tr, scene, toon) {
   return group;
 }
 
-function flip(g) { const ix = g.index.array; for (let i = 0; i < ix.length; i += 3) { const t = ix[i+1]; ix[i+1] = ix[i+2]; ix[i+2] = t; } g.computeVertexNormals(); }
+function flip(g) { const ix = g.index.array; for (let i = 0; i < ix.length; i += 3) { const t = ix[i+1]; ix[i+1] = ix[i+2]; ix[i+2] = t; } fixN(g); }
 function vertical(tr, lat, y0, y1, step) {
   const pos = [], idx = []; const n = tr.N / step;
   for (let k = 0; k <= n; k++) {
@@ -160,6 +160,15 @@ function vertical(tr, lat, y0, y1, step) {
     pos.push(p.x + r.x*lat, p.y + y0, p.z + r.z*lat, p.x + r.x*lat, p.y + y1, p.z + r.z*lat);
     if (k < n) { const a = k*2; idx.push(a, a+2, a+1, a+1, a+2, a+3); }
   }
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); fixN(g); return g;
 }
 function placeAt(tr, obj, i, lat, y) { const p = tr.P[i], r = tr.R[i]; obj.position.set(p.x + r.x*lat, p.y + y, p.z + r.z*lat); }
+
+// Normalen berechnen und kaputte (NaN/Null) durch "nach oben" ersetzen – sonst schwarze Blöcke im Leuchteffekt
+export function fixN(g) {
+  g.computeVertexNormals(); const n = g.attributes.normal.array;
+  for (let i = 0; i < n.length; i += 3) {
+    const l = Math.hypot(n[i], n[i+1], n[i+2]);
+    if (!(l > 1e-6) || !isFinite(l)) { n[i] = 0; n[i+1] = 1; n[i+2] = 0; }
+  }
+}
