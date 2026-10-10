@@ -9576,6 +9576,8 @@ render();
 'use strict';
 if (window.LXPAD) return;
 var CFG = window.LXPAD_CFG || {};
+// Xbox (Edge): Vollbild über „View halten“, Controller muss einmal auf „Spielsteuerung“ umgestellt werden
+var XBOX = /Xbox/i.test(navigator.userAgent || '');
 var P = window.LXPAD = { active:false, pads:0, game:null, back:null, pause:null, root:null, suspend:null, focused:null };
 var D = document, html = D.documentElement;
 var NAMES = ['a','b','x','y','lb','rb','lt','rt','back','start','ls','rs','up','down','left','right','home'];
@@ -9631,7 +9633,7 @@ P.fullscreen = goFull;
 function fsState(){ html.classList.toggle('lx-fs', isFull()); }
 function showFs(){ if (!fsBtn) return; fsBtn.classList.add('show'); clearTimeout(fsT); fsT = setTimeout(function(){ if (!fsBtn.matches(':hover')) fsBtn.classList.remove('show'); }, 3500); }
 function setupFs(){
-  if (CFG.fs === false || fsBtn || !D.body || !canFull()) return;
+  if (CFG.fs === false || XBOX || fsBtn || !D.body || !canFull()) return;
   fsBtn = D.createElement('button'); fsBtn.id = 'lxFs'; fsBtn.type = 'button'; fsBtn.className = CFG.fsPos || 'br';
   fsBtn.setAttribute('aria-label','Vollbild'); fsBtn.title = 'Vollbild';
   fsBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
@@ -9888,7 +9890,7 @@ function nav(p){
   if (p.hit('a')) { var c = P.focused && P.focused.isConnected && vis(P.focused) ? P.focused : null; if (c) activate(c); else move(0, 0); }
   if (p.hit('b')) back();
   if (p.hit('start')) pause();
-  if (p.hit('back') && CFG.fs !== false && !CFG.site) goFull();
+  if (p.hit('back') && CFG.fs !== false && !CFG.site && !XBOX) goFull();
   // Rechter Stick oder Schultertasten: scrollen
   var sy = p.ry || 0; if (p.down('rt')) sy = 1; if (p.down('lt')) sy = -1;
   if (sy) { scrollAcc += sy * p.dt * 900; if (Math.abs(scrollAcc) >= 4) { var s = scroller(P.focused); s.scrollTop += scrollAcc; scrollAcc = 0; } }
@@ -9899,7 +9901,14 @@ function nav(p){
   drawRing();
 }
 
-function init(){ css(); setupFs(); fsState(); }
+function xboxHint(){
+  // Nur im obersten Fenster, einmal pro Sitzung, und nur solange der Controller noch nicht bei der Seite ankommt
+  var top = true; try { top = window.top === window; } catch (e) {}
+  if (!XBOX || !top) return;
+  try { if (sessionStorage.getItem('lxXboxHint')) return; sessionStorage.setItem('lxXboxHint', '1'); } catch (e) {}
+  setTimeout(function(){ if (!seen) toast('🎮 Xbox: Menü-Taste ☰ halten → „Spielsteuerung“ wählen', 9000); }, 1200);
+}
+function init(){ css(); setupFs(); fsState(); xboxHint(); }
 // Spiele können vorab window.LXPAD_INIT = function(P){ P.game = ...; } setzen
 if (typeof window.LXPAD_INIT === 'function') { try { window.LXPAD_INIT(P); } catch (e) { console.error(e); } }
 if (D.body) init(); else D.addEventListener('DOMContentLoaded', init);

@@ -97,6 +97,7 @@ Ziel: Alle Spiele am Beamer (XGIMI Horizon Pro, Android-TV-Browser) mit Xbox-Con
   - `quelle/werkzeuge/padtest/serve.py` = Test-Server, der das Modul einbaut.
   - `pad.py` = simulierter Xbox-Controller für Playwright (`connect`, `press`, `stick`, `shot`), Größen phone/pc/tv/tv1080.
 - **Grenze:** Vollbild per Controller lehnt der Browser oft ab (keine echte Nutzergeste). Dann erscheint ein Hinweis. Einmal mit Maus oder Fernbedienung auf ⛶ klicken.
+- **Xbox (Edge):** Edge startet im Maus-Zeiger-Modus. Menü-Taste ☰ halten → „Spielsteuerung“ wählen, dann kommt der Controller bei der Seite an. Auf der Xbox erscheint dazu automatisch ein Hinweis (einmal pro Sitzung). Vollbild = View halten, deshalb dort kein eigener Vollbild-Knopf. Pause/Zurück geht in allen Spielen auch mit B. Bekannter Edge-Fehler: Reagiert der Controller nicht mehr, Xbox-Guide kurz öffnen und schließen.
 - **Wichtig für andere Chats:** Vor jedem Sync `git pull`. Nie den ganzen `quelle/`-Ordner aus einer alten Kopie über das Repo kopieren, sonst gehen diese Änderungen verloren (ist am 10.10. einmal passiert).
 
 ## 6. Weitere Ideen / später mit Martin
