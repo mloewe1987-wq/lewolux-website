@@ -250,7 +250,7 @@ function say(k, what) {
 const ann = i => sayClip('ann', i), ann2 = i => sayClip('ann2', i);
 const TRACK_ANN = { dschungel: 2, schulhof: 3, teich: 4, wueste: 5, schulhof_nacht: 3, wueste_abend: 5 };
 const HUNT_T = 120;
-const MUS_ALIAS = { market: 'school', sky: 'jungle' };
+const MUS_ALIAS = {};
 const musicFor = () => curDef ? (MUS_ALIAS[curDef.theme] || curDef.theme) : 'menu';
 function inkScreen(t) {
   const el = $('#ink'); el.innerHTML = '';
