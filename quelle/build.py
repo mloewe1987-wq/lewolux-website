@@ -32,13 +32,15 @@ GFONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
 SHOTS = [(g["scene"], v, f'{g["id"]}-{v+1}') for g in GAMES for v in range(3)] + [(s["scene"], 0, f'software-{s["id"]}') for s in SOFTWARE]
 GAME_BY_ID = {g["id"]: g for g in GAMES}
 import hashlib as _h
-VER=_h.md5("".join(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts",f),encoding="utf-8").read() for f in ("style.css","app.js","install.js","kids.css","kids.js","community.js","community.css")).encode()).hexdigest()[:8]
+import pad_inject
+VER=_h.md5("".join(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"parts",f),encoding="utf-8").read() for f in ("style.css","app.js","install.js","kids.css","kids.js","community.js","community.css","lx-pad.js")).encode()).hexdigest()[:8]
 KIDS_IDS = {k["id"] for k in KIDS}
 # Kids-Modus-Sperre: steht ganz oben im <head> jeder Seite außerhalb von /kids/ (und in jedem Nicht-Kinder-Spiel unter /games/).
 # Ist der Kids-Modus aktiv (localStorage lxKids=1), wird sofort und ohne Aufblitzen nach /kids/ umgeleitet.
 # Impressum und Datenschutz bleiben erreichbar (Pflichtangaben); jeder Klick von dort führt wieder in den Kinderbereich.
 KIDS_GUARD = "<script>try{if(localStorage.getItem('lxKids')==='1'&&!/^\\/(kids|impressum|datenschutz)\\//.test(location.pathname)){document.documentElement.style.display='none';location.replace('/kids/')}}catch(e){}</script>"
-def app_js(): return part("install.js") + "\n" + part("app.js")
+SITE_PAD = "\nwindow.LXPAD_CFG={fs:false,site:true};\n" + part("lx-pad.js")   # Controller-Steuerung der Website (schläft ohne Controller)
+def app_js(): return part("install.js") + "\n" + part("app.js") + SITE_PAD
 SW_JS = """// Lewolux Studio – Service Worker: macht die Seite installierbar und offline nutzbar.
 // Seiten: erst Netz, sonst Zwischenspeicher. Bilder/Schriften/CSS: Zwischenspeicher zuerst. Spiele und Downloads werden nicht gespeichert.
 const C = "lx-__VER__";
@@ -66,7 +68,7 @@ def standalone(g):
         css = re.sub(r'url\(([^)]+\.woff2)\)', lambda u: "url(data:font/woff2;base64," + base64.b64encode(open(os.path.join(base, u.group(1)), "rb").read()).decode() + ")", css)
         return "<style>" + css + "</style>"
     s = re.sub(r'<link href="((?!https?:)[^"]+\.css)" rel="stylesheet">', inline_css, s)
-    return s
+    return pad_inject.inject(s)
 
 def has_game(g): return os.path.isfile(P("spiele-dateien", g["id"], "index.html"))
 def rnum(r): a, b_ = r.split("/"); return f"{float(a)/float(b_):.4f}"
@@ -1183,7 +1185,7 @@ def kids_build():
         shutil.copy(P("parts/kids-fonts", f), P("dist/assets/fonts", "Fredoka-OFL-LICENSE.txt" if f.endswith(".txt") else f))
     ff = "\n".join(f"@font-face{{font-family:'Fredoka';font-style:normal;font-weight:{w};font-display:swap;src:url(../fonts/fredoka-latin-{w}-normal.woff2) format('woff2')}}" for w in (500, 700))
     open(P("dist/assets/css/kids.css"), "w", encoding="utf-8").write(ff + "\n" + part("kids.css"))
-    open(P("dist/assets/js/kids.js"), "w", encoding="utf-8").write(part("install.js") + "\n" + part("kids.js"))
+    open(P("dist/assets/js/kids.js"), "w", encoding="utf-8").write(part("install.js") + "\n" + part("kids.js") + SITE_PAD)
     kids_icons()
     open(P("dist/kids/index.html"), "w", encoding="utf-8").write(kids_page(Ctx("../")))
     open(P("dist/kids/kids.webmanifest"), "w").write(json.dumps({"id": "/kids/", "name": "Lewolux Kids", "short_name": "Lewolux Kids",
@@ -1283,6 +1285,7 @@ def main():
     for g in GAMES:
         if has_game(g):
             shutil.copytree(P("spiele-dateien", g["id"]), P("dist/games", g["id"]))
+            pad_inject.inject_file(P("dist/games", g["id"], "index.html"))   # Controller, Vollbild-Knopf
             if g["id"] not in KIDS_IDS: guard_game(P("dist/games", g["id"], "index.html"))
             if not g.get("online"): open(P("dist", g["download"]["file"]), "w", encoding="utf-8").write(standalone(g))
     for g in GAMES:

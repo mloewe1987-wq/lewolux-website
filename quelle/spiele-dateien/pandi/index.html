@@ -93,6 +93,11 @@ html,body{margin:0;height:100%;overflow:hidden;background:#bfe7d6;overscroll-beh
 #gearRing{position:absolute;inset:-6px;width:calc(100% + 12px)!important;height:calc(100% + 12px)!important;transform:rotate(-90deg)}
 .hint{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(255,255,255,.95);border-radius:16px;padding:8px 14px;font-weight:800;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 4px 0 #c6b8da;white-space:nowrap}
 .hint.on{opacity:1}
+/* Controller (nur im Controller-Modus sichtbar) */
+#padHint{position:absolute;left:50%;top:84px;transform:translateX(-50%);display:none;pointer-events:none;z-index:6;max-width:94vw;white-space:normal;text-align:center;font-size:clamp(15px,1.6vw,28px);line-height:1.35;padding:.35em 1em;opacity:0;transition:opacity .3s}
+html.lx-pad #padHint{display:block}html.lx-pad #padHint.on{opacity:1}
+#padHint b{display:inline-block;min-width:1.5em;border-radius:999px;color:#fff;padding:0 .35em;margin:0 .1em;background:#7d6c96}
+#padHint b.a{background:#4cc046}#padHint b.x{background:#3a8bff}#padHint b.y{background:#e6b800}#padHint b.bb{background:#e8343a}
 </style>
 </head>
 <body>
@@ -101,7 +106,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#bfe7d6;overscroll-beh
 <div id="ui">
   <button class="b" id="bBack" aria-label="Zurück" style="display:none"></button>
   <div class="scr" id="s-title">
-    <button class="b big pulse" id="bPlay" aria-label="Spielen"></button>
+    <button class="b big pulse" id="bPlay" aria-label="Spielen" data-pad-default></button>
     <button class="b green" id="bDress" aria-label="Ankleide-Ecke"></button>
     <button class="b yellow" id="bAlbum" aria-label="Sticker-Album"></button>
     <button class="b sm" id="bVoice" aria-label="Stimme an/aus"></button>
@@ -121,6 +126,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#bfe7d6;overscroll-beh
   <div class="scr" id="s-dress"><div class="pill" id="dcount"></div><div id="dpanel"><div id="dtabs"></div><div id="dgrid"></div></div></div>
   <div class="scr" id="s-par"><div class="card" id="pcard"></div></div>
   <div id="toast"></div>
+  <div class="pill" id="padHint" role="status"></div>
 </div>
 <script>
 'use strict';
@@ -1713,9 +1719,9 @@ function showResult(){
   for(const k of newly)addI((c,s)=>{c.fillStyle='#fff3c0';circ(c,s/2,s/2,s/2-2);c.fill();drawProj(c,k,s/2,s/2,k==='giant'?20:16,1,.4)});
   const nb=$('#rBtns');nb.innerHTML='';
   const mk=(cls,ic,lab,fn)=>{const b=document.createElement('button');b.className='b '+cls;b.innerHTML=ic;b.setAttribute('aria-label',lab);b.onclick=e=>{e.stopPropagation();sfx('tap');fn()};nb.appendChild(b);return b};
-  mk('sm',ICON.retry,'Nochmal',()=>startLevel(G.li));
+  mk('sm',ICON.retry,'Nochmal',()=>startLevel(G.li)).setAttribute('data-pad-default','');
   mk('sm',ICON.map,'Levelkarte',()=>go('world'));
-  if(G.li<LV.length-1)mk('big green pulse',ICON.next,'Weiter',()=>nextLevel()).style.cssText='position:relative;width:96px;height:96px';
+  if(G.li<LV.length-1){const wb=mk('big green pulse',ICON.next,'Weiter',()=>nextLevel());wb.style.cssText='position:relative;width:96px;height:96px';nb.querySelectorAll('[data-pad-default]').forEach(n=>n.removeAttribute('data-pad-default'));wb.setAttribute('data-pad-default','')}
   $('#res').classList.add('on');layout();
   setTimeout(()=>{
     if(newly.length){say('Neu: '+PT[newly[0]].name+'!',true);toast(PT[newly[0]].name,c=>drawProj(c,newly[0],24,24,newly[0]==='giant'?20:16,1,.4))}
@@ -1774,6 +1780,7 @@ function buildMap(){
     b.innerHTML=(open?'':`<span class="lockb">${ICON.lock}</span>`)+`<span class="wl">${ICON.star}${st}/18</span>`;
     b.onclick=()=>{audioInit();if(!open){b.classList.remove('wig');void b.offsetWidth;b.classList.add('wig');sfx('miss');say('Noch zu!');return}sfx('tap');CUR.w=i;go('world')};
     el.appendChild(b);
+    if(open){el.querySelectorAll('[data-pad-default]').forEach(n=>n.removeAttribute('data-pad-default'));b.setAttribute('data-pad-default','')}
   });
 }
 function mapEnsure(){
@@ -1799,7 +1806,8 @@ function buildWorld(){
     b.setAttribute('aria-label','Level '+(k+1));
     b.innerHTML=open?`<span class="num">${k+1}</span><span class="ss">${[0,1,2].map(j=>`<span class="st${j<st?'':' g'}">${ICON.star}</span>`).join('')}</span>`:`<span class="lockb" style="width:56%;height:56%;box-shadow:none;background:none">${ICON.lock}</span>`;
     b.onclick=()=>{audioInit();if(!open){b.classList.remove('wig');void b.offsetWidth;b.classList.add('wig');sfx('miss');return}sfx('tap');startLevel(i)};
-    el.appendChild(b);}
+    el.appendChild(b);
+    if(open&&!el.querySelector('.lvl.cur[data-pad-default]')){el.querySelectorAll('[data-pad-default]').forEach(n=>n.removeAttribute('data-pad-default'));b.setAttribute('data-pad-default','')}}
 }
 /* ---- Ankleide-Ecke ---- */
 const ITEMS={
@@ -1858,7 +1866,7 @@ function roomEnsure(){const key=[V.cw,V.ch,V.dpr].join(':');if(ROOMC.key===key)r
 /* ---- Elternbereich ---- */
 function buildPar(){
   const p=$('#pcard'),vn=VO.v?VO.v.name:'keine deutsche Stimme gefunden';
-  const row=(id,lab,sub,on)=>`<div class="row"><div>${lab}${sub?`<small>${sub}</small>`:''}</div><button class="tg${on?' on':''}" id="${id}" aria-label="${lab}"></button></div>`;
+  const row=(id,lab,sub,on)=>`<div class="row"><div>${lab}${sub?`<small>${sub}</small>`:''}</div><button class="tg${on?' on':''}" id="${id}" aria-label="${lab}"${id==='tVoice'?' data-pad-default':''}></button></div>`;
   p.innerHTML=`<h2>Elternbereich</h2>
   ${row('tVoice','Sprachausgabe','Stimme: '+vn,S.set.voice)}
   ${row('tMusic','Musik','Leise Hintergrundmusik',S.set.music)}
@@ -1867,7 +1875,7 @@ function buildPar(){
   ${row('tAll','Alle Level freischalten','Auch Outfits und Spezial-Blasen',S.all)}
   <button class="hold" id="bReset"><i></i><span>Fortschritt löschen (3 Sek. gedrückt halten)</span></button>
   <p class="note">Sterne: ${totalStars()} von ${LV.length*3} · Goldener Bambus: ${totalBamboo()} · Sticker: ${Object.keys(S.stickers).length} von ${STICKER_TYPES.length}<br>Lewolux Kids: keine Werbung, keine Käufe, keine Links nach außen. Der Spielstand wird nur auf diesem Gerät gespeichert.</p>`;
-  const tg=(id,fn)=>{$('#'+id).onclick=()=>{fn();save();sfx('tap');buildPar();syncToggles()}};
+  const tg=(id,fn)=>{$('#'+id).onclick=()=>{fn();save();sfx('tap');buildPar();syncToggles();if(window.LXPAD&&LXPAD.active)LXPAD.focus($('#'+id))}};
   tg('tVoice',()=>{S.set.voice=!S.set.voice;if(!S.set.voice)shutUp();else say('Hallo!',true)});
   tg('tMusic',()=>{S.set.music=!S.set.music;audioInit();musicVol()});
   tg('tSfx',()=>{S.set.sfx=!S.set.sfx});
@@ -2004,7 +2012,7 @@ function render(){
     for(const T of G.T)if(!T.gone&&T.react==='bub')drawTarget(c,T);
     if(G.easyRing){const e=G.easyRing;c.strokeStyle=`rgba(255,255,255,${1-e.t})`;c.lineWidth=4;circ(c,e.x,e.y,20+e.t*30);c.stroke()}
     partsDraw(c);drawAmbFront(c,G.w);drawHint(c);
-    drawConf(c);
+    drawConf(c);padDraw(c);
   }
 }
 function partsDrawPx(c){c.save();c.setTransform(V.dpr,0,0,V.dpr,0,0);partsDraw(c);c.restore()}
@@ -2081,6 +2089,86 @@ function initUI(){
   document.addEventListener('gesturestart',e=>e.preventDefault());
   document.addEventListener('contextmenu',e=>e.preventDefault());
 }
+
+/* =================== Controller (lx-pad.js) ===================
+   Nur Ergänzung: Touch/Maus bleiben unverändert. Menüs per Fokus-Navigation des Moduls.
+   Runde: Einfach-Modus = Stick bewegt Zeige-Hand, A = antippen.
+          Normal = A halten + Stick in Wurfrichtung (weiter drücken = mehr Kraft), A loslassen = werfen.
+   X = Einfach-Modus an/aus · Y/LB/RB = Blase wechseln · B = zurück · Start = Hilfe. */
+window.LXPAD_CFG=Object.assign({fsPos:'bl'},window.LXPAD_CFG||{});
+const PADS={cur:null,aim:null,hold:null,scr:'',t:0,hintT:0};
+function padOn(){return !!(window.LXPAD&&LXPAD.active)}
+function padHint(show){const el=$('#padHint');if(!el)return;
+  if(!show||!padOn()||SCR!=='play'){el.classList.remove('on');PADS.hintT=0;return}
+  el.innerHTML='🎮 '+(S.set.easy?'Stick = Hand bewegen · <b class="a">A</b> = antippen':'<b class="a">A</b> halten + Stick = zielen · loslassen = werfen')+
+    ' · <b class="x">X</b> '+(S.set.easy?'Ziehen':'Einfach')+(G.avail.length>1?' · <b class="y">Y</b> Blase wechseln':'')+' · <b class="bb">B</b> zurück';
+  el.style.top=(V.sa.t+(V.cw<600?120:84))+'px';el.classList.add('on');PADS.hintT=6}
+function padReset(){if(PADS.aim&&G.aim&&G.aim.pad){G.aim=null;pdSet('idle')}PADS.aim=null;PADS.cur=null}
+function padCurInit(){const T=G.T.find(U=>!U.hit&&!U.bonus)||G.T.find(U=>!U.hit);
+  if(T){const c=tCenter(T);PADS.cur={x:(c.x-G.cam)*V.s,y:c.y*V.s}}else PADS.cur={x:V.cw*.6,y:V.ch*.45}}
+function padHand(){return{x:(G.px-G.cam)*V.s,y:(G.py-90*G.ps)*V.s}}
+function padPickNext(d){const n=G.avail.length;if(n<2)return;const i=(G.avail.indexOf(G.sel)+d+n)%n,k=G.avail[i];
+  const b=$('#pick').children[i];if(b)b.click();else{G.sel=k;PD.proj=k}}
+function padPlay(p){
+  if(G.result)return false;            /* Ergebnis-Karte: Menü-Navigation */
+  if(p.down('a')||p.lx||p.ly||p.dx||p.dy)audioInit();
+  if(p.hit('b')){padReset();padHint(false);goBack();return true}
+  if(p.hit('start')){padHint(true);return true}
+  if(p.hit('x')){padReset();$('#bEasy').click();padHint(true);return true}
+  if(p.hit('y')||p.hit('rb'))padPickNext(1);if(p.hit('lb'))padPickNext(-1);
+  if(G.done){padReset();return true}
+  const mx=p.lx||p.dx*.8,my=p.ly||p.dy*.8;
+  if(S.set.easy){
+    if(PADS.aim)padReset();
+    if(!PADS.cur)padCurInit();const c=PADS.cur,sp=Math.min(V.cw,V.ch)*.75;
+    c.x=clamp(c.x+mx*p.dt*sp,8,V.cw-8);c.y=clamp(c.y+my*p.dt*sp,8,V.ch-8);
+    if(p.hit('a')&&G.projs.length<3){const w={x:c.x/V.s+G.cam,y:c.y/V.s};easyThrow(w.x,w.y);sfx('tap');PADS.tap=.25}
+    if(PADS.tap>0)PADS.tap-=p.dt;
+    return true}
+  PADS.cur=null;
+  if(p.hit('a')&&!G.aim&&G.projs.length<3){const h=padHand();
+    G.aim={id:-7,pad:true,px0:h.x,py0:h.y,px1:h.x,py1:h.y,pow:0,ang:PD.aim};PADS.aim={x:0,y:0};PD.pow=0;PD.proj=G.sel;pdSet('aim');sfx('tap')}
+  if(PADS.aim&&G.aim&&G.aim.pad){
+    const a=PADS.aim;
+    if(p.lx||p.ly){a.x=p.lx;a.y=p.ly}                       /* Stick: Richtung + Kraft direkt */
+    else if(p.dx||p.dy){a.x=clamp(a.x+p.dx*p.dt*1.2,-1,1);a.y=clamp(a.y+p.dy*p.dt*1.2,-1,1)}  /* Steuerkreuz: schrittweise */
+    const l=Math.hypot(a.x,a.y),k=l>1?1/l:1,d=MAXD*V.s;
+    G.aim.px1=G.aim.px0-a.x*k*d;G.aim.py1=G.aim.py0-a.y*k*d;
+    G.aim.pow=clamp(l,0,1);if(l>.05)G.aim.ang=Math.atan2(a.y,a.x);PD.aim=G.aim.ang;PD.pow=G.aim.pow;
+    if(!p.down('a')){const g=G.aim;G.aim=null;PADS.aim=null;if(g.pow>=.08&&!G.done)throwProj(g.ang,g.pow);else pdSet('idle')}
+  }
+  return true}
+function padDraw(c){
+  if(!padOn()||SCR!=='play'||G.result)return;
+  setPx();
+  if(S.set.easy&&PADS.cur){const q=PADS.cur,pr=PADS.tap>0?.82:1;
+    c.strokeStyle='rgba(255,255,255,.95)';c.lineWidth=4;circ(c,q.x,q.y,16);c.stroke();c.strokeStyle='#ffd23f';c.lineWidth=2.5;circ(c,q.x,q.y,16);c.stroke();
+    drawHand(c,q.x+6,q.y+10,Math.max(2.6,V.s*2.4)*pr,1)}
+  else if(!G.aim&&!G.done&&!G.projs.length&&G.throws===0&&G.t>1.2){const h=padHand(),k=.5+.5*Math.sin(G.t*5);
+    c.strokeStyle=`rgba(255,255,255,${.4+k*.5})`;c.lineWidth=4;circ(c,h.x,h.y,22+k*6);c.stroke();
+    const fz=Math.max(18,Math.round(V.s*18));c.font=`900 ${fz}px Nunito,Trebuchet MS,Verdana,sans-serif`;c.textAlign='center';c.textBaseline='middle';
+    c.fillStyle='#4cc046';circ(c,h.x,h.y-46-fz*.2,fz*.85);c.fill();c.fillStyle='#fff';c.fillText('A',h.x,h.y-46-fz*.2)}
+}
+window.LXPAD_INIT=function(L){
+  L.root=()=>SCR==='play'&&G.result?$('#res'):SCR==='par'?$('#pcard'):null;
+  L.back=()=>{if(PADS.hold)return true;if(SCR==='title')return true;goBack();return true};
+  L.pause=()=>true;
+  L.game=p=>{
+    if(SCR!==PADS.scr||(SCR==='play'&&G.t<PADS.t)){if(SCR!==PADS.scr)LXPAD.focused=null;PADS.scr=SCR;padReset();padHint(SCR==='play')}
+    if(SCR==='play'&&G.result!==PADS.res){PADS.res=G.result;LXPAD.focused=null}
+    PADS.t=SCR==='play'?G.t:0;
+    if(PADS.hintT>0){PADS.hintT-=p.dt;if(PADS.hintT<=0)padHint(false)}
+    if(!p.active)return false;
+    /* „Gedrückt halten“-Knöpfe (Zahnrad, Fortschritt löschen): A halten */
+    const h=PADS.hold;
+    if(h){if(!h.isConnected||!p.down('a')){PADS.hold=null;h.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}))}return true}
+    const f=LXPAD.focused;
+    if(f&&(f.id==='bGear'||f.id==='bReset')&&p.hit('a')){audioInit();PADS.hold=f;f.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true}));return true}
+    if(SCR==='play')return padPlay(p);
+    return false};
+};
+window.addEventListener('lxpadmode',e=>{const on=!!(e.detail&&e.detail.active);const gh=$('#gearHint');if(gh)gh.textContent=on?'Elternbereich: A gedrückt halten':'Elternbereich: Zahnrad gedrückt halten';
+  if(on)padHint(SCR==='play');else{padHint(false);padReset()}});
 loadSave();voiceInit();initUI();resize();syncToggles();go('title');
 requestAnimationFrame(frame);
 window.__pandi={G,V,S,PD,LV,pandiLaugh,go,startLevel,showResult,
