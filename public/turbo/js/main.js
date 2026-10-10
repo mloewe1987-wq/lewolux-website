@@ -58,6 +58,7 @@ let stats = newStats();
 window.__nanLog = [];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3();
 const wrapA = a => { while (a > Math.PI) a -= Math.PI*2; while (a < -Math.PI) a += Math.PI*2; return a; };
+const tmpV3 = new THREE.Vector3();
 const approach = (v, t, d) => v < t ? Math.min(t, v + d) : Math.max(t, v - d);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const trackAngle = i => Math.atan2(tr.T[i].x, tr.T[i].z);
@@ -631,6 +632,8 @@ function render(dt) {
     camera.fov += (fov - camera.fov)*Math.min(1, dt*4); camera.updateProjectionMatrix();
   }
   env.follow(podium.group ? podium.group.position : player && !MENU.has(state) ? player.pos : tr.P[6]);
+  // Gegner, die direkt vor der Kamera kleben, ausblenden (sonst verdecken sie das Bild)
+  if (player && !MENU.has(state) && state !== 'podium') for (const k of racers) if (k !== player) k.model.root.visible = camera.position.distanceToSquared(tmpV3.set(k.pos.x, k.y + 1, k.pos.z)) > 3.2*3.2;
   $('#speed').classList.toggle('on', !!(player && (player.boost > 0 || player.star > 0) && (state === 'race')));
   if (useBloom) composer.render(); else renderer.render(scene, camera);
   if (window.__shotCb) { const cb = window.__shotCb; window.__shotCb = null; cb(canvas.toDataURL('image/jpeg', 0.85)); }
