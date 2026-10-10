@@ -169,10 +169,10 @@ button:focus-visible,.card:focus-visible,.tsCard:focus-visible,.gItem:focus-visi
 .tb{position:absolute;border-radius:50%;border:3px solid var(--ink);font-weight:1000;color:var(--ink);display:grid;place-items:center;box-shadow:0 4px 0 var(--ink);opacity:.9}
 .tb.on{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);filter:brightness(1.2)}
 #tDrift{right:22px;bottom:30px;width:104px;height:104px;background:linear-gradient(180deg,#ffb2f0,var(--pink));font-size:17px}
-#tItem{right:136px;bottom:94px;width:82px;height:82px;border-radius:22px;border:0;padding:4px;box-shadow:0 5px 0 rgba(10,4,30,.75),0 0 18px rgba(41,240,255,.35);background:conic-gradient(from var(--ia,0deg),#29f0ff,#b46bff,#ff4fd8,#ffd84a,#5dff9d,#29f0ff);opacity:.82;animation:iaSpin 4s linear infinite}
+#tItem{right:136px;bottom:94px;width:82px;height:82px;border-radius:22px;border:0;padding:4px;box-shadow:0 5px 0 rgba(10,4,30,.75),0 0 18px rgba(41,240,255,.35);background:conic-gradient(from var(--ia,0deg),#29f0ff,#7a5cff,#ff4fd8,#7a5cff,#29f0ff);opacity:.82;animation:iaSpin 4s linear infinite}
 #tItem::before{content:"";position:absolute;inset:5px;border-radius:17px;background:radial-gradient(circle at 50% 35%,rgba(70,52,140,.92),rgba(18,10,46,.95));box-shadow:inset 0 2px 0 rgba(255,255,255,.25)}
 #tItem::after{content:"";position:absolute;inset:5px;border-radius:17px;background:linear-gradient(160deg,rgba(255,255,255,.35),transparent 45%);pointer-events:none}
-#tItemIc{position:relative;z-index:1;font-family:Bungee,system-ui,sans-serif;font-size:38px;line-height:1;color:#fff;text-shadow:0 0 10px #29f0ff,0 3px 0 #b46bff;transition:transform .2s}
+#tItemIc{position:relative;z-index:1;font-family:Bungee,system-ui,sans-serif;font-size:26px;letter-spacing:-1px;line-height:1;color:#fff;text-shadow:0 0 10px #29f0ff,0 3px 0 #b46bff;transition:transform .2s}
 #tItem:not(.ready) #tItemIc{opacity:.55}
 #tItem.ready{opacity:1;box-shadow:0 5px 0 rgba(10,4,30,.75),0 0 26px rgba(255,216,74,.85);animation:iaSpin 1.2s linear infinite,iaPop .9s ease-in-out infinite}
 #tItem.ready #tItemIc{font-family:system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:42px;text-shadow:0 4px 8px rgba(0,0,0,.5)}
@@ -390,7 +390,7 @@ body:not(.touch) #touch{display:none!important}
 <div id="touch">
   <div id="tStick"><div id="tBase"><div id="tKnob"></div></div></div>
   <div class="tb" id="tDrift">DRIFT</div>
-  <div class="tb" id="tItem"><span id="tItemIc">?</span></div>
+  <div class="tb" id="tItem"><span id="tItemIc">LX</span></div>
   <div class="tb" id="tBrake">BREMSE</div>
   <button id="tPause" aria-label="Pause">⏸</button>
 </div>
