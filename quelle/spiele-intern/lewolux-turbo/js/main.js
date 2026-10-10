@@ -856,8 +856,10 @@ function menuTick(dt, t) {
   const i = 6, p = tr.P[i];
   const d = previewDriver();
   if (d) { const cfg = PG.drv(d.id), key = d.id + JSON.stringify(cfg);
-    if (preview.key !== key) { if (preview.model) preview.group.remove(preview.model.root); preview.model = buildRacer(d.id, cfg); preview.group.add(preview.model.root); preview.key = key; } }
-  preview.group.position.set(p.x, p.y, p.z); preview.group.rotation.y = window.__fixRot ?? t*0.7;
+    if (preview.key !== key) { if (preview.model) preview.group.remove(preview.model.root); if (preview.id !== d.id) preview.spin = Math.PI*2; preview.id = d.id; preview.model = buildRacer(d.id, cfg); preview.group.add(preview.model.root); preview.key = key; } }
+  // Ausstellungs-Ansicht: Kart schaut schräg zur Kamera und wiegt sich leicht, beim Fahrerwechsel eine schnelle Drehung
+  preview.spin = (preview.spin || 0)*Math.pow(0.02, dt);
+  preview.group.position.set(p.x, p.y, p.z); preview.group.rotation.y = window.__fixRot ?? (t*0.08 + Math.PI + 0.55 + Math.sin(t*0.7)*0.35 + preview.spin);
   const showKart = state === 'select' || state === 'garage';
   preview.group.visible = showKart;
   if (preview.model) { preview.model.driver.position.y = preview.model.driver.position.y*0.9 + 0.1*Math.abs(Math.sin(t*3))*0.15; if (preview.model.halo) preview.model.halo.rotation.z += dt; }

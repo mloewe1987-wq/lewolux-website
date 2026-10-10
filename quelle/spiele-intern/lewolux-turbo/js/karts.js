@@ -209,9 +209,9 @@ export function buildRacer(id, cfg = {}) {
     add(body, RB(0.6, 0.18, 1.8, 0.08), 0x2b6fd6, 0, 0.55, 0.2);                                  // Trittbrett
     add(body, RB(0.85, 1.25, 0.28, 0.14), 0x3a8ae0, 0, 1.1, 1.05, { rx: -0.2 });                  // Beinschild
     add(body, RB(0.7, 0.14, 1.0, 0.07), 0x5a3a2a, 0, 1.42, -0.6);                                  // Sitz
-    add(body, C(0.07, 0.07, 1.2, 8), 0xcccccc, 0, 1.75, 1.18, { rx: -0.25 });
-    add(body, RB(1.3, 0.12, 0.12, 0.05), 0x222230, 0, 2.3, 1.3);
-    add(body, S(0.16, 12, 10), 0, 0, 2.15, 1.42, { mat: glow(0xfff6d0) });
+    add(body, C(0.07, 0.07, 0.8, 8), 0xcccccc, 0, 1.55, 1.2, { rx: -0.25 });
+    add(body, RB(1.3, 0.12, 0.12, 0.05), 0x222230, 0, 1.92, 1.32);
+    add(body, S(0.16, 12, 10), 0, 0, 1.72, 1.45, { mat: glow(0xfff6d0) });
     add(body, RB(0.5, 0.4, 0.5, 0.1), 0xffd23c, 0, 1.6, -1.55);                                   // Gepäckbox
     // Bleistift-Antenne
     add(body, C(0.07, 0.07, 1.4, 6), 0xffd23c, -0.32, 2.2, -1.5); add(body, CONE(0.07, 0.22, 6), 0xf3c49a, -0.32, 3.0, -1.5); add(body, C(0.072, 0.072, 0.12, 6), 0xff8ab0, -0.32, 1.47, -1.5);
@@ -259,10 +259,10 @@ export function buildRacer(id, cfg = {}) {
     eyes(h, 0.1, 0.62, 0.27, 0.1, 0x111111);
     add(h, S(0.11, 10, 8), 0x1a1a1a, 0, -0.1, 0.72, { s: [1.3, 1, 1], outline: false }); add(h, TOR(0.1, 0.025, Math.PI), 0x1a1a1a, 0, -0.25, 0.7, { rz: Math.PI, outline: false });
     // Steuerrad (Schiff)
-    const sw = new THREE.Group(); sw.position.set(0, 1.85, 0.55); sw.rotation.x = -0.5; body.add(sw);
+    const sw = new THREE.Group(); sw.position.set(0, 1.55, 0.78); sw.rotation.x = -0.95; body.add(sw);
     add(sw, TOR(0.35, 0.05), 0x8a5a2a, 0, 0, 0); for (let i = 0; i < 6; i++) add(sw, C(0.035, 0.035, 0.95, 6), 0x8a5a2a, 0, 0, 0, { rz: i/6*Math.PI, outline: false });
     car.steer = sw;
-    for (const s of [-1, 1]) { add(sw, S(0.17, 10, 8), 0x1a1a1a, s*0.32, 0.05, 0.05); tube(driver, [[s*0.62, 1.6, -0.3], [s*0.5, 1.75, 0.15], [s*0.32, 1.88, 0.55]], 0.14, 0x1a1a1a).userData.arm = true; }
+    for (const s of [-1, 1]) { add(sw, S(0.17, 10, 8), 0x1a1a1a, s*0.32, 0.05, 0.05); tube(driver, [[s*0.62, 1.6, -0.3], [s*0.5, 1.6, 0.3], [s*0.32, 1.6, 0.76]], 0.14, 0x1a1a1a).userData.arm = true; }
   } else if (id === 'lux') {
     // Neon-Flitzer (Keil-Form)
     const sh = new THREE.Shape(); sh.moveTo(-1.6, 0); sh.lineTo(1.75, 0); sh.lineTo(1.8, 0.2); sh.quadraticCurveTo(0.9, 0.45, 0.4, 0.65); sh.lineTo(-1.2, 0.75); sh.lineTo(-1.6, 0.6); sh.closePath();
@@ -348,7 +348,7 @@ export function buildRacer(id, cfg = {}) {
     add(driver, RB(0.85, 0.9, 0.45, 0.15), 0x5a7a3a, 0, 1.75, -0.85);
     add(driver, C(0.18, 0.18, 0.9, 12), 0xb04a3a, 0, 2.28, -0.95, { rz: Math.PI/2 });
     const h = add(driver, S(0.5), 0xf3c49a, 0, 2.4, -0.3); car.head = h;
-    const hat = new THREE.Group(); hat.position.y = 0.3; h.add(hat);
+    const hat = new THREE.Group(); hat.position.y = 0.3; h.add(hat); car.ownHat = hat;
     add(hat, C(1.05, 1.0, 0.07, 28), 0xf0c860, 0, 0, 0); add(hat, C(0.42, 0.5, 0.48, 18), 0xf0c860, 0, 0.26, 0); add(hat, C(0.51, 0.51, 0.1, 18), 0xd0402a, 0, 0.1, 0, { outline: false });
     eyes(h, 0.0, 0.4, 0.18, 0.12, 0x3a7a9a);
     add(h, S(0.1, 8, 6), 0xff8a6a, 0, -0.08, 0.5, { outline: false });
@@ -437,14 +437,13 @@ export function buildRacer(id, cfg = {}) {
     add(driver, RB(0.35, 0.6, 0.05, 0.02), 0xffffff, 0, 1.75, -0.08);
     add(driver, RB(0.3, 0.12, 0.08, 0.03), 0xd02a2a, 0, 2.03, -0.04);
     const h = add(driver, S(0.5), 0xf3c8a8, 0, 2.48, -0.5); car.head = h;
-    add(h, S(0.52, 16, 10), 0x1a1a1a, 0, 0.16, -0.06, { s: [1, 0.55, 1] });
+    add(h, new THREE.SphereGeometry(0.535, 18, 10, 0, Math.PI*2, 0, 1.25), 0x1a1a1a, 0, 0.02, -0.03, { s: [1, 1, 1.02], rx: -0.25 }); // Haare (Kappe, Stirn frei)
     eyes(h, 0.02, 0.42, 0.17, 0.11, 0x3a2a1a);
     add(h, RB(0.36, 0.05, 0.05, 0.02), 0x1a1a1a, 0, -0.17, 0.46, { outline: false });
     // Tablett mit Getränk (linke Hand)
-    const tray = new THREE.Group(); tray.position.set(-0.65, 2.55, -0.2); driver.add(tray); car.tray = tray;
+    const tray = new THREE.Group(); tray.position.set(0, 3.0, -0.5); h.parent.add(tray); car.tray = tray; // Tablett balanciert er auf dem Kopf
     add(tray, C(0.45, 0.45, 0.04, 20), 0xd0d8e0, 0, 0, 0); add(tray, C(0.1, 0.08, 0.32, 10), 0xffcf4a, 0.1, 0.18, 0, { em: 0x332200 }); add(tray, S(0.12, 10, 8), 0xffffff, 0.1, 0.36, 0, { outline: false });
-    add(driver, S(0.12, 10, 8), 0xffffff, -0.65, 2.45, -0.2);
-    steering(car, 0.15, 1.95, -0.9, -0.5, 0x3ad4c0, 0xffffff, null);
+    steering(car, 0, 1.9, 0.12, -0.7, 0x3ad4c0, 0xffffff, [0.42, 2.05, -0.5, 0x1a1a24]);
   } else if (id === 'goldfuchs') {
     // Goldflitzer
     const gold = 0xffc928;
@@ -560,7 +559,8 @@ function genericVehicle(car, id, type, col, gold) {
 // ---------- Outfits (Kopfschmuck) ----------
 function outfit(car, type, id) {
   const h = car.head, r = car.headR, g = new THREE.Group(); h.add(g); g.position.y = r*0.82;
-  if (id === 'sonni') g.position.y = r*0.82 + 0.75;
+  // Sonni: Hut-Outfits ersetzen seinen Strohhut, statt darüber zu schweben
+  if (id === 'sonni') { if (['party', 'tophat', 'viking', 'crown'].includes(type) && car.ownHat) car.ownHat.visible = false; else g.position.y = r*0.82 + 0.75; }
   if (type === 'party') { const c = add(g, CONE(r*0.55, r*1.4, 16), 0, 0, r*0.6, 0, { mat: new THREE.MeshToonMaterial({ map: stripes('#ff3fd0', '#ffe14a', 8), gradientMap: grad }) }); c.rotation.z = 0.15; add(g, S(r*0.18, 10, 8), 0x29f0ff, 0.1, r*1.35, 0); }
   else if (type === 'phones') { g.position.y = 0; add(g, TOR(r*1.02, r*0.09, Math.PI), 0x222230, 0, 0, 0); for (const s of [-1, 1]) add(g, C(r*0.32, r*0.32, r*0.28, 16), 0xff3fd0, s*r*1.0, 0, 0, { rz: Math.PI/2, em: 0x330a22 }); }
   else if (type === 'tophat') { add(g, C(r*0.95, r*0.95, r*0.08, 20), 0x1a1a22, 0, 0, 0); add(g, C(r*0.62, r*0.62, r*1.05, 20), 0x1a1a22, 0, r*0.55, 0); add(g, C(r*0.64, r*0.64, r*0.18, 20), 0xd0402a, 0, r*0.15, 0, { outline: false }); }
