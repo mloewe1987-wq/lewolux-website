@@ -34,6 +34,8 @@ export const priceOf = r => 40 + r.lvl*25;              // früher kaufen mit M�
 // Aufgaben-Pool: ev = Ereignis, n = Ziel
 const QUESTS = [
   { id: 'race3', text: 'Fahre 3 Rennen', ev: 'race', n: 3, coins: 40 },
+  { id: 'hunt1', text: 'Gewinne eine Münzjagd', ev: 'huntWin', n: 1, coins: 70 },
+  { id: 'hunt30', text: 'Sammle 40 Münzen in einer Münzjagd', ev: 'hunt30', n: 1, coins: 80 },
   { id: 'win1', text: 'Gewinne ein Rennen', ev: 'win', n: 1, coins: 60 },
   { id: 'podium3', text: 'Komm 3× aufs Podest', ev: 'podium', n: 3, coins: 60 },
   { id: 'hit5', text: 'Triff 5 Gegner mit Items', ev: 'hit', n: 5, coins: 50 },

@@ -75,13 +75,19 @@ export function createItems(ctx) {
   const coinGeo = new THREE.CylinderGeometry(0.62, 0.62, 0.16, 24); coinGeo.rotateX(Math.PI/2);
   const coinMat = [new THREE.MeshToonMaterial({ color: 0xffc928, emissive: 0x6a3a00 }), new THREE.MeshToonMaterial({ map: coinT, emissive: 0x3a2000 })];
   const coins = [];
-  for (const [f, lat] of ctx.def.coins) {
-    const i0 = Math.round(f*tr.N);
+  let huntMode = false, extraCoins = [];
+  const addRow = (f, lat, list) => { const i0 = Math.round(f*tr.N);
     for (let k = 0; k < 6; k++) { const i = (i0 + k*5) % tr.N; const m = withOutline(new THREE.Mesh(coinGeo, [coinMat[0], coinMat[1], coinMat[1]]), 1.1);
-      m.position.copy(tr.P[i]).addScaledVector(tr.R[i], lat); m.position.y += 1.2; scene.add(m); coins.push({ m, t: 0, base: m.position.y, ph: k*0.5 }); }
+      m.position.copy(tr.P[i]).addScaledVector(tr.R[i], lat); m.position.y += 1.2; scene.add(m); const c = { m, t: 0, base: m.position.y, ph: k*0.5, i, lat }; coins.push(c); if (list) list.push(c); } };
+  for (const [f, lat] of ctx.def.coins) addRow(f, lat);
+  // Münzjagd: viele zusätzliche Münzreihen, schneller wieder da
+  function setHunt(on) {
+    huntMode = on;
+    if (on && !extraCoins.length) { const taken = ctx.def.coins.map(c => c[0]); for (let f = 0.02; f < 0.98; f += 0.06) { if (taken.some(t => Math.abs(t - f) < 0.03)) continue; addRow(f, [-5, 0, 5, -2, 3][Math.round(f*100) % 5], extraCoins); } }
+    for (const c of extraCoins) c.m.visible = on;
   }
 
-  function reset() { for (const p of pickups) { p.t = 0; p.g.visible = true; } for (const c of coins) { c.t = 0; c.m.visible = true; } for (const e of ents) scene.remove(e.m); ents.length = 0; }
+  function reset() { for (const p of pickups) { p.t = 0; p.g.visible = true; } for (const c of coins) { c.t = 0; c.m.visible = huntMode || !extraCoins.includes(c); } for (const e of ents) scene.remove(e.m); ents.length = 0; }
 
   function roll(k) {
     const tab = TABLE[Math.max(0, Math.min(5, k.place - 1))]; let sum = 0; for (const v of Object.values(tab)) sum += v;
@@ -96,10 +102,10 @@ export function createItems(ctx) {
     }
   }
   function checkCoins(k) {
-    for (const c of coins) if (c.t <= 0) { const dx = c.m.position.x - k.pos.x, dz = c.m.position.z - k.pos.z;
-      if (dx*dx + dz*dz < 2.2*2.2) { c.t = 9; c.m.visible = false; for (let n = 0; n < 8; n++) sparks.emit(c.m.position.x, c.m.position.y, c.m.position.z, (Math.random() - .5)*6, Math.random()*5, (Math.random() - .5)*6, COL.yellow, 0.4); if ((k.coins || 0) < 10) k.coins = (k.coins || 0) + 1; if (k.isPlayer) { sfx('coin'); ctx.onCoins(k.coins, true); } } }
+    for (const c of coins) if (c.t <= 0 && c.m.visible) { const dx = c.m.position.x - k.pos.x, dz = c.m.position.z - k.pos.z;
+      if (dx*dx + dz*dz < 2.2*2.2) { c.t = huntMode ? 7 : 9; c.m.visible = false; k.hunt = (k.hunt || 0) + 1; for (let n = 0; n < 8; n++) sparks.emit(c.m.position.x, c.m.position.y, c.m.position.z, (Math.random() - .5)*6, Math.random()*5, (Math.random() - .5)*6, COL.yellow, 0.4); if ((k.coins || 0) < 10) k.coins = (k.coins || 0) + 1; if (k.isPlayer) { sfx('coin'); ctx.onCoins(k.coins, true); } } }
   }
-  function loseCoins(k, n = 3) { const lost = Math.min(k.coins || 0, n); k.coins = (k.coins || 0) - lost; if (lost && k.isPlayer) { ctx.onCoins(k.coins); }
+  function loseCoins(k, n = 3) { if (huntMode) k.hunt = Math.max(0, (k.hunt || 0) - 3); const lost = Math.min(k.coins || 0, n); k.coins = (k.coins || 0) - lost; if (lost && k.isPlayer) { ctx.onCoins(k.coins); }
     for (let i = 0; i < lost*4; i++) sparks.emit(k.pos.x, k.y + 1.5, k.pos.z, (Math.random() - .5)*10, 6 + Math.random()*4, (Math.random() - .5)*10, COL.yellow, 0.8); }
 
   // ---------- Treffer ----------
@@ -169,7 +175,7 @@ export function createItems(ctx) {
   // ---------- Aktualisieren ----------
   function update(dt, t) {
     for (const p of pickups) { if (p.t > 0) { p.t -= dt; if (p.t <= 0) p.g.visible = true; } p.g.rotation.y += dt*1.6; p.g.position.y = p.base + Math.sin(t*2.4 + p.ph)*0.3; p.ring.rotation.z += dt*3; ringMat.color.setHSL((t*0.3) % 1, 1, 0.6); }
-    for (const c of coins) { if (c.t > 0) { c.t -= dt; if (c.t <= 0) c.m.visible = true; } c.m.rotation.y += dt*3; c.m.position.y = c.base + Math.sin(t*3 + c.ph)*0.15; }
+    for (const c of coins) { if (c.t > 0) { c.t -= dt; if (c.t <= 0) c.m.visible = huntMode || !extraCoins.includes(c); } c.m.rotation.y += dt*3; c.m.position.y = c.base + Math.sin(t*3 + c.ph)*0.15; }
     const racers = ctx.getRacers();
     for (const k of racers) {
       if (k.ghost > 0) k.ghost -= dt;
@@ -255,5 +261,5 @@ export function createItems(ctx) {
     if (go) a.useAt = it === 'troete3' && (k.itemN || 3) > 1 ? raceT + 1.2 : 0;
     return go;
   }
-  return { ents, pickups, coins, reset, roll, use, update, checkPickup, checkCoins, hitKart, aiWants };
+  return { ents, pickups, coins, setHunt, get huntMode() { return huntMode; }, reset, roll, use, update, checkPickup, checkCoins, hitKart, aiWants };
 }

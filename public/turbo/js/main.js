@@ -243,6 +243,7 @@ function say(k, what) {
 }
 const ann = i => sayClip('ann', i), ann2 = i => sayClip('ann2', i);
 const TRACK_ANN = { dschungel: 2, schulhof: 3, teich: 4, wueste: 5, schulhof_nacht: 3, wueste_abend: 5 };
+const HUNT_T = 120;
 const MUS_ALIAS = { market: 'school', sky: 'jungle' };
 const musicFor = () => curDef ? (MUS_ALIAS[curDef.theme] || curDef.theme) : 'menu';
 function inkScreen(t) {
@@ -319,6 +320,7 @@ function control(k, dt) {
     if (e.type === 'cloud') { lane = e.lat > 0 ? -7 : 7; continue; }
     if (d.lengthSq() < 30*30 && d.x*Math.sin(k.h) + d.z*Math.cos(k.h) > 0) { const l = tr.locate(e.pos, k.loc.i); lane = l.lat > k.loc.lat ? l.lat - 5 : l.lat + 5; }
   }
+  if (session.mode === 'coins' && (a.hunter ??= Math.random() < 0.55)) { let best = 1e9; for (const c of items.coins) { if (!c.m.visible || c.t > 0) continue; let d = c.i - i; if (d < 0) d += tr.N; if (d > 8 && d < 60 && d < best) { best = d; lane = c.lat + a.lane*0.7; } } }
   lane = clamp(lane, -HALF + 2, HALF - 2);
   const look = 10 + Math.round(Math.max(0, k.speed)*0.35);
   const j = (i + look) % tr.N; const tp = tr.P[j], tl = tr.R[j];
@@ -454,7 +456,7 @@ function physics(k, dt) {
   }
 }
 function onLap(k) {
-  if (k.finished) return;
+  if (k.finished || session.mode === 'coins') return;
   if (k.lap > LAPS) {
     k.finished = true; k.fTime = raceT;
     if (k.isPlayer) finishPlayer();
@@ -464,7 +466,7 @@ function onLap(k) {
     if (k.lap === LAPS) { showMsg('Letzte Runde!', 1.8, 'big'); sfx('final'); ann(6); playMusic(musicFor(), true); } else { showMsg(`Runde ${k.lap}`, 1.3); sfx('lap'); ann(5); }
   }
 }
-let fwQueue = 0;
+let fwQueue = 0, huntWarn = false;
 function fireworks(n) { fwQueue += n; }
 function fireworkTick(dt) {
   if (fwQueue <= 0 || !player || Math.random() > dt*6) return; fwQueue--;
@@ -597,7 +599,10 @@ function update(dt, t) {
       collide(); items.update(dt, t); ghostTick(dt); fireworkTick(dt); fxTick(dt);
       // Platzierung
       const before = player.place;
-      [...racers].sort((a, b) => (b.finished - a.finished) || (a.finished ? a.fTime - b.fTime : b.prog - a.prog)).forEach((k, i) => k.place = i + 1);
+      (session.mode === 'coins' ? [...racers].sort((a, b) => ((b.hunt || 0) - (a.hunt || 0)) || (b.prog - a.prog)) : [...racers].sort((a, b) => (b.finished - a.finished) || (a.finished ? a.fTime - b.fTime : b.prog - a.prog))).forEach((k, i) => k.place = i + 1);
+      if (session.mode === 'coins' && state === 'race') { const left = HUNT_T - raceT;
+        if (left < 10.5 && !huntWarn) { huntWarn = true; showMsg('Noch 10 Sekunden!', 1.6, 'big'); sfx('final'); playMusic(musicFor(), true); }
+        if (left <= 0) { for (const k of racers) { k.finished = true; k.fTime = raceT; } finishPlayer(); } }
       if (state === 'race' && player.place === 1 && before > 1 && raceT > 5) say(player, 'pass');
       chaseCam(dt);
       if (state === 'finished' && stateT > 3.2 && !results) { if (session.mode === 'time') showTimeResults(); else showResults(); }
@@ -640,8 +645,8 @@ function hudTick(dt) {
   if (!player) return;
   $('#pos').innerHTML = `${player.place}<small>.</small><span>/${racers.length}</span>`;
   $('#pos').style.color = ['#ffe14a', '#e6e6ff', '#ffb27a'][player.place - 1] || '#fff';
-  $('#lap').textContent = `Runde ${clamp(player.lap, 1, LAPS)}/${LAPS}`;
-  $('#time').textContent = fmt(raceT);
+  if (session.mode === 'coins') { $('#lap').textContent = `🪙 ${player.hunt || 0} Münzen`; $('#time').textContent = fmt(Math.max(0, HUNT_T - raceT)); }
+  else { $('#lap').textContent = `Runde ${clamp(player.lap, 1, LAPS)}/${LAPS}`; $('#time').textContent = fmt(raceT); }
   if (msgT > 0) { msgT -= dt; if (msgT <= 0) msgEl.className = ''; }
   if (sayT > 0) { sayT -= dt; if (sayT <= 0) sayEl.classList.remove('show'); }
   if (warnT > 0) { warnT -= dt; if (warnT <= 0) warnEl.classList.remove('show'); }
@@ -690,11 +695,12 @@ function startRace() {
       racers.filter(r => r !== player).forEach((r, i) => { const gp = i >= pPos ? i + 1 : i; const row = Math.floor(gp / 2), side = gp % 2 ? 1 : -1, ii = (tr.N - 14 - row*10 + tr.N) % tr.N; r.pos.copy(tr.P[ii]).addScaledVector(tr.R[ii], side*5); r.y = tr.P[ii].y; r.prevS = ii; r.prog = ii - tr.N; tr.locate(r.pos, ii, r.loc); });
     }
   }
+  items.setHunt(session.mode === 'coins'); huntWarn = false; for (const r of racers) r.hunt = 0;
   items.reset(); preview.group.visible = false; $('#coins').textContent = '🪙 0';
   if (session.mode === 'time') for (const p of items.pickups) { p.t = 1e9; p.g.visible = false; }
   state = 'intro'; stateT = 0; raceT = 0; countN = 4; results = null; paused = false;
   setScreen('race'); updateItemBox(); $('#ink').style.opacity = 0;
-  $('#trackName').textContent = session.track.icon + ' ' + session.track.name + (session.mode === 'gp' ? `  ·  Rennen ${session.idx + 1}/4` : session.mode === 'time' ? '  ·  Zeitfahren' : '');
+  $('#trackName').textContent = session.track.icon + ' ' + session.track.name + (session.mode === 'gp' ? `  ·  Rennen ${session.idx + 1}/4` : session.mode === 'time' ? '  ·  Zeitfahren' : session.mode === 'coins' ? '  ·  Münzjagd: 2 Minuten' : '');
   $('#trackName').classList.add('show'); setTimeout(() => $('#trackName').classList.remove('show'), 3500);
   $('#ghostNote').textContent = session.mode === 'time' ? (PG.state().best[session.track.id] ? '👻 Bestzeit ' + fmt(PG.state().best[session.track.id]) : '') : '';
   if (MOBILE) { input.mode = 'touch'; $('#touch').classList.toggle('tilt', input.touchMode === 'tilt'); }
@@ -751,12 +757,13 @@ function showResults() {
   if (gp) list.forEach(k => { session.points[k.def.id] = (session.points[k.def.id] || 0) + POINTS[k.place - 1]; });
   $('#resList').innerHTML = list.map(k => {
     const time = k.finished ? k.fTime : raceT + (LAPS*tr.N - k.prog) / avg;
-    return `<li class="${k.isPlayer ? 'me' : ''}"><b>${k.place}.</b><span style="background:${k.def.color}">${k.def.icon}</span><em>${k.def.name}</em><i>${k.finished ? '' : '≈ '}${fmt(time)}</i>${gp ? `<i class="pts">+${POINTS[k.place - 1]}</i>` : ''}</li>`;
+    return `<li class="${k.isPlayer ? 'me' : ''}"><b>${k.place}.</b><span style="background:${k.def.color}">${k.def.icon}</span><em>${k.def.name}</em><i>${session.mode === 'coins' ? '🪙 ' + (k.hunt || 0) : (k.finished ? '' : '≈ ') + fmt(time)}</i>${gp ? `<i class="pts">+${POINTS[k.place - 1]}</i>` : ''}</li>`;
   }).join('');
   $('#resTitle').textContent = player.place === 1 ? 'Gewonnen! 🏆' : player.place <= 3 ? `Platz ${player.place} – Podest!` : `Platz ${player.place}`;
-  $('#resSub').textContent = session.track.icon + ' ' + session.track.name + (gp ? ` · Rennen ${session.idx + 1}/4` : '');
+  $('#resSub').textContent = session.track.icon + ' ' + session.track.name + (gp ? ` · Rennen ${session.idx + 1}/4` : session.mode === 'coins' ? ` · Münzjagd · ${player.hunt || 0} Münzen` : '');
   // Ereignisse für Aufgaben
   PG.event('race'); if (player.place <= 3) PG.event('podium');
+  if (session.mode === 'coins') { if (player.place === 1) PG.event('huntWin'); if ((player.hunt || 0) >= 40) PG.event('hunt30'); stats.coins = Math.round((player.hunt || 0)/3); }
   if (player.place === 1) { PG.event('win'); PG.event('win:' + player.def.id); PG.event('win@' + session.track.id); PG.trackWin(session.track.id, TRACKS.map(t => t.id)); }
   PG.event('hit', stats.hits); PG.event('trick', stats.tricks); PG.event('coin', stats.coins); PG.event('item', stats.items); PG.event('mini', stats.drifts); PG.event('purple', stats.purple || 0);
   awardXP(raceXP(player), []);
@@ -932,7 +939,7 @@ function openTrackSel() {
       el.innerHTML = `<b>${c.icon}</b><span>${c.name}</span><i>${c.tracks.map(id => trackById(id).icon).join(' ')}</i><i>${best === 1 ? '🏆 Gold' : best === 2 ? '🥈 Silber' : best === 3 ? '🥉 Bronze' : 'Noch kein Pokal'} (${cls.name})</i>`;
       el.onclick = () => { session = { mode: 'gp', cup: c, idx: 0, points: {}, order: null, track: trackById(c.tracks[0]) }; startRace(); }; L.appendChild(el); }
   } else {
-    $('#tsTitle').textContent = session.mode === 'time' ? 'Zeitfahren: Strecke wählen' : 'Strecke wählen';
+    $('#tsTitle').textContent = session.mode === 'time' ? 'Zeitfahren: Strecke wählen' : session.mode === 'coins' ? 'Münzjagd: Strecke wählen' : 'Strecke wählen';
     const bg = { jungle: '#4a1a7a', school: '#2a7ad6', pond: '#d0604a', desert: '#d08a3a', market: '#e52a2a', sky: '#2a1a6a' };
     for (const t of TRACKS) { const best = PG.state().best[t.id]; const el = document.createElement('button'); el.className = 'tsCard'; el.style.setProperty('--bg', bg[t.theme]);
       el.innerHTML = `<b>${t.icon}</b><span>${t.name}</span><i>${best ? '⏱️ ' + fmt(best) : PG.state().wins[t.id] ? '🏁 Gewonnen' : '&nbsp;'}</i>`;
@@ -1018,7 +1025,7 @@ if (PG.state().muted) { setMuted(true); $('#btnSound').textContent = '🔇'; }
 
 loadTrack(TRACKS[Q.has('track') ? Math.max(0, TRACKS.findIndex(t => t.id === Q.get('track'))) : 0]);
 setScreen('title');
-if (AUTO) { selIdx = 3; session.track = trackById(Q.get('track') || 'dschungel'); if (Q.has('gp')) { session = { mode: 'gp', cup: CUPS[+Q.get('cup') || 0], idx: 0, points: {}, order: null, track: trackById(CUPS[+Q.get('cup') || 0].tracks[0]) }; } startRace(); }
+if (AUTO) { selIdx = 3; session.track = trackById(Q.get('track') || 'dschungel'); if (Q.get('mode')) session.mode = Q.get('mode'); if (Q.has('gp')) { session = { mode: 'gp', cup: CUPS[+Q.get('cup') || 0], idx: 0, points: {}, order: null, track: trackById(CUPS[+Q.get('cup') || 0].tracks[0]) }; } startRace(); }
 window.__qa = (i, side = 0, back = 8, up = 3.2) => { const p = tr.P[i], T = tr.T[i], R = tr.R[i]; camera.clearViewOffset(); camera.position.set(p.x - T.x*back + R.x*side, p.y + up, p.z - T.z*back + R.z*side); camera.lookAt(p.x + T.x*10, p.y + 1.5, p.z + T.z*10); camera.fov = 70; camera.updateProjectionMatrix(); env.follow(p); env.update(clock.elapsedTime, 0.016); if (useBloom) composer.render(); else renderer.render(scene, camera); return canvas.toDataURL('image/jpeg', 0.7); };
 window.__loadTrack = id => loadTrack(trackById(id));
 window.__R = renderer; window.__CMP = composer; window.__S = scene; window.__C = camera; window.__THREE = THREE;

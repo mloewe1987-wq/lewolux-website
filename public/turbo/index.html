@@ -55,7 +55,8 @@ button{font:inherit;cursor:pointer}
 .mHead,.gHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .logo.small{font-size:clamp(28px,5vw,48px);transform:rotate(-2deg);text-align:left}
 .wallet{background:rgba(20,11,46,.75);border:2px solid #ffe14a;border-radius:99px;padding:6px 14px;font-weight:1000;font-size:20px}
-.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.gHead .wallet{margin-right:52px}
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .mode{border:3px solid var(--ink);border-radius:20px;background:rgba(255,255,255,.93);color:var(--ink);padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 6px 0 var(--ink);transition:transform .12s}
 .mode b{font-size:42px;line-height:1}.mode span{font-weight:1000;font-size:20px}.mode i{font-style:normal;font-size:12px;opacity:.7}
 .mode.big{background:linear-gradient(180deg,#fff79a,#ffc928)}
@@ -225,6 +226,7 @@ body:not(.touch) #touch{display:none!important}
     <button class="mode big" data-mode="gp"><b>🏆</b><span>Grand Prix</span><i>4 Strecken, Punkte und Pokal</i></button>
     <button class="mode big" data-mode="single"><b>🏁</b><span>Einzelrennen</span><i>Eine Strecke deiner Wahl</i></button>
     <button class="mode" data-mode="time"><b>⏱️</b><span>Zeitfahren</span><i>Gegen deinen Geist</i></button>
+    <button class="mode" data-mode="coins"><b>🪙</b><span>Münzjagd</span><i>2 Minuten Münzen sammeln</i></button>
     <button class="mode" data-mode="garage"><b>🔧</b><span>Garage</span><i>Fahrzeuge, Outfits, Lack</i></button>
     <button class="mode" data-mode="quests"><b>📜</b><span>Aufgaben</span><i id="questHint">Belohnungen holen</i></button>
     <button class="mode" data-mode="help"><b>🎮</b><span>Steuerung</span><i>Tasten und Tipps</i></button>
@@ -263,7 +265,7 @@ body:not(.touch) #touch{display:none!important}
     <div class="seg mobileOnly"><span>Lenken</span><button data-ctl="stick" class="on">Daumen-Stick</button><button data-ctl="tilt">Handy neigen</button></div>
     <label id="invRow" class="mobileOnly"><input type="checkbox" id="inv"> Neigen umkehren</label>
     <div class="seg"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div>
-    <div class="seg"><span>Lenkhilfe</span><button data-assist="0">Aus</button><button data-assist="1">An (hält dich auf der Strecke)</button></div>
+    <div class="seg"><span>Lenkhilfe</span><button data-assist="0">Aus</button><button data-assist="1">An</button></div>
   </div>
   <div id="selRow"><button class="btn ghost" id="btnBack" data-back="menu">Zurück</button><button class="btn ghost" id="btnGarage">🔧 Garage</button><button class="btn" id="btnGo">Weiter</button></div>
 </div></section>
