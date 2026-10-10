@@ -852,9 +852,9 @@ function menuTick(dt, t) {
   const showKart = state === 'select' || state === 'garage';
   preview.group.visible = showKart;
   if (preview.model) { preview.model.driver.position.y = preview.model.driver.position.y*0.9 + 0.1*Math.abs(Math.sin(t*3))*0.15; if (preview.model.halo) preview.model.halo.rotation.z += dt; }
-  const a = t*0.08, r = showKart ? 8.5 : 30;
-  const look = showKart ? tmpV.set(p.x, p.y + (camera.aspect < 1 ? 2.6 : 1.1), p.z) : tmpV.set(p.x, p.y + 4, p.z);
-  camera.position.set(p.x + Math.sin(a)*r, p.y + (showKart ? 3.3 : 10), p.z + Math.cos(a)*r);
+  const a = t*0.08, r = showKart ? 8.5 : 60, q2 = showKart ? p : tr.P[Math.round(tr.N*0.12)];
+  const look = showKart ? tmpV.set(p.x, p.y + (camera.aspect < 1 ? 2.6 : 1.1), p.z) : tmpV.set(q2.x, q2.y + 4, q2.z);
+  camera.position.set(q2.x + Math.sin(a)*r, q2.y + (showKart ? 3.3 : 28), q2.z + Math.cos(a)*r);
   camera.lookAt(look); camera.fov = camera.aspect < 1 ? 70 : 50;
   const panel = state === 'garage' ? $('.garPanel') : $('.selPanel');
   if (showKart && camera.aspect >= 1) { const pw = (panel || {}).offsetWidth || innerWidth*0.45; camera.setViewOffset(innerWidth, innerHeight, pw*0.5, -innerHeight*0.04, innerWidth, innerHeight); } else camera.clearViewOffset();
