@@ -412,7 +412,8 @@ $$('.mn-box').forEach(box=>{const tabs=$$('[role=tab]',box),pans=$$('[role=tabpa
 const modal=$('#modal'),stage=$('#stage'),shotCv=$('#stageShot'),host=$('#demoHost');let cur=null,curShot=0,cleanup=null,lastFocus=null,curMode='demo';
 const shotImg=document.createElement('img');shotImg.className='stage-img';shotImg.alt='';shotImg.hidden=true;if(shotCv)shotCv.after(shotImg);
 if(modal){shotCv.dataset.scene=GAMES[0].scene;shotCv.dataset.v=0;ro.observe(shotCv);
-  if(!document.fullscreenEnabled||!fine)$('#fsBtn').hidden=true;}
+  /* Vollbild-Knopf: nur auf Handys/Tablets ausblenden (die öffnen Spiele ohnehin im Vollbild-Player). Xbox, TV-Browser und PC behalten ihn. */
+  if(!document.fullscreenEnabled||(!fine&&!/Xbox|SMART-TV|SmartTV|GoogleTV|Android TV|AFT|BRAVIA|Tizen|Web0S/i.test(navigator.userAgent)&&matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<900))$('#fsBtn').hidden=true;}
 function openModal(id,mode,trigger){const g=GAMES.find(x=>x.id===id);if(!g||!modal)return;cur=g;lastFocus=trigger||document.activeElement;
   /* Auf Handys und in eingebetteten Ansichten (z. B. Claude-App) öffnet sich die Arcade direkt unter dem angetippten Element im Seitenfluss.
      So ist sie immer sichtbar, egal wie der umgebende Rahmen scrollt. Auf dem Desktop bleibt es ein Overlay. */
