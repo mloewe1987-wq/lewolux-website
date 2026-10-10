@@ -19,7 +19,7 @@ const SIM = +Q.get('sim') || 1;
 const MOBILE = touch.on;
 const $ = s => document.querySelector(s);
 const LAPS = 3;
-const CLASSES = [{ id: 'gem', name: 'Gemütlich', base: 25, ai: 0.86 }, { id: 'flott', name: 'Flott', base: 30, ai: 0.94 }, { id: 'turbo', name: 'Turbo', base: 36, ai: 1.0 }];
+const CLASSES = [{ id: 'gem', name: 'Gemütlich', base: 25, ai: 0.86 }, { id: 'flott', name: 'Flott', base: 30, ai: 0.94 }, { id: 'turbo', name: 'Turbo', base: 36, ai: 1.0 }, { id: 'spiegel', name: 'Spiegel', base: 36, ai: 1.0, mirror: true }];
 // ---------- Grundgerüst ----------
 const canvas = $('#c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: !MOBILE, powerPreference: 'high-performance' });
@@ -209,7 +209,12 @@ function buildDecals() {
     const i = Math.round((n + 0.3)/12*tr.N + Math.random()*40) % tr.N, l = (Math.random() - 0.5)*12; const h = new THREE.Group(); h.add(m); h.position.copy(tr.P[i]).addScaledVector(tr.R[i], l); h.position.y += 0.04; h.rotation.y = trackAngle(i) + (Math.random() - 0.5)*0.6; m.receiveShadow = true; world.add(h);
   }
 }
-function loadTrack(def) {
+const MIRROR = {};
+function mirrorOf(def) { // Spiegel-Klasse: Strecke seitenverkehrt
+  return MIRROR[def.id] ||= { ...def, mirrored: true, cp: def.cp.map(([x, z, y]) => [-x, z, y]), pads: def.pads.map(([f, l]) => [f, -l]), ramps: def.ramps.map(([f, l, w]) => [f, -l, w]), coins: def.coins.map(([f, l]) => [f, -l]) };
+}
+function loadTrack(def, race = false) {
+  if (race && cls.mirror && session.mode !== 'time' && !def.mirrored) def = mirrorOf(def);
   if (curDef === def) return;
   if (world) { scene.remove(world); disposeTree(world); }
   world = new THREE.Group(); scene.add(world);
@@ -669,7 +674,7 @@ let ghost = null, ghostRec = [], ghostT = 0;
 function startRace() {
   initAudio();
   const def = allDrivers()[selIdx] || DRIVERS[0];
-  loadTrack(session.track);
+  loadTrack(session.track, true);
   for (const r of racers) scene.remove(r.model.root);
   if (ghost) { scene.remove(ghost.root); ghost = null; }
   racers = []; stats = newStats();
@@ -908,7 +913,7 @@ function goMenu() {
 function updateQuestHint() { const q = PG.quests(); const n = q.filter(x => x.p >= x.n).length; $('#questHint').textContent = `${q.length} offen` + (n ? ` · ${n} fertig!` : ''); }
 document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { sfx('click'); const m = b.dataset.mode;
   if (m === 'garage') openGarage(); else if (m === 'quests') openQuests(); else if (m === 'help') { state = 'help'; setScreen('help'); } else goSelect(m); });
-function goSelect(mode) { initAudio(); if (mode === 'gp') ann2(0); else if (mode === 'time') ann2(6); else ann(14); session.mode = mode; state = 'select'; setScreen('select'); renderCards(); $('#btnGo').textContent = 'Weiter'; }
+function goSelect(mode) { initAudio(); markMirror(); if (mode === 'gp') ann2(0); else if (mode === 'time') ann2(6); else ann(14); session.mode = mode; state = 'select'; setScreen('select'); renderCards(); $('#btnGo').textContent = 'Weiter'; }
 function renderCards() {
   const wrap = $('#cards'); wrap.innerHTML = ''; const list = allDrivers(); if (selIdx >= list.length) selIdx = 0;
   wrap.style.gridTemplateColumns = `repeat(${list.length},1fr)`;
@@ -1001,6 +1006,8 @@ function togglePause(on) {
 
 // Knöpfe
 $('#btnStart').onclick = () => { sfx('click'); goMenu(); setTimeout(() => ann(0), 300); };
+const markMirror = () => { const b = document.querySelector('[data-cls=spiegel]'); if (!b) return; const ok = !!PG.state().ach.cupturbo || Q.has('mirror'); b.disabled = !ok; b.textContent = ok ? 'Spiegel' : '🔒 Spiegel'; b.title = ok ? '' : 'Gewinne einen Grand Prix auf Turbo'; };
+markMirror();
 document.querySelectorAll('[data-cls]').forEach(b => b.onclick = () => { cls = CLASSES.find(c => c.id === b.dataset.cls); document.querySelectorAll('[data-cls]').forEach(x => x.classList.toggle('on', x === b)); sfx('click'); });
 document.querySelectorAll('[data-ctl]').forEach(b => b.onclick = () => { input.touchMode = b.dataset.ctl; markCtl(); sfx('click'); });
 function markCtl() { document.querySelectorAll('[data-ctl]').forEach(x => x.classList.toggle('on', x.dataset.ctl === input.touchMode)); $('#invRow').style.display = input.touchMode === 'tilt' ? '' : 'none'; }
@@ -1025,7 +1032,7 @@ if (PG.state().muted) { setMuted(true); $('#btnSound').textContent = '🔇'; }
 
 loadTrack(TRACKS[Q.has('track') ? Math.max(0, TRACKS.findIndex(t => t.id === Q.get('track'))) : 0]);
 setScreen('title');
-if (AUTO) { selIdx = 3; session.track = trackById(Q.get('track') || 'dschungel'); if (Q.get('mode')) session.mode = Q.get('mode'); if (Q.has('gp')) { session = { mode: 'gp', cup: CUPS[+Q.get('cup') || 0], idx: 0, points: {}, order: null, track: trackById(CUPS[+Q.get('cup') || 0].tracks[0]) }; } startRace(); }
+if (AUTO) { selIdx = 3; if (Q.get('cls')) cls = CLASSES.find(c => c.id === Q.get('cls')) || cls; session.track = trackById(Q.get('track') || 'dschungel'); if (Q.get('mode')) session.mode = Q.get('mode'); if (Q.has('gp')) { session = { mode: 'gp', cup: CUPS[+Q.get('cup') || 0], idx: 0, points: {}, order: null, track: trackById(CUPS[+Q.get('cup') || 0].tracks[0]) }; } startRace(); }
 window.__qa = (i, side = 0, back = 8, up = 3.2) => { const p = tr.P[i], T = tr.T[i], R = tr.R[i]; camera.clearViewOffset(); camera.position.set(p.x - T.x*back + R.x*side, p.y + up, p.z - T.z*back + R.z*side); camera.lookAt(p.x + T.x*10, p.y + 1.5, p.z + T.z*10); camera.fov = 70; camera.updateProjectionMatrix(); env.follow(p); env.update(clock.elapsedTime, 0.016); if (useBloom) composer.render(); else renderer.render(scene, camera); return canvas.toDataURL('image/jpeg', 0.7); };
 window.__loadTrack = id => loadTrack(trackById(id));
 window.__R = renderer; window.__CMP = composer; window.__S = scene; window.__C = camera; window.__THREE = THREE;
