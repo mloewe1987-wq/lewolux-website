@@ -72,6 +72,33 @@ Stand: 9. Oktober 2026. Diese Datei fasst zusammen, was ein neuer Chat wissen mu
   4. Danach Antrag auf Veröffentlichung.
 - **Tester-Anmeldung:** lewolux.de/ring-legends/tester/ → Mail an hallo@lewolux.de mit Gmail-Adresse → in die Play-Console-Testerliste eintragen → Einladungslink schicken.
 
+## 6a. Controller & Beamer (seit 10.10.)
+
+Ziel: Alle Spiele am Beamer (XGIMI Horizon Pro, Android-TV-Browser) mit Xbox-Controller spielbar, ohne dass sich Handy/Touch oder PC/Maus verändern.
+
+- **Gemeinsames Modul `quelle/parts/lx-pad.js`:** schläft, bis ein Controller-Knopf gedrückt wird. Dann:
+  - Hinweis „🎮 Controller verbunden“, leuchtender Fokus-Rahmen (nur im Controller-Modus, Klasse `html.lx-pad`).
+  - Steuerkreuz/linker Stick = Auswahl, A = bestätigen, B = zurück, Start = Pause/Menü, View = Vollbild.
+  - Maus oder Touch schaltet den Controller-Modus sofort wieder aus.
+  - Vollbild-Knopf unten rechts, nur bei Maus/Controller sichtbar, nie am Handy.
+  - Spiele klinken sich über `window.LXPAD_INIT = function(P){ P.game / P.back / P.pause / P.root }` ein (siehe Kopfkommentar). Markierungen im HTML: `data-pad` (anwählbar), `data-pad-default` (Startfokus), `data-pad-back`, `data-pad-skip`.
+- **Einbau:** `build.py` hängt das Modul über `quelle/pad_inject.py` automatisch an jedes Spiel unter `/games/` und an jede Download-Datei. Website (`app.js`) und Kids-Bereich (`kids.js`) bekommen es auch. Läuft ein Spiel im iframe, ruht die Website-Steuerung, und View schließt das Spiel (Kids: fragt „Beenden?“).
+- **Spiel-Extras:** `quelle/spiele-extras/<id>.html` wird beim Bauen zusätzlich eingefügt. Aktuell nur Ring Legends (Großbild-Zoom), weil Ring Legends aus seinem eigenen Repo kommt und sonst bei jedem Update überschrieben würde.
+- **Pro Spiel:**
+  - **RPG-Maker-Spiele** (Mandat, Sternenwurf, Idle Legenden, Kasse oder Zettel): Start = Menü/Pause. Alle eigenen Bildschirme haben eine Controller-Auswahl mit Leuchtrahmen.
+    - Mandat: Y = Karte, RB = Tag beenden, LB = Ziel.
+    - Sternenwurf: Y = Auto-Drehen, RB = Auto-Brüten, LB = Quests.
+    - Kasse oder Zettel: X = Küche, Y = Tresen.
+  - **Kritzelheld:** Stift-Cursor (Stick bewegen, A halten = malen, X = radieren, Y/Start = zwischen Stift und Knöpfen wechseln). Minispiele angepasst. Eigene Großbild-Ansicht im Querformat ab 900 px, nur ohne Touch und nicht in der Android-App.
+  - **Schulhofkicker:** neuer Startbildschirm (Schulhof-Stadion mit Zuschauern, Toren, Linien, Drachen). Die alten Kreide-Kästchen waren der Fehler. Alle Minispiele per Controller.
+  - **Pandi, Nervbert:** Zielen/Werfen bzw. Schlagen per Stick + A. Der Hinweis mit der Belegung erscheint nur im Controller-Modus.
+  - **Ring Legends:** Menüs über die Fokus-Navigation, auf großen Bildschirmen proportional vergrößert. Mit echtem Server noch nicht getestet, weil der Server aus der Testumgebung nicht erreichbar war.
+- **Testen:**
+  - `quelle/werkzeuge/padtest/serve.py` = Test-Server, der das Modul einbaut.
+  - `pad.py` = simulierter Xbox-Controller für Playwright (`connect`, `press`, `stick`, `shot`), Größen phone/pc/tv/tv1080.
+- **Grenze:** Vollbild per Controller lehnt der Browser oft ab (keine echte Nutzergeste). Dann erscheint ein Hinweis. Einmal mit Maus oder Fernbedienung auf ⛶ klicken.
+- **Wichtig für andere Chats:** Vor jedem Sync `git pull`. Nie den ganzen `quelle/`-Ordner aus einer alten Kopie über das Repo kopieren, sonst gehen diese Änderungen verloren (ist am 10.10. einmal passiert).
+
 ## 6. Weitere Ideen / später mit Martin
 
 - Instagram-Profil für Lewolux anlegen, Kanäle bei Epidemic eintragen, Facebook, Reddit, Tester für Ring Legends finden.

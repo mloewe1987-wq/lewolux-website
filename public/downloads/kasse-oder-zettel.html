@@ -78292,7 +78292,7 @@ if (typeof module !== "undefined") module.exports = RKZ;
                     rr(c, 40, 412, w - 80, 104, 16); c.fillStyle = "#fff4e8"; c.fill();
                     text(c, "So geht's:", 60, 436, 17, C.orange, "left", FB);
                     text(c, "Tisch antippen = hingehen & bedienen · Küche/Tresen = Zettel abgeben, Essen holen", 60, 464, 15, C.ink, "left", F, w - 120);
-                    text(c, "Der orange Ring zeigt, wo du als Nächstes hinsolltest. Tasten: 1–8, K, T", 60, 490, 15, C.ink, "left", F, w - 120);
+                    text(c, (RKZ.padOn && RKZ.padOn() ? "Controller: Steuerkreuz wählen, A = hingehen, X = Küche, Y = Tresen, B = Pause" : "Der orange Ring zeigt, wo du als Nächstes hinsolltest. Tasten: 1–8, K, T"), 60, 490, 15, C.ink, "left", F, w - 120);
                 }
             }, [{ label: "Los geht's!", x: 380, y: tut ? 566 : 420, w: 280, fill: M.color, onClick: () => { this.closeOverlay(); this.countdown = 150; this.state = "count"; se("Decision1"); } }]);
             this.openOverlay(ov);
@@ -78551,6 +78551,124 @@ if (typeof module !== "undefined") module.exports = RKZ;
         update() { super.update(); if (Input.isTriggered("ok")) SceneManager.goto(Scene_RkzLevels); }
     }
     window.Scene_RkzTitle = Scene_RkzTitle;
+
+    //=========================================================================
+    // Controller (Xbox/Standard-Gamepad) – Ergänzung; Maus, Touch und Tastatur bleiben unverändert
+    // Steuerkreuz/Stick = Knopf bzw. Tisch wählen, A = auslösen/hingehen, B/Start = Pause/zurück,
+    // X = Küche, Y = Tresen, View = Vollbild. Leuchtrahmen nur im Controller-Modus.
+    //=========================================================================
+    const padOn = RKZ.padOn = () => !!(window.LXPAD && LXPAD.active);
+    window.LXPAD_CFG = window.LXPAD_CFG || { fs: false };   // eigener Vollbild-Knopf (Titel/Pause) + View-Knopf; Ecken sind belegt
+    window.LXPAD_INIT = function(P) { P.game = function(p) { if (p.hit("back")) P.fullscreen(); return true; }; };
+    Object.assign(Input.gamepadMapper, { 2: "kK", 3: "kT", 9: "escape" });
+    const _rqFull = RKZ.requestFull;
+    RKZ.requestFull = function() { if (padOn() && window.LXPAD) { LXPAD.fullscreen(); return; } _rqFull.apply(this, arguments); };
+    // Leuchtrahmen am gewählten Knopf
+    const _bDraw = RkzButton.prototype.draw;
+    RkzButton.prototype.draw = function() {
+        _bDraw.call(this);
+        if (!this._padFocus) return;
+        const c = this.bitmap.context, w = this._w, h = this._h, r = (this.o.radius || h / 2) + 6;
+        c.save(); c.shadowColor = "rgba(59,232,255,0.95)"; c.shadowBlur = 8;
+        rr(c, 5, 5, w + 14, h + 14, r); c.strokeStyle = "#3be8ff"; c.lineWidth = 5; c.stroke();
+        c.shadowBlur = 0; rr(c, 9, 9, w + 6, h + 6, r - 3); c.strokeStyle = "#ffffff"; c.lineWidth = 2; c.stroke(); c.restore(); upd(this.bitmap);
+    };
+    const setPadFocus = (sc, b) => {
+        if (sc._padF === b) return;
+        if (sc._padF) { sc._padF._padFocus = false; sc._padF.draw(); }
+        sc._padF = b; if (b) { b._padFocus = true; b.draw(); }
+    };
+    const padButtons = sc => {
+        const out = [], walk = n => { for (const ch of n.children || []) { if (!ch.visible) continue; if (ch instanceof RkzButton) { if (ch.enabled && ch.o.onClick) out.push(ch); } else walk(ch); } };
+        if (sc.overlay) walk(sc.overlay); else if (!(sc instanceof Scene_RkzShift)) walk(sc);
+        return out;
+    };
+    const padDir = () => Input.isRepeated("left") ? [-1, 0] : Input.isRepeated("right") ? [1, 0] : Input.isRepeated("up") ? [0, -1] : Input.isRepeated("down") ? [0, 1] : null;
+    // räumlich nächstes Ziel in Richtung d (Liste von {x, y})
+    const padStep = (list, cur, d) => {
+        let best = null, bs = Infinity;
+        for (const o of list) {
+            if (o === cur) continue;
+            const dx = o.x - cur.x, dy = o.y - cur.y, main = d[0] ? dx * d[0] : dy * d[1], side = Math.abs(d[0] ? dy : dx);
+            if (main <= 4) continue;
+            const s = main + side * 2.2; if (s < bs) { bs = s; best = o; }
+        }
+        return best;
+    };
+    const padNav = sc => {
+        const list = padButtons(sc);
+        let f = sc._padF && list.includes(sc._padF) ? sc._padF : null;
+        if (!f && list.length) {
+            f = list.find(b => b._label === "Spielen") || list.find(b => b._label === "Weiterspielen") || null;
+            if (!f) { let ba = 0; for (const b of list) { const a = b._w * b._h; if (a > ba) { ba = a; f = b; } } }
+        }
+        const d = padDir();
+        if (f && d) { const n = padStep(list, f, d); if (n) { f = n; se("Cursor1", 40); } }
+        setPadFocus(sc, f);
+        if (f && Input.isTriggered("ok") && !RkzButton.block) { f._down = 6; se("Decision2", 60); RkzButton.block = true; f.o.onClick(); }
+    };
+    const padOff = sc => { if (sc._padF) setPadFocus(sc, null); };
+    // Titel: A löst den gewählten Knopf aus (statt immer „Jetzt spielen“)
+    const _tU = Scene_RkzTitle.prototype.update;
+    Scene_RkzTitle.prototype.update = function() { if (padOn()) { Scene_Base.prototype.update.call(this); padNav(this); } else { padOff(this); _tU.call(this); } };
+    const _lU = Scene_RkzLevels.prototype.update;
+    Scene_RkzLevels.prototype.update = function() { _lU.call(this); if (padOn()) padNav(this); else padOff(this); };
+    Scene_RkzCompare.prototype.update = function() {
+        Scene_Base.prototype.update.call(this);
+        if (!padOn()) return padOff(this);
+        padNav(this);
+        if (Input.isTriggered("cancel") && !this._padLeft) { this._padLeft = true; SceneManager.goto(Scene_RkzLevels); }
+    };
+    // Schicht: Tisch/Küche/Tresen per Steuerkreuz wählen, A = hingehen
+    class PadCursor extends Sprite {
+        constructor() { super(new Bitmap(360, 360)); this.anchor.x = 0.5; this.anchor.y = 0.5; this._k = ""; }
+        show(tg, x, y, w, h) {
+            const k = tg.t + tg.id + "|" + w; this.x = x; this.y = y; this.visible = true;
+            if (k === this._k) return; this._k = k; const b = this.bitmap, c = b.context; b.clear();
+            c.save(); c.shadowColor = "rgba(59,232,255,0.95)"; c.shadowBlur = 16; c.strokeStyle = "#3be8ff"; c.lineWidth = 6;
+            if (tg.t === "table") { c.beginPath(); c.arc(180, 180, 112, 0, Math.PI * 2); c.stroke(); }
+            else { rr(c, 180 - w / 2, 180 - h / 2, w, h, 20); c.stroke(); }
+            c.restore(); upd(b);
+        }
+        update() { super.update(); this.opacity = 190 + Math.sin(Graphics.frameCount / 9) * 60; }
+    }
+    const padTargets = sc => {
+        const L = RKZ.LAYOUT, out = sc.shift.tables.map(tb => ({ t: "table", id: tb.id, x: tb.x, y: tb.y }));
+        for (const k of ["kitchen", "bar"]) { const r = L[k]; out.push({ t: k, x: r.x + r.w / 2, y: r.y + r.h / 2, w: r.w + 24, h: r.h + 24 }); }
+        return out;
+    };
+    const _sU = Scene_RkzShift.prototype.update;
+    Scene_RkzShift.prototype.update = function() {
+        const st0 = this.state;
+        _sU.call(this);
+        const on = padOn();
+        if (!on) { padOff(this); if (this._padCur) this._padCur.visible = false; return; }
+        if (this.overlay) {
+            if (this._padCur) this._padCur.visible = false;
+            padNav(this);
+            if (st0 === "pause" && this.state === "pause" && Input.isTriggered("cancel")) { this.closeOverlay(); this.state = "play"; this._padF = null; }
+            return;
+        }
+        this._padF = null;
+        if (this.state !== "play" && this.state !== "count") { if (this._padCur) this._padCur.visible = false; return; }
+        const list = padTargets(this);
+        let cur = this._padT && list.find(o => o.t === this._padT.t && o.id === this._padT.id);
+        if (!cur) { const h = this.shift.suggest && this.shift.suggest(); cur = (h && list.find(o => o.t === h.t && o.id === h.id)) || list[0]; }
+        const d = padDir();
+        if (d) { const n = padStep(list, cur, d); if (n) { cur = n; se("Cursor1", 35); } }
+        this._padT = cur;
+        if (this.state === "play" && Input.isTriggered("ok")) this.tap({ t: cur.t, id: cur.id });
+        this.tableSprites.forEach(sp => { if (cur.t === "table" && cur.id === sp.tb.id) sp.hover = true; });
+        if (cur.t !== "table") this.stations[cur.t].hover = true;
+        if (!this._padCur) { this._padCur = new PadCursor(); this.addChild(this._padCur); }
+        this._padCur.show(cur, cur.x, cur.y, cur.w, cur.h);
+    };
+    const _setTip = Scene_RkzShift.prototype.setTip;
+    Scene_RkzShift.prototype.setTip = function(t, col) {
+        if (t && padOn()) t = t.replace("(K)", "(X)").replace("(T)", "(Y)").replace("Tisch, Küche oder Tresen antippen", "Steuerkreuz wählen, A = hingehen");
+        return _setTip.call(this, t, col);
+    };
+
     // Fallback, falls der Maker doch den Standard-Titel ruft
     Scene_Title.prototype.create = function() { Scene_Base.prototype.create.call(this); };
     Scene_Title.prototype.start = function() { Scene_Base.prototype.start.call(this); SceneManager.goto(Scene_RkzTitle); };
@@ -78562,4 +78680,353 @@ window.addEventListener('load', function(){ SceneManager.run(Scene_Boot); });
 
 </script>
 
-</body></html>
+<!--lx-pad--><script>/* Lewolux Controller-Modul (lx-pad.js)
+   Ergänzung für Spiele und Website: Xbox-/Standard-Controller per Gamepad-API.
+   - Schläft, bis ein Controller benutzt wird. Maus, Touch und Tastatur bleiben unverändert.
+   - Linker Stick / Steuerkreuz = Fokus bewegen, A = bestätigen, B = zurück, Start = Pause/Menü.
+   - Leuchtende Fokus-Markierung nur im Controller-Modus.
+   - Hinweis „🎮 Controller verbunden“.
+   - Kleiner Vollbild-Knopf (nur mit Maus oder Controller sichtbar, nie am Handy).
+   Spiele können sich einklinken (alles optional, jederzeit setzbar):
+     LXPAD.game(p)     -> jedes Bild aufgerufen; true = Eingabe gehört dem Spiel (keine Menü-Navigation)
+     LXPAD.back()      -> true, wenn B selbst behandelt wurde
+     LXPAD.pause()     -> true, wenn Start selbst behandelt wurde
+     LXPAD.root()      -> Element, auf das die Navigation beschränkt wird (z. B. offener Dialog)
+     LXPAD.suspend()   -> true = Modul ruht komplett (z. B. Spiel läuft im iframe)
+   p: { lx, ly, rx, ry (Sticks mit Totzone), dx, dy (-1/0/1 inkl. Steuerkreuz),
+        down(n), hit(n) (gerade gedrückt), up(n) (gerade losgelassen), dt }
+   Knopfnamen: a b x y lb rb lt rt back start ls rs up down left right
+   Konfiguration vor dem Laden: window.LXPAD_CFG = { fs:false (kein Vollbild-Knopf), fsPos:'br'|'bl'|'tr'|'tl', site:true } */
+(function(){
+'use strict';
+if (window.LXPAD) return;
+var CFG = window.LXPAD_CFG || {};
+var P = window.LXPAD = { active:false, pads:0, game:null, back:null, pause:null, root:null, suspend:null, focused:null };
+var D = document, html = D.documentElement;
+var NAMES = ['a','b','x','y','lb','rb','lt','rt','back','start','ls','rs','up','down','left','right','home'];
+var DZ = 0.35;
+var cur = {}, prev = {}, axes = [0,0,0,0], last = 0, raf = 0, rep = { dir:'', t:0, n:0 };
+var ring, toastEl, fsBtn, styleEl, toastT, fsT, scrollAcc = 0;
+
+/* ---------- Stil (nur im Controller-Modus sichtbar) ---------- */
+function css(){
+  if (styleEl) return;
+  styleEl = D.createElement('style'); styleEl.id = 'lxPadCss';
+  styleEl.textContent =
+    '#lxPadRing{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:2147483646;border-radius:14px;' +
+      'box-shadow:0 0 0 4px #fff,0 0 0 8px #3be8ff,0 0 26px 10px rgba(59,232,255,.75);opacity:0;transition:opacity .15s,left .12s ease-out,top .12s ease-out,width .12s ease-out,height .12s ease-out}' +
+    'html.lx-pad #lxPadRing.on{opacity:1;animation:lxPadGlow 1.4s ease-in-out infinite}' +
+    '@keyframes lxPadGlow{50%{box-shadow:0 0 0 4px #fff,0 0 0 9px #ffd23b,0 0 34px 14px rgba(255,210,59,.7)}}' +
+    '@media (prefers-reduced-motion:reduce){html.lx-pad #lxPadRing.on{animation:none;transition:opacity .15s}}' +
+    'html.lx-pad,html.lx-pad *{cursor:none!important}' +
+    '#lxPadToast{position:fixed;left:50%;top:max(14px,env(safe-area-inset-top,0px));transform:translate(-50%,-140%);z-index:2147483647;pointer-events:none;' +
+      'background:rgba(17,20,38,.92);color:#fff;font:700 clamp(15px,1.6vw,26px)/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;padding:.6em 1.1em;border-radius:999px;' +
+      'box-shadow:0 8px 30px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);white-space:nowrap}' +
+    '#lxPadToast.on{transform:translate(-50%,0)}' +
+    '#lxFs{position:fixed;z-index:2147483645;width:44px;height:44px;border-radius:12px;border:0;padding:0;margin:0;display:none;align-items:center;justify-content:center;' +
+      'background:rgba(17,20,38,.62);color:#fff;cursor:pointer;opacity:0;transition:opacity .3s;box-shadow:0 2px 10px rgba(0,0,0,.25)}' +
+    '#lxFs svg{width:24px;height:24px}#lxFs:hover{opacity:1!important;background:rgba(17,20,38,.85)}' +
+    '#lxFs.br{right:12px;bottom:12px}#lxFs.bl{left:12px;bottom:12px}#lxFs.tr{right:12px;top:12px}#lxFs.tl{left:12px;top:12px}' +
+    '@media (pointer:fine){#lxFs{display:flex}}html.lx-pad #lxFs{display:flex}#lxFs.show{opacity:.8}' +
+    'html.lx-fs #lxFs{display:none!important}';
+  (D.head || html).appendChild(styleEl);
+}
+function ensureRing(){ if (!ring && D.body){ ring = D.createElement('div'); ring.id = 'lxPadRing'; ring.setAttribute('aria-hidden','true'); D.body.appendChild(ring); } }
+
+/* ---------- Hinweis ---------- */
+function toast(msg, ms){
+  if (!D.body) return; css();
+  if (!toastEl){ toastEl = D.createElement('div'); toastEl.id = 'lxPadToast'; toastEl.setAttribute('role','status'); D.body.appendChild(toastEl); }
+  toastEl.textContent = msg; void toastEl.offsetWidth; toastEl.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, ms || 2600);
+}
+P.toast = toast;
+
+/* ---------- Vollbild ---------- */
+function isFull(){ return !!(D.fullscreenElement || D.webkitFullscreenElement); }
+function canFull(){ var e = html; return !!(e.requestFullscreen || e.webkitRequestFullscreen) && D.fullscreenEnabled !== false && D.webkitFullscreenEnabled !== false; }
+function goFull(){
+  try {
+    if (isFull()) { (D.exitFullscreen || D.webkitExitFullscreen).call(D); return; }
+    var r = (html.requestFullscreen || html.webkitRequestFullscreen).call(html, { navigationUI:'hide' });
+    if (r && r.catch) r.catch(function(){ if (P.active) toast('Vollbild: bitte einmal mit Maus oder Fernbedienung auf ⛶ klicken', 3800); });
+  } catch (e) {}
+}
+P.fullscreen = goFull;
+function fsState(){ html.classList.toggle('lx-fs', isFull()); }
+function showFs(){ if (!fsBtn) return; fsBtn.classList.add('show'); clearTimeout(fsT); fsT = setTimeout(function(){ if (!fsBtn.matches(':hover')) fsBtn.classList.remove('show'); }, 3500); }
+function setupFs(){
+  if (CFG.fs === false || fsBtn || !D.body || !canFull()) return;
+  fsBtn = D.createElement('button'); fsBtn.id = 'lxFs'; fsBtn.type = 'button'; fsBtn.className = CFG.fsPos || 'br';
+  fsBtn.setAttribute('aria-label','Vollbild'); fsBtn.title = 'Vollbild';
+  fsBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+  fsBtn.addEventListener('click', function(e){ e.stopPropagation(); e.preventDefault(); goFull(); });
+  ['pointerdown','mousedown','touchstart','pointerup','mouseup'].forEach(function(t){ fsBtn.addEventListener(t, function(e){ e.stopPropagation(); }); });
+  D.body.appendChild(fsBtn); showFs();
+  D.addEventListener('mousemove', function(e){ if (e.isTrusted) showFs(); }, { passive:true });
+}
+D.addEventListener('fullscreenchange', fsState); D.addEventListener('webkitfullscreenchange', fsState);
+
+/* ---------- Controller-Modus an/aus ---------- */
+function setActive(on){
+  if (P.active === on) return;
+  P.active = on; html.classList.toggle('lx-pad', on);
+  if (on){ css(); ensureRing(); showFs(); } else if (ring) ring.classList.remove('on');
+  try { window.dispatchEvent(new CustomEvent('lxpadmode', { detail:{ active:on } })); } catch (e) {}
+}
+function leave(e){ if (e.isTrusted && P.active) setActive(false); }
+D.addEventListener('pointerdown', leave, true); D.addEventListener('touchstart', leave, { capture:true, passive:true });
+D.addEventListener('mousemove', function(e){ if (e.isTrusted && P.active && (Math.abs(e.movementX) + Math.abs(e.movementY) > 6)) setActive(false); }, { capture:true, passive:true });
+
+/* ---------- Gamepad lesen ---------- */
+function pads(){ try { return navigator.getGamepads ? navigator.getGamepads() : []; } catch (e) { return []; } }
+function read(){
+  var list = pads(), st = {}, ax = [0,0,0,0], any = false, n = 0;
+  for (var i = 0; i < (list ? list.length : 0); i++){
+    var g = list[i]; if (!g || g.connected === false) continue; n++;
+    var b = g.buttons || [];
+    for (var k = 0; k < NAMES.length; k++){ var bb = b[k]; if (bb && (bb.pressed || bb.value > 0.5)) { st[NAMES[k]] = true; any = true; } }
+    var a = g.axes || [];
+    for (var j = 0; j < 4; j++){ var v = +a[j] || 0; if (Math.abs(v) > Math.abs(ax[j])) ax[j] = v; }
+    // manche Controller melden das Steuerkreuz als Achse 9 (Hat-Switch)
+    if (g.mapping !== 'standard' && a.length > 9 && Math.abs(a[9]) <= 1.01 && Math.abs(a[9]) > 0.05){
+      var h = Math.round((a[9] + 1) * 3.5); if (h === 0 || h === 1 || h === 7) st.up = true; if (h >= 3 && h <= 5) st.down = true; if (h >= 5 && h <= 7) st.left = true; if (h >= 1 && h <= 3) st.right = true;
+    }
+  }
+  for (var q = 0; q < 4; q++){ var vv = ax[q]; ax[q] = Math.abs(vv) < DZ ? 0 : (vv - Math.sign(vv) * DZ) / (1 - DZ); if (ax[q]) any = true; }
+  P.pads = n; return { st:st, ax:ax, any:any };
+}
+var api = {
+  down: function(n){ return !!cur[n]; },
+  hit:  function(n){ return !!cur[n] && !prev[n]; },
+  up:   function(n){ return !cur[n] && !!prev[n]; }
+};
+P.state = api;
+
+function connected(e){
+  if (P.suspend && P.suspend()) { start(); return; }
+  var id = e && e.gamepad && e.gamepad.id || '';
+  toast('🎮 Controller verbunden' + (/xbox|xinput|045e/i.test(id) ? '' : ''));
+  start();
+}
+function start(){ if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } }
+window.addEventListener('gamepadconnected', connected);
+window.addEventListener('gamepaddisconnected', function(){ setTimeout(function(){ var l = pads(), n = 0; for (var i = 0; i < (l ? l.length : 0); i++) if (l[i]) n++; if (!n) { toast('🎮 Controller getrennt'); setActive(false); } }, 50); });
+// Falls der Controller schon vor dem Laden verbunden war
+var seen = false;
+var probe = setInterval(function(){ var l = pads(); for (var i = 0; i < (l ? l.length : 0); i++) if (l[i]) { if (!seen) { seen = true; start(); } return; } }, 1000);
+
+/* ---------- Haupt-Schleife ---------- */
+function loop(t){
+  raf = requestAnimationFrame(loop);
+  var dt = Math.min(0.1, (t - last) / 1000); last = t;
+  var r = read();
+  prev = cur; cur = r.st; axes = r.ax;
+  if (P.suspend && P.suspend()) { if (api.hit('back') && P.onSuspendBack) P.onSuspendBack(); hideRing(); return; }
+  if (r.any && !P.active && !D.hidden) { setActive(true); if (!seen) { seen = true; toast('🎮 Controller verbunden'); } }
+  var dx = (cur.left ? -1 : 0) + (cur.right ? 1 : 0), dy = (cur.up ? -1 : 0) + (cur.down ? 1 : 0);
+  if (!dx && Math.abs(axes[0]) > 0.45) dx = Math.sign(axes[0]);
+  if (!dy && Math.abs(axes[1]) > 0.45) dy = Math.sign(axes[1]);
+  var p = { lx:axes[0], ly:axes[1], rx:axes[2], ry:axes[3], dx:dx, dy:dy, dt:dt, down:api.down, hit:api.hit, up:api.up, active:P.active };
+  P.last = p;
+  var took = false;
+  if (typeof P.game === 'function') { try { took = !!P.game(p); } catch (e) { console.error(e); } }
+  if (took) { hideRing(); rep.dir = ''; return; }
+  if (!P.active) return;
+  nav(p);
+}
+
+/* ---------- Menü-Navigation (DOM) ---------- */
+var SEL = 'button,a[href],input:not([type=hidden]),select,textarea,summary,[role=button],[role=tab],[role=menuitem],[role=option],[role=switch],[role=checkbox],[role=radio],[role=link],[tabindex]:not([tabindex="-1"]),[data-pad]';
+var BTN = 'button,a[href],[role=button],[role=link],[role=tab],[role=menuitem],[role=option]';
+function vis(el){
+  if (!el || el.disabled || el.closest('[hidden],[inert],[aria-hidden="true"],[data-pad-skip]')) return null;
+  if (el.id === 'lxFs' && !(D.fullscreenEnabled !== false)) return null;
+  var r = el.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return null;
+  var cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.08 || cs.pointerEvents === 'none' && !el.hasAttribute('data-pad')) return null;
+  return r;
+}
+function onTop(el, r){
+  var vw = innerWidth, vh = innerHeight;
+  var x0 = Math.max(0, r.left), x1 = Math.min(vw, r.right), y0 = Math.max(0, r.top), y1 = Math.min(vh, r.bottom);
+  if (x1 - x0 < 2 || y1 - y0 < 2) return null; // außerhalb des Bildschirms
+  var pts = [[(x0 + x1) / 2, (y0 + y1) / 2], [x0 + (x1 - x0) * .2, y0 + (y1 - y0) * .3], [x0 + (x1 - x0) * .8, y0 + (y1 - y0) * .7]];
+  for (var i = 0; i < pts.length; i++){
+    var h = D.elementFromPoint(pts[i][0], pts[i][1]);
+    if (h && (h === el || el.contains(h) || (h.contains(el) && h !== D.body && h !== html) || h === ring)) return true;
+  }
+  return false;
+}
+function modalRoot(){
+  if (typeof P.root === 'function') { var rr = P.root(); if (rr) return rr; }
+  var ms = D.querySelectorAll('dialog[open],[aria-modal="true"],[role="dialog"],[role="alertdialog"]'), best = null;
+  for (var i = 0; i < ms.length; i++){ var m = ms[i]; if (vis(m) && !m.closest('[hidden]')) best = m; }
+  return best;
+}
+function candidates(){
+  var root = modalRoot(), scope = root || D, out = [], els = scope.querySelectorAll(SEL);
+  for (var i = 0; i < els.length; i++){
+    var el = els[i]; if (el === ring || el === toastEl) continue;
+    if (!el.hasAttribute('data-pad')) {
+      // verschachtelt: Knopf im Knopf -> der äußere zählt; Container mit tabindex um Knöpfe -> die inneren zählen
+      if (el.matches(BTN) && el.parentElement && el.parentElement.closest(BTN)) continue;
+      if (!el.matches(BTN + ',input,select,textarea,summary') && el.querySelector(SEL)) continue;
+    }
+    var r = vis(el); if (!r) continue;
+    var top = onTop(el, r);
+    if (top === false) continue;               // verdeckt
+    if (top === null && !root && !inScroller(el)) continue; // außerhalb des Bildes und nicht scrollbar erreichbar
+    out.push({ el:el, r:r });
+  }
+  return out;
+}
+function inScroller(el){
+  for (var p = el.parentElement; p && p !== D.body; p = p.parentElement){
+    var cs = getComputedStyle(p);
+    if (/(auto|scroll)/.test(cs.overflowY + cs.overflowX) && (p.scrollHeight > p.clientHeight + 2 || p.scrollWidth > p.clientWidth + 2)) return true;
+    if (cs.position === 'fixed') return false;
+  }
+  return D.scrollingElement && D.scrollingElement.scrollHeight > innerHeight + 2;
+}
+function pickStart(list){
+  var def = list.filter(function(c){ return c.el.matches('[data-pad-default],[autofocus]'); })[0];
+  if (def) return def.el;
+  var act = D.activeElement; if (act && act !== D.body) for (var i = 0; i < list.length; i++) if (list[i].el === act) return act;
+  // größtes sichtbares Bedienelement (meist „Spielen“/„Los geht’s“)
+  var best = null, ba = 0;
+  list.forEach(function(c){ var r = c.r; if (r.bottom < 0 || r.top > innerHeight) return; var a = Math.min(r.width, innerWidth) * Math.min(r.height, innerHeight); if (c.el.matches('input,textarea,select')) a *= 0.3; if (a > ba) { ba = a; best = c.el; } });
+  return best || (list[0] && list[0].el);
+}
+function move(dx, dy){
+  var list = candidates(); if (!list.length) return;
+  var f = P.focused, fr = f && list.filter(function(c){ return c.el === f; })[0];
+  if (!fr) { focus(pickStart(list)); return; }
+  var a = fr.r, ax = (a.left + a.right) / 2, ay = (a.top + a.bottom) / 2, best = null, bs = Infinity;
+  list.forEach(function(c){
+    if (c.el === f) return; var b = c.r, bx = (b.left + b.right) / 2, by = (b.top + b.bottom) / 2, main, side, ovl;
+    if (dx) {
+      main = dx > 0 ? b.left - a.right : a.left - b.right; if ((dx > 0 ? bx <= ax + 1 : bx >= ax - 1)) return;
+      ovl = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); side = ovl > 0 ? 0 : Math.abs(by - ay);
+    } else {
+      main = dy > 0 ? b.top - a.bottom : a.top - b.bottom; if ((dy > 0 ? by <= ay + 1 : by >= ay - 1)) return;
+      ovl = Math.min(a.right, b.right) - Math.max(a.left, b.left); side = ovl > 0 ? 0 : Math.abs(bx - ax);
+    }
+    var s = Math.max(main, -8) + side * 2.2 + (ovl > 0 ? 0 : 30);
+    if (s < bs) { bs = s; best = c.el; }
+  });
+  if (best) focus(best);
+  else if (dy) scrollBy(dy * innerHeight * 0.35); // nichts mehr in der Richtung: ein Stück weiterscrollen
+}
+function scroller(el){
+  for (var p = el && el.parentElement; p && p !== D.body; p = p.parentElement){
+    var cs = getComputedStyle(p);
+    if (/(auto|scroll)/.test(cs.overflowY) && p.scrollHeight > p.clientHeight + 2) return p;
+  }
+  return D.scrollingElement || html;
+}
+function scrollBy(px){ var s = scroller(P.focused); try { s.scrollBy({ top:px, behavior:'smooth' }); } catch (e) { s.scrollTop += px; } }
+function focus(el){
+  if (!el) return; P.focused = el;
+  try { el.scrollIntoView({ block:'nearest', inline:'nearest', behavior:'smooth' }); } catch (e) {}
+  if (!el.matches('input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select')) {
+    try { el.focus({ preventScroll:true }); } catch (e) {}
+  }
+  try { el.dispatchEvent(new CustomEvent('lxpadfocus', { bubbles:true })); } catch (e) {}
+  drawRing();
+}
+P.focus = focus;
+function hideRing(){ if (ring) ring.classList.remove('on'); }
+function drawRing(){
+  ensureRing(); var f = P.focused; if (!ring) return;
+  if (!f || !f.isConnected || !P.active) { hideRing(); return; }
+  var r = f.getBoundingClientRect(); if (r.width < 2) { hideRing(); return; }
+  var cs = getComputedStyle(f), rad = parseFloat(cs.borderTopLeftRadius) || 10, pad = 3;
+  // CSS-Zoom (z. B. Großbild-Ansicht): Rahmen-Koordinaten in seine eigene Zoom-Stufe umrechnen
+  var z = ring.currentCSSZoom || 1; if (z !== 1) r = { left:r.left / z, top:r.top / z, width:r.width / z, height:r.height / z };
+  ring.style.left = (r.left - pad) + 'px'; ring.style.top = (r.top - pad) + 'px';
+  ring.style.width = (r.width + pad * 2) + 'px'; ring.style.height = (r.height + pad * 2) + 'px';
+  ring.style.borderRadius = Math.min(rad + pad, (r.height + pad * 2) / 2) + 'px';
+  ring.classList.add('on');
+}
+function fire(el, type, x, y){
+  var o = { bubbles:true, cancelable:true, composed:true, clientX:x, clientY:y, button:0, buttons:type.indexOf('down') > 0 ? 1 : 0, view:window };
+  try {
+    if (type.indexOf('pointer') === 0) { o.pointerId = 1; o.pointerType = 'mouse'; o.isPrimary = true; el.dispatchEvent(new PointerEvent(type, o)); }
+    else el.dispatchEvent(new MouseEvent(type, o));
+  } catch (e) {}
+}
+function activate(el){
+  if (!el) return;
+  if (el.matches('input[type=range]')) return;
+  if (el.matches('input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=reset]),textarea,select')) {
+    try { el.focus(); if (el.showPicker && el.tagName === 'SELECT') el.showPicker(); } catch (e) {}
+    return;
+  }
+  var r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  fire(el, 'pointerdown', x, y); fire(el, 'mousedown', x, y); fire(el, 'pointerup', x, y); fire(el, 'mouseup', x, y);
+  if (el.click) el.click(); else fire(el, 'click', x, y);
+}
+P.activate = activate;
+var BACK_RE = /^(zur(ü|ue)ck|back|schlie(ß|ss)en|close|abbrechen|cancel|beenden|menü|menu|hauptmenü|home|×|✕|✖|x|←|‹|⟵|◀|<|‹ zurück|← zurück)$/i;
+var BACK_IN = /(zur(ü|ue)ck|schlie(ß|ss)en|close|back|abbrechen)/i;
+function label(el){ return ((el.getAttribute('aria-label') || '') + ' ' + (el.title || '') + ' ' + (el.textContent || '')).replace(/\s+/g, ' ').trim(); }
+function findBack(){
+  var list = candidates(), best = null, bs = -1;
+  list.forEach(function(c){
+    var el = c.el, al = (el.getAttribute('aria-label') || el.title || '').trim(), tx = (el.textContent || '').replace(/\s+/g, ' ').trim(), s = 0;
+    if (el.matches('[data-pad-back]')) s = 100;
+    else if (BACK_RE.test(al) || BACK_RE.test(tx)) s = 60;
+    else if (BACK_IN.test(al) || (tx.length < 24 && BACK_IN.test(tx))) s = 40;
+    else if (/class="[^"]*(close|back|zurueck|zurück)/i.test(el.outerHTML.slice(0, 200))) s = 30;
+    if (s > bs && s > 0) { bs = s; best = el; }
+  });
+  return best;
+}
+function key(k, code, kc){
+  var t = D.activeElement && D.activeElement !== D.body ? D.activeElement : D;
+  ['keydown','keyup'].forEach(function(type){ try { t.dispatchEvent(new KeyboardEvent(type, { key:k, code:code, keyCode:kc, which:kc, bubbles:true, cancelable:true })); } catch (e) {} });
+}
+P.key = key;
+function back(){
+  if (typeof P.back === 'function' && P.back()) return;
+  var b = findBack(); if (b) { activate(b); return; }
+  key('Escape', 'Escape', 27);
+}
+function pause(){
+  if (typeof P.pause === 'function' && P.pause()) return;
+  var list = candidates(), b = null;
+  list.forEach(function(c){ var l = label(c.el); if (!b && /(^|\s)(pause|menü|menu|einstellungen|optionen)(\s|$)/i.test(l)) b = c.el; });
+  if (b) { activate(b); return; }
+  key('Escape', 'Escape', 27);
+}
+function nav(p){
+  // Richtung mit Wiederholung beim Halten
+  var dir = p.dx ? (p.dx > 0 ? 'R' : 'L') : p.dy ? (p.dy > 0 ? 'D' : 'U') : '';
+  var now = performance.now();
+  if (dir) {
+    var f = P.focused;
+    if (f && f.matches && f.matches('input[type=range]') && p.dx) {
+      if (dir !== rep.dir || now > rep.t) { var st = parseFloat(f.step) || 1; f.value = (parseFloat(f.value) || 0) + p.dx * st; f.dispatchEvent(new Event('input', { bubbles:true })); f.dispatchEvent(new Event('change', { bubbles:true })); rep.t = now + (dir !== rep.dir ? 380 : 90); rep.dir = dir; }
+    } else if (dir !== rep.dir) { rep.dir = dir; rep.t = now + 400; move(p.dx, p.dx ? 0 : p.dy); }
+    else if (now > rep.t) { rep.t = now + 140; move(p.dx, p.dx ? 0 : p.dy); }
+  } else rep.dir = '';
+  if (p.hit('a')) { var c = P.focused && P.focused.isConnected && vis(P.focused) ? P.focused : null; if (c) activate(c); else move(0, 0); }
+  if (p.hit('b')) back();
+  if (p.hit('start')) pause();
+  if (p.hit('back') && CFG.fs !== false && !CFG.site) goFull();
+  // Rechter Stick oder Schultertasten: scrollen
+  var sy = p.ry || 0; if (p.down('rt')) sy = 1; if (p.down('lt')) sy = -1;
+  if (sy) { scrollAcc += sy * p.dt * 900; if (Math.abs(scrollAcc) >= 4) { var s = scroller(P.focused); s.scrollTop += scrollAcc; scrollAcc = 0; } }
+  if (P.focused && (!P.focused.isConnected || !vis(P.focused) || onTop(P.focused, P.focused.getBoundingClientRect()) === false)) {
+    // Fokus ist verschwunden (Dialog zu, Seite gewechselt): neu wählen
+    P.focused = null; var list = candidates(); if (list.length) focus(pickStart(list)); else hideRing();
+  } else if (!P.focused) { var l2 = candidates(); if (l2.length) focus(pickStart(l2)); }
+  drawRing();
+}
+
+function init(){ css(); setupFs(); fsState(); }
+// Spiele können vorab window.LXPAD_INIT = function(P){ P.game = ...; } setzen
+if (typeof window.LXPAD_INIT === 'function') { try { window.LXPAD_INIT(P); } catch (e) { console.error(e); } }
+if (D.body) init(); else D.addEventListener('DOMContentLoaded', init);
+})();
+</script></body></html>
