@@ -823,3 +823,13 @@ window.lxAgeGate=init;document.querySelectorAll('.age-gate').forEach(init)})();
   const secs=['spiele','software'].map(id=>document.getElementById(id)).filter(Boolean);
   if(secs.length&&'IntersectionObserver' in window){ const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)mark(en.target.id);}),{rootMargin:'-40% 0px -55% 0px'}); secs.forEach(x=>io.observe(x)); }
 })();
+
+/* ---------- Controller (lx-pad.js): Website per Controller bedienbar.
+   Läuft ein Spiel (iframe), ruht die Website-Steuerung; die View-/Back-Taste schließt das Spiel. ---------- */
+window.LXPAD_INIT=function(P){
+  const playing=()=>{const pl=document.querySelector('.player');return !!(document.querySelector('.game-frame')||(pl&&!pl.hidden&&pl.querySelector('iframe')))};
+  P.suspend=playing;
+  P.onSuspendBack=()=>{const pl=document.querySelector('.player');
+    if(pl&&!pl.hidden){const c=pl.querySelector('.pl-close');if(c)c.click();return}
+    const m=document.getElementById('modal');const x=m&&m.querySelector('[data-close]');if(x)x.click()};
+};

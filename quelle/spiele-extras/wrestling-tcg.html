@@ -1,0 +1,21 @@
+<!-- Ring Legends: Ergänzung für große Querformat-Bildschirme (Beamer, PC). Wird von pad_inject.py beim Bauen eingefügt,
+     damit sie ein neues Ring-Legends-Update aus dem eigenen Repo übersteht. Handys/Tablets mit Touch bleiben unverändert. -->
+<style>
+@media (min-width:900px) and (orientation:landscape) and (hover:hover) and (pointer:fine){
+  body{background:radial-gradient(ellipse at 50% 0%,var(--bg2),var(--bg) 70%) fixed}
+}
+</style>
+<script>
+(function(){
+  // Großer Bildschirm: alles proportional vergrößern (wie Browser-Zoom), damit Text aus 3 m lesbar ist.
+  var mq = matchMedia('(min-width:900px) and (orientation:landscape) and (hover:hover) and (pointer:fine)'), de = document.documentElement;
+  function fit(){
+    var k = 1;
+    if (mq.matches || (window.LXPAD && LXPAD.active && innerWidth > innerHeight * 1.2)) k = Math.max(1, Math.min(2.2, innerHeight / 620));
+    k = Math.round(k * 20) / 20;
+    de.style.zoom = k === 1 ? '' : String(k);
+  }
+  fit(); addEventListener('resize', fit); addEventListener('lxpadmode', fit);
+  if (mq.addEventListener) mq.addEventListener('change', fit);
+})();
+</script>

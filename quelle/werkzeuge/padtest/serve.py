@@ -13,7 +13,7 @@ class H(http.server.SimpleHTTPRequestHandler):
         if p.endswith("/"): p += "index.html"
         f = os.path.join(ROOT, p.lstrip("/"))
         if p.endswith(".html") and os.path.isfile(f):
-            b = pad_inject.inject(open(f, encoding="utf-8").read()).encode("utf-8")
+            b = pad_inject.inject(open(f, encoding="utf-8").read(), p.strip('/').split('/')[0]).encode("utf-8")
             self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(b))); self.send_header("Cache-Control", "no-store"); self.end_headers(); self.wfile.write(b); return
         return super().do_GET()

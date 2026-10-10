@@ -259,6 +259,8 @@ function drawRing(){
   if (!f || !f.isConnected || !P.active) { hideRing(); return; }
   var r = f.getBoundingClientRect(); if (r.width < 2) { hideRing(); return; }
   var cs = getComputedStyle(f), rad = parseFloat(cs.borderTopLeftRadius) || 10, pad = 3;
+  // CSS-Zoom (z. B. Großbild-Ansicht): Rahmen-Koordinaten in seine eigene Zoom-Stufe umrechnen
+  var z = ring.currentCSSZoom || 1; if (z !== 1) r = { left:r.left / z, top:r.top / z, width:r.width / z, height:r.height / z };
   ring.style.left = (r.left - pad) + 'px'; ring.style.top = (r.top - pad) + 'px';
   ring.style.width = (r.width + pad * 2) + 'px'; ring.style.height = (r.height + pad * 2) + 'px';
   ring.style.borderRadius = Math.min(rad + pad, (r.height + pad * 2) / 2) + 'px';

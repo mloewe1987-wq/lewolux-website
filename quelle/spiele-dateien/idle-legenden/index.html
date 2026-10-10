@@ -78446,6 +78446,31 @@ var IdleCore = IdleCore || {};
 
 </script>
 <script>
+
+// --- Controller (Xbox/Standard-Gamepad) – Ergänzung; Maus, Touch und Tastatur bleiben unverändert ---
+// Eingabe gehört dem Spiel: RPG Maker liest den Controller selbst, das Lewolux-Modul (lx-pad.js) zeigt nur
+// Hinweis, Vollbild-Knopf und setzt html.lx-pad. View/Back = Vollbild.
+window.LXPAD_CFG = window.LXPAD_CFG || { fsPos: "br" };
+window.LXPAD_INIT = function(P){ P.game = function(p){ if (p.hit('back')) P.fullscreen(); if (window.lxPadGame) window.lxPadGame(p); return true; }; };
+window.lxPadOn = function(){ return !!(window.LXPAD && LXPAD.active); };
+// Gamepad-Knopf i gerade gedrückt (nur Controller, nie Tastatur) – Kanten je Szene selbst auswerten
+window.lxPadBtn = function(i){ var g = Input._gamepadStates || []; for (var k = 0; k < g.length; k++) if (g[k] && g[k][i]) return true; return false; };
+
+(function(){
+  "use strict";
+  Input.gamepadMapper[9] = "menu";   // Start = Menü (Y bleibt ebenfalls Menü)
+  (function(){ var st = document.createElement("style"); st.textContent = "html.lx-pad #rmFull{display:none!important}"; (document.head || document.documentElement).appendChild(st); })();   // Touch-Vollbildknopf nicht doppelt
+  if (window.IdleCore && IdleCore.GUIDE) IdleCore.GUIDE.push(["Steuerung", function(){ return [
+    "\\C[6]Tastatur:\\C[0] Pfeiltasten laufen, Enter/Leertaste ansprechen,",
+    "Esc = Menü.  \\C[6]Maus/Touch:\\C[0] Boden antippen = laufen.", "",
+    "\\C[6]Controller:\\C[0] Stick/Steuerkreuz laufen,",
+    "A = ansprechen/abbauen/bestätigen, B = zurück,",
+    "Start oder Y = Menü, X halten = rennen,",
+    "LB/RB = Seite blättern, View = Vollbild."]; }]);
+})();
+
+</script>
+<script>
 window.addEventListener('load', function(){ SceneManager.run(Scene_Boot); });
 
 </script>

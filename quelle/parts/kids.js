@@ -312,3 +312,12 @@
   /* ---- Als App installieren (eigenes Manifest /kids/kids.webmanifest) ---- */
   if(window.lxInstall) lxInstall(document.getElementById('kInstall'),'Lewolux Kids als App','So kommt Lewolux Kids auf den Startbildschirm:');
 })();
+
+/* ---- Controller (lx-pad.js): ruht, solange ein Spiel läuft (das Spiel liest den Controller selbst).
+   View-/Back-Taste fragt „Beenden?“, danach Ja/Nein per Steuerkreuz und A. ---- */
+window.LXPAD_INIT=function(P){
+  const pl=document.getElementById('kPlayer'), quit=document.getElementById('kQuit');
+  P.suspend=()=>!!(pl&&!pl.hidden&&quit&&quit.hidden);
+  P.onSuspendBack=()=>{ const c=document.getElementById('kClose'); if(c) c.click(); };
+  P.root=()=>quit&&!quit.hidden?quit:null;
+};

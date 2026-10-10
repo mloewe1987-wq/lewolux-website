@@ -78292,7 +78292,7 @@ if (typeof module !== "undefined") module.exports = RKZ;
                     rr(c, 40, 412, w - 80, 104, 16); c.fillStyle = "#fff4e8"; c.fill();
                     text(c, "So geht's:", 60, 436, 17, C.orange, "left", FB);
                     text(c, "Tisch antippen = hingehen & bedienen · Küche/Tresen = Zettel abgeben, Essen holen", 60, 464, 15, C.ink, "left", F, w - 120);
-                    text(c, "Der orange Ring zeigt, wo du als Nächstes hinsolltest. Tasten: 1–8, K, T", 60, 490, 15, C.ink, "left", F, w - 120);
+                    text(c, (RKZ.padOn && RKZ.padOn() ? "Controller: Steuerkreuz wählen, A = hingehen, X = Küche, Y = Tresen, B = Pause" : "Der orange Ring zeigt, wo du als Nächstes hinsolltest. Tasten: 1–8, K, T"), 60, 490, 15, C.ink, "left", F, w - 120);
                 }
             }, [{ label: "Los geht's!", x: 380, y: tut ? 566 : 420, w: 280, fill: M.color, onClick: () => { this.closeOverlay(); this.countdown = 150; this.state = "count"; se("Decision1"); } }]);
             this.openOverlay(ov);
@@ -78551,6 +78551,124 @@ if (typeof module !== "undefined") module.exports = RKZ;
         update() { super.update(); if (Input.isTriggered("ok")) SceneManager.goto(Scene_RkzLevels); }
     }
     window.Scene_RkzTitle = Scene_RkzTitle;
+
+    //=========================================================================
+    // Controller (Xbox/Standard-Gamepad) – Ergänzung; Maus, Touch und Tastatur bleiben unverändert
+    // Steuerkreuz/Stick = Knopf bzw. Tisch wählen, A = auslösen/hingehen, B/Start = Pause/zurück,
+    // X = Küche, Y = Tresen, View = Vollbild. Leuchtrahmen nur im Controller-Modus.
+    //=========================================================================
+    const padOn = RKZ.padOn = () => !!(window.LXPAD && LXPAD.active);
+    window.LXPAD_CFG = window.LXPAD_CFG || { fs: false };   // eigener Vollbild-Knopf (Titel/Pause) + View-Knopf; Ecken sind belegt
+    window.LXPAD_INIT = function(P) { P.game = function(p) { if (p.hit("back")) P.fullscreen(); return true; }; };
+    Object.assign(Input.gamepadMapper, { 2: "kK", 3: "kT", 9: "escape" });
+    const _rqFull = RKZ.requestFull;
+    RKZ.requestFull = function() { if (padOn() && window.LXPAD) { LXPAD.fullscreen(); return; } _rqFull.apply(this, arguments); };
+    // Leuchtrahmen am gewählten Knopf
+    const _bDraw = RkzButton.prototype.draw;
+    RkzButton.prototype.draw = function() {
+        _bDraw.call(this);
+        if (!this._padFocus) return;
+        const c = this.bitmap.context, w = this._w, h = this._h, r = (this.o.radius || h / 2) + 6;
+        c.save(); c.shadowColor = "rgba(59,232,255,0.95)"; c.shadowBlur = 8;
+        rr(c, 5, 5, w + 14, h + 14, r); c.strokeStyle = "#3be8ff"; c.lineWidth = 5; c.stroke();
+        c.shadowBlur = 0; rr(c, 9, 9, w + 6, h + 6, r - 3); c.strokeStyle = "#ffffff"; c.lineWidth = 2; c.stroke(); c.restore(); upd(this.bitmap);
+    };
+    const setPadFocus = (sc, b) => {
+        if (sc._padF === b) return;
+        if (sc._padF) { sc._padF._padFocus = false; sc._padF.draw(); }
+        sc._padF = b; if (b) { b._padFocus = true; b.draw(); }
+    };
+    const padButtons = sc => {
+        const out = [], walk = n => { for (const ch of n.children || []) { if (!ch.visible) continue; if (ch instanceof RkzButton) { if (ch.enabled && ch.o.onClick) out.push(ch); } else walk(ch); } };
+        if (sc.overlay) walk(sc.overlay); else if (!(sc instanceof Scene_RkzShift)) walk(sc);
+        return out;
+    };
+    const padDir = () => Input.isRepeated("left") ? [-1, 0] : Input.isRepeated("right") ? [1, 0] : Input.isRepeated("up") ? [0, -1] : Input.isRepeated("down") ? [0, 1] : null;
+    // räumlich nächstes Ziel in Richtung d (Liste von {x, y})
+    const padStep = (list, cur, d) => {
+        let best = null, bs = Infinity;
+        for (const o of list) {
+            if (o === cur) continue;
+            const dx = o.x - cur.x, dy = o.y - cur.y, main = d[0] ? dx * d[0] : dy * d[1], side = Math.abs(d[0] ? dy : dx);
+            if (main <= 4) continue;
+            const s = main + side * 2.2; if (s < bs) { bs = s; best = o; }
+        }
+        return best;
+    };
+    const padNav = sc => {
+        const list = padButtons(sc);
+        let f = sc._padF && list.includes(sc._padF) ? sc._padF : null;
+        if (!f && list.length) {
+            f = list.find(b => b._label === "Spielen") || list.find(b => b._label === "Weiterspielen") || null;
+            if (!f) { let ba = 0; for (const b of list) { const a = b._w * b._h; if (a > ba) { ba = a; f = b; } } }
+        }
+        const d = padDir();
+        if (f && d) { const n = padStep(list, f, d); if (n) { f = n; se("Cursor1", 40); } }
+        setPadFocus(sc, f);
+        if (f && Input.isTriggered("ok") && !RkzButton.block) { f._down = 6; se("Decision2", 60); RkzButton.block = true; f.o.onClick(); }
+    };
+    const padOff = sc => { if (sc._padF) setPadFocus(sc, null); };
+    // Titel: A löst den gewählten Knopf aus (statt immer „Jetzt spielen“)
+    const _tU = Scene_RkzTitle.prototype.update;
+    Scene_RkzTitle.prototype.update = function() { if (padOn()) { Scene_Base.prototype.update.call(this); padNav(this); } else { padOff(this); _tU.call(this); } };
+    const _lU = Scene_RkzLevels.prototype.update;
+    Scene_RkzLevels.prototype.update = function() { _lU.call(this); if (padOn()) padNav(this); else padOff(this); };
+    Scene_RkzCompare.prototype.update = function() {
+        Scene_Base.prototype.update.call(this);
+        if (!padOn()) return padOff(this);
+        padNav(this);
+        if (Input.isTriggered("cancel") && !this._padLeft) { this._padLeft = true; SceneManager.goto(Scene_RkzLevels); }
+    };
+    // Schicht: Tisch/Küche/Tresen per Steuerkreuz wählen, A = hingehen
+    class PadCursor extends Sprite {
+        constructor() { super(new Bitmap(360, 360)); this.anchor.x = 0.5; this.anchor.y = 0.5; this._k = ""; }
+        show(tg, x, y, w, h) {
+            const k = tg.t + tg.id + "|" + w; this.x = x; this.y = y; this.visible = true;
+            if (k === this._k) return; this._k = k; const b = this.bitmap, c = b.context; b.clear();
+            c.save(); c.shadowColor = "rgba(59,232,255,0.95)"; c.shadowBlur = 16; c.strokeStyle = "#3be8ff"; c.lineWidth = 6;
+            if (tg.t === "table") { c.beginPath(); c.arc(180, 180, 112, 0, Math.PI * 2); c.stroke(); }
+            else { rr(c, 180 - w / 2, 180 - h / 2, w, h, 20); c.stroke(); }
+            c.restore(); upd(b);
+        }
+        update() { super.update(); this.opacity = 190 + Math.sin(Graphics.frameCount / 9) * 60; }
+    }
+    const padTargets = sc => {
+        const L = RKZ.LAYOUT, out = sc.shift.tables.map(tb => ({ t: "table", id: tb.id, x: tb.x, y: tb.y }));
+        for (const k of ["kitchen", "bar"]) { const r = L[k]; out.push({ t: k, x: r.x + r.w / 2, y: r.y + r.h / 2, w: r.w + 24, h: r.h + 24 }); }
+        return out;
+    };
+    const _sU = Scene_RkzShift.prototype.update;
+    Scene_RkzShift.prototype.update = function() {
+        const st0 = this.state;
+        _sU.call(this);
+        const on = padOn();
+        if (!on) { padOff(this); if (this._padCur) this._padCur.visible = false; return; }
+        if (this.overlay) {
+            if (this._padCur) this._padCur.visible = false;
+            padNav(this);
+            if (st0 === "pause" && this.state === "pause" && Input.isTriggered("cancel")) { this.closeOverlay(); this.state = "play"; this._padF = null; }
+            return;
+        }
+        this._padF = null;
+        if (this.state !== "play" && this.state !== "count") { if (this._padCur) this._padCur.visible = false; return; }
+        const list = padTargets(this);
+        let cur = this._padT && list.find(o => o.t === this._padT.t && o.id === this._padT.id);
+        if (!cur) { const h = this.shift.suggest && this.shift.suggest(); cur = (h && list.find(o => o.t === h.t && o.id === h.id)) || list[0]; }
+        const d = padDir();
+        if (d) { const n = padStep(list, cur, d); if (n) { cur = n; se("Cursor1", 35); } }
+        this._padT = cur;
+        if (this.state === "play" && Input.isTriggered("ok")) this.tap({ t: cur.t, id: cur.id });
+        this.tableSprites.forEach(sp => { if (cur.t === "table" && cur.id === sp.tb.id) sp.hover = true; });
+        if (cur.t !== "table") this.stations[cur.t].hover = true;
+        if (!this._padCur) { this._padCur = new PadCursor(); this.addChild(this._padCur); }
+        this._padCur.show(cur, cur.x, cur.y, cur.w, cur.h);
+    };
+    const _setTip = Scene_RkzShift.prototype.setTip;
+    Scene_RkzShift.prototype.setTip = function(t, col) {
+        if (t && padOn()) t = t.replace("(K)", "(X)").replace("(T)", "(Y)").replace("Tisch, Küche oder Tresen antippen", "Steuerkreuz wählen, A = hingehen");
+        return _setTip.call(this, t, col);
+    };
+
     // Fallback, falls der Maker doch den Standard-Titel ruft
     Scene_Title.prototype.create = function() { Scene_Base.prototype.create.call(this); };
     Scene_Title.prototype.start = function() { Scene_Base.prototype.start.call(this); SceneManager.goto(Scene_RkzTitle); };

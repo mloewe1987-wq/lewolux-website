@@ -80645,7 +80645,7 @@ var Stern = Stern || {};
         Stern.panel(b, 0, 0, 330, 64, c ? "rgba(125,255,154,0.95)" : "rgba(255,224,138,0.9)", 0.85);
         b.fontFace = $gameSystem.mainFontFace(); b.outlineWidth = 3;
         b.fontSize = 11; b.textColor = c ? ((Graphics.frameCount >> 5) % 2 ? "#7dff9a" : "#ffffff") : "#ffe08a";
-        b.drawText(c ? "! " + c + " BELOHNUNG" + (c > 1 ? "EN" : "") + " BEREIT – hier klicken oder Questtafel" : "AUFTRAG  ·  Questtafel südlich vom Altar", 12, 3, 306, 16);
+        b.drawText(c ? "! " + c + " BELOHNUNG" + (c > 1 ? "EN" : "") + " BEREIT – " + (Stern.padOn && Stern.padOn() ? "LB drücken oder Questtafel" : "hier klicken oder Questtafel") : "AUFTRAG  ·  Questtafel südlich vom Altar", 12, 3, 306, 16);
         b.fontSize = 15; b.textColor = "#ffffff"; b.drawText(j.text, 12, 19, 306, 20);
         Stern.bar(b, 12, 46, 220, 8, p / j.n, "#5a8cff", "#b4d0ff");
         b.fontSize = 12; b.textColor = "#cfd6ff"; b.drawText(Stern.fmt(p) + " / " + Stern.fmt(j.n), 236, 40, 82, 18, "right");
@@ -81361,6 +81361,45 @@ var Stern = Stern || {};
         if (this._backgroundSprite) this._backgroundSprite.setColorTone([-60, -50, 10, 60]);
         const v = new Sprite(vignetteBitmap()); this.addChild(v);
     };
+})();
+
+</script>
+<script>
+
+// --- Controller (Xbox/Standard-Gamepad) – Ergänzung; Maus, Touch und Tastatur bleiben unverändert ---
+// Eingabe gehört dem Spiel: RPG Maker liest den Controller selbst, das Lewolux-Modul (lx-pad.js) zeigt nur
+// Hinweis, Vollbild-Knopf und setzt html.lx-pad. View/Back = Vollbild.
+window.LXPAD_CFG = window.LXPAD_CFG || { fsPos: "bl" };
+window.LXPAD_INIT = function(P){ P.game = function(p){ if (p.hit('back')) P.fullscreen(); if (window.lxPadGame) window.lxPadGame(p); return true; }; };
+window.lxPadOn = function(){ return !!(window.LXPAD && LXPAD.active); };
+// Gamepad-Knopf i gerade gedrückt (nur Controller, nie Tastatur) – Kanten je Szene selbst auswerten
+window.lxPadBtn = function(i){ var g = Input._gamepadStates || []; for (var k = 0; k < g.length; k++) if (g[k] && g[k][i]) return true; return false; };
+
+(function(){
+  "use strict";
+  var padOn = Stern.padOn = window.lxPadOn, SW = Stern.SW;
+  Input.gamepadMapper[9] = "menu";       // Start = Menü
+  (function(){ var st = document.createElement("style"); st.textContent = "html.lx-pad #rmFull{display:none!important}"; (document.head || document.documentElement).appendChild(st); })();   // Touch-Vollbildknopf nicht doppelt
+  Input.gamepadMapper[3] = "sternAuto";  // Y = Auto-Drehen an/aus (wie Taste R)
+  var swv = function(id){ return $gameSwitches && $gameSwitches.value(id); };
+  // Knopf-Hinweise im Controller-Modus
+  var _as = Stern.autoStatus; Stern.autoStatus = function(){ var r = _as.apply(this, arguments); return padOn() ? [r[0].replace("[R]", "[Y]"), r[1]] : r; };
+  var _hs = Stern.autoHatchStatus; Stern.autoHatchStatus = function(){ var r = _hs.apply(this, arguments); return padOn() ? [r[0].replace("[T]", "[RB]"), r[1]] : r; };
+  var _to = Stern.toast; Stern.toast = function(text, tier, icon){
+    if (padOn()) text = String(text).replace("Taste R", "Y").replace("R = stopp", "Y = stopp").replace("T = stopp", "RB = stopp").replace("T = wieder an", "RB = wieder an");
+    return _to.call(this, text, tier, icon);
+  };
+  // Karte: LB = Quests, RB = Auto-Brüten (nur Controller)
+  var _u = Scene_Map.prototype.update;
+  Scene_Map.prototype.update = function(){
+    _u.call(this);
+    var pm = padOn(); if (pm !== this._lxPm) { this._lxPm = pm; if (this._sternHud) this._sternHud._key = ""; }
+    var lb = lxPadBtn(4), rb = lxPadBtn(5), hl = lb && !this._lxLb, hr = rb && !this._lxRb; this._lxLb = lb; this._lxRb = rb;
+    if (!(hl || hr) || !swv(SW.ACTIVE) || $gameMessage.isBusy() || SceneManager.isSceneChanging() || !this.isActive()) return;
+    if (hr) Stern.toggleAutoHatch();
+    else if (Stern.tutDone && Stern.tutDone()) Stern.openQuests();
+  };
+  if (Stern.HELP && Stern.HELP[0]) Stern.HELP[0][1].push("\\C[3]Controller:\\C[0] A ansprechen · B zurück · Start Menü", "Y Auto-Drehen · RB Auto-Brüten · LB Quests · X rennen");
 })();
 
 </script>

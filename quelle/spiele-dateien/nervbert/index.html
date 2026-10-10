@@ -154,6 +154,12 @@ input[type=range]{width:150px;accent-color:var(--org)}
 background:var(--yel);border:3px solid var(--ol);border-radius:16px;padding:8px 16px;font-weight:900;font-size:16px;box-shadow:0 4px 0 var(--ol);transition:all .3s;white-space:nowrap;max-width:94vw;overflow:hidden;text-overflow:ellipsis}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 #rot{display:none}
+/* Controller (nur im Controller-Modus sichtbar) */
+#padHint{position:fixed;left:50%;top:calc(118px + var(--sat));transform:translateX(-50%);z-index:8;display:none;pointer-events:none;max-width:94vw;text-align:center;
+background:rgba(29,19,48,.88);color:#fff;border:3px solid var(--ol);border-radius:16px;padding:.35em 1em;font-weight:900;font-size:clamp(15px,1.5vw,28px);line-height:1.4;opacity:0;transition:opacity .3s}
+html.lx-pad #padHint{display:block}html.lx-pad #padHint.on{opacity:1}
+#padHint b{display:inline-block;min-width:1.5em;border-radius:999px;padding:0 .35em;margin:0 .1em;background:#5d5574;border:2px solid #fff}
+#padHint b.a{background:#4cc046}#padHint b.x{background:#3a8bff}#padHint b.bb{background:#e8343a}
 .mbox .row .btn.ic{flex:none}
 @media (min-aspect-ratio:21/20) and (max-height:520px){
  #title{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));justify-content:space-between}
@@ -172,7 +178,7 @@ background:var(--yel);border:3px solid var(--ol);border-radius:16px;padding:8px 
  <div class="topcorner"><span class="coinbadge" data-coins></span></div>
  <div class="logo"><span class="l1">HAU DEN</span><span class="l2">NERVBERT</span><span class="l3">Der Nachbar, der nervt. Bis jetzt.</span></div>
  <div class="tmenu">
-  <button class="btn big" id="bPlay" data-ic="play">SPIELEN</button>
+  <button class="btn big" id="bPlay" data-ic="play" data-pad-default>SPIELEN</button>
   <div class="trow">
    <button class="btn teal" id="bShop" data-ic="shop">Werkstatt</button>
    <button class="btn pink" id="bWard" data-ic="shirt">Garderobe</button>
@@ -206,14 +212,14 @@ background:var(--yel);border:3px solid var(--ol);border-radius:16px;padding:8px 
 </div>
 
 <div id="intro" class="scr modal"><div class="mbox"><div class="ribbon" id="inLvl">Level 1</div><h3 id="inName" style="margin-top:12px"></h3><div class="sub" id="inTheme"></div>
- <div class="goalbig" id="inGoal"></div><div class="tip" id="inTip"></div><button class="btn big" id="bGo">LOS!</button></div></div>
+ <div class="goalbig" id="inGoal"></div><div class="tip" id="inTip"></div><button class="btn big" id="bGo" data-pad-default>LOS!</button></div></div>
 
 <div id="pause" class="scr modal"><div class="mbox"><div class="ribbon">Pause</div><h3 style="margin-top:14px">Kurz durchatmen</h3>
  <div class="col" id="pauseSet"></div>
- <div class="col"><button class="btn teal" id="bResume" data-ic="play">Weiter</button><div class="row"><button class="btn yel" id="bRetry" data-ic="retry">Neustart</button><button class="btn pink" id="bToMap" data-ic="map">Karte</button></div></div></div></div>
+ <div class="col"><button class="btn teal" id="bResume" data-ic="play" data-pad-default>Weiter</button><div class="row"><button class="btn yel" id="bRetry" data-ic="retry">Neustart</button><button class="btn pink" id="bToMap" data-ic="map">Karte</button></div></div></div></div>
 
 <div id="settings" class="scr modal"><div class="mbox"><div class="ribbon">Einstellungen</div><div class="col" id="setBox" style="margin-top:14px"></div>
- <button class="btn gray sm" id="bReset">Spielstand löschen</button><button class="btn teal" id="bSetOk">Fertig</button></div></div>
+ <button class="btn gray sm" id="bReset">Spielstand löschen</button><button class="btn teal" id="bSetOk" data-pad-default>Fertig</button></div></div>
 
 <div id="end" class="scr modal"><div class="mbox"><div class="ribbon" id="endRib">Geschafft!</div>
  <div class="bigstars" id="endStars"></div><h3 id="endH"></h3><div class="sub" id="endSub"></div>
@@ -221,8 +227,9 @@ background:var(--yel);border:3px solid var(--ol);border-radius:16px;padding:8px 
  <div class="row"><button class="btn white ic" id="bEndMap" data-ic="map" aria-label="Karte"></button><button class="btn yel" id="bEndRetry" data-ic="retry">Nochmal</button><button class="btn" id="bEndNext" data-ic="play">Weiter</button></div>
  <button class="btn teal sm" id="bEndShop" data-ic="shop">Werkstatt</button></div></div>
 
-<div id="confirm" class="scr modal"><div class="mbox"><h3 id="cfH">Sicher?</h3><div class="sub" id="cfT"></div><div class="row"><button class="btn gray" id="cfNo">Abbrechen</button><button class="btn pink" id="cfYes">Ja</button></div></div></div>
+<div id="confirm" class="scr modal"><div class="mbox"><h3 id="cfH">Sicher?</h3><div class="sub" id="cfT"></div><div class="row"><button class="btn gray" id="cfNo" data-pad-default>Abbrechen</button><button class="btn pink" id="cfYes">Ja</button></div></div></div>
 <div id="toast"></div>
+<div id="padHint" role="status"></div>
 <script>
 'use strict';
 /* ===================== Hau den Nervbert – Lewolux Studio ===================== */
@@ -1334,6 +1341,7 @@ function render(dt){
  for(const b of G.bursts)drawComic(b);
  if(G.state==='play'&&!G.demo||GV.state!=='rest')drawGloveFP(t);
  if(G.state==='play'&&(GV.state==='charge'))drawCrosshair(t);
+ else if(padAimShow())drawCrosshair(t);
  if(G.state==='play'&&G.phase==='aim'&&GV.state==='rest'&&G.used===0&&G.li<2&&!G.paused)drawHint(t);
  ctx.setTransform(DPR,0,0,DPR,0,0);
  if(G.slowT>0||G.bigSlow>0){const g=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);g.addColorStop(0,'rgba(60,40,140,0)');g.addColorStop(1,'rgba(60,40,140,'+(G.slowT>0?.45:.3)+')');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
@@ -1389,7 +1397,7 @@ function drawCrosshair(t){const x=IN.cx,y=IN.cy;const h=hitTest(x,y,true);const 
 function drawHint(t){const P=NB.P;if(!P)return;const p=P[9];const k=(t%2.2)/2.2;const fsz=clamp(Math.min(W,H)*.034,13,18);
  const x=p.x+40,y=p.y+60-Math.sin(k*Math.PI)*30;ctx.save();ctx.globalAlpha=.9;ctx.fillStyle='#fff';ctx.strokeStyle=OL;ctx.lineWidth=3;
  ctx.beginPath();ctx.arc(x,y,14+(k<.5?k*12:0),0,TAU);ctx.globalAlpha=.4+.4*Math.sin(t*6);ctx.stroke();ctx.globalAlpha=1;
- ctx.font='900 '+fsz+'px '+FONT;ctx.textAlign='center';const txt='Halten · Zielen · Loslassen!';const w=ctx.measureText(txt).width+24;const bx=clamp(W/2,w/2+8,W-w/2-8),by=H-gloveRest().R0*2.6;
+ ctx.font='900 '+fsz+'px '+FONT;ctx.textAlign='center';const txt=padOn()?'A halten · Stick zielen · loslassen!':'Halten · Zielen · Loslassen!';const w=ctx.measureText(txt).width+24;const bx=clamp(W/2,w/2+8,W-w/2-8),by=H-gloveRest().R0*2.6;
  rr(ctx,bx-w/2,by-fsz,w,fsz*2,fsz);ctx.fillStyle='rgba(29,19,48,.8)';ctx.fill();ctx.fillStyle='#ffd23f';ctx.textBaseline='middle';ctx.fillText(txt,bx,by+1);ctx.restore()}
 /* ---------- UI ---------- */
 const IC={
@@ -1432,7 +1440,7 @@ bindBtn($('#bSetOk'),()=>modal('settings',false));
 bindBtn($('#bReset'),()=>confirmBox('Spielstand löschen?','Alle Sterne, Münzen und Upgrades sind dann weg. Nervbert freut sich.',()=>{S=clone(DEF);save();modal('settings',false);toast('Spielstand gelöscht');coinsUI()}));
 $$('[data-back]').forEach(b=>bindBtn(b,()=>{if(CUR==='shop'&&SHOP_BACK==='map')openMap();else show('title')}));
 function confirmBox(h,t,yes){$('#cfH').textContent=h;$('#cfT').textContent=t;modal('confirm',true);$('#cfYes').onclick=()=>{SFX.click();modal('confirm',false);yes()};$('#cfNo').onclick=()=>{SFX.click();modal('confirm',false)}}
-function buildSettings(box){box.innerHTML='';const row=(label,key)=>{const r=document.createElement('div');r.className='setrow';r.innerHTML='<span>'+label+'</span>';const tg=document.createElement('div');tg.className='tog'+(S.set[key]?' on':'');
+function buildSettings(box){box.innerHTML='';const row=(label,key)=>{const r=document.createElement('div');r.className='setrow';r.innerHTML='<span>'+label+'</span>';const tg=document.createElement('div');tg.className='tog'+(S.set[key]?' on':'');tg.setAttribute('data-pad','');tg.setAttribute('role','switch');tg.setAttribute('aria-label',label);
   tg.onclick=()=>{auInit();S.set[key]=S.set[key]?0:1;tg.classList.toggle('on',!!S.set[key]);applyVol();save();SFX.click();if(key==='vib'&&S.set.vib)vib(40)};r.appendChild(tg);box.appendChild(r)};
  row('Musik','music');row('Soundeffekte','sfx');const r=document.createElement('div');r.className='setrow';r.innerHTML='<span>Lautstärke</span>';const sl=document.createElement('input');sl.type='range';sl.min=0;sl.max=1;sl.step=.05;sl.value=S.set.vol;
  sl.oninput=()=>{S.set.vol=+sl.value;applyVol();save()};sl.onchange=()=>SFX.coin();r.appendChild(sl);box.appendChild(r);row('Vibration','vib')}
@@ -1450,7 +1458,7 @@ function buildMap(){const box=$('#mapIn');box.innerHTML='';const n=LEVELS.length
  let dpath='';pos.forEach((p,i)=>{const x=p.x*wpx;if(!i)dpath+='M'+x+' '+p.y;else{const q=pos[i-1];const qx=q.x*wpx;dpath+=' C'+qx+' '+(q.y+step*.5)+' '+x+' '+(p.y-step*.5)+' '+x+' '+p.y}});
  svg.innerHTML='<path d="'+dpath+'" fill="none" stroke="#1d1330" stroke-width="14" stroke-linecap="round" opacity=".8"/><path d="'+dpath+'" fill="none" stroke="#fff8ea" stroke-width="7" stroke-dasharray="2 14" stroke-linecap="round"/>';box.appendChild(svg);
  let cur=0;for(let i=0;i<n;i++)if(levelUnlocked(i))cur=i;
- pos.forEach((p,i)=>{const b=document.createElement('button');const un=levelUnlocked(i),st=S.stars[i]||0;b.className='node'+(!un?' lock':st>0?' done':'')+(i===cur&&!(st>0)?' cur':'');b.style.left=(p.x*100)+'%';b.style.top=p.y+'px';
+ pos.forEach((p,i)=>{const b=document.createElement('button');const un=levelUnlocked(i),st=S.stars[i]||0;b.className='node'+(!un?' lock':st>0?' done':'')+(i===cur&&!(st>0)?' cur':'');b.style.left=(p.x*100)+'%';b.style.top=p.y+'px';if(i===cur)b.setAttribute('data-pad-default','');
   b.innerHTML=un?(i+1)+'':IC.lock;if(un){const s=document.createElement('div');s.className='st';s.innerHTML=[0,1,2].map(k=>k<st?IC.star:IC.star0).join('');b.appendChild(s);b.onclick=()=>{auInit();SFX.click();startLevel(i)}}
   else b.onclick=()=>{SFX.huh();toast('Erst Level '+i+' schaffen!')};box.appendChild(b)});
  // unlock bar
@@ -1521,10 +1529,52 @@ function endLevel(){if(G.phase==='done')return;setPhase('done');const L=G.L,i=G.
   const gt=goalText(L);$('#endStats').innerHTML='<div><span>Ziel: '+gt[0].replace(/!$/,'')+'</span><b>'+(met?'✓':'✗')+'</b></div><div><span>Punkte</span><b>'+fmt(G.score)+'</b></div><div><span>Weitester Schlag</span><b>'+fmt(G.best,1)+' m</b></div><div><span>Gesamtweite</span><b>'+fmt(G.total,1)+' m</b></div><div><span>Zerstört</span><b>'+G.broken+'</b></div>';
   $('#endGain').innerHTML='+'+fmt(coins)+' '+IC.coin;const eu=$('#endUnl');eu.innerHTML='';
   unl.forEach(s=>{const d=document.createElement('div');d.className='unl';const c=document.createElement('canvas');skinPreview(c,s,'laugh',true,52);d.appendChild(c);d.insertAdjacentHTML('beforeend','<div>Neues Kostüm freigeschaltet:<br><b>'+s.name+'</b></div>');eu.appendChild(d)});
-  const hasNext=i+1<LEVELS.length&&levelUnlocked(i+1);$('#bEndNext').style.display=hasNext?'':'none';$('#bEndRetry').className='btn '+(hasNext?'yel':'');
+  const hasNext=i+1<LEVELS.length&&levelUnlocked(i+1);$('#bEndNext').style.display=hasNext?'':'none';$('#bEndNext').toggleAttribute('data-pad-default',hasNext);$('#bEndRetry').toggleAttribute('data-pad-default',!hasNext);$('#bEndRetry').className='btn '+(hasNext?'yel':'');
   modal('end',true);coinsUI();(met?SFX.win:SFX.lose)()},500)}
 bindBtn($('#bEndMap'),()=>{modal('end',false);openMap()});bindBtn($('#bEndRetry'),()=>startLevel(G.li));bindBtn($('#bEndNext'),()=>startLevel(G.li+1));bindBtn($('#bEndShop'),()=>{modal('end',false);openShop('up','map')});
 
+
+/* ---------- Controller (lx-pad.js) ----------
+   Nur Ergänzung: Maus/Touch/Tastatur unverändert. Menüs per Fokus-Navigation des Moduls.
+   Runde: Stick = Fadenkreuz · A halten = aufladen, loslassen = Schlag · X = Zeitlupe · B/Start = Pause. */
+const PADN={cur:null,ph:'',hintT:0,charging:false};
+function padOn(){return !!(window.LXPAD&&LXPAD.active)}
+function padAimShow(){return padOn()&&G.state==='play'&&!G.paused&&G.phase==='aim'&&GV.state==='rest'&&!IN.down&&PADN.cur}
+function padHint(show){const el=$('#padHint');if(!show||!padOn()){el.classList.remove('on');PADN.hintT=0;return}
+ el.innerHTML='🎮 Stick = zielen · <b class="a">A</b> halten = Kraft, loslassen = Schlag · <b class="x">X</b> Zeitlupe · <b class="bb">B</b> Pause';el.classList.add('on');PADN.hintT=6}
+function padTarget(){const P=NB.P;if(P&&P[1]&&P[3])return{x:(P[1].x+P[3].x)/2,y:(P[1].y+P[3].y)/2};return{x:W/2,y:H*.45}}
+function padModal(){for(const id of ['confirm','settings','pause','end','intro'])if($('#'+id).classList.contains('on'))return $('#'+id);return null}
+function padGame(p){
+ if(G.state!=='play'||G.demo){PADN.cur=null;PADN.charging=false;return false}
+ if(G.phase!==PADN.ph){if(G.phase==='aim'){PADN.cur=null;if(PADN.ph==='intro')padHint(true)}PADN.ph=G.phase}
+ if(PADN.hintT>0){PADN.hintT-=p.dt;if(PADN.hintT<=0)padHint(false)}
+ if(padModal()||G.paused){if(PADN.charging){PADN.charging=false;IN.down=false;if(GV.state==='charge')GV.state='rest'}return false}
+ if(!p.active)return false;
+ if(p.down('a')||p.lx||p.ly)auInit();
+ if(p.hit('b')||p.hit('start')){if(PADN.charging){PADN.charging=false;IN.down=false;if(GV.state==='charge')GV.state='rest'}padHint(false);togglePause();return true}
+ if(p.hit('x')){$('#bSlow').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true}));return true}
+ if(G.phase==='rest'||G.phase==='getup'||G.phase==='float'){if(p.hit('a')&&G.phaseT>.35)G.skip=true;return true}
+ if(G.phase!=='aim'){PADN.charging=false;return true}
+ if(!PADN.cur)PADN.cur=padTarget();
+ const c=PADN.cur,sp=Math.min(W,H)*.85,mx=p.lx||p.dx*.7,my=p.ly||p.dy*.7;
+ c.x=clamp(c.x+mx*p.dt*sp,10,W-10);c.y=clamp(c.y+my*p.dt*sp,10,H-10);
+ if(!IN.down){IN.cx=IN.tcx=c.x;IN.cy=IN.tcy=c.y}
+ if(p.hit('a')&&canAim()&&!IN.down){IN.down=true;IN.id='pad';IN.touch=false;IN.aim=true;IN.x=IN.sx=c.x;IN.y=IN.sy=c.y;IN.t0=performance.now();
+  IN.cx=IN.tcx=c.x;IN.cy=IN.tcy=c.y;GV.state='charge';GV.charge=0;GV.t=0;PADN.charging=true;padHint(false);
+  if(G.L.dg&&Math.random()<G.L.dg&&!NB.hop)nbDodge();else if(Math.random()<.35&&!NB.say)nbSay(pick(LINES.nervous),1.4)}
+ if(PADN.charging){IN.x=IN.tcx=c.x;IN.y=IN.tcy=c.y;
+  if(!p.down('a')){PADN.charging=false;if(IN.down&&IN.id==='pad'){endPointer()}}}
+ return true}
+window.LXPAD_INIT=function(L){
+ L.root=()=>padModal();
+ L.game=p=>padGame(p);
+ L.back=()=>{const m=padModal();
+  if(m){const id=m.id;if(id==='confirm')$('#cfNo').click();else if(id==='settings')$('#bSetOk').click();else if(id==='pause')$('#bResume').click();
+   else if(id==='intro'||id==='end'){auInit();SFX.click();modal(id,false);openMap()}return true}
+  if(CUR==='title')return true;return false};
+ L.pause=()=>{if($('#pause').classList.contains('on')){$('#bResume').click();return true}if(G.state==='play'&&!padModal()){togglePause();return true}return false};
+};
+window.addEventListener('lxpadmode',e=>{if(!(e.detail&&e.detail.active)){padHint(false);PADN.cur=null;if(PADN.charging){PADN.charging=false;IN.down=false;if(GV.state==='charge')GV.state='rest'}}});
 /* ---------- Boot ---------- */
 function resize(){W=window.innerWidth;H=window.innerHeight;DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);layout();bgTheme=-1;if(CUR==='map')buildMap()}
 window.addEventListener('resize',resize);
