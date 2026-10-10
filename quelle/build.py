@@ -163,8 +163,18 @@ def pic(c, name, alt, sizes="(max-width:680px) 100vw, 640px", lazy=True, cls="")
 def is_real(g): return bool(real_shot(g["id"] + "-1"))
 def scene_attr(g): return "" if is_real(g) else f' data-scene="{g["scene"]}"'
 
+def plats_html(c, g):
+    """Plattform-Liste; der Xbox-Eintrag führt zur Anleitung „Auf der Xbox spielen“."""
+    def li(p):
+        if p == "xbox": return f'<li class="pl-xbox"><a href="{c.root}xbox/" title="Anleitung: Auf der Xbox spielen">{ICONS[p][0]}{ICONS[p][1]}<span class="xb-chip">Anleitung</span></a></li>'
+        return f'<li>{ICONS[p][0]}{ICONS[p][1]}</li>'
+    return "".join(li(p) for p in g["plats"])
+
+def xbox_btn(c, g):
+    return f'<a class="xb-btn" href="{c.root}xbox/">{ICONS["xbox"][0]}<span><b>Auf der Xbox spielen</b><small>So geht’s mit dem Controller</small></span></a>' if "xbox" in g["plats"] else ""
+
 def card(c, g, i):
-    plats = "".join(f'<li>{ICONS[p][0]}{ICONS[p][1]}</li>' for p in g["plats"])
+    plats = plats_html(c, g)
     genres = "".join(f'<span class="genre">{e(x)}</span>' for x in g["genres"])
     tech = "".join(f'<li>{e(t)}</li>' for t in g["tech"])
     return f'''        <article class="card{' wide' if g.get('wide') else ''}" id="spiel-{g['id']}" data-cats="{g['cats']}" style="--accent:{g['accent']};--glow:{g['accent']}99">
@@ -830,7 +840,7 @@ def game_page(c, g):
       <p class="g-tag">{e(g['tagline'])}</p>
       <p class="desc" style="font-size:16px">{e(g['desc'])}</p>
       <dl class="g-meta"><dt>Preis</dt><dd>Kostenlos (Early Access)</dd><dt>Status</dt><dd>{e(g['status'])}</dd><dt>Plattform</dt><dd>{e(plats)}</dd><dt>Technik</dt><dd>{e(', '.join(g['tech']))}</dd><dt>Download</dt><dd>{e(g['download']['format'])}</dd></dl>
-      <div class="g-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt im Browser spielen</button>{dl_btn(c, g, "Kostenlos herunterladen")}</div>
+      <div class="g-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt im Browser spielen</button>{dl_btn(c, g, "Kostenlos herunterladen")}</div>{xbox_btn(c, g)}
       {G_TIP if c.dl(g) else ""}
     </div>
   </div>
@@ -866,7 +876,7 @@ def group_of(g):
 
 def lp_card(c, g, i, mode="browser"):
     """Spielkarte für Übersichtsseiten (gleiches Design wie auf der Startseite). „Jetzt spielen“ führt zur Spielseite."""
-    plats = "".join(f'<li>{ICONS[p][0]}{ICONS[p][1]}</li>' for p in g["plats"])
+    plats = plats_html(c, g)
     genres = "".join(f'<span class="genre">{e(x)}</span>' for x in g["genres"])
     page = c.page(g); playable = has_game(g)
     if mode == "kids":
@@ -948,6 +958,70 @@ def page_browser_games(c):
         "Kostenlose Browser-Games", "Browser-Games · ohne Download", "Kostenlose Browser-Games ohne Anmeldung",
         "Hier findest du alle Spiele von Lewolux Studio, die direkt im Browser laufen. Kein Download, kein Konto, keine Werbung: Spiel aussuchen, auf „Jetzt spielen“ tippen und loslegen – am PC, auf dem Tablet oder auf dem Handy.",
         [f"{len(games)} Spiele im Browser", "Ohne Anmeldung", "Ohne Werbung & Käufe", "PC, Tablet & Handy"], content, FAQ_BROWSER, games, "assets/img/og-lewolux-studio.jpg")
+
+XBOX_FAQ = [
+    ("Welche Lewolux-Spiele laufen auf der Xbox?", "Alle Spiele mit dem Xbox-Zeichen bei „Plattform“, zum Beispiel Lewolux Turbo, Mandat, Sternenwurf, Idle Legenden, Kasse oder Zettel und Schulhofkicker. Sie laufen im Edge-Browser der Xbox Series X|S und Xbox One."),
+    ("Muss ich etwas installieren?", "Nein. Du öffnest nur den Microsoft-Edge-Browser auf der Konsole und gehst auf lewolux.de. Es gibt nichts zu kaufen und kein Konto."),
+    ("Warum reagiert der Controller nur als Maus-Zeiger?", "Edge startet im Browser-Modus. Halte die Menü-Taste ☰ gedrückt und wähle „Spielsteuerung“ (englisch „Use game controls“). Dann kommt der Controller direkt im Spiel an."),
+    ("Wie komme ich wieder zum Maus-Zeiger?", "Halte die Menü-Taste ☰ erneut gedrückt und wähle die Browser-Steuerung. So kannst du z. B. ein anderes Spiel anklicken."),
+    ("Wie schalte ich den Vollbildmodus ein?", "Halte die Ansicht-Taste (zwei kleine Rechtecke) gedrückt. Nochmal halten beendet den Vollbildmodus. Auf der Website gibt es zusätzlich den Knopf „Vollbild“."),
+    ("Das Spiel ruckelt. Was hilft?", "Schalte in den Xbox-Einstellungen unter System den Bildschirmrand für Apps aus. Der Rand kostet im Browser viel Leistung."),
+    ("Der Controller reagiert plötzlich nicht mehr.", "Drück kurz die Xbox-Taste und schließ das Menü wieder. Danach hat die Seite den Controller zurück. Hilft das nicht, Seite neu laden und „Spielsteuerung“ erneut wählen."),
+]
+
+XBOX_PAD_SVG = """<svg class="xb-pad" viewBox="0 0 520 330" role="img" aria-labelledby="xbpT"><title id="xbpT">Controller mit den wichtigsten Tasten</title>
+<defs><linearGradient id="xbBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4058"/><stop offset="1" stop-color="#1c2030"/></linearGradient>
+<radialGradient id="xbGlow" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#3be8ff" stop-opacity=".22"/><stop offset="1" stop-color="#3be8ff" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="260" cy="170" rx="240" ry="150" fill="url(#xbGlow)"/>
+<path d="M150 70c40-14 180-14 220 0 46 16 70 46 86 104 18 64 20 112-8 128-26 15-56-6-78-40-14-22-30-30-60-30h-100c-30 0-46 8-60 30-22 34-52 55-78 40-28-16-26-64-8-128 16-58 40-88 86-104z" fill="url(#xbBody)" stroke="#5c6688" stroke-width="2.5"/>
+<path d="M168 58q-18-16-46-8l-8 20M352 58q18-16 46-8l8 20" fill="none" stroke="#5c6688" stroke-width="7" stroke-linecap="round"/>
+<circle cx="172" cy="128" r="30" fill="#14161f" stroke="#5c6688" stroke-width="2"/><circle class="xb-hl xb-hl-stick" cx="172" cy="128" r="21" fill="#2a2f42"/>
+<g class="xb-hl xb-hl-dpad" fill="#2a2f42"><rect x="196" y="186" width="20" height="58" rx="5"/><rect x="177" y="205" width="58" height="20" rx="5"/></g>
+<circle cx="316" cy="215" r="22" fill="#14161f" stroke="#5c6688" stroke-width="2"/><circle cx="316" cy="215" r="15" fill="#2a2f42"/>
+<g font-family="Plus Jakarta Sans,system-ui,sans-serif" font-weight="800" font-size="17" text-anchor="middle">
+<circle class="xb-hl xb-hl-y" cx="382" cy="98" r="17" fill="#e6b800"/><text x="382" y="104" fill="#1a1400">Y</text>
+<circle class="xb-hl xb-hl-x" cx="350" cy="130" r="17" fill="#2f7cf6"/><text x="350" y="136" fill="#fff">X</text>
+<circle class="xb-hl xb-hl-b" cx="414" cy="130" r="17" fill="#e8343a"/><text x="414" y="136" fill="#fff">B</text>
+<circle class="xb-hl xb-hl-a" cx="382" cy="162" r="17" fill="#3fbf46"/><text x="382" y="168" fill="#fff">A</text></g>
+<circle cx="260" cy="96" r="18" fill="#14161f" stroke="#5c6688" stroke-width="2"/><circle cx="260" cy="96" r="9" fill="none" stroke="#9aa3b8" stroke-width="2.5"/>
+<g class="xb-hl xb-hl-view"><circle cx="226" cy="134" r="11" fill="#2a2f42"/><rect x="220" y="129" width="7" height="6" rx="1.5" fill="none" stroke="#cfd6ea" stroke-width="1.8"/><rect x="224" y="133" width="7" height="6" rx="1.5" fill="#2a2f42" stroke="#cfd6ea" stroke-width="1.8"/></g>
+<g class="xb-hl xb-hl-menu"><circle cx="294" cy="134" r="11" fill="#2a2f42"/><path d="M288 130h12M288 134h12M288 138h12" stroke="#cfd6ea" stroke-width="1.8" stroke-linecap="round"/></g>
+</svg>"""
+
+def page_xbox(c):
+    R = c.root
+    games = [g for g in GAMES if "xbox" in g["plats"] and has_game(g)]
+    grid = "\n".join(lp_card(c, g, i, "browser") for i, g in enumerate(games))
+    steps = [
+        ("1", "Edge öffnen", "Starte auf der Xbox den Browser <b>Microsoft Edge</b>. Du findest ihn unter „Meine Spiele &amp; Apps“."),
+        ("2", "lewolux.de aufrufen", "Gib <b>lewolux.de</b> ein und such dir ein Spiel aus. Mit dem Maus-Zeiger klickst du auf „Jetzt spielen“."),
+        ("3", "Spielsteuerung einschalten", "Halte die <span class=\"xb-key menu\">☰</span> <b>Menü-Taste</b> gedrückt und wähle <b>„Spielsteuerung“</b> (englisch „Use game controls“). Jetzt steuert der Controller das Spiel."),
+        ("4", "Vollbild &amp; los!", "Halte die <span class=\"xb-key view\">⧉</span> <b>Ansicht-Taste</b> gedrückt für Vollbild. Ein leuchtender Rahmen zeigt dir, was gerade ausgewählt ist."),
+    ]
+    st = "".join(f'<li class="xb-step"><span class="xb-num">{n}</span><h3>{t}</h3><p>{d}</p></li>' for n, t, d in steps)
+    keys = [("stick", "🕹", "Linker Stick / Steuerkreuz", "Auswählen und bewegen"), ("a", "A", "A", "Bestätigen, springen, schießen"),
+            ("b", "B", "B", "Zurück oder Pause"), ("x", "X/Y", "X und Y", "Je nach Spiel – steht im Spiel eingeblendet"),
+            ("menu", "☰", "Menü-Taste halten", "Zwischen Spielsteuerung und Maus-Zeiger wechseln"), ("view", "⧉", "Ansicht-Taste halten", "Vollbild an und aus")]
+    kl = "".join(f'<li data-k="{k}"><span class="xb-key {k}">{g_}</span><span><b>{e(n)}</b><small>{e(d)}</small></span></li>' for k, g_, n, d in keys)
+    content = f'''  <section class="lp-sec" aria-labelledby="xbs-h"><div class="sec-head"><div><span class="eyebrow">In 4 Schritten</span><h2 id="xbs-h">So startest du</h2></div></div>
+    <ol class="xb-steps">{st}</ol></section>
+  <section class="lp-sec xb-ctl" aria-labelledby="xbc-h"><div class="sec-head"><div><span class="eyebrow">Tastenbelegung</span><h2 id="xbc-h">Der Controller in unseren Spielen</h2><p>Überall gleich: Stick zum Auswählen, A zum Bestätigen, B zurück.</p></div></div>
+    <div class="xb-ctl-grid"><figure class="xb-fig">{XBOX_PAD_SVG}</figure><ul class="xb-keys">{kl}</ul></div></section>
+  <section class="lp-sec" aria-labelledby="xbt-h"><div class="xb-tips"><h2 id="xbt-h">Klappt etwas nicht?</h2><ul>
+    <li><b>Nur ein Maus-Zeiger, kein Leuchtrahmen?</b> Dann ist noch die Browser-Steuerung aktiv: ☰ Menü-Taste halten → „Spielsteuerung“.</li>
+    <li><b>Controller reagiert nicht mehr?</b> Kurz die Xbox-Taste drücken und das Menü wieder schließen.</li>
+    <li><b>Ruckelt es?</b> In den Xbox-Einstellungen unter System den Bildschirmrand für Apps ausschalten.</li>
+  </ul></div></section>
+  <section class="lp-sec" aria-labelledby="xbg-h"><div class="sec-head"><div><span class="eyebrow">Xbox-tauglich</span><h2 id="xbg-h">Diese Spiele laufen auf der Xbox</h2></div></div>
+    <div class="grid lp-grid">
+{grid}
+    </div></section>
+'''
+    return landing_page(c, "xbox/", "Lewolux auf der Xbox spielen – Anleitung",
+        "So spielst du die kostenlosen Lewolux-Spiele auf der Xbox: Edge-Browser öffnen, Spielsteuerung einschalten, mit dem Controller losspielen.",
+        "Auf der Xbox spielen", "Xbox · Edge-Browser", "Auf der Xbox spielen",
+        "Unsere Spiele laufen direkt im Browser deiner Xbox, kostenlos und ohne Installation. Mit einem Handgriff steuerst du sie mit dem Controller, ganz wie ein echtes Konsolenspiel.",
+        ["Xbox Series X|S & One", "Ohne Installation", "Mit Controller", "Kostenlos"], content, XBOX_FAQ, games, "assets/img/og-lewolux-studio.jpg", page_type="WebPage")
 
 def page_all_games(c):
     R = c.root; secs = []; n = 0; ordered = []
@@ -1359,7 +1433,7 @@ def main():
     deskboard_parts()
     teaser_assets()
     kids_build()
-    for path, fn in (("kostenlose-browser-games", page_browser_games), ("kostenlose-spiele", page_all_games), ("kinderspiele-kostenlos", page_kids_games)):
+    for path, fn in (("kostenlose-browser-games", page_browser_games), ("kostenlose-spiele", page_all_games), ("kinderspiele-kostenlos", page_kids_games), ("xbox", page_xbox)):
         os.makedirs(P("dist", path), exist_ok=True)
         open(P("dist", path, "index.html"), "w", encoding="utf-8").write(fn(Ctx("../")))
     pdf_seo()
@@ -1392,6 +1466,7 @@ def main():
     sm += "".join(u(f"software/{x['id']}/", [f"assets/screenshots/software-{x['id']}.jpg"], "0.7") for x in SOFTWARE)
     if os.path.isfile(P("dist/pdf/index.html")): sm += u("pdf/", [], "0.6")
     sm += "".join(u(path, [], "0.9") for path, _, _ in LANDINGS)
+    sm += u("xbox/", [], "0.7")
     open(P("dist/sitemap.xml"), "w").write(sm + "</urlset>\n")
     lastmod.save()
     open(P("dist/robots.txt"), "w").write(f"User-agent: *\nAllow: /\nDisallow: /downloads/\nDisallow: /admin/\n\nSitemap: {SITE}sitemap.xml\n")
