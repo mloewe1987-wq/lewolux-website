@@ -56,6 +56,7 @@ button{font:inherit;cursor:pointer}
 .logo.small{font-size:clamp(28px,5vw,48px);transform:rotate(-2deg);text-align:left}
 .wallet{background:rgba(20,11,46,.75);border:2px solid #ffe14a;border-radius:99px;padding:6px 14px;font-weight:1000;font-size:20px}
 .gHead .wallet{margin-right:52px}
+.seg button:disabled{opacity:.45;cursor:not-allowed}
 .modes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .mode{border:3px solid var(--ink);border-radius:20px;background:rgba(255,255,255,.93);color:var(--ink);padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 6px 0 var(--ink);transition:transform .12s}
 .mode b{font-size:42px;line-height:1}.mode span{font-weight:1000;font-size:20px}.mode i{font-style:normal;font-size:12px;opacity:.7}
@@ -197,6 +198,7 @@ body:not(.touch) #touch{display:none!important}
 @keyframes rot{50%{transform:rotate(-90deg)}}
 @media (max-width:700px){.modes{grid-template-columns:repeat(2,1fr)}.garPanel{width:100%}.gDrivers{grid-template-columns:repeat(4,1fr)}}
 @media (max-height:480px){
+ .selPanel .gfxRow{display:none}
  .modes{gap:8px}.mode{padding:6px}.mode b{font-size:28px}.mode span{font-size:15px}.mode i{display:none}
  .garPanel{gap:6px;padding:8px 12px}.gItem b{font-size:22px}.gItems{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}
  .panel{padding:12px;gap:8px}.tsCard b{font-size:30px}.resList li{padding:3px 8px}.resList span{width:26px;height:26px;font-size:15px}
@@ -264,7 +266,7 @@ body:not(.touch) #touch{display:none!important}
     <div class="seg"><span>Tempo</span><button data-cls="gem">Gemütlich</button><button data-cls="flott" class="on">Flott</button><button data-cls="turbo">Turbo</button><button data-cls="spiegel">Spiegel</button></div>
     <div class="seg mobileOnly"><span>Lenken</span><button data-ctl="stick" class="on">Daumen-Stick</button><button data-ctl="tilt">Handy neigen</button></div>
     <label id="invRow" class="mobileOnly"><input type="checkbox" id="inv"> Neigen umkehren</label>
-    <div class="seg"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div>
+    <div class="seg gfxRow"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div>
     <div class="seg"><span>Lenkhilfe</span><button data-assist="0">Aus</button><button data-assist="1">An</button></div>
   </div>
   <div id="selRow"><button class="btn ghost" id="btnBack" data-back="menu">Zurück</button><button class="btn ghost" id="btnGarage">🔧 Garage</button><button class="btn" id="btnGo">Weiter</button></div>
