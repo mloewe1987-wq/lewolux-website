@@ -78268,15 +78268,22 @@ var POL = window.POL = window.POL || {};
     //=========================================================================
     const GROUNDS = { g: 1 };
     W.cache = {};
+    // Speicher sparen: große Außenkarten auf Geräten mit wenig Grafikspeicher (Xbox, ältere Handys) kleiner zeichnen.
+    // W.lowMem wird automatisch erhöht, wenn die Grafikkarte „Speicher voll“ meldet.
+    W.BIG = 2000000;
+    W.lowMem = /Xbox/i.test(navigator.userAgent || "") ? 1 : (navigator.deviceMemory && navigator.deviceMemory <= 2 ? 1 : 0);
+    W.scaleFor = px => px < W.BIG ? 1 : [1, 0.75, 0.5, 0.35][Math.min(3, W.lowMem)];
+    W.free = id => { const r = W.cache[id]; if (!r) return; delete W.cache[id]; try { r.base.width = r.base.height = 0; r.over.width = r.over.height = 0; } catch (e) {} };
     W.data = () => window.$dataPolWorld || null;
     W.mapDef = id => { const d = W.data(); return d && d.maps ? d.maps[id] : null; };
     W.render = function(id) {
         if (W.cache[id]) return W.cache[id];
         const m = W.mapDef(id); if (!m) return null;
-        const w = m.w * T, h = m.h * T;
-        const base = document.createElement("canvas"); base.width = w; base.height = h;
-        const over = document.createElement("canvas"); over.width = w; over.height = h;
+        const w = m.w * T, h = m.h * T, S = W.scaleFor(w * h);
+        const base = document.createElement("canvas"); base.width = Math.ceil(w * S); base.height = Math.ceil(h * S);
+        const over = document.createElement("canvas"); over.width = Math.ceil(w * S); over.height = Math.ceil(h * S);
         const b = base.getContext("2d"), o = over.getContext("2d"), R = rng(1000 + id * 77);
+        if (S !== 1) { b.scale(S, S); o.scale(S, S); }
         ground(b, R, 0, 0, w, h, m.ground || "grass");
         const objs = [];
         (m.items || []).forEach(it => {
@@ -78299,7 +78306,7 @@ var POL = window.POL = window.POL || {};
             } catch (e) { console.error("World draw", it, e); }
         });
         // Rand außerhalb (Innenräume): nichts
-        W.cache[id] = { base, over, w, h };
+        W.cache[id] = { base, over, w, h, s: S };
         return W.cache[id];
     };
     const FURN_T = {}; ["bed", "sofa", "armchair", "tv", "table", "council", "desk", "shelf", "wardrobe", "fridge", "kitchen", "bar", "bottles", "stool", "chair", "plant", "picture", "window", "clock", "whiteboard", "pinboard", "flags", "wappen", "counter", "copier", "cabinet", "cooler", "dart", "jukebox", "rug", "beanbag", "lampfloor", "coatrack", "radio", "micstand", "piano", "wposter"].forEach(k => FURN_T[k] = 1);
@@ -78324,12 +78331,12 @@ var POL = window.POL = window.POL || {};
     const _isBush = Game_Map.prototype.isBush; Game_Map.prototype.isBush = function(x, y) { return W.mapDef(this.mapId()) ? false : _isBush.call(this, x, y); };
     const _isCounter = Game_Map.prototype.isCounter; Game_Map.prototype.isCounter = function(x, y) { return W.mapDef(this.mapId()) ? this.regionId(x, y) === 2 : _isCounter.call(this, x, y); };
     // Sprites: Boden (unter Figuren) & Überlagerung (Baumkronen, Laternen, Türme)
-    function chunks(canvas, z) {
-        const out = [], CH = 1024;
+    function chunks(canvas, z, S) {
+        const out = [], CH = 1024; S = S || 1;
         for (let cy = 0; cy < canvas.height; cy += CH) for (let cx = 0; cx < canvas.width; cx += CH) {
             const cw = Math.min(CH, canvas.width - cx), chh = Math.min(CH, canvas.height - cy);
             const bmp = new Bitmap(cw, chh); bmp.context.drawImage(canvas, cx, cy, cw, chh, 0, 0, cw, chh); bmp._baseTexture.update();
-            const sp = new Sprite(bmp); sp._ox = cx; sp._oy = cy; sp.z = z; out.push(sp);
+            const sp = new Sprite(bmp); sp._ox = cx / S; sp._oy = cy / S; sp.z = z; if (S !== 1) sp.scale.x = sp.scale.y = 1 / S; out.push(sp);
         }
         return out;
     }
@@ -78337,8 +78344,10 @@ var POL = window.POL = window.POL || {};
     Spriteset_Map.prototype.createTilemap = function() {
         _createTilemap.call(this);
         this._polWorld = null;
-        const r = W.render($gameMap.mapId()); if (!r) return;
-        const base = chunks(r.base, -1), over = chunks(r.over, 6);
+        const mid = $gameMap.mapId(), r = W.render(mid); if (!r) return;
+        const base = chunks(r.base, -1, r.s), over = chunks(r.over, 6, r.s);
+        if (r.w * r.h >= W.BIG) W.free(mid);   // große Karte liegt jetzt in den Kacheln – Quellbild nicht doppelt im Speicher halten
+        this._polGlCheck = 3;
         base.forEach(s => this._tilemap.addChild(s)); over.forEach(s => this._tilemap.addChild(s));
         this._polWorld = base.concat(over);
         // Namensschilder an Gebäuden
@@ -78358,10 +78367,18 @@ var POL = window.POL = window.POL || {};
     const _updTilemap = Spriteset_Map.prototype.updateTilemap;
     Spriteset_Map.prototype.updateTilemap = function() {
         _updTilemap.call(this);
+        if (this._polGlCheck > 0 && --this._polGlCheck === 0) {
+            try {
+                const gl = Graphics._app && Graphics._app.renderer && Graphics._app.renderer.gl;
+                let oom = false; if (gl) for (let i = 0, e; i < 8 && (e = gl.getError()) !== gl.NO_ERROR; i++) if (e === gl.OUT_OF_MEMORY) oom = true;
+                if (oom && W.lowMem < 3) { W.lowMem++; Object.keys(W.cache).forEach(W.free); console.warn("Grafikspeicher voll – Karte wird kleiner gezeichnet (Stufe " + W.lowMem + ")"); $gamePlayer.reserveTransfer($gameMap.mapId(), $gamePlayer.x, $gamePlayer.y, $gamePlayer.direction(), 2); }
+            } catch (e) {}
+        }
         if (this._polWorld) { const ox = Math.round($gameMap.displayX() * T), oy = Math.round($gameMap.displayY() * T); this._polWorld.forEach(s => { s.x = s._ox - ox; s.y = s._oy - oy; if (s._polLabel) s.visible = POL.labels !== false; }); }
     };
     W.thumb = function(id, maxW, maxH) {
-        const r = W.render(id); if (!r) return null;
+        const had = !!W.cache[id], r = W.render(id); if (!r) return null;
+        if (!had && r.w * r.h >= W.BIG) setTimeout(() => W.free(id), 0);
         const sc = Math.min(maxW / r.w, maxH / r.h), c = document.createElement("canvas"); c.width = Math.round(r.w * sc); c.height = Math.round(r.h * sc);
         const x = c.getContext("2d"); x.imageSmoothingQuality = "high"; x.drawImage(r.base, 0, 0, c.width, c.height); x.drawImage(r.over, 0, 0, c.width, c.height); return { canvas: c, sc };
     };
