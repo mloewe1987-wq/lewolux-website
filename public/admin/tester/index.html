@@ -1,0 +1,20 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>Tester-Liste | Lewolux Studio</title>
+<style>body{margin:0;font:15px/1.5 system-ui,sans-serif;background:#0d0b1a;color:#eee}main{max-width:820px;margin:0 auto;padding:24px 16px}
+h1{font-size:24px}input,button{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid #444;background:#1b1830;color:#fff}button{cursor:pointer;background:#3be8ff;color:#111;border:0;font-weight:700}
+table{width:100%;border-collapse:collapse;margin-top:16px}td,th{padding:8px;border-bottom:1px solid #2a2640;text-align:left;font-size:14px}.muted{color:#999}.row{display:flex;gap:8px;flex-wrap:wrap}</style></head>
+<body><main><h1>📱 Tester-Liste (Ring Legends)</h1>
+<p class="muted">Admin-Schlüssel eingeben (das Secret <b>ADMIN_TOKEN</b> aus Cloudflare). Er bleibt nur in diesem Browser gespeichert.</p>
+<div class="row"><input id="k" type="password" placeholder="Admin-Schlüssel" size="30"><button id="go">Liste laden</button><button id="csv">Als CSV laden</button><button id="copy">Adressen kopieren</button></div>
+<p id="msg" class="muted"></p><table id="t" hidden><thead><tr><th>E-Mail</th><th>Name</th><th>Handy</th><th>Angemeldet</th><th></th></tr></thead><tbody></tbody></table>
+<script>(function(){var K=document.getElementById('k'),M=document.getElementById('msg'),T=document.getElementById('t'),B=T.querySelector('tbody'),rows=[];
+try{K.value=localStorage.getItem('lwxAdminTok')||''}catch(e){}
+function h(){try{localStorage.setItem('lwxAdminTok',K.value)}catch(e){}return{Authorization:'Bearer '+K.value}}
+function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+function load(){M.textContent='Lade …';fetch('/api/c/admin/testers',{headers:h()}).then(function(r){return r.json()}).then(function(r){if(!r.ok){M.textContent=r.error==='disabled'?'ADMIN_TOKEN ist in Cloudflare noch nicht gesetzt.':'Schlüssel falsch oder Fehler ('+(r.error||'?')+').';T.hidden=true;return}
+rows=r.testers;M.textContent=rows.length+' Anmeldung(en)';T.hidden=!rows.length;B.innerHTML=rows.map(function(x,i){return '<tr><td>'+esc(x.email)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.device)+'</td><td>'+esc(new Date(x.at).toLocaleString('de-DE'))+'</td><td><button data-i="'+i+'">Löschen</button></td></tr>'}).join('')}).catch(function(){M.textContent='Keine Verbindung.'})}
+B.addEventListener('click',function(e){var i=e.target.dataset.i;if(i==null)return;if(!confirm('Eintrag löschen?'))return;fetch('/api/c/admin/testers/delete',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},h()),body:JSON.stringify({email:rows[i].email})}).then(load)});
+document.getElementById('go').onclick=load;
+document.getElementById('csv').onclick=function(){fetch('/api/c/admin/testers?format=csv',{headers:h()}).then(function(r){return r.blob()}).then(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tester.csv';a.click()})};
+document.getElementById('copy').onclick=function(){var t=rows.map(function(x){return x.email}).join(', ');navigator.clipboard.writeText(t).then(function(){M.textContent='Adressen kopiert – in der Play Console in die Testerliste einfügen.'})};
+if(K.value)load()})();</script></main></body></html>

@@ -995,3 +995,9 @@ html.modal-open .lux,html.player-open .lux{display:none}
 html,body{overflow-x:clip}
 
 .studio-trailer{text-align:center}.studio-trailer .trl-lead{max-width:640px;margin:8px auto 22px;color:var(--muted,#b8b3d6)}.studio-trailer .trailer{max-width:980px;margin:0 auto;--accent:var(--cyan)}
+/* Tester-Anmeldung (Ring Legends) */
+.ts-form{max-width:560px;margin:18px 0 6px;display:flex;flex-direction:column;gap:12px}
+.ts-form .fld em{font-style:normal;opacity:.65;font-weight:400}
+.ts-ok{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--muted)}
+.ts-ok input{margin-top:3px;width:18px;height:18px;flex:none;accent-color:var(--accent,#3be8ff)}
+.ts-form .btn{align-self:flex-start}

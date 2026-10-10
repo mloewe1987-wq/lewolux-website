@@ -315,15 +315,32 @@ def tester_page(c):
     li = "".join(f'<li><span class="ts-i" aria-hidden="true">{i}</span><b>{e(t)}</b><span>{e(d)}</span></li>' for i, t, d in steps)
     faq = [("Kostet das etwas?", "Nein. Ring Legends ist kostenlos, auch im Test."),
            ("Was brauche ich?", "Ein Android-Handy und ein Google-Konto (Gmail). Für iPhone gibt es die Browser-Version auf lewolux.de."),
-           ("Was passiert mit meiner Adresse?", "Wir tragen sie nur in die Testerliste in der Google Play Console ein und nutzen sie für die Einladung. Danach löschen wir die Mail. Mehr dazu in der Datenschutzerklärung."),
+           ("Was passiert mit meiner Adresse?", "Wir speichern sie nur für den Test, tragen sie in die Testerliste in der Google Play Console ein und schicken dir die Einladung. Nach dem Test löschen wir sie. Mehr dazu in der Datenschutzerklärung."),
            ("Muss ich Feedback geben?", "Musst du nicht, freut uns aber riesig. Fehler, Ideen und Lob einfach über das Feedback-Formular auf der Spielseite.")]
     faqh = "".join(f"<details><summary>{e(q)}</summary><p>{e(a)}</p></details>" for q, a in faq)
     body = f'''<main class="wrap tester-page">
   <nav aria-label="Breadcrumb"><ol class="crumbs"><li><a href="{c.root}">Start</a></li><li><a href="{c.root}spiele/wrestling-tcg/">Ring Legends</a></li><li aria-current="page">Tester werden</li></ol></nav>
   <section class="ts-hero"><span class="eyebrow">Android-Vorabtest</span><h1>Werde Ring-Legends-Tester</h1>
   <p class="up-lead">Ring Legends kommt in den Play Store – und du kannst es vor allen anderen auf deinem Handy spielen. Für den Start brauchen wir Tester, die 14 Tage dabei sind.</p>
-  <div class="g-actions"><a class="btn btn-play" id="testerBtn" href="{TESTER_MAIL}">✉️ Jetzt als Tester melden</a><a class="btn" href="{c.root}games/wrestling-tcg/index.html">Schon mal im Browser spielen</a></div>
-  <p class="up-note">Kein Mailprogramm? Schreib einfach an <b>{EMAIL}</b> mit dem Betreff „Ring Legends Tester“ und deiner Gmail-Adresse.</p></section>
+  <form class="cm-card ts-form" id="testerForm" novalidate>
+    <p class="cm-k">Anmeldung</p><h3>Jetzt als Tester melden</h3>
+    <label class="fld"><span>Deine Gmail-Adresse <em>(die vom Play Store)</em></span><input name="email" type="email" required maxlength="120" autocomplete="email" placeholder="name@gmail.com"></label>
+    <label class="fld"><span>Name <em>(optional, gern ein Spitzname)</em></span><input name="name" maxlength="40" autocomplete="nickname"></label>
+    <label class="fld"><span>Dein Handy <em>(optional, z. B. Samsung Galaxy S21)</em></span><input name="device" maxlength="60"></label>
+    <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+    <label class="ts-ok"><input type="checkbox" name="consent" required> <span>Ich bin einverstanden, dass Lewolux meine Adresse für die Einladung zum Play-Store-Test speichert. Nach dem Test wird sie gelöscht. Mehr im <a href="{c.root}datenschutz/">Datenschutz</a>.</span></label>
+    <button class="btn btn-play" type="submit">✉️ Anmeldung absenden</button>
+    <p class="cm-note" aria-live="polite"></p>
+  </form>
+  <p class="up-note">Lieber per Mail? <a href="{TESTER_MAIL}">Schreib uns an {EMAIL}</a> mit dem Betreff „Ring Legends Tester“. Im Browser spielen kannst du schon jetzt: <a href="{c.root}games/wrestling-tcg/index.html">Ring Legends starten</a>.</p></section>
+<script>(function(){{var f=document.getElementById('testerForm');if(!f)return;var n=f.querySelector('.cm-note'),b=f.querySelector('button');
+f.addEventListener('submit',function(e){{e.preventDefault();var d={{email:f.email.value.trim(),name:f.name.value.trim(),device:f.device.value.trim(),website:f.website.value,consent:f.consent.checked,game:'wrestling-tcg'}};
+if(!/^[^\s@]+@[^\s@]+\.[a-z]{{2,}}$/i.test(d.email)){{n.textContent='Bitte gib eine gültige E-Mail-Adresse ein.';f.email.focus();return}}
+if(!d.consent){{n.textContent='Bitte setz noch den Haken bei der Einwilligung.';return}}
+b.disabled=true;n.textContent='Wird gesendet …';
+fetch('/api/c/tester',{{method:'POST',headers:{{'Content-Type':'application/json','x-lwx':'1'}},body:JSON.stringify(d)}}).then(function(r){{return r.json().catch(function(){{return{{ok:false}}}})}}).then(function(r){{
+if(r.ok){{f.innerHTML='<p class="cm-k">Danke!</p><h3>Du stehst auf der Testerliste 🎉</h3><p>Sobald der Test startet, schicken wir dir den Einladungslink an <b></b>.</p>';f.querySelector('b').textContent=d.email}}
+else{{b.disabled=false;n.textContent=r.msg||'Das hat leider nicht geklappt. Versuch es später noch einmal oder schreib uns eine Mail.'}}}}).catch(function(){{b.disabled=false;n.textContent='Keine Verbindung. Versuch es gleich noch einmal oder schreib uns eine Mail.'}})}})}})();</script>
   <section aria-labelledby="ts-h"><h2 id="ts-h">So läuft der Test</h2><ol class="ts-steps">{li}</ol></section>
   <section aria-labelledby="tf-h"><h2 id="tf-h">Fragen</h2><div class="faq">{faqh}</div></section>
 </main>
@@ -1357,6 +1374,8 @@ def main():
     open(P("dist/ring-legends/tester/index.html"), "w", encoding="utf-8").write(tester_page(Ctx("../../")))
     open(P("dist/ring-legends/datenschutz/index.html"), "w", encoding="utf-8").write(simple_page(Ctx("../../"), "ring-legends/datenschutz/", "Datenschutz – Ring Legends (App und Browser)", part("ring-legends-datenschutz.html")))
     os.makedirs(P("dist/admin"), exist_ok=True)
+    os.makedirs(P("dist/admin/tester"), exist_ok=True)
+    open(P("dist/admin/tester/index.html"), "w", encoding="utf-8").write(part("admin-tester.html"))
     open(P("dist/admin/index.html"), "w", encoding="utf-8").write(part("admin.html").replace('<meta charset="utf-8">', '<meta charset="utf-8">' + KIDS_GUARD, 1).replace("{{API}}", API).replace("{{GAMES}}", json.dumps({g["id"]: g["short"] for g in GAMES}, ensure_ascii=False)))
     open(P("dist/404.html"), "w", encoding="utf-8").write(simple_page(Ctx("/"), "404", "Seite nicht gefunden", '<p class="prose">Diese Seite gibt es nicht. <a href="/">Zur Startseite</a> oder direkt zu den <a href="/#spiele">Spielen</a>.</p>').replace('content="noindex, follow"', 'content="noindex"'))
     # seo files

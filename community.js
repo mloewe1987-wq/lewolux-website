@@ -134,6 +134,7 @@ export class Community extends DurableObject {
       CREATE INDEX IF NOT EXISTS plays_top ON plays(game, ms);
       CREATE TABLE IF NOT EXISTS notifs(id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER NOT NULL, kind TEXT NOT NULL, from_uid INTEGER, game TEXT, at INTEGER NOT NULL, expires INTEGER, seen INTEGER NOT NULL DEFAULT 0);
       CREATE INDEX IF NOT EXISTS notifs_uid ON notifs(uid, seen);
+      CREATE TABLE IF NOT EXISTS testers(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL, name TEXT, device TEXT, game TEXT, at INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reporter INTEGER NOT NULL, reported INTEGER NOT NULL, msg_id INTEGER, body TEXT, reason TEXT, at INTEGER NOT NULL);
     `);
   }
@@ -278,6 +279,7 @@ export class Community extends DurableObject {
       try { b = txt ? JSON.parse(txt) : {}; } catch { return err(400, "bad_json"); }
       if (!b || typeof b !== "object" || Array.isArray(b)) return err(400, "bad_json");
       if (path === "/login") return this.login(req, b, ip);
+      if (path === "/tester") return this.tester(b, ip);
       if (path === "/nick") return this.nickCheck(req, b, ip);
       const s = await this.session(req);
       if (path === "/logout") return this.logout(s);
@@ -692,6 +694,20 @@ export class Community extends DurableObject {
     return json({ ok: true }, 200, { "Set-Cookie": clearCookie() });
   }
 
+  // ------------------------------------------------------------ Tester-Anmeldung (Play-Store-Vorabtest, ohne Konto)
+  tester(b, ip) {
+    if (b.website) return json({ ok: true });   // Honigtopf für Bots
+    if (!this.limit("tester:" + ip, 5, 3600e3)) return err(429, "rate", "Zu viele Anmeldungen. Bitte später noch einmal.");
+    const email = String(b.email || "").trim().toLowerCase();
+    if (email.length > 120 || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(email)) return err(400, "email", "Bitte gib eine gültige E-Mail-Adresse ein.");
+    if (b.consent !== true) return err(400, "consent", "Bitte bestätige die Einwilligung.");
+    const clean = (v, n) => String(v || "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, n);
+    const game = ["wrestling-tcg"].includes(b.game) ? b.game : "wrestling-tcg";
+    this.run(`INSERT INTO testers(email,name,device,game,at) VALUES(?,?,?,?,?)
+      ON CONFLICT(email) DO UPDATE SET name=excluded.name, device=excluded.device, at=excluded.at`, email, clean(b.name, 40), clean(b.device, 60), game, Date.now());
+    return json({ ok: true });
+  }
+
   // ------------------------------------------------------------ Admin (nur mit Secret ADMIN_TOKEN)
   async admin(req, path, ip, url) {
     const tok = this.env.ADMIN_TOKEN;
@@ -707,6 +723,12 @@ export class Community extends DurableObject {
       this.deleteUser(u.id);
       return json({ ok: true, deleted: u.nick });
     }
+    if (path === "/admin/testers/delete" && req.method === "POST") {
+      // Body: {"email":"…"} löscht einen Eintrag, {"all":true} leert die Liste
+      const b = await req.json().catch(() => ({}));
+      if (b.all === true) this.run("DELETE FROM testers"); else this.run("DELETE FROM testers WHERE email=?", String(b.email || "").trim().toLowerCase());
+      return json({ ok: true });
+    }
     if (req.method !== "GET") return err(405, "method");
     if (path === "/admin/newsletter") {
       const rows = this.q("SELECT nick, email, nl_at, nl_ver, nl_state FROM users WHERE newsletter=1 AND email IS NOT NULL ORDER BY nl_at");
@@ -717,6 +739,16 @@ export class Community extends DurableObject {
       }
       return json({ ok: true, text: NL_TEXT, count: rows.length, subscribers: rows.map(r => ({ email: r.email, nick: r.nick, consent_at: new Date(r.nl_at).toISOString(), text_version: r.nl_ver, status: r.nl_state })) });
     }
+    if (path === "/admin/testers") {
+      const rows = this.q("SELECT email, name, device, game, at FROM testers ORDER BY at");
+      if (url.searchParams.get("format") === "csv") {
+        const esc = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        const csv = "email;name;handy;spiel;angemeldet\n" + rows.map(r => [r.email, r.name, r.device, r.game, new Date(r.at).toISOString()].map(esc).join(";")).join("\n");
+        return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Cache-Control": "no-store", "Content-Disposition": 'attachment; filename="tester.csv"' } });
+      }
+      return json({ ok: true, count: rows.length, testers: rows.map(r => ({ ...r, at: new Date(r.at).toISOString() })) });
+    }
+    if (path === "/admin/testers/delete" ) return err(405, "method");
     if (path === "/admin/reports") {
       const rows = this.q(`SELECT r.id, r.at, r.body, r.reason, a.nick reporter, b.nick reported, b.id reported_id FROM reports r
         LEFT JOIN users a ON a.id=r.reporter LEFT JOIN users b ON b.id=r.reported ORDER BY r.id DESC LIMIT 200`);
