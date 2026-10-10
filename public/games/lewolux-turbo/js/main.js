@@ -121,7 +121,7 @@ const pads = [], ramps = [];
 const chevTex = (() => { const c = document.createElement('canvas'); c.width = 64; c.height = 128; const g = c.getContext('2d');
   g.fillStyle = '#ff7a1a'; g.fillRect(0, 0, 64, 128); g.fillStyle = '#fff36b';
   for (let y = 0; y < 128; y += 64) { g.beginPath(); g.moveTo(4, y + 50); g.lineTo(32, y + 14); g.lineTo(60, y + 50); g.lineTo(60, y + 64); g.lineTo(32, y + 28); g.lineTo(4, y + 64); g.fill(); }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 2); return t; })();
+  const t = new THREE.CanvasTexture(c); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 2); return t; })(); // Pfeile zeigen in Fahrtrichtung
 function buildPads(def) { pads.length = 0;
 for (const [f, lat] of def.pads) {
   const i = Math.round(f*tr.N); const m = new THREE.Mesh(new THREE.PlaneGeometry(6, 9), new THREE.MeshBasicMaterial({ map: chevTex, transparent: true, opacity: 0.95 }));
@@ -292,8 +292,8 @@ function drawMini() {
 let state = 'title', stateT = 0, raceT = 0, countN = 0, paused = false, results = null;
 const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
 
-const SCREENS = ['title', 'menu', 'select', 'trackSel', 'garage', 'quests', 'help', 'pause', 'results', 'standings', 'podium'];
-const MENU = new Set(['title', 'menu', 'select', 'trackSel', 'garage', 'quests', 'help', 'standings']);
+const SCREENS = ['title', 'menu', 'select', 'setup', 'trackSel', 'garage', 'quests', 'help', 'pause', 'results', 'standings', 'podium'];
+const MENU = new Set(['title', 'menu', 'select', 'setup', 'trackSel', 'garage', 'quests', 'help', 'standings']);
 function setScreen(s) {
   for (const id of SCREENS) $('#' + id).classList.toggle('show', s === id);
   document.querySelectorAll('.walletN').forEach(e => e.textContent = PG.state().wallet);
@@ -576,7 +576,7 @@ function loop() {
 }
 function update(dt, t) {
   env.update(t, dt); if (world && world.userData.waterTex) world.userData.waterTex.offset.y += dt*0.15;
-  chevTex.offset.y -= dt*1.5;
+  chevTex.offset.y += dt*1.5;
 
   if (MENU.has(state)) { menuTick(dt, t); } else if (state === 'podium') { podiumTick(dt, t); }
   else if (!paused) {
@@ -623,6 +623,7 @@ function update(dt, t) {
 function render(dt) {
   // Kamera anwenden
   if (!MENU.has(state) && state !== 'podium') {
+    if (window.__camHook) window.__camHook(camPos, camLook, player, racers);
     camera.position.copy(camPos);
     if (shake > 0) { shake -= dt; camera.position.x += (Math.random() - .5)*shake; camera.position.y += (Math.random() - .5)*shake; }
     camera.lookAt(camLook);
@@ -873,7 +874,7 @@ function menuTick(dt, t) {
 // Steuerung der Menüs mit Controller/Tastatur: Richtung bewegt den Fokus, A/Enter klickt, B/Esc geht zurück
 let lastDir = '', dirT = 0;
 function focusables() { const scr = document.querySelector('.scr.show'); if (!scr) return []; return [...scr.querySelectorAll('button, .card, .tsCard, .gItem')].filter(e => e.offsetParent && !e.disabled); }
-function focusFirst() { setTimeout(() => { const f = focusables(); const pref = f.find(e => e.classList.contains('sel') || e.id === 'btnGo' || e.id === 'btnNext' || e.id === 'btnAgain' || e.id === 'btnPodDone') || f[0]; if (pref && (input.mode === 'pad' || input.mode === 'keys')) pref.focus({ preventScroll: false }); }, 50); }
+function focusFirst() { setTimeout(() => { const f = focusables(); const pref = f.find(e => e.classList.contains('sel') || e.id === 'btnGo' || e.id === 'btnSetGo' || e.id === 'btnNext' || e.id === 'btnAgain' || e.id === 'btnPodDone') || f[0]; if (pref && (input.mode === 'pad' || input.mode === 'keys')) pref.focus({ preventScroll: false }); }, 50); }
 function menuNav(dt) {
   const pads = navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : [];
   let dx = 0, dy = 0, ok = false, back = false;
@@ -905,7 +906,7 @@ function goBack() {
   const b = document.querySelector('.scr.show [data-back]'); if (b) { b.click(); return; }
   if (state === 'menu') { state = 'title'; setScreen('title'); }
 }
-document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => { const to = b.dataset.back; sfx('click'); if (to === 'menu') goMenu(); else if (to === 'select') goSelect(session.mode); }));
+document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => { const to = b.dataset.back; sfx('click'); if (to === 'menu') goMenu(); else if (to === 'select') goSelect(session.mode); else if (to === 'setup') openSetup(); }));
 
 function goMenu() {
   initAudio(); paused = false; engineStop(); playMusic('menu');
@@ -927,11 +928,17 @@ function renderCards() {
     wrap.appendChild(el);
   });
   const d = list[selIdx], cfg = PG.drv(d.id), st = PG.stats(d, cfg);
-  const bar = (n, v) => `<div class="st"><em>${n}</em><i style="--v:${v/6*100}%"></i></div>`;
-  $('#info').innerHTML = `<h2>${d.icon} ${d.name} <small style="font-size:13px;opacity:.7">Level ${cfg.lvl}</small></h2><p>${cfg.vehicle === 'sig' ? d.ride : PG.VEHICLES[cfg.vehicle].name} · aus „${d.from}“</p>${bar('Tempo', st.speed)}${bar('Beschleunigung', st.accel)}${bar('Handling', st.handling)}${bar('Gewicht', st.weight)}`;
+  const bar = (n, v) => `<div class="sb"><em>${n}</em><u>${[1, 2, 3, 4, 5, 6].map(k => `<i class="${k <= Math.round(v) ? 'on' : ''}"></i>`).join('')}</u></div>`;
+  const ride = cfg.vehicle === 'sig' ? d.ride : PG.VEHICLES[cfg.vehicle].name;
+  $('#info').innerHTML = `<div class="nameplate" style="--c:${d.color}"><span class="np-i">${d.icon}</span><div><h2>${d.name}<span class="lvl">LV ${cfg.lvl}</span></h2><p>${ride}</p></div></div>
+    <div class="facts"><span>🎮 Aus „${d.from}“</span>${d.age ? `<span>🎂 Alter: ${d.age}</span>` : ''}${d.trait ? `<span>⭐ ${d.trait}</span>` : ''}</div>
+    ${d.bio ? `<p class="bio">${d.bio}</p>` : ''}
+    <div class="stats">${bar('Tempo', st.speed)}${bar('Beschleunigung', st.accel)}${bar('Handling', st.handling)}${bar('Gewicht', st.weight)}</div>`;
   document.querySelectorAll('[data-cls]').forEach(x => x.classList.toggle('on', x.dataset.cls === cls.id));
 }
-$('#btnGo').onclick = async () => {
+$('#btnGo').onclick = () => { sfx('click'); openSetup(); };
+function openSetup() { state = 'setup'; setScreen('setup'); markMirror(); markAssist(); document.querySelectorAll('[data-cls]').forEach(x => x.classList.toggle('on', x.dataset.cls === cls.id)); }
+$('#btnSetGo').onclick = async () => {
   if (MOBILE) {
     try { await document.documentElement.requestFullscreen?.(); await screen.orientation?.lock?.('landscape'); } catch (_) {}
     if (input.touchMode === 'tilt' && !touch.tiltOK) { const ok = await enableTilt(); if (!ok) { input.touchMode = 'stick'; markCtl(); } }
@@ -1009,7 +1016,7 @@ function togglePause(on) {
 
 // Knöpfe
 $('#btnStart').onclick = () => { sfx('click'); goMenu(); setTimeout(() => ann(0), 300); };
-const markMirror = () => { const b = document.querySelector('[data-cls=spiegel]'); if (!b) return; const ok = !!PG.state().ach.cupturbo || Q.has('mirror'); b.disabled = !ok; b.textContent = ok ? 'Spiegel' : '🔒 Spiegel'; b.title = ok ? '' : 'Gewinne einen Grand Prix auf Turbo'; };
+const markMirror = () => { const b = document.querySelector('[data-cls=spiegel]'); if (!b) return; const ok = !!PG.state().ach.cupturbo || Q.has('mirror'); b.disabled = !ok; const t = b.querySelector('i'); if (t) t.textContent = ok ? 'Strecken seitenverkehrt' : '🔒 GP auf Turbo gewinnen'; else b.textContent = ok ? 'Spiegel' : '🔒 Spiegel'; b.title = ok ? '' : 'Gewinne einen Grand Prix auf Turbo'; };
 markMirror();
 document.querySelectorAll('[data-cls]').forEach(b => b.onclick = () => { cls = CLASSES.find(c => c.id === b.dataset.cls); document.querySelectorAll('[data-cls]').forEach(x => x.classList.toggle('on', x === b)); sfx('click'); });
 document.querySelectorAll('[data-ctl]').forEach(b => b.onclick = () => { input.touchMode = b.dataset.ctl; markCtl(); sfx('click'); });

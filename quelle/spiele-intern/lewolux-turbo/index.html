@@ -113,8 +113,8 @@ button:focus-visible,.card:focus-visible,.tsCard:focus-visible,.gItem:focus-visi
 .aList{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
 .aList li{background:rgba(255,255,255,.06);border-radius:12px;padding:8px 10px;font-size:13px;opacity:.5}.aList li.done{opacity:1;background:rgba(255,243,107,.18)}
 .achH{margin:6px 0 0}
-#toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-120%);transition:transform .3s;z-index:40;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:8px 16px;font-weight:900;box-shadow:0 5px 0 var(--ink);max-width:90vw;text-align:center}
-#toast.show{transform:translate(-50%,0)}
+#toast{position:fixed;left:50%;top:14px;transform:translate(-50%,calc(-100% - 40px));visibility:hidden;transition:transform .3s;z-index:40;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:8px 16px;font-weight:900;box-shadow:0 5px 0 var(--ink);max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0);visibility:visible}
 #trackName{position:absolute;left:50%;bottom:22%;transform:translate(-50%,20px);opacity:0;transition:.4s;font-weight:1000;font-size:clamp(22px,4vw,40px);text-shadow:0 4px 0 var(--ink),0 0 10px var(--ink);white-space:nowrap}
 #trackName.show{opacity:1;transform:translate(-50%,0)}
 .card small{font-size:10px;opacity:.7}
@@ -209,6 +209,79 @@ body:not(.touch) #touch{display:none!important}
  .btn{padding:9px 14px;font-size:16px}.seg button{padding:5px 4px;font-size:12px}
  #itemBox{width:66px;height:66px}#itemIcon{font-size:38px}#coins{top:104px;font-size:18px}#say{left:90px}
 }
+
+/* ===== Neues Menü- und Auswahl-Design (10.10.) ===== */
+@font-face{font-family:Bungee;src:url(assets/fonts/bungee.woff2) format("woff2");font-display:swap}
+.eyebrow{margin:0;font:12px/1 Bungee,system-ui;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;opacity:.95}
+/* Hauptmenü: Leiste links, Strecke rechts */
+#menu{justify-content:flex-start;background:linear-gradient(90deg,rgba(12,6,32,.94) 0%,rgba(12,6,32,.82) 34%,rgba(12,6,32,0) 62%)}
+.mPanel{width:min(460px,46vw);height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(10px,2.4vh,22px);padding:clamp(14px,4vh,40px) clamp(16px,3vw,44px);overflow:auto}
+.brand{display:flex;flex-direction:column;line-height:.86;transform:skewX(-8deg);transform-origin:left;filter:drop-shadow(0 6px 0 rgba(0,0,0,.35))}
+.brand .b1{font:clamp(18px,2.4vw,30px) Bungee,system-ui;letter-spacing:6px;color:#fff;opacity:.92}
+.brand .b2{font:clamp(54px,8vw,108px) Bungee,system-ui;background:linear-gradient(180deg,#fff36b 0%,#ffb23c 45%,#ff3fd0 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 18px rgba(255,63,208,.55))}
+.brand .b3{align-self:flex-start;margin-top:8px;font:11px/1 Bungee,system-ui;letter-spacing:2px;background:var(--pink);color:#fff;padding:5px 10px;border-radius:6px}
+.modes{display:flex;flex-direction:column;gap:clamp(6px,1.2vh,10px)}
+.mode{display:flex;flex-direction:row;align-items:center;gap:14px;text-align:left;border:0;border-radius:14px;padding:clamp(8px,1.6vh,14px) 16px;background:rgba(255,255,255,.07);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);transform:skewX(-8deg);transition:transform .15s,background .15s,box-shadow .15s}
+.mode>*{transform:skewX(8deg)}
+.mode b{font-size:clamp(24px,3.4vh,32px);line-height:1;width:40px;text-align:center}
+.mode span{display:flex;flex-direction:column;font:clamp(16px,2.6vh,22px)/1.1 Bungee,system-ui;letter-spacing:.5px}
+.mode i{font:600 12px/1.3 system-ui;opacity:.7;letter-spacing:0;margin-top:3px}
+.mode.hot{background:linear-gradient(90deg,rgba(255,63,208,.35),rgba(122,44,255,.25))}
+.mode:hover,.mode:focus-visible{outline:none;transform:skewX(-8deg) translateX(10px);background:linear-gradient(90deg,#fff36b,#ffb23c);color:var(--ink);box-shadow:0 0 0 3px var(--ink),0 0 28px rgba(255,210,60,.55)}
+.modeRow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.mode.mini{flex-direction:column;gap:4px;padding:8px 6px;text-align:center;justify-content:center}
+.mode.mini span{font-size:12px;align-items:center}.mode.mini b{font-size:24px;width:auto}.mode.mini i{display:none}
+.mode.mini:hover,.mode.mini:focus-visible{transform:skewX(-8deg) translateY(-3px)}
+.mFoot{display:flex;align-items:center;gap:12px}.mVer{font:11px Bungee,system-ui;letter-spacing:2px;opacity:.5}
+/* Fahrerauswahl */
+#select{background:linear-gradient(90deg,rgba(12,6,32,0) 30%,rgba(12,6,32,.82) 52%,rgba(12,6,32,.95))}
+.selPanel{width:min(600px,56vw);gap:12px;justify-content:center}
+#info{background:none;border:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.nameplate{display:flex;align-items:center;gap:14px}
+.nameplate .np-i{flex:none;width:72px;height:72px;border-radius:20px;display:grid;place-items:center;font-size:42px;background:var(--c);box-shadow:0 0 0 3px #fff,0 0 30px var(--c);transform:rotate(-6deg)}
+.nameplate h2{margin:0;font:clamp(24px,3.4vw,38px)/1 Bungee,system-ui;letter-spacing:.5px;transform:skewX(-6deg)}
+.nameplate p{margin:6px 0 0;font-size:13px;opacity:.8}
+.lvl{display:inline-block;font:11px/1 Bungee,system-ui;background:var(--yel);color:var(--ink);padding:4px 8px;border-radius:6px;margin-left:8px;vertical-align:middle;transform:skewX(0)}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.facts span{font-size:12px;font-weight:800;background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.16);border-radius:99px;padding:5px 10px}
+.bio{margin:0;font-size:14px;line-height:1.45;opacity:.9;max-width:56ch}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+.sb{display:flex;flex-direction:column;gap:4px}.sb em{font:10px Bungee,system-ui;letter-spacing:1.5px;opacity:.75;font-style:normal}
+.sb u{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;text-decoration:none}
+.sb u i{height:9px;border-radius:2px;background:rgba(255,255,255,.14);transform:skewX(-20deg)}
+.sb u i.on{background:linear-gradient(90deg,var(--cyan),var(--pink));box-shadow:0 0 8px rgba(41,240,255,.5)}
+#cards{display:grid!important;grid-template-columns:repeat(6,1fr)!important;gap:8px}
+.card{padding:8px 2px 6px;border-radius:14px;border:0;background:rgba(255,255,255,.08);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);gap:4px;font-size:11px;transition:transform .12s}
+.card b{width:48px;height:48px;font-size:28px;border:0;box-shadow:0 0 0 2px rgba(255,255,255,.7)}
+.card span{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;text-align:center;font-weight:900;font-size:11px;hyphens:auto}
+.card small{font-size:9px;opacity:.6}
+.card.sel{background:linear-gradient(180deg,#fff36b,#ffb23c);color:var(--ink);transform:translateY(-4px);box-shadow:0 0 0 3px var(--ink),0 0 22px rgba(255,210,60,.6)}
+.card:hover{transform:translateY(-3px)}
+#selRow{display:flex;gap:10px}#selRow .btn{flex:1;padding:12px 10px;font-size:17px}#selRow #btnGo{flex:1.6}
+/* Rennen einstellen */
+#setup{background:rgba(12,6,32,.55)}
+.setPanel{width:min(760px,94vw);gap:14px}
+.setPanel h2{margin:0;font:clamp(22px,3vw,32px) Bungee,system-ui}
+.setGroup{display:flex;flex-direction:column;gap:6px}
+.sgH{margin:0;font:11px Bungee,system-ui;letter-spacing:2px;opacity:.7;text-transform:uppercase}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.tiles.two{grid-template-columns:1fr 1fr}
+.tile{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;border-radius:14px;padding:10px 6px;background:rgba(255,255,255,.08);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.16);transition:transform .12s}
+.tile b{font-size:26px;line-height:1.1}.tile span{font:14px Bungee,system-ui}.tile i{font-style:normal;font-size:11px;opacity:.7;text-align:center}
+.tile.on{background:linear-gradient(180deg,#fff36b,#ffb23c);color:var(--ink);box-shadow:0 0 0 3px var(--ink),0 0 20px rgba(255,210,60,.5)}
+.tile:disabled{opacity:.4}
+.tile:hover{transform:translateY(-2px)}
+.setPanel .row{display:flex;gap:10px;justify-content:flex-end}
+@media (max-width:700px){.mPanel{width:100%}#menu{background:rgba(12,6,32,.8)}.selPanel{width:100%}#select{background:rgba(12,6,32,.85)}.tiles{grid-template-columns:1fr 1fr}}
+@media (max-height:480px){
+ .mPanel{flex-direction:row;flex-wrap:wrap;align-content:center;width:min(760px,96vw);gap:10px}.brand{width:100%;flex-direction:row;align-items:baseline;gap:10px}.brand .b2{font-size:40px}.brand .b1{font-size:16px}
+ .modes{display:grid;grid-template-columns:1fr 1fr;width:100%}.modeRow{grid-column:1/-1}.mode{padding:7px 12px}.mode span{font-size:15px}.mode i{display:none}.mFoot{display:none}
+ #menu{background:linear-gradient(90deg,rgba(12,6,32,.92),rgba(12,6,32,.55))}
+ .selPanel{width:min(560px,62vw);gap:6px}.nameplate .np-i{width:44px;height:44px;font-size:26px;border-radius:12px}.nameplate h2{font-size:20px}.nameplate p{margin-top:2px;font-size:11px}
+ .bio{font-size:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.facts span{font-size:10px;padding:2px 7px}.stats{gap:3px 12px}.sb u i{height:6px}
+ #cards{gap:4px}.card{padding:4px 1px}.card b{width:30px;height:30px;font-size:18px}.card span{font-size:9px}.card small{display:none}
+ #selRow .btn{padding:7px 8px;font-size:14px}.eyebrow{font-size:10px}
+ .setPanel{gap:6px;padding:12px 16px}.setPanel h2{font-size:18px}.tile{padding:5px 4px;flex-direction:row;justify-content:center;gap:6px}.tile b{font-size:18px}.tile i{display:none}.tile span{font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -223,21 +296,24 @@ body:not(.touch) #touch{display:none!important}
   <p class="hint">🎮 Controller, ⌨️ Tastatur oder 📱 Touch</p>
 </section>
 
-<section id="menu" class="scr"><div class="menuWrap">
-  <div class="mHead"><div class="logo small">LEWOLUX TURBO</div><div class="wallet">🪙 <span class="walletN">0</span></div></div>
+<section id="menu" class="scr"><div class="mPanel">
+  <div class="brand"><span class="b1">LEWOLUX</span><span class="b2">TURBO</span><span class="b3">Early Access</span></div>
   <div class="modes">
-    <button class="mode big" data-mode="gp"><b>🏆</b><span>Grand Prix</span><i>4 Strecken, Punkte und Pokal</i></button>
-    <button class="mode big" data-mode="single"><b>🏁</b><span>Einzelrennen</span><i>Eine Strecke deiner Wahl</i></button>
-    <button class="mode" data-mode="time"><b>⏱️</b><span>Zeitfahren</span><i>Gegen deinen Geist</i></button>
-    <button class="mode" data-mode="coins"><b>🪙</b><span>Münzjagd</span><i>2 Minuten Münzen sammeln</i></button>
-    <button class="mode" data-mode="garage"><b>🔧</b><span>Garage</span><i>Fahrzeuge, Outfits, Lack</i></button>
-    <button class="mode" data-mode="quests"><b>📜</b><span>Aufgaben</span><i id="questHint">Belohnungen holen</i></button>
-    <button class="mode" data-mode="help"><b>🎮</b><span>Steuerung</span><i>Tasten und Tipps</i></button>
+    <button class="mode hot" data-mode="gp"><b>🏆</b><span>Grand Prix<i>4 Rennen · Punkte · Pokal</i></span></button>
+    <button class="mode" data-mode="single"><b>🏁</b><span>Einzelrennen<i>Eine Strecke deiner Wahl</i></span></button>
+    <button class="mode" data-mode="time"><b>⏱️</b><span>Zeitfahren<i>Gegen deinen Geist</i></span></button>
+    <button class="mode" data-mode="coins"><b>🪙</b><span>Münzjagd<i>2 Minuten Münzen sammeln</i></span></button>
+    <div class="modeRow">
+      <button class="mode mini" data-mode="garage"><b>🔧</b><span>Garage</span></button>
+      <button class="mode mini" data-mode="quests"><b>📜</b><span>Aufgaben<i id="questHint"></i></span></button>
+      <button class="mode mini" data-mode="help"><b>🎮</b><span>Steuerung</span></button>
+    </div>
   </div>
+  <div class="mFoot"><div class="wallet">🪙 <span class="walletN">0</span></div><span class="mVer">lewolux.de</span></div>
 </div></section>
 
 <section id="trackSel" class="scr"><div class="panel wide"><h2 id="tsTitle">Strecke wählen</h2><div id="tsList" class="tsGrid"></div>
-  <div class="row"><button class="btn ghost" data-back="select">Zurück</button></div></div></section>
+  <div class="row"><button class="btn ghost" data-back="setup">Zurück</button></div></div></section>
 
 <section id="standings" class="scr"><div class="panel"><h2 id="stTitle">Zwischenstand</h2><p id="stSub" class="sub"></p><ul id="stList" class="resList"></ul><button class="btn" id="btnNext">Weiter</button></div></section>
 
@@ -260,17 +336,30 @@ body:not(.touch) #touch{display:none!important}
 <div id="toast"></div>
 
 <section id="select" class="scr"><div class="selPanel">
-  <h1>Wähle deinen Fahrer</h1>
-  <div id="cards"></div>
+  <p class="eyebrow">Fahrer wählen</p>
   <div id="info"></div>
-  <div class="opts">
-    <div class="seg"><span>Tempo</span><button data-cls="gem">Gemütlich</button><button data-cls="flott" class="on">Flott</button><button data-cls="turbo">Turbo</button><button data-cls="spiegel">Spiegel</button></div>
-    <div class="seg mobileOnly"><span>Lenken</span><button data-ctl="stick" class="on">Daumen-Stick</button><button data-ctl="tilt">Handy neigen</button></div>
-    <label id="invRow" class="mobileOnly"><input type="checkbox" id="inv"> Neigen umkehren</label>
-    <div class="seg gfxRow"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div>
-    <div class="seg"><span>Lenkhilfe</span><button data-assist="0">Aus</button><button data-assist="1">An</button></div>
-  </div>
-  <div id="selRow"><button class="btn ghost" id="btnBack" data-back="menu">Zurück</button><button class="btn ghost" id="btnGarage">🔧 Garage</button><button class="btn" id="btnGo">Weiter</button></div>
+  <div id="cards"></div>
+  <div id="selRow"><button class="btn ghost" id="btnBack" data-back="menu">Zurück</button><button class="btn ghost" id="btnGarage">🔧 Garage</button><button class="btn" id="btnGo">Weiter ▶</button></div>
+</div></section>
+<section id="setup" class="scr"><div class="panel setPanel">
+  <p class="eyebrow">Rennen einstellen</p>
+  <h2>Wie willst du fahren?</h2>
+  <div class="setGroup"><p class="sgH">Tempo</p><div class="tiles">
+    <button class="tile" data-cls="gem"><b>🐢</b><span>Gemütlich</span><i>Für Einsteiger und Kinder</i></button>
+    <button class="tile on" data-cls="flott"><b>🏎️</b><span>Flott</span><i>Das normale Rennen</i></button>
+    <button class="tile" data-cls="turbo"><b>🔥</b><span>Turbo</span><i>Für Profis</i></button>
+    <button class="tile" data-cls="spiegel"><b>🪞</b><span>Spiegel</span><i>Strecken seitenverkehrt</i></button>
+  </div></div>
+  <div class="setGroup"><p class="sgH">Lenkhilfe</p><div class="tiles two">
+    <button class="tile" data-assist="0"><b>🎯</b><span>Aus</span><i>Volle Kontrolle</i></button>
+    <button class="tile" data-assist="1"><b>🛟</b><span>An</span><i>Hält dich auf der Strecke</i></button>
+  </div></div>
+  <div class="setGroup mobileOnly"><p class="sgH">Steuerung am Handy</p><div class="tiles two">
+    <button class="tile" data-ctl="stick"><b>🕹️</b><span>Daumen-Stick</span><i>Links wischen zum Lenken</i></button>
+    <button class="tile" data-ctl="tilt"><b>📱</b><span>Handy neigen</span><i>Wie ein Lenkrad</i></button>
+  </div><label id="invRow"><input type="checkbox" id="inv"> Neigen umkehren</label></div>
+  <div class="setGroup"><p class="sgH">Grafik</p><div class="seg"><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div></div>
+  <div class="row"><button class="btn ghost" data-back="select">Zurück</button><button class="btn" id="btnSetGo">Strecke wählen ▶</button></div>
 </div></section>
 
 <div id="hud">
