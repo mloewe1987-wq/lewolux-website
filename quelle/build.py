@@ -1290,7 +1290,7 @@ def kids_page(c):
     </form>
     <button class="k-back" id="kBack" type="button" data-say="{e(KIDS_PHRASES['back'])}">Weiter spielen</button>
     <p class="k-note"><b>Gut zu wissen:</b> Der Kids-Modus sperrt nur die anderen Seiten von lewolux.de in diesem Browser. Er ist keine echte Kindersicherung: Andere Apps, Webseiten oder ein neuer Tab bleiben erreichbar. Um das Gerät wirklich abzusichern, nutzen Sie <b>Google Family Link</b> (Android) oder auf iPhone/iPad <b>Bildschirmzeit</b> bzw. <b>Geführter Zugriff</b>.</p>
-    <p class="k-legal"><a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a> · <a href="/impressum/#ki">Bilder und Stimmen teils mit KI erstellt</a></p>
+    <p class="k-legal"><a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a></p>
   </div>
 </dialog>
 <script id="kids-data" type="application/json">__KIDSDATA__</script>
