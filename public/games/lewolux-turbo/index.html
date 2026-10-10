@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="de">
+<head><script>try{if(localStorage.getItem('lxKids')==='1'&&!/^\/(kids|impressum|datenschutz)\//.test(location.pathname)){document.documentElement.style.display='none';location.replace('/kids/')}}catch(e){}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#140b2e">
+<title>Lewolux Turbo</title>
+<style>
+:root{--ink:#150a24;--pink:#ff3fd0;--cyan:#29f0ff;--yel:#fff36b;--pur:#7a2cff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;background:#140b2e;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+.scr{position:fixed;inset:0;display:none;z-index:5}
+.scr.show{display:flex}
+button{font:inherit;cursor:pointer}
+.btn{border:3px solid var(--ink);border-radius:16px;padding:14px 26px;font-weight:900;font-size:20px;color:var(--ink);background:linear-gradient(180deg,#fff79a,#ffc928);box-shadow:0 5px 0 var(--ink);letter-spacing:.5px}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.btn.alt{background:linear-gradient(180deg,#b9f7ff,#29c8ff)}
+.btn.ghost{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.5);box-shadow:none}
+.logo{font-weight:1000;font-size:clamp(44px,9vw,104px);line-height:.9;letter-spacing:-2px;text-align:center;
+ background:linear-gradient(90deg,#ff3fd0,#ffb23c,#fff36b,#46e07a,#29f0ff,#a24bff);-webkit-background-clip:text;background-clip:text;color:transparent;
+ -webkit-text-stroke:3px var(--ink);filter:drop-shadow(0 6px 0 var(--ink)) drop-shadow(0 0 24px rgba(255,63,208,.6));transform:rotate(-3deg)}
+/* Titel */
+#title{flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;padding-bottom:max(22px,env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(20,11,46,0) 45%,rgba(20,11,46,.92)),url(assets/keyart.jpg) center top/cover}
+#title .logo{display:none}
+#title p{margin:0;opacity:.9;font-weight:700;text-align:center;padding:0 16px}
+#title .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.tag{background:var(--pink);color:#fff;padding:4px 12px;border-radius:99px;font-weight:900;font-size:13px;border:2px solid var(--ink)}
+#btnSound{position:fixed;top:12px;right:12px;z-index:20;width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(20,11,46,.6);color:#fff;font-size:20px}
+/* Auswahl */
+#select{justify-content:flex-end;background:linear-gradient(90deg,rgba(20,11,46,0) 35%,rgba(20,11,46,.75) 58%,rgba(20,11,46,.92))}
+.selPanel{width:min(470px,54vw);height:100%;overflow-y:auto;padding:16px 18px;padding-bottom:max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;justify-content:center}
+.selPanel h1{margin:0;font-size:24px;font-weight:1000;text-shadow:0 3px 0 var(--ink)}
+#info{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);border-radius:16px;padding:10px 14px}
+#info h2{margin:0;font-size:22px}#info p{margin:0 0 6px;opacity:.8;font-size:13px}
+.st{display:flex;align-items:center;gap:8px;font-size:12px;margin:3px 0}.st em{font-style:normal;width:105px;opacity:.85}
+.st i{flex:1;height:9px;border-radius:9px;background:rgba(255,255,255,.15);position:relative;overflow:hidden}
+.st i:after{content:"";position:absolute;inset:0;width:var(--v);background:linear-gradient(90deg,var(--cyan),var(--pink));border-radius:9px}
+#cards{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.card{padding:6px 2px;border-radius:14px;border:3px solid var(--ink);background:rgba(255,255,255,.92);color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 4px 0 var(--ink);font-weight:800;font-size:11px;min-width:0}
+.card span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.card b{font-size:26px;width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:var(--c);border:2px solid var(--ink)}
+.card.sel{background:var(--yel);transform:translateY(-4px);box-shadow:0 7px 0 var(--ink),0 0 0 3px var(--pink)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.seg{display:flex;background:rgba(255,255,255,.1);border-radius:12px;padding:3px;gap:3px;align-items:center}
+.seg span{font-size:12px;opacity:.8;padding:0 6px;width:62px;flex:none}
+.seg button{flex:1;border:0;border-radius:9px;padding:7px 6px;background:transparent;color:#fff;font-weight:800;font-size:13px}
+.seg button.on{background:#fff;color:var(--ink)}
+#selRow{display:flex;gap:10px}#selRow .btn{flex:1}#selRow .ghost{flex:.5}
+#invRow{font-size:13px;display:flex;align-items:center;gap:6px}
+/* Hauptmenü */
+#menu{background:linear-gradient(180deg,rgba(20,11,46,.2),rgba(20,11,46,.85));align-items:center;justify-content:center}
+.menuWrap{width:min(900px,94vw);display:flex;flex-direction:column;gap:14px}
+.mHead,.gHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.logo.small{font-size:clamp(28px,5vw,48px);transform:rotate(-2deg);text-align:left}
+.wallet{background:rgba(20,11,46,.75);border:2px solid #ffe14a;border-radius:99px;padding:6px 14px;font-weight:1000;font-size:20px}
+.gHead .wallet{margin-right:52px}
+.seg button:disabled{opacity:.45;cursor:not-allowed}
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.mode{border:3px solid var(--ink);border-radius:20px;background:rgba(255,255,255,.93);color:var(--ink);padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 6px 0 var(--ink);transition:transform .12s}
+.mode b{font-size:42px;line-height:1}.mode span{font-weight:1000;font-size:20px}.mode i{font-style:normal;font-size:12px;opacity:.7}
+.mode.big{background:linear-gradient(180deg,#fff79a,#ffc928)}
+.mode:hover,.mode:focus-visible{transform:translateY(-4px) scale(1.03)}
+button:focus-visible,.card:focus-visible,.tsCard:focus-visible,.gItem:focus-visible{outline:4px solid var(--cyan);outline-offset:3px}
+.hint{font-size:14px;opacity:.8}
+.panel.wide{min-width:min(760px,94vw)}
+.sub{margin:0;text-align:center;opacity:.8;font-size:14px}
+.tsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tsCard{border:3px solid var(--ink);border-radius:16px;background:var(--bg,#2a1a5a);color:#fff;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 5px 0 var(--ink);text-shadow:0 2px 0 var(--ink)}
+.tsCard b{font-size:44px}.tsCard span{font-weight:1000;font-size:17px;text-align:center}.tsCard i{font-style:normal;font-size:12px;opacity:.9}
+.tsCard.locked{filter:grayscale(1) brightness(.6)}
+.resList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.resList li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:12px;padding:6px 10px;font-weight:800}
+.resList li.me{background:rgba(255,243,107,.25);outline:2px solid var(--yel)}
+.resList b{width:28px}.resList span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;border:2px solid var(--ink);font-size:20px}
+.resList em{flex:1;font-style:normal}.resList i{font-style:normal;font-variant-numeric:tabular-nums;opacity:.85}
+.resList .pts{background:var(--pink);border-radius:8px;padding:0 8px;opacity:1}
+#resXP{display:flex;flex-wrap:wrap;gap:6px}#resXP .xpLine,#resXP .xpBar{flex-basis:100%}#resXP .reward{font-size:12px;padding:4px 8px}
+#results .panel{max-width:min(560px,94vw)}
+.xpBar{height:12px;border-radius:12px;background:rgba(255,255,255,.15);overflow:hidden}.xpBar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width 1.2s}
+.xpLine{display:flex;justify-content:space-between;font-weight:800;font-size:14px}
+.reward{display:flex;align-items:center;gap:8px;background:rgba(255,243,107,.18);border:2px solid var(--yel);border-radius:12px;padding:6px 10px;font-weight:800;animation:pop .4s}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+/* Podium */
+#podium{flex-direction:column;justify-content:space-between;pointer-events:none}
+#podium button{pointer-events:auto}
+.podTop{text-align:center;padding-top:20px;text-shadow:0 4px 0 var(--ink)}
+.podTop h1{margin:0;font-size:clamp(36px,7vw,72px);font-weight:1000;color:var(--yel);-webkit-text-stroke:2px var(--ink)}
+.podTop p{margin:4px 0 0;font-size:20px;font-weight:800}
+.podBottom{display:flex;flex-direction:column;align-items:center;gap:10px;padding-bottom:20px}
+#podRewards{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:90vw;font-size:13px}
+#podRewards>*{padding:3px 10px !important}
+/* Garage */
+#garage{justify-content:flex-end;background:linear-gradient(90deg,rgba(20,11,46,0) 30%,rgba(20,11,46,.8) 55%,rgba(20,11,46,.94))}
+.garPanel{width:min(520px,58vw);height:100%;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.garPanel h1{margin:0;font-size:24px}
+.gDrivers{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.gLevel{background:rgba(255,255,255,.08);border-radius:14px;padding:8px 12px}
+.gTabs{display:flex;gap:4px;background:rgba(255,255,255,.1);border-radius:12px;padding:3px}
+.gTabs button{flex:1;border:0;border-radius:9px;padding:8px 4px;background:transparent;color:#fff;font-weight:800}
+.gTabs button.on{background:#fff;color:var(--ink)}
+.gItems{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.gItem{border:3px solid var(--ink);border-radius:14px;background:rgba(255,255,255,.92);color:var(--ink);padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:800;font-size:12px;box-shadow:0 4px 0 var(--ink);position:relative}
+.gItem b{font-size:28px}.gItem.on{background:var(--yel);box-shadow:0 4px 0 var(--ink),0 0 0 3px var(--pink)}
+.gItem.locked{background:rgba(255,255,255,.35)}.gItem small{font-size:11px;opacity:.8}
+.gItem em{font-style:normal;font-size:10px;color:#2a7a2a}
+#gStats .st em{width:110px}
+.qList,.aList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.qList li{background:rgba(255,255,255,.08);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.qList .qTop{display:flex;justify-content:space-between;font-weight:800;gap:8px}
+.qList button{align-self:flex-end;border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:4px 8px;font-size:12px}
+.aList{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.aList li{background:rgba(255,255,255,.06);border-radius:12px;padding:8px 10px;font-size:13px;opacity:.5}.aList li.done{opacity:1;background:rgba(255,243,107,.18)}
+.achH{margin:6px 0 0}
+#toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-120%);transition:transform .3s;z-index:40;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:8px 16px;font-weight:900;box-shadow:0 5px 0 var(--ink);max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+#trackName{position:absolute;left:50%;bottom:22%;transform:translate(-50%,20px);opacity:0;transition:.4s;font-weight:1000;font-size:clamp(22px,4vw,40px);text-shadow:0 4px 0 var(--ink),0 0 10px var(--ink);white-space:nowrap}
+#trackName.show{opacity:1;transform:translate(-50%,0)}
+.card small{font-size:10px;opacity:.7}
+#ghostNote{position:absolute;right:18px;top:70px;font-weight:900;text-shadow:0 2px 0 var(--ink)}
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:4}
+#hud.show{display:block}
+#pos{position:absolute;right:18px;bottom:14px;font-size:clamp(56px,11vh,96px);font-weight:1000;line-height:1;-webkit-text-stroke:3px var(--ink);text-shadow:0 5px 0 var(--ink)}
+#pos small{font-size:.5em}#pos span{font-size:.3em;color:#fff;-webkit-text-stroke:2px var(--ink)}
+#lapBox{position:absolute;right:72px;top:12px;text-align:right;font-weight:900;text-shadow:0 2px 0 var(--ink),0 0 6px var(--ink)}
+#lap{font-size:24px}#time{font-size:18px;font-variant-numeric:tabular-nums;opacity:.95}
+#itemBox{position:absolute;left:14px;top:12px;width:84px;height:84px;border-radius:20px;border:4px solid var(--ink);background:rgba(255,255,255,.25);display:grid;place-items:center;box-shadow:0 0 0 3px rgba(255,255,255,.6) inset}
+#itemBox.full{background:rgba(255,243,107,.85);animation:pulse 1s infinite}
+#itemBox.rolling{background:rgba(41,240,255,.6)}
+#itemIcon{font-size:48px;line-height:1}
+#itemN{position:absolute;right:-6px;bottom:-6px;background:var(--pink);color:#fff;border:3px solid var(--ink);border-radius:12px;padding:0 6px;font-size:16px}
+#itemN:empty,#itemName:empty{display:none}
+#itemName{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;font-style:normal;font-weight:900;font-size:12px;white-space:nowrap;text-shadow:0 2px 0 var(--ink),0 0 4px var(--ink)}
+#coins{position:absolute;left:14px;top:128px;font-weight:1000;font-size:22px;text-shadow:0 3px 0 var(--ink),0 0 4px var(--ink)}
+#coins.pop{animation:cpop .3s}
+@keyframes cpop{50%{transform:scale(1.35)}}
+@keyframes pulse{50%{transform:scale(1.07)}}
+#mini{position:absolute;left:12px;bottom:12px;width:170px;height:150px;opacity:.95}
+#msg{position:absolute;left:0;right:0;top:30%;text-align:center;font-size:44px;font-weight:1000;opacity:0;transform:scale(.6);transition:transform .15s,opacity .15s;-webkit-text-stroke:3px var(--ink);text-shadow:0 5px 0 var(--ink);color:var(--yel)}
+#msg.show{opacity:1;transform:scale(1)}#msg.big{font-size:110px}#msg.go{color:#46e07a}#msg.warn{color:#ff5a5a;font-size:38px}
+#say{position:absolute;left:110px;top:16px;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(-10px);transition:.2s;max-width:min(420px,50vw)}
+#say.show{opacity:1;transform:none}
+#say b{font-size:30px;width:52px;height:52px;flex:none;display:grid;place-items:center;border-radius:50%;border:3px solid var(--ink)}
+#say span{background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:6px 10px;font-weight:800;font-size:15px;box-shadow:0 3px 0 var(--ink)}
+#say i{display:block;font-style:normal;font-size:11px;opacity:.6}
+#warn{position:absolute;left:50%;top:18%;transform:translate(-50%,-10px);background:rgba(20,11,46,.85);border:2px solid var(--yel);border-radius:12px;padding:8px 14px;font-weight:900;opacity:0;transition:.2s;white-space:nowrap}
+#warn.show{opacity:1;transform:translate(-50%,0)}
+#driftBar{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:120px;height:8px;border-radius:8px;background:var(--c);opacity:0;box-shadow:0 0 14px var(--c);transition:opacity .15s}
+#driftBar.show{opacity:.9}
+#ink{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0}
+.blob{position:absolute;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55) 0 6%,transparent 7%),radial-gradient(circle at 45% 45%,var(--a),var(--b) 75%);border-radius:48% 52% 40% 60%/55% 45% 55% 45%;filter:drop-shadow(0 0 1vmin rgba(0,0,0,.35));animation:splat .25s ease-out}
+.blob i{position:absolute;top:70%;width:14%;background:linear-gradient(var(--b),var(--a));border-radius:0 0 50% 50%;animation:drip 3s ease-in forwards}
+@keyframes splat{from{transform:scale(.2)}}
+@keyframes drip{from{height:0}}
+#speed{position:fixed;inset:-10%;pointer-events:none;z-index:3;opacity:0;transition:opacity .25s;
+ background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.0) 0deg 4deg,rgba(255,255,255,.22) 4deg 4.6deg,rgba(255,255,255,0) 4.6deg 9deg);
+ -webkit-mask:radial-gradient(circle,transparent 38%,#000 70%);mask:radial-gradient(circle,transparent 38%,#000 70%);animation:spin 0.35s linear infinite}
+#speed.on{opacity:1}
+@keyframes spin{to{transform:rotate(9deg)}}
+/* Touch */
+#touch{position:fixed;inset:0;z-index:4;display:none}
+#touch.show{display:block}
+#tStick{position:absolute;left:0;top:25%;bottom:0;width:50%}
+#tBase{position:absolute;width:130px;height:130px;margin:-65px 0 0 -65px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,11,46,.3);left:110px;top:calc(100% - 110px);opacity:.45;pointer-events:none}
+#tKnob{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:rgba(255,255,255,.85);border:3px solid var(--ink)}
+#touch.tilt #tBase{display:none}
+.tb{position:absolute;border-radius:50%;border:3px solid var(--ink);font-weight:1000;color:var(--ink);display:grid;place-items:center;box-shadow:0 4px 0 var(--ink);opacity:.9}
+.tb.on{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);filter:brightness(1.2)}
+#tDrift{right:22px;bottom:30px;width:104px;height:104px;background:linear-gradient(180deg,#ffb2f0,var(--pink));font-size:17px}
+#tItem{right:140px;bottom:96px;width:78px;height:78px;background:rgba(255,255,255,.6);font-size:30px}
+#tItem.ready{background:var(--yel)}
+#tBrake{right:140px;bottom:16px;width:62px;height:62px;background:rgba(255,255,255,.6);font-size:12px}
+#tPause{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.6);background:rgba(20,11,46,.5);color:#fff;font-size:18px}
+body:not(.touch) #touch{display:none!important}
+.touch #mini{left:auto;right:12px;top:84px;bottom:auto;width:130px;height:115px}
+.touch #pos{right:auto;left:50%;transform:translateX(-50%);bottom:auto;top:58px;font-size:52px}
+.touch #lapBox{top:12px}
+/* Pause / Ergebnis / Hilfe */
+.panel{margin:auto;background:rgba(20,11,46,.92);border:3px solid rgba(255,255,255,.25);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px;align-items:stretch;min-width:min(340px,90vw);max-height:92vh;overflow:auto}
+.panel h2{margin:0 0 4px;text-align:center;font-size:28px}
+#pause,#results,#help{background:rgba(10,5,25,.55);backdrop-filter:blur(3px)}
+#resList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+#resList li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:12px;padding:6px 10px;font-weight:800}
+#resList li.me{background:rgba(255,243,107,.25);outline:2px solid var(--yel)}
+#resList b{width:28px}#resList span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;border:2px solid var(--ink);font-size:20px}
+#resList em{flex:1;font-style:normal}#resList i{font-style:normal;font-variant-numeric:tabular-nums;opacity:.85}
+#help .panel{max-width:560px;font-size:15px;line-height:1.45}
+#help h3{margin:6px 0 2px;color:var(--yel)}
+#help ul{margin:0;padding-left:18px}
+#padNote{position:fixed;left:50%;bottom:16px;transform:translate(-50%,30px);opacity:0;transition:.3s;background:#46e07a;color:var(--ink);font-weight:900;padding:8px 16px;border-radius:12px;border:3px solid var(--ink);z-index:30}
+#padNote.show{opacity:1;transform:translate(-50%,0)}
+#rot{display:none}
+@media (orientation:portrait) and (pointer:coarse){
+ #rot{display:flex;position:fixed;inset:0;z-index:50;background:#140b2e;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;font-weight:900;font-size:20px;padding:20px}
+ #rot div{font-size:64px;animation:rot 1.6s infinite}
+}
+@keyframes rot{50%{transform:rotate(-90deg)}}
+@media (max-width:700px){.modes{grid-template-columns:repeat(2,1fr)}.garPanel{width:100%}.gDrivers{grid-template-columns:repeat(4,1fr)}}
+@media (max-height:480px){
+ .selPanel .gfxRow{display:none}
+ .modes{gap:8px}.mode{padding:6px}.mode b{font-size:28px}.mode span{font-size:15px}.mode i{display:none}
+ .garPanel{gap:6px;padding:8px 12px}.gItem b{font-size:22px}.gItems{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}
+ .panel{padding:12px;gap:8px}.tsCard b{font-size:30px}.resList li{padding:3px 8px}.resList span{width:26px;height:26px;font-size:15px}
+ .selPanel{gap:6px;padding:8px 14px;justify-content:flex-start}.selPanel h1{font-size:18px}
+ #info{padding:6px 10px}#info h2{font-size:16px}#info p{font-size:11px;margin-bottom:2px}.st{margin:0;font-size:11px}.st em{width:95px}
+ .card b{width:34px;height:34px;font-size:19px}.card{font-size:10px;padding:4px 1px}
+ .btn{padding:9px 14px;font-size:16px}.seg button{padding:5px 4px;font-size:12px}
+ #itemBox{width:66px;height:66px}#itemIcon{font-size:38px}#coins{top:104px;font-size:18px}#say{left:90px}
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="btnSound" aria-label="Ton an/aus">🔊</button>
+
+<section id="title" class="scr">
+  <span class="tag">EARLY ACCESS</span>
+  <div class="logo">LEWOLUX<br>TURBO</div>
+  <p>12 Strecken · 3 Cups · Garage · Aufgaben</p>
+  <div class="row"><button class="btn" id="btnStart">Los geht’s!</button></div>
+  <p class="hint">🎮 Controller, ⌨️ Tastatur oder 📱 Touch</p>
+</section>
+
+<section id="menu" class="scr"><div class="menuWrap">
+  <div class="mHead"><div class="logo small">LEWOLUX TURBO</div><div class="wallet">🪙 <span class="walletN">0</span></div></div>
+  <div class="modes">
+    <button class="mode big" data-mode="gp"><b>🏆</b><span>Grand Prix</span><i>4 Strecken, Punkte und Pokal</i></button>
+    <button class="mode big" data-mode="single"><b>🏁</b><span>Einzelrennen</span><i>Eine Strecke deiner Wahl</i></button>
+    <button class="mode" data-mode="time"><b>⏱️</b><span>Zeitfahren</span><i>Gegen deinen Geist</i></button>
+    <button class="mode" data-mode="coins"><b>🪙</b><span>Münzjagd</span><i>2 Minuten Münzen sammeln</i></button>
+    <button class="mode" data-mode="garage"><b>🔧</b><span>Garage</span><i>Fahrzeuge, Outfits, Lack</i></button>
+    <button class="mode" data-mode="quests"><b>📜</b><span>Aufgaben</span><i id="questHint">Belohnungen holen</i></button>
+    <button class="mode" data-mode="help"><b>🎮</b><span>Steuerung</span><i>Tasten und Tipps</i></button>
+  </div>
+</div></section>
+
+<section id="trackSel" class="scr"><div class="panel wide"><h2 id="tsTitle">Strecke wählen</h2><div id="tsList" class="tsGrid"></div>
+  <div class="row"><button class="btn ghost" data-back="select">Zurück</button></div></div></section>
+
+<section id="standings" class="scr"><div class="panel"><h2 id="stTitle">Zwischenstand</h2><p id="stSub" class="sub"></p><ul id="stList" class="resList"></ul><button class="btn" id="btnNext">Weiter</button></div></section>
+
+<section id="podium" class="scr"><div class="podTop"><h1 id="podTitle"></h1><p id="podSub"></p></div><div class="podBottom"><div id="podRewards"></div><button class="btn" id="btnPodDone">Weiter</button></div></section>
+
+<section id="garage" class="scr"><div class="garPanel">
+  <div class="gHead"><h1>🔧 Garage</h1><div class="wallet">🪙 <span class="walletN">0</span></div></div>
+  <div id="gDrivers" class="gDrivers"></div>
+  <div id="gLevel" class="gLevel"></div>
+  <div class="gTabs"><button data-gtab="vehicle" class="on">Fahrzeug</button><button data-gtab="wheels">Räder</button><button data-gtab="paint">Lack</button><button data-gtab="outfit">Outfit</button></div>
+  <div id="gItems" class="gItems"></div>
+  <div id="gStats"></div>
+  <div class="row"><button class="btn ghost" data-back="menu">Zurück</button></div>
+</div></section>
+
+<section id="quests" class="scr"><div class="panel wide"><h2>📜 Aufgaben</h2><p class="sub">Erledige Aufgaben für Münzen. Mit Münzen kannst du Sachen in der Garage früher freischalten.</p>
+  <ul id="qList" class="qList"></ul><h3 class="achH">🏅 Erfolge</h3><ul id="aList" class="aList"></ul>
+  <div class="row"><button class="btn ghost" data-back="menu">Zurück</button></div></div></section>
+
+<div id="toast"></div>
+
+<section id="select" class="scr"><div class="selPanel">
+  <h1>Wähle deinen Fahrer</h1>
+  <div id="cards"></div>
+  <div id="info"></div>
+  <div class="opts">
+    <div class="seg"><span>Tempo</span><button data-cls="gem">Gemütlich</button><button data-cls="flott" class="on">Flott</button><button data-cls="turbo">Turbo</button><button data-cls="spiegel">Spiegel</button></div>
+    <div class="seg mobileOnly"><span>Lenken</span><button data-ctl="stick" class="on">Daumen-Stick</button><button data-ctl="tilt">Handy neigen</button></div>
+    <label id="invRow" class="mobileOnly"><input type="checkbox" id="inv"> Neigen umkehren</label>
+    <div class="seg gfxRow"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div>
+    <div class="seg"><span>Lenkhilfe</span><button data-assist="0">Aus</button><button data-assist="1">An</button></div>
+  </div>
+  <div id="selRow"><button class="btn ghost" id="btnBack" data-back="menu">Zurück</button><button class="btn ghost" id="btnGarage">🔧 Garage</button><button class="btn" id="btnGo">Weiter</button></div>
+</div></section>
+
+<div id="hud">
+  <div id="itemBox"><div id="itemIcon"></div><b id="itemN"></b><em id="itemName"></em></div>
+  <div id="coins">🪙 0</div>
+  <div id="say"></div>
+  <div id="lapBox"><div id="lap">Runde 1/3</div><div id="time">0:00.00</div></div>
+  <div id="pos">6<span>/6</span></div>
+  <canvas id="mini" width="340" height="300"></canvas>
+  <div id="msg"></div>
+  <div id="warn"></div>
+  <div id="driftBar"></div>
+  <div id="trackName"></div>
+  <div id="ghostNote"></div>
+</div>
+<div id="ink"></div>
+<div id="speed"></div>
+
+<div id="touch">
+  <div id="tStick"><div id="tBase"><div id="tKnob"></div></div></div>
+  <div class="tb" id="tDrift">DRIFT</div>
+  <div class="tb" id="tItem">🎁</div>
+  <div class="tb" id="tBrake">BREMSE</div>
+  <button id="tPause" aria-label="Pause">⏸</button>
+</div>
+
+<section id="pause" class="scr"><div class="panel"><h2>Pause</h2>
+  <button class="btn" id="btnResume">Weiter</button><button class="btn alt" id="btnRestart">Neu starten</button><button class="btn ghost" id="btnMenu">Zum Menü</button>
+  <div class="seg" style="justify-content:center"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div><div class="seg" style="justify-content:center"><span>Lenkhilfe</span><button data-assist="0">Aus</button><button data-assist="1">An</button></div></div></section>
+
+<section id="results" class="scr"><div class="panel"><h2 id="resTitle">Ergebnis</h2><p id="resSub" class="sub"></p><ul id="resList" class="resList"></ul><div id="resXP"></div>
+  <button class="btn" id="btnAgain">Nochmal fahren</button><button class="btn ghost" id="btnChange">Zum Menü</button></div></section>
+
+<section id="help" class="scr"><div class="panel">
+  <h2>Steuerung</h2>
+  <h3>⌨️ Tastatur</h3><ul><li>Pfeiltasten oder WASD: Gas, Bremse, Lenken</li><li>Leertaste oder Shift halten: Driften (loslassen = Turbo)</li><li>E, F oder Enter: Item benutzen</li><li>Esc oder P: Pause</li></ul>
+  <h3>🎮 Controller (Xbox u. a.)</h3><ul><li>Linker Stick: Lenken · A oder RT: Gas · B oder LT: Bremse</li><li>RB halten: Driften · X, Y oder LB: Item · Start: Pause</li></ul>
+  <h3>📱 Handy (quer halten)</h3><ul><li>Gas gibt das Spiel automatisch</li><li>Lenken mit Daumen-Stick links oder durch Neigen</li><li>Rechts: DRIFT halten, 🎁 Item, BREMSE</li></ul>
+  <h3>💡 Tipps</h3><ul><li>Auf einer Schanze in der Luft Drift drücken = Trick, beim Landen gibt’s Turbo</li><li>🪙 Münzen machen dich etwas schneller (max. 10), bei Treffern verlierst du welche</li><li>Je länger du driftest, desto stärker der Turbo: blau → orange → lila Funken</li><li>Wundertüten geben Items aus unseren Spielen. Orange Pfeilfelder geben Turbo.</li><li>Gas genau bei der „1“ des Countdowns = Turbo-Start</li><li>Fahr dicht hinter einem Gegner: Windschatten gibt dir einen kleinen Schub</li><li>Lenkhilfe (Fahrerauswahl oder Pause) hält dich auf der Strecke – gut für Kinder</li><li>Münzjagd: 2 Minuten sammeln, wer getroffen wird, verliert 3 Münzen</li><li>Grand Prix auf „Turbo“ gewinnen schaltet die Spiegel-Strecken frei</li></ul>
+  <button class="btn" data-back="menu">Verstanden</button></div></section>
+
+<div id="padNote">🎮 Controller verbunden!</div>
+<div id="rot"><div>📱</div>Bitte Handy quer halten</div>
+<script>if(matchMedia('(pointer: coarse)').matches||'ontouchstart' in window)document.body.classList.add('touch')</script>
+<script type="importmap">{"imports":{"three":"./js/three.module.min.js"}}</script>
+<script type="module" src="js/main.js"></script>
+<!--lx-pad--><script>/* Lewolux Turbo hat eine eigene Controller-Steuerung: Website-Modul ruhen lassen */window.LXPAD_CFG=Object.assign(window.LXPAD_CFG||{},{fs:false});setTimeout(function(){if(window.LXPAD)window.LXPAD.suspend=function(){return true}},0);</script>
+<script>/* Lewolux Controller-Modul (lx-pad.js)
+   Ergänzung für Spiele und Website: Xbox-/Standard-Controller per Gamepad-API.
+   - Schläft, bis ein Controller benutzt wird. Maus, Touch und Tastatur bleiben unverändert.
+   - Linker Stick / Steuerkreuz = Fokus bewegen, A = bestätigen, B = zurück, Start = Pause/Menü.
+   - Leuchtende Fokus-Markierung nur im Controller-Modus.
+   - Hinweis „🎮 Controller verbunden“.
+   - Kleiner Vollbild-Knopf (nur mit Maus oder Controller sichtbar, nie am Handy).
+   Spiele können sich einklinken (alles optional, jederzeit setzbar):
+     LXPAD.game(p)     -> jedes Bild aufgerufen; true = Eingabe gehört dem Spiel (keine Menü-Navigation)
+     LXPAD.back()      -> true, wenn B selbst behandelt wurde
+     LXPAD.pause()     -> true, wenn Start selbst behandelt wurde
+     LXPAD.root()      -> Element, auf das die Navigation beschränkt wird (z. B. offener Dialog)
+     LXPAD.suspend()   -> true = Modul ruht komplett (z. B. Spiel läuft im iframe)
+   p: { lx, ly, rx, ry (Sticks mit Totzone), dx, dy (-1/0/1 inkl. Steuerkreuz),
+        down(n), hit(n) (gerade gedrückt), up(n) (gerade losgelassen), dt }
+   Knopfnamen: a b x y lb rb lt rt back start ls rs up down left right
+   Konfiguration vor dem Laden: window.LXPAD_CFG = { fs:false (kein Vollbild-Knopf), fsPos:'br'|'bl'|'tr'|'tl', site:true } */
+(function(){
+'use strict';
+if (window.LXPAD) return;
+var CFG = window.LXPAD_CFG || {};
+// Xbox (Edge): Vollbild über „View halten“, Controller muss einmal auf „Spielsteuerung“ umgestellt werden
+var XBOX = /Xbox/i.test(navigator.userAgent || '');
+var P = window.LXPAD = { active:false, pads:0, game:null, back:null, pause:null, root:null, suspend:null, focused:null };
+var D = document, html = D.documentElement;
+var NAMES = ['a','b','x','y','lb','rb','lt','rt','back','start','ls','rs','up','down','left','right','home'];
+var DZ = 0.35;
+var cur = {}, prev = {}, axes = [0,0,0,0], last = 0, raf = 0, rep = { dir:'', t:0, n:0 };
+var ring, toastEl, fsBtn, styleEl, toastT, fsT, scrollAcc = 0;
+
+/* ---------- Stil (nur im Controller-Modus sichtbar) ---------- */
+function css(){
+  if (styleEl) return;
+  styleEl = D.createElement('style'); styleEl.id = 'lxPadCss';
+  styleEl.textContent =
+    '#lxPadRing{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:2147483646;border-radius:14px;' +
+      'box-shadow:0 0 0 4px #fff,0 0 0 8px #3be8ff,0 0 26px 10px rgba(59,232,255,.75);opacity:0;transition:opacity .15s,left .12s ease-out,top .12s ease-out,width .12s ease-out,height .12s ease-out}' +
+    'html.lx-pad #lxPadRing.on{opacity:1;animation:lxPadGlow 1.4s ease-in-out infinite}' +
+    '@keyframes lxPadGlow{50%{box-shadow:0 0 0 4px #fff,0 0 0 9px #ffd23b,0 0 34px 14px rgba(255,210,59,.7)}}' +
+    '@media (prefers-reduced-motion:reduce){html.lx-pad #lxPadRing.on{animation:none;transition:opacity .15s}}' +
+    'html.lx-pad,html.lx-pad *{cursor:none!important}' +
+    '#lxPadToast{position:fixed;left:50%;top:max(14px,env(safe-area-inset-top,0px));transform:translate(-50%,-140%);z-index:2147483647;pointer-events:none;' +
+      'background:rgba(17,20,38,.92);color:#fff;font:700 clamp(15px,1.6vw,26px)/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;padding:.6em 1.1em;border-radius:999px;' +
+      'box-shadow:0 8px 30px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);white-space:nowrap}' +
+    '#lxPadToast.on{transform:translate(-50%,0)}' +
+    '#lxFs{position:fixed;z-index:2147483645;width:44px;height:44px;border-radius:12px;border:0;padding:0;margin:0;display:none;align-items:center;justify-content:center;' +
+      'background:rgba(17,20,38,.62);color:#fff;cursor:pointer;opacity:0;transition:opacity .3s;box-shadow:0 2px 10px rgba(0,0,0,.25)}' +
+    '#lxFs svg{width:24px;height:24px}#lxFs:hover{opacity:1!important;background:rgba(17,20,38,.85)}' +
+    '#lxFs.br{right:12px;bottom:12px}#lxFs.bl{left:12px;bottom:12px}#lxFs.tr{right:12px;top:12px}#lxFs.tl{left:12px;top:12px}' +
+    '@media (pointer:fine){#lxFs{display:flex}}html.lx-pad #lxFs{display:flex}#lxFs.show{opacity:.8}' +
+    'html.lx-fs #lxFs{display:none!important}';
+  (D.head || html).appendChild(styleEl);
+}
+function ensureRing(){ if (!ring && D.body){ ring = D.createElement('div'); ring.id = 'lxPadRing'; ring.setAttribute('aria-hidden','true'); D.body.appendChild(ring); } }
+
+/* ---------- Hinweis ---------- */
+function toast(msg, ms){
+  if (!D.body) return; css();
+  if (!toastEl){ toastEl = D.createElement('div'); toastEl.id = 'lxPadToast'; toastEl.setAttribute('role','status'); D.body.appendChild(toastEl); }
+  toastEl.textContent = msg; void toastEl.offsetWidth; toastEl.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, ms || 2600);
+}
+P.toast = toast;
+
+/* ---------- Vollbild ---------- */
+function isFull(){ return !!(D.fullscreenElement || D.webkitFullscreenElement); }
+function canFull(){ var e = html; return !!(e.requestFullscreen || e.webkitRequestFullscreen) && D.fullscreenEnabled !== false && D.webkitFullscreenEnabled !== false; }
+function goFull(){
+  try {
+    if (isFull()) { (D.exitFullscreen || D.webkitExitFullscreen).call(D); return; }
+    var r = (html.requestFullscreen || html.webkitRequestFullscreen).call(html, { navigationUI:'hide' });
+    if (r && r.catch) r.catch(function(){ if (P.active) toast('Vollbild: bitte einmal mit Maus oder Fernbedienung auf ⛶ klicken', 3800); });
+  } catch (e) {}
+}
+P.fullscreen = goFull;
+function fsState(){ html.classList.toggle('lx-fs', isFull()); }
+function showFs(){ if (!fsBtn) return; fsBtn.classList.add('show'); clearTimeout(fsT); fsT = setTimeout(function(){ if (!fsBtn.matches(':hover')) fsBtn.classList.remove('show'); }, 3500); }
+function setupFs(){
+  if (CFG.fs === false || XBOX || fsBtn || !D.body || !canFull()) return;
+  fsBtn = D.createElement('button'); fsBtn.id = 'lxFs'; fsBtn.type = 'button'; fsBtn.className = CFG.fsPos || 'br';
+  fsBtn.setAttribute('aria-label','Vollbild'); fsBtn.title = 'Vollbild';
+  fsBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+  fsBtn.addEventListener('click', function(e){ e.stopPropagation(); e.preventDefault(); goFull(); });
+  ['pointerdown','mousedown','touchstart','pointerup','mouseup'].forEach(function(t){ fsBtn.addEventListener(t, function(e){ e.stopPropagation(); }); });
+  D.body.appendChild(fsBtn); showFs();
+  D.addEventListener('mousemove', function(e){ if (e.isTrusted) showFs(); }, { passive:true });
+}
+D.addEventListener('fullscreenchange', fsState); D.addEventListener('webkitfullscreenchange', fsState);
+
+/* ---------- Controller-Modus an/aus ---------- */
+function setActive(on){
+  if (P.active === on) return;
+  P.active = on; html.classList.toggle('lx-pad', on);
+  if (on){ css(); ensureRing(); showFs(); } else if (ring) ring.classList.remove('on');
+  try { window.dispatchEvent(new CustomEvent('lxpadmode', { detail:{ active:on } })); } catch (e) {}
+}
+function leave(e){ if (e.isTrusted && P.active) setActive(false); }
+D.addEventListener('pointerdown', leave, true); D.addEventListener('touchstart', leave, { capture:true, passive:true });
+D.addEventListener('mousemove', function(e){ if (e.isTrusted && P.active && (Math.abs(e.movementX) + Math.abs(e.movementY) > 6)) setActive(false); }, { capture:true, passive:true });
+
+/* ---------- Gamepad lesen ---------- */
+function pads(){ try { return navigator.getGamepads ? navigator.getGamepads() : []; } catch (e) { return []; } }
+function read(){
+  var list = pads(), st = {}, ax = [0,0,0,0], any = false, n = 0;
+  for (var i = 0; i < (list ? list.length : 0); i++){
+    var g = list[i]; if (!g || g.connected === false) continue; n++;
+    var b = g.buttons || [];
+    for (var k = 0; k < NAMES.length; k++){ var bb = b[k]; if (bb && (bb.pressed || bb.value > 0.5)) { st[NAMES[k]] = true; any = true; } }
+    var a = g.axes || [];
+    for (var j = 0; j < 4; j++){ var v = +a[j] || 0; if (Math.abs(v) > Math.abs(ax[j])) ax[j] = v; }
+    // manche Controller melden das Steuerkreuz als Achse 9 (Hat-Switch)
+    if (g.mapping !== 'standard' && a.length > 9 && Math.abs(a[9]) <= 1.01 && Math.abs(a[9]) > 0.05){
+      var h = Math.round((a[9] + 1) * 3.5); if (h === 0 || h === 1 || h === 7) st.up = true; if (h >= 3 && h <= 5) st.down = true; if (h >= 5 && h <= 7) st.left = true; if (h >= 1 && h <= 3) st.right = true;
+    }
+  }
+  for (var q = 0; q < 4; q++){ var vv = ax[q]; ax[q] = Math.abs(vv) < DZ ? 0 : (vv - Math.sign(vv) * DZ) / (1 - DZ); if (ax[q]) any = true; }
+  P.pads = n; return { st:st, ax:ax, any:any };
+}
+var api = {
+  down: function(n){ return !!cur[n]; },
+  hit:  function(n){ return !!cur[n] && !prev[n]; },
+  up:   function(n){ return !cur[n] && !!prev[n]; }
+};
+P.state = api;
+
+function connected(e){
+  if (P.suspend && P.suspend()) { start(); return; }
+  var id = e && e.gamepad && e.gamepad.id || '';
+  toast('🎮 Controller verbunden' + (/xbox|xinput|045e/i.test(id) ? '' : ''));
+  start();
+}
+function start(){ if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } }
+window.addEventListener('gamepadconnected', connected);
+window.addEventListener('gamepaddisconnected', function(){ setTimeout(function(){ var l = pads(), n = 0; for (var i = 0; i < (l ? l.length : 0); i++) if (l[i]) n++; if (!n) { toast('🎮 Controller getrennt'); setActive(false); } }, 50); });
+// Falls der Controller schon vor dem Laden verbunden war
+var seen = false;
+var probe = setInterval(function(){ var l = pads(); for (var i = 0; i < (l ? l.length : 0); i++) if (l[i]) { if (!seen) { seen = true; start(); } return; } }, 1000);
+
+/* ---------- Haupt-Schleife ---------- */
+function loop(t){
+  raf = requestAnimationFrame(loop);
+  var dt = Math.min(0.1, (t - last) / 1000); last = t;
+  var r = read();
+  prev = cur; cur = r.st; axes = r.ax;
+  if (P.suspend && P.suspend()) { if (api.hit('back') && P.onSuspendBack) P.onSuspendBack(); hideRing(); return; }
+  if (r.any && !P.active && !D.hidden) { setActive(true); if (!seen) { seen = true; toast('🎮 Controller verbunden'); } }
+  var dx = (cur.left ? -1 : 0) + (cur.right ? 1 : 0), dy = (cur.up ? -1 : 0) + (cur.down ? 1 : 0);
+  if (!dx && Math.abs(axes[0]) > 0.45) dx = Math.sign(axes[0]);
+  if (!dy && Math.abs(axes[1]) > 0.45) dy = Math.sign(axes[1]);
+  var p = { lx:axes[0], ly:axes[1], rx:axes[2], ry:axes[3], dx:dx, dy:dy, dt:dt, down:api.down, hit:api.hit, up:api.up, active:P.active };
+  P.last = p;
+  var took = false;
+  if (typeof P.game === 'function') { try { took = !!P.game(p); } catch (e) { console.error(e); } }
+  if (took) { hideRing(); rep.dir = ''; return; }
+  if (!P.active) return;
+  nav(p);
+}
+
+/* ---------- Menü-Navigation (DOM) ---------- */
+var SEL = 'button,a[href],input:not([type=hidden]),select,textarea,summary,[role=button],[role=tab],[role=menuitem],[role=option],[role=switch],[role=checkbox],[role=radio],[role=link],[tabindex]:not([tabindex="-1"]),[data-pad]';
+var BTN = 'button,a[href],[role=button],[role=link],[role=tab],[role=menuitem],[role=option]';
+function vis(el){
+  if (!el || el.disabled || el.closest('[hidden],[inert],[aria-hidden="true"],[data-pad-skip]')) return null;
+  if (el.id === 'lxFs' && !(D.fullscreenEnabled !== false)) return null;
+  var r = el.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return null;
+  var cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.08 || cs.pointerEvents === 'none' && !el.hasAttribute('data-pad')) return null;
+  return r;
+}
+function onTop(el, r){
+  var vw = innerWidth, vh = innerHeight;
+  var x0 = Math.max(0, r.left), x1 = Math.min(vw, r.right), y0 = Math.max(0, r.top), y1 = Math.min(vh, r.bottom);
+  if (x1 - x0 < 2 || y1 - y0 < 2) return null; // außerhalb des Bildschirms
+  var pts = [[(x0 + x1) / 2, (y0 + y1) / 2], [x0 + (x1 - x0) * .2, y0 + (y1 - y0) * .3], [x0 + (x1 - x0) * .8, y0 + (y1 - y0) * .7]];
+  for (var i = 0; i < pts.length; i++){
+    var h = D.elementFromPoint(pts[i][0], pts[i][1]);
+    if (h && (h === el || el.contains(h) || (h.contains(el) && h !== D.body && h !== html) || h === ring)) return true;
+  }
+  return false;
+}
+function modalRoot(){
+  if (typeof P.root === 'function') { var rr = P.root(); if (rr) return rr; }
+  var ms = D.querySelectorAll('dialog[open],[aria-modal="true"],[role="dialog"],[role="alertdialog"]'), best = null;
+  for (var i = 0; i < ms.length; i++){ var m = ms[i]; if (vis(m) && !m.closest('[hidden]')) best = m; }
+  return best;
+}
+function candidates(){
+  var root = modalRoot(), scope = root || D, out = [], els = scope.querySelectorAll(SEL);
+  for (var i = 0; i < els.length; i++){
+    var el = els[i]; if (el === ring || el === toastEl) continue;
+    if (!el.hasAttribute('data-pad')) {
+      // verschachtelt: Knopf im Knopf -> der äußere zählt; Container mit tabindex um Knöpfe -> die inneren zählen
+      if (el.matches(BTN) && el.parentElement && el.parentElement.closest(BTN)) continue;
+      if (!el.matches(BTN + ',input,select,textarea,summary') && el.querySelector(SEL)) continue;
+    }
+    var r = vis(el); if (!r) continue;
+    var top = onTop(el, r);
+    if (top === false) continue;               // verdeckt
+    if (top === null && !root && !inScroller(el)) continue; // außerhalb des Bildes und nicht scrollbar erreichbar
+    out.push({ el:el, r:r });
+  }
+  return out;
+}
+function inScroller(el){
+  for (var p = el.parentElement; p && p !== D.body; p = p.parentElement){
+    var cs = getComputedStyle(p);
+    if (/(auto|scroll)/.test(cs.overflowY + cs.overflowX) && (p.scrollHeight > p.clientHeight + 2 || p.scrollWidth > p.clientWidth + 2)) return true;
+    if (cs.position === 'fixed') return false;
+  }
+  return D.scrollingElement && D.scrollingElement.scrollHeight > innerHeight + 2;
+}
+function pickStart(list){
+  var def = list.filter(function(c){ return c.el.matches('[data-pad-default],[autofocus]'); })[0];
+  if (def) return def.el;
+  var act = D.activeElement; if (act && act !== D.body) for (var i = 0; i < list.length; i++) if (list[i].el === act) return act;
+  // größtes sichtbares Bedienelement (meist „Spielen“/„Los geht’s“)
+  var best = null, ba = 0;
+  list.forEach(function(c){ var r = c.r; if (r.bottom < 0 || r.top > innerHeight) return; var a = Math.min(r.width, innerWidth) * Math.min(r.height, innerHeight); if (c.el.matches('input,textarea,select')) a *= 0.3; if (a > ba) { ba = a; best = c.el; } });
+  return best || (list[0] && list[0].el);
+}
+function move(dx, dy){
+  var list = candidates(); if (!list.length) return;
+  var f = P.focused, fr = f && list.filter(function(c){ return c.el === f; })[0];
+  if (!fr) { focus(pickStart(list)); return; }
+  var a = fr.r, ax = (a.left + a.right) / 2, ay = (a.top + a.bottom) / 2, best = null, bs = Infinity;
+  list.forEach(function(c){
+    if (c.el === f) return; var b = c.r, bx = (b.left + b.right) / 2, by = (b.top + b.bottom) / 2, main, side, ovl;
+    if (dx) {
+      main = dx > 0 ? b.left - a.right : a.left - b.right; if ((dx > 0 ? bx <= ax + 1 : bx >= ax - 1)) return;
+      ovl = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); side = ovl > 0 ? 0 : Math.abs(by - ay);
+    } else {
+      main = dy > 0 ? b.top - a.bottom : a.top - b.bottom; if ((dy > 0 ? by <= ay + 1 : by >= ay - 1)) return;
+      ovl = Math.min(a.right, b.right) - Math.max(a.left, b.left); side = ovl > 0 ? 0 : Math.abs(bx - ax);
+    }
+    var s = Math.max(main, -8) + side * 2.2 + (ovl > 0 ? 0 : 30);
+    if (s < bs) { bs = s; best = c.el; }
+  });
+  if (best) focus(best);
+  else if (dy) scrollBy(dy * innerHeight * 0.35); // nichts mehr in der Richtung: ein Stück weiterscrollen
+}
+function scroller(el){
+  for (var p = el && el.parentElement; p && p !== D.body; p = p.parentElement){
+    var cs = getComputedStyle(p);
+    if (/(auto|scroll)/.test(cs.overflowY) && p.scrollHeight > p.clientHeight + 2) return p;
+  }
+  return D.scrollingElement || html;
+}
+function scrollBy(px){ var s = scroller(P.focused); try { s.scrollBy({ top:px, behavior:'smooth' }); } catch (e) { s.scrollTop += px; } }
+function focus(el){
+  if (!el) return; P.focused = el;
+  try { el.scrollIntoView({ block:'nearest', inline:'nearest', behavior:'smooth' }); } catch (e) {}
+  if (!el.matches('input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select')) {
+    try { el.focus({ preventScroll:true }); } catch (e) {}
+  }
+  try { el.dispatchEvent(new CustomEvent('lxpadfocus', { bubbles:true })); } catch (e) {}
+  drawRing();
+}
+P.focus = focus;
+function hideRing(){ if (ring) ring.classList.remove('on'); }
+function drawRing(){
+  ensureRing(); var f = P.focused; if (!ring) return;
+  if (!f || !f.isConnected || !P.active) { hideRing(); return; }
+  var r = f.getBoundingClientRect(); if (r.width < 2) { hideRing(); return; }
+  var cs = getComputedStyle(f), rad = parseFloat(cs.borderTopLeftRadius) || 10, pad = 3;
+  // CSS-Zoom (z. B. Großbild-Ansicht): Rahmen-Koordinaten in seine eigene Zoom-Stufe umrechnen
+  var z = ring.currentCSSZoom || 1; if (z !== 1) r = { left:r.left / z, top:r.top / z, width:r.width / z, height:r.height / z };
+  ring.style.left = (r.left - pad) + 'px'; ring.style.top = (r.top - pad) + 'px';
+  ring.style.width = (r.width + pad * 2) + 'px'; ring.style.height = (r.height + pad * 2) + 'px';
+  ring.style.borderRadius = Math.min(rad + pad, (r.height + pad * 2) / 2) + 'px';
+  ring.classList.add('on');
+}
+function fire(el, type, x, y){
+  var o = { bubbles:true, cancelable:true, composed:true, clientX:x, clientY:y, button:0, buttons:type.indexOf('down') > 0 ? 1 : 0, view:window };
+  try {
+    if (type.indexOf('pointer') === 0) { o.pointerId = 1; o.pointerType = 'mouse'; o.isPrimary = true; el.dispatchEvent(new PointerEvent(type, o)); }
+    else el.dispatchEvent(new MouseEvent(type, o));
+  } catch (e) {}
+}
+function activate(el){
+  if (!el) return;
+  if (el.matches('input[type=range]')) return;
+  if (el.matches('input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=reset]),textarea,select')) {
+    try { el.focus(); if (el.showPicker && el.tagName === 'SELECT') el.showPicker(); } catch (e) {}
+    return;
+  }
+  var r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  fire(el, 'pointerdown', x, y); fire(el, 'mousedown', x, y); fire(el, 'pointerup', x, y); fire(el, 'mouseup', x, y);
+  if (el.click) el.click(); else fire(el, 'click', x, y);
+}
+P.activate = activate;
+var BACK_RE = /^(zur(ü|ue)ck|back|schlie(ß|ss)en|close|abbrechen|cancel|beenden|menü|menu|hauptmenü|home|×|✕|✖|x|←|‹|⟵|◀|<|‹ zurück|← zurück)$/i;
+var BACK_IN = /(zur(ü|ue)ck|schlie(ß|ss)en|close|back|abbrechen)/i;
+function label(el){ return ((el.getAttribute('aria-label') || '') + ' ' + (el.title || '') + ' ' + (el.textContent || '')).replace(/\s+/g, ' ').trim(); }
+function findBack(){
+  var list = candidates(), best = null, bs = -1;
+  list.forEach(function(c){
+    var el = c.el, al = (el.getAttribute('aria-label') || el.title || '').trim(), tx = (el.textContent || '').replace(/\s+/g, ' ').trim(), s = 0;
+    if (el.matches('[data-pad-back]')) s = 100;
+    else if (BACK_RE.test(al) || BACK_RE.test(tx)) s = 60;
+    else if (BACK_IN.test(al) || (tx.length < 24 && BACK_IN.test(tx))) s = 40;
+    else if (/class="[^"]*(close|back|zurueck|zurück)/i.test(el.outerHTML.slice(0, 200))) s = 30;
+    if (s > bs && s > 0) { bs = s; best = el; }
+  });
+  return best;
+}
+function key(k, code, kc){
+  var t = D.activeElement && D.activeElement !== D.body ? D.activeElement : D;
+  ['keydown','keyup'].forEach(function(type){ try { t.dispatchEvent(new KeyboardEvent(type, { key:k, code:code, keyCode:kc, which:kc, bubbles:true, cancelable:true })); } catch (e) {} });
+}
+P.key = key;
+function back(){
+  if (typeof P.back === 'function' && P.back()) return;
+  var b = findBack(); if (b) { activate(b); return; }
+  key('Escape', 'Escape', 27);
+}
+function pause(){
+  if (typeof P.pause === 'function' && P.pause()) return;
+  var list = candidates(), b = null;
+  list.forEach(function(c){ var l = label(c.el); if (!b && /(^|\s)(pause|menü|menu|einstellungen|optionen)(\s|$)/i.test(l)) b = c.el; });
+  if (b) { activate(b); return; }
+  key('Escape', 'Escape', 27);
+}
+function nav(p){
+  // Richtung mit Wiederholung beim Halten
+  var dir = p.dx ? (p.dx > 0 ? 'R' : 'L') : p.dy ? (p.dy > 0 ? 'D' : 'U') : '';
+  var now = performance.now();
+  if (dir) {
+    var f = P.focused;
+    if (f && f.matches && f.matches('input[type=range]') && p.dx) {
+      if (dir !== rep.dir || now > rep.t) { var st = parseFloat(f.step) || 1; f.value = (parseFloat(f.value) || 0) + p.dx * st; f.dispatchEvent(new Event('input', { bubbles:true })); f.dispatchEvent(new Event('change', { bubbles:true })); rep.t = now + (dir !== rep.dir ? 380 : 90); rep.dir = dir; }
+    } else if (dir !== rep.dir) { rep.dir = dir; rep.t = now + 400; move(p.dx, p.dx ? 0 : p.dy); }
+    else if (now > rep.t) { rep.t = now + 140; move(p.dx, p.dx ? 0 : p.dy); }
+  } else rep.dir = '';
+  if (p.hit('a')) { var c = P.focused && P.focused.isConnected && vis(P.focused) ? P.focused : null; if (c) activate(c); else move(0, 0); }
+  if (p.hit('b')) back();
+  if (p.hit('start')) pause();
+  if (p.hit('back') && CFG.fs !== false && !CFG.site && !XBOX) goFull();
+  // Rechter Stick oder Schultertasten: scrollen
+  var sy = p.ry || 0; if (p.down('rt')) sy = 1; if (p.down('lt')) sy = -1;
+  if (sy) { scrollAcc += sy * p.dt * 900; if (Math.abs(scrollAcc) >= 4) { var s = scroller(P.focused); s.scrollTop += scrollAcc; scrollAcc = 0; } }
+  if (P.focused && (!P.focused.isConnected || !vis(P.focused) || onTop(P.focused, P.focused.getBoundingClientRect()) === false)) {
+    // Fokus ist verschwunden (Dialog zu, Seite gewechselt): neu wählen
+    P.focused = null; var list = candidates(); if (list.length) focus(pickStart(list)); else hideRing();
+  } else if (!P.focused) { var l2 = candidates(); if (l2.length) focus(pickStart(l2)); }
+  drawRing();
+}
+
+function xboxHint(){
+  // Nur im obersten Fenster, einmal pro Sitzung, und nur solange der Controller noch nicht bei der Seite ankommt
+  var top = true; try { top = window.top === window; } catch (e) {}
+  if (!XBOX || !top) return;
+  try { if (sessionStorage.getItem('lxXboxHint')) return; sessionStorage.setItem('lxXboxHint', '1'); } catch (e) {}
+  setTimeout(function(){ if (!seen) toast('🎮 Xbox: Menü-Taste ☰ halten → „Spielsteuerung“ wählen', 9000); }, 1200);
+}
+function init(){ css(); setupFs(); fsState(); xboxHint(); }
+// Spiele können vorab window.LXPAD_INIT = function(P){ P.game = ...; } setzen
+if (typeof window.LXPAD_INIT === 'function') { try { window.LXPAD_INIT(P); } catch (e) { console.error(e); } }
+if (D.body) init(); else D.addEventListener('DOMContentLoaded', init);
+})();
+</script></body>
+</html>

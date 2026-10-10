@@ -70,7 +70,8 @@ def standalone(g):
     s = re.sub(r'<link href="((?!https?:)[^"]+\.css)" rel="stylesheet">', inline_css, s)
     return pad_inject.inject(s, g["id"])
 
-def has_game(g): return os.path.isfile(P("spiele-dateien", g["id"], "index.html"))
+def game_dir(g): return P(g["src"]) if g.get("src") else P("spiele-dateien", g["id"])
+def has_game(g): return os.path.isfile(os.path.join(game_dir(g), "index.html"))
 def rnum(r): a, b_ = r.split("/"); return f"{float(a)/float(b_):.4f}"
 def real_shot(name):
     for ext in ("png", "jpg", "jpeg", "webp"):
@@ -140,12 +141,13 @@ class Ctx:
             return f"data:image/{mime};base64," + base64.b64encode(open(P("dist/assets/img", file), "rb").read()).decode()
         return f"{self.root}assets/img/{file}"
     def page(self, g): return f"#spiel-{g['id']}" if self.preview else f"{self.root}spiele/{g['id']}/"
-    def dl(self, g): return f"{self.root}{g['download']['file']}" if has_game(g) and not g.get("online") else None
+    def dl(self, g): return f"{self.root}{g['download']['file']}" if has_game(g) and not g.get("online") and not g.get("nodl") else None
 
 G_TIP = '''<div class="dl-tip slim"><div><p class="rec-k">★ Empfohlen: der Download</p><ul class="tip-list"><li><b>Startet sofort</b>, ohne Ladezeit</li><li><b>Läuft offline</b>, überall, auch ohne Internet</li><li><b>Eine Datei</b>: nichts installieren, kein Account, keine Werbung</li><li><b>Deine Version gehört dir</b>, dein Spielstand bleibt auf deinem Gerät</li></ul><p class="tip-how">Am PC per Doppelklick öffnen, auf Android über „Downloads“ mit Chrome. Auf dem iPhone spielst du am besten direkt im Browser.</p></div></div>'''
 
 def dl_btn(c, g, label, aria=False):
     if g.get("online"): return f'<a class="btn btn-dl" href="{c.root}ring-legends/tester/">{DL}Android-Tester werden</a>'
+    if g.get("nodl"): return f'<span class="btn btn-dl is-off" aria-disabled="true">{DL}Nur im Browser</span>'
     if not c.dl(g): return f'<span class="btn btn-dl is-off" aria-disabled="true">{DL}Download bald</span>'
     fn = g["download"]["file"].split("/")[-1]; a = f' aria-label="{e(g["short"])} kostenlos herunterladen"' if aria else ""
     return f'<a class="btn btn-dl rec" href="{c.dl(g)}" download="{fn}"{a}>{DL}{label}<span class="rec-b">Empfohlen</span></a>'
@@ -205,7 +207,7 @@ def sw(c, s):
 
 def game_data(c):
     return json.dumps({"games": [dict({k: g[k] for k in ("id","scene","demo","title","short","tagline","genres","story","controls","features","shots","accent")},
-        download=dict(format=g["download"]["format"], href=c.dl(g)), page=c.page(g),
+        download=dict(format=g["download"]["format"], href=c.dl(g), tips=g.get("tips")), page=c.page(g),
         play=(None if c.preview or not has_game(g) else f"{c.root}games/{g['id']}/index.html"), ratio=g["ratio"].replace("/", " / "), real=is_real(g), orient=g.get("orient","auto"), rnum=rnum(g["ratio"]),
         shotImgs=[c.shot(f"{g['id']}-{i+1}", True) for i in range(3)]) for g in GAMES]}, ensure_ascii=False).replace("</", "<\\/")
 
@@ -705,7 +707,27 @@ TRAILER_JS = """<script>(function(){document.querySelectorAll('.trailer').forEac
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var r=v.play();if(r&&r.catch)r.catch(function(){})}else v.pause()})},{threshold:.35});io.observe(v);
 b.onclick=function(){v.muted=!v.muted;if(!v.muted){v.currentTime=0;v.play()}b.textContent=v.muted?'🔇 Ton an':'🔊 Ton aus';b.setAttribute('aria-pressed',String(!v.muted))}})})();</script>"""
 
+def promo_turbo(c):
+    g = GAME_BY_ID.get("lewolux-turbo")
+    if not g: return ""
+    return f'''  <section class="promo" id="lewolux-turbo-neu" aria-labelledby="promo-t-h" style="--accent:{g['accent']}">
+    <div class="wrap promo-in">
+      {trailer(c, "", *g["trailer"])}
+      <div class="promo-copy">
+        <span class="eyebrow">Neu · Early Access</span>
+        <h2 id="promo-t-h">Lewolux Turbo ist da!</h2>
+        <p>Unser 3D-Fun-Racer mit allen Lewolux-Figuren: 12 Strecken in 3 Cups, Drift-Turbo, Items aus unseren Spielen und ein goldener Pokal. Kostenlos im Browser, mit Xbox-Controller, Tastatur oder am Handy.</p>
+        <ul class="promo-feats"><li>🏁 12 Strecken</li><li>🦁 11 Fahrer</li><li>🏆 Grand Prix</li><li>🎮 Controller</li></ul>
+        <div class="promo-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt spielen</button><a class="btn btn-dl" href="{c.page(g)}">Mehr zum Spiel</a></div>
+      </div>
+    </div>
+  </section>
+'''
+
 def promo(c):
+    return promo_turbo(c) + promo_rl(c)
+
+def promo_rl(c):
     g = GAME_BY_ID["wrestling-tcg"]
     return f'''  <section class="promo" id="ring-legends-update" aria-labelledby="promo-h" style="--accent:{g['accent']}">
     <div class="wrap promo-in">
@@ -726,7 +748,7 @@ def update_section(c, g):
     u = g.get("update")
     if not u: return ""
     items = "".join(f'<li><span class="up-i" aria-hidden="true">{i}</span><b>{e(t)}</b><span>{e(d)}</span></li>' for i, t, d in u["items"])
-    return f'''  <section class="g-update" id="update" aria-labelledby="up-h"><span class="eyebrow">{e(u["kicker"])}</span><h2 id="up-h">{e(u["title"])}</h2><p class="up-lead">{e(u["lead"])}</p>{trailer(c, "in-update")}<ul class="up-list">{items}</ul><div class="g-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt online spielen</button></div><p class="up-note">{e(u["note"])}</p></section>
+    return f'''  <section class="g-update" id="update" aria-labelledby="up-h"><span class="eyebrow">{e(u["kicker"])}</span><h2 id="up-h">{e(u["title"])}</h2><p class="up-lead">{e(u["lead"])}</p>{trailer(c, "in-update", *(g.get("trailer") or ()))}<ul class="up-list">{items}</ul><div class="g-actions"><button class="btn btn-play" data-open="{g['id']}" data-mode="demo">{PLAY}Jetzt online spielen</button></div><p class="up-note">{e(u["note"])}</p></section>
 '''
 
 KIDS_BY_ID = {k["id"]: k for k in KIDS}
@@ -760,7 +782,7 @@ def game_page(c, g):
     gallery = "".join(f'<li><figure>{pic(c, g["id"]+"-"+str(i+1), "Screenshot aus "+g["short"]+": "+cap)}<figcaption>{e(cap)}</figcaption></figure></li>' for i, cap in enumerate(g["shots"]))
     faq = [(f"Ist {g['short']} kostenlos?", f"Ja. {g['short']} ist während der Entwicklung komplett kostenlos, im Browser und als Early-Access-Download."),
            (f"Kann ich {g['short']} auf dem Handy spielen?", f"Ja. {g['short']} läuft im Browser auf Smartphone, Tablet und PC" + (" und ist als Android-App verfügbar." if "android" in g["plats"] else ".")),
-           (f"Wie lade ich {g['short']} herunter?", (f"Über den Button „Kostenlos herunterladen“ erhältst du das komplette Spiel als eine einzige HTML-Datei. Einfach öffnen, schon läuft es im Browser, auch offline, am PC und am Handy. Ein Account ist nicht nötig." if has_game(g) else f"Der Download von {g['short']} folgt, sobald die erste spielbare Version fertig ist."))]
+           (f"Wie lade ich {g['short']} herunter?", (f"{g['short']} läuft direkt im Browser, ein Download ist nicht nötig. Einfach auf „Jetzt im Browser spielen“ tippen, am PC und am Handy, ohne Account." if g.get("nodl") else f"Über den Button „Kostenlos herunterladen“ erhältst du das komplette Spiel als eine einzige HTML-Datei. Einfach öffnen, schon läuft es im Browser, auch offline, am PC und am Handy. Ein Account ist nicht nötig." if has_game(g) else f"Der Download von {g['short']} folgt, sobald die erste spielbare Version fertig ist."))]
     if g.get("online"):
         faq = [(f"Ist {g['short']} kostenlos?", f"Ja. {g['short']} ist kostenlos und kein Pay-to-Win. Alle Packs gibt es mit Münzen aus dem Spiel."),
                (f"Kann ich {g['short']} auf dem Handy spielen?", f"Ja. {g['short']} läuft im Browser auf Smartphone, Tablet und PC. Die Android-App für Google Play ist in Vorbereitung."),
@@ -774,7 +796,10 @@ def game_page(c, g):
         {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}]
         + ([{"@type": "VideoObject", "name": g["short"] + " – Trailer zum großen Update", "description": "15 Sekunden Ring Legends: Packs öffnen, Karten graden, Ring-Duelle, Markt und Tausch. Kostenlos im Browser, bald im Play Store.",
              "thumbnailUrl": SITE + "assets/video/ring-legends-trailer-l.jpg", "contentUrl": SITE + "assets/video/ring-legends-trailer-l.mp4", "uploadDate": "2026-10-08", "duration": "PT15S", "inLanguage": "de",
-             "publisher": {"@id": SITE + "#studio"}, "embedUrl": SITE + url + "#update"}] if g.get("update") and os.path.isfile(P("video/ring-legends-trailer-l.mp4")) else [])}]
+             "publisher": {"@id": SITE + "#studio"}, "embedUrl": SITE + url + "#update"}] if g["id"] == "wrestling-tcg" and os.path.isfile(P("video/ring-legends-trailer-l.mp4")) else [])
+        + ([{"@type": "VideoObject", "name": "Lewolux Turbo – Trailer", "description": "Lewolux Turbo: 12 Strecken, 11 Fahrer, ein Pokal. Der 3D-Fun-Racer kostenlos im Browser.",
+             "thumbnailUrl": SITE + "assets/video/lewolux-turbo-trailer-l.jpg", "contentUrl": SITE + "assets/video/lewolux-turbo-trailer-l.mp4", "uploadDate": "2026-10-10", "duration": "PT30S", "inLanguage": "de",
+             "publisher": {"@id": SITE + "#studio"}, "embedUrl": SITE + url + "#update"}] if g["id"] == "lewolux-turbo" and os.path.isfile(P("video/lewolux-turbo-trailer-l.mp4")) else [])}]
     # LCP-Bild vorladen – mit denselben srcset/sizes wie das <picture> im Kopf, sonst lädt das Handy das Bild doppelt
     preload = f'<link rel="preload" as="image" type="image/webp" imagesrcset="{c.shot(g["id"]+"-1", True)} 640w, {c.shot(g["id"]+"-1")} 1280w" imagesizes="(max-width:900px) 100vw, 720px" fetchpriority="high">'
     h = head(c, ptitle(s["title"]), s["meta"], url, f"assets/og/og-{g['id']}.jpg", jsonld, preload=preload)
@@ -1284,16 +1309,19 @@ def main():
     # echte Spiele kopieren
     for g in GAMES:
         if has_game(g):
-            shutil.copytree(P("spiele-dateien", g["id"]), P("dist/games", g["id"]))
+            shutil.copytree(game_dir(g), P("dist/games", g["id"]))
             pad_inject.inject_file(P("dist/games", g["id"], "index.html"))   # Controller, Vollbild-Knopf
             if g["id"] not in KIDS_IDS: guard_game(P("dist/games", g["id"], "index.html"))
-            if not g.get("online"): open(P("dist", g["download"]["file"]), "w", encoding="utf-8").write(standalone(g))
+            if not g.get("online") and not g.get("nodl"): open(P("dist", g["download"]["file"]), "w", encoding="utf-8").write(standalone(g))
     for g in GAMES:
         os.makedirs(P("dist/games", g["id"]), exist_ok=True)
         if not has_game(g): open(P("dist/games", g["id"], "HIER-WEB-EXPORT-REIN.txt"), "w", encoding="utf-8").write(f"Den Web-Export von {g['title']} hier hineinkopieren (index.html muss direkt in diesem Ordner liegen). Danach ist das Spiel auf der Website sofort spielbar.\n")
     # Prototyp Lewolux Turbo (nicht verlinkt, noindex)
     if os.path.isfile(P("spiele-intern/lewolux-turbo/index.html")):
-        shutil.copytree(P("spiele-intern/lewolux-turbo"), P("dist/turbo"), dirs_exist_ok=True)
+        if any(g["id"] == "lewolux-turbo" for g in GAMES):   # alter Prototyp-Link leitet aufs veröffentlichte Spiel weiter
+            os.makedirs(P("dist/turbo"), exist_ok=True)
+            open(P("dist/turbo/index.html"), "w", encoding="utf-8").write('<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><link rel="canonical" href="/spiele/lewolux-turbo/"><script>location.replace("/games/lewolux-turbo/index.html"+location.search)</script><a href="/games/lewolux-turbo/index.html">Lewolux Turbo starten</a>')
+        else: shutil.copytree(P("spiele-intern/lewolux-turbo"), P("dist/turbo"), dirs_exist_ok=True)
     print("Spiele im Browser:", [g["id"] for g in GAMES if has_game(g)] or "noch keine (Ordner spiele-dateien/ füllen)")
     # pages
     open(P("dist/index.html"), "w", encoding="utf-8").write(index_page(Ctx("./")))

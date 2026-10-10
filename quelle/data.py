@@ -1,6 +1,30 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="lewolux-turbo", group="arcade", ratio="16/9", scene="wrestle", demo="none", wide=True, accent="#ff3fd0", src="spiele-intern/lewolux-turbo", nodl=True,
+  title="Lewolux Turbo", short="Lewolux Turbo", tagline="Zwölf Strecken. Elf Fahrer. Ein Pokal.",
+  desc="Der Fun-Racer von Lewolux: Fahr mit Lux, Kritzel, Pandi, Nervbert und vielen mehr durch 12 verrückte Strecken, drifte für Turbo-Boosts und räum die Konkurrenz mit Items aus unseren Spielen ab. Kostenlos im Browser, mit Controller und am Handy.",
+  genres=["Kart-Racer","3D","Party"], cats="arcade family", status="Neu · Early Access",
+  plats=["web","mobile","pad"], tech=["Three.js","WebGL","Gamepad"],
+  story="Die Lewolux-Figuren haben genug vom Stillsitzen. Lux will beweisen, dass er der König der Strecke ist, Pandi rast in der Badewanne, Kellner Karl im Einkaufswagen und Kritzel flattert hinterher. Vom Neon-Dschungel bis zur Regenbogen-Allee: Wer holt sich den goldenen Pokal?",
+  controls=[["Gas / Bremse","Pfeil hoch / runter · A / B"],["Lenken","Pfeiltasten · Stick"],["Driften & Trick","Leertaste · RB"],["Item benutzen","E · X / Y"]],
+  features=["12 Strecken in 3 Cups mit Grand Prix und Siegerehrung","11 Fahrer, Fahrzeuge, Räder, Lackierungen und Outfits","Driften mit 3 Turbo-Stufen, Schanzen, Tricks und Windschatten","Münzjagd, Zeitfahren mit Geist, Spiegel-Strecken","Xbox-Controller, Tastatur und Handy, Lenkhilfe für Kinder"],
+  shots=["Regenbogen-Allee: Drift durchs Weltall","Laternenfest: nächtliches Rennen über den Teich","Siegerehrung nach dem Grand Prix"],
+  reel=["Neu","Der Fun-Racer von Lewolux","12 Strecken, 11 Fahrer, ein goldener Pokal."],
+  trailer=("lewolux-turbo-trailer", "Trailer zu Lewolux Turbo"),
+  tips=["<b>Sofort loslegen</b>, direkt im Browser, ohne Download","<b>Xbox-Controller</b> einstecken und losfahren, auch auf dem Beamer","<b>Am Handy</b> quer halten: Daumen-Stick oder Handy neigen","<b>Fortschritt</b> bleibt in deinem Browser gespeichert"],
+  update=dict(kicker="Neu · Oktober 2026", title="Lewolux Turbo ist da",
+   lead="Unser bisher größtes Spiel: ein 3D-Fun-Racer mit allen Lewolux-Figuren. Kostenlos im Browser, mit Xbox-Controller, Tastatur oder am Handy.",
+   items=[("🏁", "12 Strecken, 3 Cups", "Neon-Dschungel, Schulhof-Stadion, Pandis Teich, Wüste, Supermarkt, Sternenturm, Regenbogen-Allee und mehr."),
+          ("🏆", "Grand Prix", "Vier Rennen, Punkte nach jedem Lauf und eine Siegerehrung mit Pokal und Feuerwerk."),
+          ("🦁", "11 Fahrer", "Lux, Kritzel, Pandi, Nervbert, Kicker-Kid, Sonni, Berta, Brecher, Elara, Kellner Karl und ein geheimer Goldfuchs."),
+          ("💨", "Drift-Turbo", "Lang driften, Funken sammeln, Turbo zünden. Dazu Schanzen mit Tricks und Windschatten."),
+          ("🎁", "Items aus unseren Spielen", "Turbo-Tröte, Boxhandschuh-Rakete, Fußball, Seifenblase, Wahlplakat, Gewitterwolke und mehr."),
+          ("🔧", "Garage und Level", "Jeder Fahrer steigt auf und schaltet Fahrzeuge, Räder, Lacke und Outfits frei. Nur Optik und faire Werte, kein Pay-to-Win."),
+          ("🪙", "Münzjagd und Zeitfahren", "Zwei Minuten Münzen sammeln oder gegen den eigenen Geist um die Bestzeit fahren."),
+          ("🎮", "Controller, Tastatur, Handy", "Mit Xbox-Controller auf dem Beamer, am PC oder mit Touch am Handy. Die Lenkhilfe hilft Kindern.")],
+   note="Lewolux Turbo ist Early Access: Wir bauen weiter. Sag uns unten, was du dir wünschst."),
+  download=dict(file="downloads/lewolux-turbo.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="mandat", group="strategie", ratio="816/624", scene="mandat", demo="mandat", wide=True, accent="#3be8ff",
   title="Mandat – Vom Dorf ins Kanzleramt", short="Mandat", tagline="Vom Gemeinderat bis in den Bundestag.",
   desc="Starte mit 18 im Dorf, gründe deine eigene Partei oder tritt einer bei. Tägliche Umfragen, Wahlprognosen, Bürgerwünsche in Prozent und Entscheidungen, die wehtun.",
@@ -163,6 +187,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "lewolux-turbo": dict(
+  title="Lewolux Turbo – Kart-Racer kostenlos im Browser spielen",
+  meta="Lewolux Turbo: 3D-Kart-Racer mit 12 Strecken, 11 Fahrern, Grand Prix, Items und Drift-Turbo. Kostenlos im Browser, mit Controller und am Handy.",
+  long=["<strong>Lewolux Turbo</strong> ist ein bunter 3D-Fun-Racer im Stil der großen Kart-Klassiker, gebaut für den Browser. Du fährst mit den Figuren aus den Lewolux-Spielen: Löwe Lux, Eule Kritzel, Pandi in der Badewanne, Onkel Nervbert, Kicker-Kid, Kellner Karl und vielen mehr. Jeder Fahrer hat eigene Werte, eigene Sprüche und ein eigenes Fahrzeug.",
+        "Gefahren wird auf <strong>12 Strecken in 3 Cups</strong>: vom Neon-Dschungel über den Schulhof bei Nacht und das Supermarkt-Chaos bis zur Regenbogen-Allee im Weltall. Wer lange driftet, bekommt blaue, orange und lila Turbo-Funken, auf Schanzen gibt es Tricks, und Wundertüten bringen Items wie Turbo-Tröte, Boxhandschuh-Rakete, Seifenblase oder Gewitterwolke.",
+        "Neben dem <strong>Grand Prix mit Punkten und Siegerehrung</strong> gibt es Einzelrennen, Zeitfahren gegen den eigenen Geist und die Münzjagd. Jeder Fahrer steigt im Level auf und schaltet Fahrzeuge, Räder, Lackierungen und Outfits frei. Lewolux Turbo läuft kostenlos im Browser, am PC mit Tastatur oder Xbox-Controller und am Handy mit Touch-Steuerung. Eine zuschaltbare Lenkhilfe macht es auch für Kinder leicht."]),
  "mandat": dict(
   title="Mandat – Polit-RPG kostenlos im Browser spielen",
   meta="Mandat: Vom Dorf ins Kanzleramt. Gründe deine Partei, gewinne Wahlen und triff harte Entscheidungen. Kostenloses Polit-RPG für PC und Handy.",
@@ -239,6 +269,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Lewolux Turbo: der Fun-Racer mit 12 Strecken ist da", "spiele/lewolux-turbo/"),
  ("Großes Update", "Ring Legends ist jetzt online: Markt, Ranglisten, Pop-Report", "#ring-legends-update"),
  ("Bald", "Ring Legends kommt als App in den Play Store", "spiele/wrestling-tcg/#update"),
  ("Neu", "DeskBoard 1.7 jetzt kostenlos zum Download", "software/deskboard/"),
