@@ -836,8 +836,8 @@ function podiumTick(dt, t) {
   podium.t += dt; const g = podium.group; if (!g) return;
   const a = Math.sin(t*0.3)*0.5, c = podium.cam;
   const fw = new THREE.Vector3(0, 0, -1).applyEuler(g.rotation);
-  camera.position.set(g.position.x - fw.x*16 + Math.cos(a)*3, g.position.y + 6, g.position.z - fw.z*16 + Math.sin(a)*3);
-  camera.lookAt(g.position.x, g.position.y + 3.2, g.position.z); camera.clearViewOffset(); camera.fov = camera.aspect < 1 ? 75 : 55; camera.updateProjectionMatrix();
+  camera.position.set(g.position.x - fw.x*19 + Math.cos(a)*3, g.position.y + 6.5, g.position.z - fw.z*19 + Math.sin(a)*3);
+  camera.lookAt(g.position.x, g.position.y + 2.6, g.position.z); camera.clearViewOffset(); camera.fov = camera.aspect < 1 ? 75 : 55; camera.updateProjectionMatrix();
   podium.cup.rotation.y += dt*1.2;
   podium.top.forEach((x, i) => { if (!x.m) return; x.m.driver.position.y = Math.abs(Math.sin(t*(i ? 4 : 6) + i))*(i ? 0.25 : 0.5); if (x.m.head) x.m.head.rotation.y = Math.sin(t*2 + i)*0.4; });
   if (Math.random() < 0.8) { const cc = [COL.blue, COL.orange, COL.purple, COL.yellow][Math.random()*4 | 0]; sparks.emit(g.position.x + (Math.random() - .5)*16, g.position.y + 14, g.position.z + (Math.random() - .5)*8, (Math.random() - .5)*2, -2, (Math.random() - .5)*2, cc, 3); }
