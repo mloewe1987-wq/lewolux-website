@@ -123,6 +123,14 @@ def og_image(src, dst):
     im.crop((0, (h - nh) // 2, w, (h - nh) // 2 + nh)).resize((1200, 630), Image.LANCZOS).save(dst, quality=85, optimize=True)
 
 # ---------------------------------------------------------------- context
+_VER = {}
+def _ver(path):
+    """Cache-Buster: Bilder liegen ein Jahr im Browser-Cache, ein geänderter Inhalt bekommt so eine neue Adresse."""
+    if path not in _VER:
+        try: _VER[path] = "?v=" + _h.md5(open(path, "rb").read()).hexdigest()[:8]
+        except OSError: _VER[path] = ""
+    return _VER[path]
+
 class Ctx:
     """preview=True -> alles eingebettet (data:-URIs), Links auf Spielseiten werden zu Modal-Ankern"""
     def __init__(self, root, preview=False):
@@ -134,7 +142,8 @@ class Ctx:
                 data = open(P("dist/assets/screenshots", f"{name}-640.{fmt}"), "rb").read()
                 self._cache[key] = f"data:image/{fmt};base64," + base64.b64encode(data).decode()
             return self._cache[key]
-        return f"{self.root}assets/screenshots/{name}{'-640' if small else ''}.{fmt}"
+        fn = f"{name}{'-640' if small else ''}.{fmt}"
+        return f"{self.root}assets/screenshots/{fn}{_ver(P('dist/assets/screenshots', fn))}"
     def img(self, file):
         if self.preview:
             ext = file.rsplit(".", 1)[1]; mime = "jpeg" if ext == "jpg" else ext

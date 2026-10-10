@@ -266,7 +266,7 @@ function updateItemBox() {
   const ib = $('#itemIcon'); const k = player;
   if (k.roll > 0) return;
   ib.textContent = k.item ? ITEMS[k.item].icon : ''; $('#itemN').textContent = k.item && k.itemN > 1 ? '×' + k.itemN : ''; $('#itemName').textContent = k.item ? ITEMS[k.item].name : ''; $('#itemBox').classList.toggle('full', !!k.item);
-  $('#tItem').classList.toggle('ready', !!k.item);
+  $('#tItem').classList.toggle('ready', !!k.item); { const ti = $('#tItemIc'), v = k.item ? ITEMS[k.item].icon : '?'; if (ti.textContent !== v) ti.textContent = v; }
 }
 const fmt = t => { const m = Math.floor(t / 60), s = t - m*60; return `${m}:${s < 10 ? '0' : ''}${s.toFixed(2)}`; };
 

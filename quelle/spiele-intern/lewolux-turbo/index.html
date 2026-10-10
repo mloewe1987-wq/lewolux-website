@@ -169,8 +169,17 @@ button:focus-visible,.card:focus-visible,.tsCard:focus-visible,.gItem:focus-visi
 .tb{position:absolute;border-radius:50%;border:3px solid var(--ink);font-weight:1000;color:var(--ink);display:grid;place-items:center;box-shadow:0 4px 0 var(--ink);opacity:.9}
 .tb.on{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);filter:brightness(1.2)}
 #tDrift{right:22px;bottom:30px;width:104px;height:104px;background:linear-gradient(180deg,#ffb2f0,var(--pink));font-size:17px}
-#tItem{right:140px;bottom:96px;width:78px;height:78px;background:rgba(255,255,255,.6);font-size:30px}
-#tItem.ready{background:var(--yel)}
+#tItem{right:136px;bottom:94px;width:82px;height:82px;border-radius:22px;border:0;padding:4px;box-shadow:0 5px 0 rgba(10,4,30,.75),0 0 18px rgba(41,240,255,.35);background:conic-gradient(from var(--ia,0deg),#29f0ff,#b46bff,#ff4fd8,#ffd84a,#5dff9d,#29f0ff);opacity:.82;animation:iaSpin 4s linear infinite}
+#tItem::before{content:"";position:absolute;inset:5px;border-radius:17px;background:radial-gradient(circle at 50% 35%,rgba(70,52,140,.92),rgba(18,10,46,.95));box-shadow:inset 0 2px 0 rgba(255,255,255,.25)}
+#tItem::after{content:"";position:absolute;inset:5px;border-radius:17px;background:linear-gradient(160deg,rgba(255,255,255,.35),transparent 45%);pointer-events:none}
+#tItemIc{position:relative;z-index:1;font-family:Bungee,system-ui,sans-serif;font-size:38px;line-height:1;color:#fff;text-shadow:0 0 10px #29f0ff,0 3px 0 #b46bff;transition:transform .2s}
+#tItem:not(.ready) #tItemIc{opacity:.55}
+#tItem.ready{opacity:1;box-shadow:0 5px 0 rgba(10,4,30,.75),0 0 26px rgba(255,216,74,.85);animation:iaSpin 1.2s linear infinite,iaPop .9s ease-in-out infinite}
+#tItem.ready #tItemIc{font-family:system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif;font-size:42px;text-shadow:0 4px 8px rgba(0,0,0,.5)}
+#tItem.on{transform:scale(.92);filter:brightness(1.25)}
+@property --ia{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes iaSpin{to{--ia:360deg}}
+@keyframes iaPop{50%{transform:scale(1.07)}}
 #tBrake{right:140px;bottom:16px;width:62px;height:62px;background:rgba(255,255,255,.6);font-size:12px}
 #tPause{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.6);background:rgba(20,11,46,.5);color:#fff;font-size:18px}
 body:not(.touch) #touch{display:none!important}
@@ -381,7 +390,7 @@ body:not(.touch) #touch{display:none!important}
 <div id="touch">
   <div id="tStick"><div id="tBase"><div id="tKnob"></div></div></div>
   <div class="tb" id="tDrift">DRIFT</div>
-  <div class="tb" id="tItem">🎁</div>
+  <div class="tb" id="tItem"><span id="tItemIc">?</span></div>
   <div class="tb" id="tBrake">BREMSE</div>
   <button id="tPause" aria-label="Pause">⏸</button>
 </div>
@@ -397,7 +406,7 @@ body:not(.touch) #touch{display:none!important}
   <h2>Steuerung</h2>
   <h3>⌨️ Tastatur</h3><ul><li>Pfeiltasten oder WASD: Gas, Bremse, Lenken</li><li>Leertaste oder Shift halten: Driften (loslassen = Turbo)</li><li>E, F oder Enter: Item benutzen</li><li>Esc oder P: Pause</li></ul>
   <h3>🎮 Controller (Xbox u. a.)</h3><ul><li>Linker Stick: Lenken · A oder RT: Gas · B oder LT: Bremse</li><li>RB halten: Driften · X, Y oder LB: Item · Start: Pause</li></ul>
-  <h3>📱 Handy (quer halten)</h3><ul><li>Gas gibt das Spiel automatisch</li><li>Lenken mit Daumen-Stick links oder durch Neigen</li><li>Rechts: DRIFT halten, 🎁 Item, BREMSE</li></ul>
+  <h3>📱 Handy (quer halten)</h3><ul><li>Gas gibt das Spiel automatisch</li><li>Lenken mit Daumen-Stick links oder durch Neigen</li><li>Rechts: DRIFT halten, Item-Box, BREMSE</li></ul>
   <h3>💡 Tipps</h3><ul><li>Auf einer Schanze in der Luft Drift drücken = Trick, beim Landen gibt’s Turbo</li><li>🪙 Münzen machen dich etwas schneller (max. 10), bei Treffern verlierst du welche</li><li>Je länger du driftest, desto stärker der Turbo: blau → orange → lila Funken</li><li>Wundertüten geben Items aus unseren Spielen. Orange Pfeilfelder geben Turbo.</li><li>Gas genau bei der „1“ des Countdowns = Turbo-Start</li><li>Fahr dicht hinter einem Gegner: Windschatten gibt dir einen kleinen Schub</li><li>Lenkhilfe (Fahrerauswahl oder Pause) hält dich auf der Strecke – gut für Kinder</li><li>Münzjagd: 2 Minuten sammeln, wer getroffen wird, verliert 3 Münzen</li><li>Grand Prix auf „Turbo“ gewinnen schaltet die Spiegel-Strecken frei</li></ul>
   <button class="btn" data-back="menu">Verstanden</button></div></section>
 
