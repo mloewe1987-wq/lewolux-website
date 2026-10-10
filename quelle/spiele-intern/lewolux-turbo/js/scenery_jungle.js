@@ -2,12 +2,18 @@
 import * as THREE from './three.module.min.js';
 import { rnd } from './scenery_common.js';
 
-export function jungle(K) {
+export function jungle(K, def = {}) {
   const { scene, tr, toon, quality, m4, q, e, s3, p3, WALL, glow } = K;
+  if (def.temple) {
+    scene.fog = new THREE.Fog(0xd89a8a, 170, 820);
+    K.sky({ top: 0x3a5ab0, mid: 0xff9a7a, hor: 0xffe0a0, disc: { c0: '#fff6d0', c1: 'rgba(255,200,120,.55)', size: 260, pos: [-520, 70, -520] }, clouds: { color: 'rgba(255,220,200,.85)' } });
+    K.lights({ hemi: [0xffe0c0, 0x3a4a60, 1.25], sun: [0xffd8a0, 2.6], dir: [-240, 180, -200] });
+  } else {
   scene.fog = new THREE.Fog(0x2a1452, 160, 820);
   K.sky({ top: 0x080530, mid: 0x42145a, hor: 0xff52a0, aurora: true, stars: true,
     disc: { c0: '#fff6d8', c1: 'rgba(255,190,255,.45)', size: 220, pos: [-500, 330, -560], moon: true }, clouds: { color: 'rgba(255,170,230,.55)' } });
   K.lights({ hemi: [0x9fd8ff, 0x4a1a70, 1.25], sun: [0xfff0ff, 2.2] });
+  }
   K.ground([0x123a32, 0x1a4c40, 0x0d2b27, 0x1f5a4a, 0x2a2a5a]);
 
   K.palms([...K.along(Math.round(85*quality), WALL + 6, WALL + 30), ...K.spots(Math.round(65*quality), WALL + 30, 260)]);
@@ -51,6 +57,7 @@ export function jungle(K) {
   K.mountains(0x3a1a68, 0x24104a);
   K.motes(Math.round(700*quality), 0xfff27a);
   waterfall(K, { rock: 0x4a2a72, top: 0x1f9a7a, topEm: 0x06302a });
+  if (def.temple) templeRuins(K);
   return K.finish();
 }
 
@@ -82,4 +89,29 @@ export function waterfall(K, o) {
   pool.rotation.x = -Math.PI/2; pool.position.set(frontX + dir.x*10, K.groundLevel + 0.3, frontZ + dir.z*10); scene.add(pool);
   const mist = new THREE.Sprite(new THREE.SpriteMaterial({ map: K.haloT, color: 0xbff4ff, transparent: true, opacity: 0.5, depthWrite: false })); mist.position.set(frontX + dir.x*5, -1, frontZ + dir.z*5); mist.scale.set(36, 12, 1); scene.add(mist);
   K.upd.push((t, dt) => { wtex.offset.y += dt*1.8; mist.material.opacity = 0.4 + Math.sin(t*2)*0.1; });
+}
+
+// Tempel-Ruinen: Säulen (teils umgestürzt), Steinköpfe mit Leuchtaugen, Stufenpyramide im Innenraum
+function templeRuins(K) {
+  const { scene, tr, toon, quality, m4, q, e, s3, p3, WALL, glow } = K;
+  const stone = toon(0xa8a490, 0x3a3a40), moss = toon(0x4a8a4a, 0x1a3020);
+  const cols = K.along(Math.round(110*quality + 16), WALL + 3, WALL + 12);
+  K.inst(new THREE.CylinderGeometry(1.7, 2.0, 1, 10), stone, cols, ([x, z, d], i) => { const y = K.groundY(x, z, d); if (i % 5 === 0) { m4.compose(p3.set(x, y + 1, z), q.setFromEuler(e.set(Math.PI/2, rnd(0, 6), 0, 'YXZ')), s3.set(1, rnd(7, 12), 1)); } else { const h = rnd(5, 14); m4.compose(p3.set(x, y + h/2, z), q.setFromEuler(e.set(rnd(-0.08, 0.08), 0, rnd(-0.08, 0.08))), s3.set(1, h, 1)); } }, true);
+  K.inst(new THREE.BoxGeometry(4.6, 1.1, 4.6), moss, cols.filter((_, i) => i % 5), ([x, z, d]) => { const y = K.groundY(x, z, d); m4.compose(p3.set(x, y + 0.45, z), q.setFromEuler(e.set(0, rnd(0, 1), 0)), s3.setScalar(1)); });
+  // Steinköpfe
+  const heads = K.along(8, WALL + 8, WALL + 16);
+  for (const [x, z, d] of heads) { const g = new THREE.Group(); g.scale.setScalar(1.6); g.position.set(x, K.groundY(x, z, d), z); const pi = tr.locate(new THREE.Vector3(x, 0, z)).i; g.lookAt(tr.P[pi].x, g.position.y, tr.P[pi].z); scene.add(g);
+    const hd = new THREE.Mesh(new THREE.BoxGeometry(6, 8, 5), stone); hd.position.y = 4; hd.castShadow = true; g.add(hd); const brow = new THREE.Mesh(new THREE.BoxGeometry(6.4, 1.2, 1.4), moss); brow.position.set(0, 6, 2.4); g.add(brow);
+    for (const s of [-1, 1]) { const ey = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.8, 0.3), glow(0x29f0ff)); ey.position.set(s*1.5, 5, 2.55); g.add(ey); }
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.4, 1.2), stone); nose.position.set(0, 3.4, 2.8); g.add(nose); const mouth = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.6, 0.3), toon(0x2a2a30)); mouth.position.set(0, 1.4, 2.55); g.add(mouth); }
+  // Stufenpyramide
+  const c = K.inner.getCenter(new THREE.Vector3());
+  if (K.distTo(c.x, c.z) > 45) { const g = new THREE.Group(); g.position.set(c.x, K.groundY(c.x, c.z, K.distTo(c.x, c.z)) - 0.5, c.z); scene.add(g);
+    const sz = Math.min(36, K.distTo(c.x, c.z) - 8);
+    for (let k = 0; k < 6; k++) { const w = sz*(1 - k*0.14); const b = new THREE.Mesh(new THREE.BoxGeometry(w, 4, w), k % 2 ? stone : toon(0x9a9a86, 0x2a2a30)); b.position.y = 2 + k*4; b.castShadow = true; b.receiveShadow = true; g.add(b); }
+    const st = new THREE.Mesh(new THREE.BoxGeometry(sz*0.18, 24, sz*0.5), moss); st.position.set(0, 10, sz*0.32); st.rotation.x = -0.55; g.add(st);
+    const shrine = new THREE.Mesh(new THREE.BoxGeometry(sz*0.22, 5, sz*0.22), stone); shrine.position.y = 26.5; g.add(shrine);
+    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(2.6, 0), glow(0x29f0ff)); gem.position.y = 33; g.add(gem);
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: K.haloT, color: 0x29f0ff, transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending })); halo.position.y = 33; halo.scale.setScalar(22); g.add(halo);
+    K.upd.push(t => { gem.rotation.y = t; gem.position.y = 33 + Math.sin(t*1.5)*0.6; }); }
 }

@@ -3,7 +3,12 @@ export const input = { steer: 0, gas: 0, brake: 0, drift: false, item: false, pa
 const keys = new Set();
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 export const touch = { on: isTouch, stickX: 0, drift: false, item: false, brake: false, tilt: 0, tiltOK: false };
-let itemLatch = false, pauseLatch = false;
+let itemLatch = false, pauseLatch = false, kbSteer = 0, lastT = performance.now();
+// Controller-Vibration (Xbox-Pad), still ignoriert, wenn nicht unterstützt
+export function rumble(strong = 0.5, ms = 120) {
+  if (input.mode !== 'pad' || !navigator.getGamepads) return;
+  for (const p of navigator.getGamepads()) { const a = p && p.vibrationActuator; if (a && a.playEffect) try { a.playEffect('dual-rumble', { duration: ms, strongMagnitude: strong, weakMagnitude: Math.min(1, strong*1.3) }); } catch (_) {} }
+}
 
 addEventListener('keydown', e => {
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
@@ -14,8 +19,11 @@ addEventListener('blur', () => keys.clear());
 
 export function pollInput() {
   let steer = 0, gas = 0, brake = 0, drift = false, item = false, pause = false;
-  if (keys.has('ArrowLeft') || keys.has('KeyA')) steer -= 1;
-  if (keys.has('ArrowRight') || keys.has('KeyD')) steer += 1;
+  const now = performance.now(), dt = Math.min(0.1, (now - lastT)/1000); lastT = now;
+  // Tastatur: Lenkung weich einblenden statt hart -1/+1
+  let kt = 0; if (keys.has('ArrowLeft') || keys.has('KeyA')) kt -= 1; if (keys.has('ArrowRight') || keys.has('KeyD')) kt += 1;
+  if (kt === 0) kbSteer = 0; else { if (Math.sign(kbSteer) !== kt) kbSteer = kt*0.35; kbSteer = Math.max(-1, Math.min(1, kbSteer + kt*dt*5)); }
+  steer = kbSteer;
   if (keys.has('ArrowUp') || keys.has('KeyW')) gas = 1;
   if (keys.has('ArrowDown') || keys.has('KeyS')) brake = 1;
   if (keys.has('Space') || keys.has('ShiftLeft') || keys.has('ShiftRight')) drift = true;
@@ -29,7 +37,7 @@ export function pollInput() {
     if (!p || !p.connected) continue;
     const b = i => p.buttons[i] && (p.buttons[i].pressed || p.buttons[i].value > 0.4);
     const v = i => (p.buttons[i] ? p.buttons[i].value : 0);
-    let ax = p.axes[0] || 0; if (Math.abs(ax) < 0.15) ax = 0; else ax = Math.sign(ax) * (Math.abs(ax) - 0.15) / 0.85;
+    let ax = p.axes[0] || 0; if (Math.abs(ax) < 0.15) ax = 0; else ax = Math.sign(ax) * Math.pow((Math.abs(ax) - 0.15) / 0.85, 1.3);
     if (b(14)) ax = -1; if (b(15)) ax = 1;
     if (ax !== 0) { steer = ax; input.mode = 'pad'; }
     const g = Math.max(b(0) ? 1 : 0, v(7)); if (g > 0.1) { gas = Math.max(gas, g); input.mode = 'pad'; }

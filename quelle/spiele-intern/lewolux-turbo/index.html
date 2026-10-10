@@ -214,7 +214,7 @@ body:not(.touch) #touch{display:none!important}
 <section id="title" class="scr">
   <span class="tag">VORSCHAU-VERSION</span>
   <div class="logo">LEWOLUX<br>TURBO</div>
-  <p>4 Strecken · Grand Prix · Garage · Aufgaben</p>
+  <p>12 Strecken · 3 Cups · Garage · Aufgaben</p>
   <div class="row"><button class="btn" id="btnStart">Los geht’s!</button></div>
   <p class="hint">🎮 Controller, ⌨️ Tastatur oder 📱 Touch</p>
 </section>
@@ -263,6 +263,7 @@ body:not(.touch) #touch{display:none!important}
     <div class="seg mobileOnly"><span>Lenken</span><button data-ctl="stick" class="on">Daumen-Stick</button><button data-ctl="tilt">Handy neigen</button></div>
     <label id="invRow" class="mobileOnly"><input type="checkbox" id="inv"> Neigen umkehren</label>
     <div class="seg"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div>
+    <div class="seg"><span>Lenkhilfe</span><button data-assist="0">Aus</button><button data-assist="1">An (hält dich auf der Strecke)</button></div>
   </div>
   <div id="selRow"><button class="btn ghost" id="btnBack" data-back="menu">Zurück</button><button class="btn ghost" id="btnGarage">🔧 Garage</button><button class="btn" id="btnGo">Weiter</button></div>
 </div></section>
@@ -293,7 +294,7 @@ body:not(.touch) #touch{display:none!important}
 
 <section id="pause" class="scr"><div class="panel"><h2>Pause</h2>
   <button class="btn" id="btnResume">Weiter</button><button class="btn alt" id="btnRestart">Neu starten</button><button class="btn ghost" id="btnMenu">Zum Menü</button>
-  <div class="seg" style="justify-content:center"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div></div></section>
+  <div class="seg" style="justify-content:center"><span>Grafik</span><button data-gfx="auto">Auto</button><button data-gfx="high">Hoch</button><button data-gfx="mid">Mittel</button><button data-gfx="low">Niedrig</button></div><div class="seg" style="justify-content:center"><span>Lenkhilfe</span><button data-assist="0">Aus</button><button data-assist="1">An</button></div></div></section>
 
 <section id="results" class="scr"><div class="panel"><h2 id="resTitle">Ergebnis</h2><p id="resSub" class="sub"></p><ul id="resList" class="resList"></ul><div id="resXP"></div>
   <button class="btn" id="btnAgain">Nochmal fahren</button><button class="btn ghost" id="btnChange">Zum Menü</button></div></section>
@@ -303,7 +304,7 @@ body:not(.touch) #touch{display:none!important}
   <h3>⌨️ Tastatur</h3><ul><li>Pfeiltasten oder WASD: Gas, Bremse, Lenken</li><li>Leertaste oder Shift halten: Driften (loslassen = Turbo)</li><li>E, F oder Enter: Item benutzen</li><li>Esc oder P: Pause</li></ul>
   <h3>🎮 Controller (Xbox u. a.)</h3><ul><li>Linker Stick: Lenken · A oder RT: Gas · B oder LT: Bremse</li><li>RB halten: Driften · X, Y oder LB: Item · Start: Pause</li></ul>
   <h3>📱 Handy (quer halten)</h3><ul><li>Gas gibt das Spiel automatisch</li><li>Lenken mit Daumen-Stick links oder durch Neigen</li><li>Rechts: DRIFT halten, 🎁 Item, BREMSE</li></ul>
-  <h3>💡 Tipps</h3><ul><li>Auf einer Schanze in der Luft Drift drücken = Trick, beim Landen gibt’s Turbo</li><li>🪙 Münzen machen dich etwas schneller (max. 10), bei Treffern verlierst du welche</li><li>Je länger du driftest, desto stärker der Turbo: blau → orange → lila Funken</li><li>Wundertüten geben Items aus unseren Spielen. Orange Pfeilfelder geben Turbo.</li><li>Gas genau bei der „1“ des Countdowns = Turbo-Start</li></ul>
+  <h3>💡 Tipps</h3><ul><li>Auf einer Schanze in der Luft Drift drücken = Trick, beim Landen gibt’s Turbo</li><li>🪙 Münzen machen dich etwas schneller (max. 10), bei Treffern verlierst du welche</li><li>Je länger du driftest, desto stärker der Turbo: blau → orange → lila Funken</li><li>Wundertüten geben Items aus unseren Spielen. Orange Pfeilfelder geben Turbo.</li><li>Gas genau bei der „1“ des Countdowns = Turbo-Start</li><li>Fahr dicht hinter einem Gegner: Windschatten gibt dir einen kleinen Schub</li><li>Lenkhilfe (Fahrerauswahl oder Pause) hält dich auf der Strecke – gut für Kinder</li></ul>
   <button class="btn" data-back="menu">Verstanden</button></div></section>
 
 <div id="padNote">🎮 Controller verbunden!</div>

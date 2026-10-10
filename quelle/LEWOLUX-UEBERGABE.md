@@ -165,4 +165,11 @@ Stand: 9. Oktober 2026. Diese Datei fasst zusammen, was ein neuer Chat wissen mu
 3. Version 1.0 (12 Fahrer, 12 Strecken, alle Modi, Sounds und Stimmen): ca. 1–2 Wochen in mehreren Sitzungen.
 4. Später: mehr Cups, Online-Rennen.
 
+### Stand Nacht 9./10.10. (Nachtschicht bis 7 Uhr)
+- **12 Strecken, 3 Cups:** Lewolux-Cup (Dschungel, Schulhof, Teich, Wüste), Sternen-Cup (Supermarkt-Chaos, Schulhof bei Nacht, Wüsten-Sonnenuntergang, Sternenturm), Legenden-Cup (Tempel-Ruinen, Laternenfest, Supermarkt-Nachtschicht, Regenbogen-Allee). Strecken in `js/tracks.js` (`cp`, `scale`, Stil), Umgebung je Thema in `js/scenery_<thema>.js` mit Varianten über `night`, `sunset`, `temple`; Fahrbahn-Stile in `track.js` (u. a. `rainbow`, `tiles`, `planks`, `glass`).
+- **11 Fahrer** (+ Berta, Brecher, Elara, Kellner Karl, Goldfuchs zum Freischalten), Modi Grand Prix / Einzelrennen / Zeitfahren mit Geist, Garage (Fahrzeuge, Räder, Lack, Outfits), Aufgaben, Erfolge, Level 1–20 pro Fahrer.
+- **Fahrgefühl:** Windschatten (dicht hinter Gegnern → kurzer Schub), **Lenkhilfe** (Fahrerauswahl/Pause, für Kinder).
+- **Audio:** Code für echte Dateien ist fertig (`assets/sfx/<name>.mp3`, `assets/voice/<fahrer>_<n>.mp3`, `assets/music/<thema>.mp3`). Geladen wird nur, was in `assets/audio.json` (`{"files":["sfx/coin.mp3", …]}`) steht – sonst Synth-Ersatz. Die Stimmen (ElevenLabs, `turbo_voices_1.zip`) und Epidemic-Musik/SFX liegen in Martins Downloads; einbauen, sobald die Rechner-Verbindung steht (Stimmen-Stapel per Pausen in Einzelclips schneiden, Reihenfolge wie `SAY_IDX`).
+- Tests: `?auto=1&sim=40&gp=1&cup=0|1|2` (GP-Simulation), `?track=<id>&nobloom`, `window.__qa(i, seite)`.
+
 **Token sparen:** viele kleine Dateien, automatisch im Hintergrund testen statt vieler Screenshots, in klaren Etappen arbeiten.

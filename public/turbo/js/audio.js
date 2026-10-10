@@ -36,8 +36,13 @@ function noise(dur, f0, f1, vol = 0.3, q = 1, type = 'bandpass', delay = 0, bus 
 const BUF = {}, LOADING = {};
 const SFX_FILES = { item: 'pickup', got: null, boost: 'boost', honk: 'honk', hit: 'bonk', punch: 'punch', pop: 'pop', bubble: 'pop', kick: 'kick', zap: 'zap', thunder: 'thunder', roar: 'roar', coin: 'coin', splash: 'splash', crowd: 'crowd', firework: 'firework', ink: 'splat', slip: 'slip', bump: 'thud', trick: 'trick', confetti: 'confetti' };
 const SFX_VOL = { item: 0.55, boost: 0.5, honk: 0.6, hit: 0.6, punch: 0.6, pop: 0.6, bubble: 0.5, kick: 0.6, zap: 0.55, thunder: 0.6, roar: 0.75, coin: 0.4, splash: 0.4, crowd: 0.5, firework: 0.5, ink: 0.6, slip: 0.55, bump: 0.25, trick: 0.5, confetti: 0.55 };
+// Nur Dateien laden, die in assets/audio.json stehen (vermeidet 404-Anfragen, solange Audio fehlt)
+let MAN = null; const manReady = fetch('assets/audio.json').then(r => r.ok ? r.json() : null).then(j => { MAN = new Set(j ? j.files : []); }).catch(() => { MAN = new Set(); });
+const has = url => MAN && MAN.has(url.replace(/^assets\//, ''));
 export function loadBuf(key, url) {
   if (BUF[key] || LOADING[key] || !ctx) return;
+  if (!MAN) { LOADING[key] = manReady.then(() => { delete LOADING[key]; loadBuf(key, url); }); return; }
+  if (!has(url)) { BUF[key] = null; LOADING[key] = true; return; }
   LOADING[key] = fetch(url).then(r => r.ok ? r.arrayBuffer() : Promise.reject(r.status)).then(b => ctx.decodeAudioData(b)).then(d => { BUF[key] = d; }).catch(() => { BUF[key] = null; });
 }
 export function preloadSfx() { for (const f of new Set(Object.values(SFX_FILES).filter(Boolean))) loadBuf('sfx:' + f, 'assets/sfx/' + f + '.mp3'); }
@@ -133,13 +138,15 @@ export function playMusic(name, fast = false) {
   if (!ctx || !audio.musicOn) return;
   if (musicName !== name) {
     stopMusicEl();
-    const el = new Audio('assets/music/' + name + '.mp3'); el.loop = true; el.crossOrigin = 'anonymous'; el.preload = 'auto';
+    if (!has('assets/music/' + name + '.mp3')) { musicName = name; musicStop(); musicStart(fast); return; }
+    musicStop(); const el = new Audio('assets/music/' + name + '.mp3'); el.loop = true; el.crossOrigin = 'anonymous'; el.preload = 'auto';
     try { musicSrc = ctx.createMediaElementSource(el); musicGain = ctx.createGain(); musicGain.gain.value = 0; musicSrc.connect(musicGain); musicGain.connect(master); } catch (_) { musicSrc = null; }
     musicEl = el; musicName = name;
     el.addEventListener('error', () => { if (musicEl === el) { stopMusicEl(); musicStart(fast); } });
     el.play().catch(() => {});
     if (musicGain) musicGain.gain.setTargetAtTime(audio.muted ? 0 : 0.42, ctx.currentTime, 0.4);
   } else if (musicEl && musicEl.paused) musicEl.play().catch(() => {});
+  else if (!musicEl) { musicStop(); musicStart(fast); }
   if (musicEl) { musicEl.playbackRate = fast ? 1.08 : 1; musicEl.preservesPitch = false; }
 }
 function stopMusicEl() { if (musicEl) { try { musicEl.pause(); musicEl.src = ''; } catch (_) {} } if (musicSrc) try { musicSrc.disconnect(); } catch (_) {} musicEl = null; musicSrc = null; musicName = null; }

@@ -2,11 +2,17 @@
 import * as THREE from './three.module.min.js';
 import { rnd } from './scenery_common.js';
 
-export function desert(K) {
+export function desert(K, def = {}) {
   const { scene, tr, toon, quality, m4, q, e, s3, p3, WALL, ctex } = K;
+  if (def.sunset) {
+    scene.fog = new THREE.Fog(0xff9a6a, 220, 950);
+    K.sky({ top: 0x3a2a7a, mid: 0xff6a5a, hor: 0xffc070, disc: { c0: '#fff0b0', c1: 'rgba(255,140,80,.6)', size: 300, pos: [520, 60, -480] }, clouds: { color: 'rgba(255,160,160,.8)', n: 14, y0: 60, y1: 180 } });
+    K.lights({ hemi: [0xffc8a0, 0x6a3a5a, 1.05], sun: [0xffa070, 2.7], dir: [300, 120, -260] });
+  } else {
   scene.fog = new THREE.Fog(0xf6d8a8, 240, 980);
   K.sky({ top: 0x1a6ad0, mid: 0x7ac2ff, hor: 0xffe2a8, disc: { c0: '#fffbe8', c1: 'rgba(255,230,150,.6)', size: 200, pos: [-300, 380, -520] }, clouds: { color: 'rgba(255,255,255,.7)', n: 8, y0: 160, y1: 260 } });
   K.lights({ hemi: [0xfff0d8, 0xb08a5a, 1.2], sun: [0xfff0d0, 2.9], dir: [-120, 340, -160] });
+  }
   K.ground([0xe0b070, 0xecc080, 0xd4a060, 0xe8b878], -5.5, 110, g => { g.strokeStyle = 'rgba(160,110,60,.25)'; g.lineWidth = 2; for (let y = 0; y < 256; y += 12) { g.beginPath(); for (let x = 0; x <= 256; x += 8) g.lineTo(x, y + Math.sin(x*0.08 + y)*3); g.stroke(); } });
   const sand = toon(0xe8b878);
   // Dünen
@@ -67,7 +73,8 @@ export function desert(K) {
   K.rocks(120, 0xc8743a);
   K.tufts(500, 300, 0xc8b060);
   K.billboards(toon(0xffb23c), 0x8a5a2a);
-  K.mountains(0xd8946a, 0xe8b08a, 0.7, 'mesa');
+  if (def.sunset) K.mountains(0x8a3a5a, 0x6a2a5a, 0.7, 'mesa'); else K.mountains(0xd8946a, 0xe8b08a, 0.7, 'mesa');
+  if (def.sunset) K.posts({ pole: 0x6a3a2a, h: 4, every: 40, lamp: [0xffb060, 0xffb060], halo: 0.5 });
   K.motes(Math.round(200*quality), 0xfff0c8, 50, 2, 50, 0.5, 4);
   return K.finish();
 }

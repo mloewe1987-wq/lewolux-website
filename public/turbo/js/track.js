@@ -81,13 +81,19 @@ export function buildTrackMeshes(tr, scene, toon, st) {
     if (st.planks) { const ph = 22; for (let y = 0, k = 0; y < h; y += ph, k++) { g.fillStyle = ['rgba(255,220,170,.10)', 'rgba(90,50,20,.10)', 'rgba(255,200,140,.05)'][k % 3]; g.fillRect(0, y, w, ph);
         g.strokeStyle = 'rgba(110,70,40,.35)'; g.lineWidth = 1; for (let n = 0; n < 4; n++) { g.beginPath(); const yy = y + 4 + n*4 + Math.random()*2; g.moveTo(0, yy); for (let x = 0; x <= w; x += 32) g.lineTo(x, yy + Math.sin(x*0.03 + k)*1.5); g.stroke(); }
         g.fillStyle = 'rgba(40,20,8,.75)'; g.fillRect(0, y, w, 3); g.fillStyle = 'rgba(30,30,30,.6)'; for (const x of [0.06, 0.5, 0.94]) { g.beginPath(); g.arc(w*x, y + ph/2, 2.5, 0, 7); g.fill(); } } }
+    if (st.tiles) { g.strokeStyle = 'rgba(120,125,140,.55)'; g.lineWidth = 3; for (let x = 0; x <= w; x += 64) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); } for (let y = 0; y <= h; y += 64) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+      g.fillStyle = 'rgba(255,255,255,.18)'; for (let x = 0; x < w; x += 64) for (let y = 0; y < h; y += 64) if ((x + y)/64 % 2) g.fillRect(x + 2, y + 2, 60, 60); }
+    if (st.glass) { g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(160,120,255,.6)'; g.lineWidth = 2; for (let x = 0; x <= w; x += 64) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); } for (let y = 0; y <= h; y += 64) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+      for (let i = 0; i < 160; i++) { g.fillStyle = `rgba(255,255,255,${Math.random()*0.8})`; g.fillRect(Math.random()*w, Math.random()*h, 2, 2); } }
+    if (st.rainbow) { const rc = ['#ff3a5a', '#ff8a2a', '#ffe14a', '#3ad46a', '#29c8f0', '#5a6aff', '#b36bff']; const bw = w/rc.length; rc.forEach((c, k) => { g.fillStyle = c; g.globalAlpha = 0.8; g.fillRect(k*bw, 0, bw + 1, h); }); g.globalAlpha = 1;
+      g.fillStyle = 'rgba(255,255,255,.25)'; for (let y = 0; y < h; y += 64) g.fillRect(0, y, w, 6); for (let i = 0; i < 300; i++) { g.fillStyle = `rgba(255,255,255,${Math.random()*0.9})`; g.fillRect(Math.random()*w, Math.random()*h, 2, 2); } }
     if (st.tracks) { g.strokeStyle = 'rgba(90,60,30,.25)'; g.lineWidth = 10; for (const x of [0.28, 0.36, 0.64, 0.72]) { g.beginPath(); g.moveTo(w*x, 0); for (let y = 0; y <= h; y += 32) g.lineTo(w*x + Math.sin(y*0.02)*6, y); g.stroke(); } }
-    if (!st.planks && !st.tracks) { for (let i = 0; i < 9; i++) { g.strokeStyle = 'rgba(10,6,24,.4)'; g.lineWidth = 1.5; g.beginPath(); let x = Math.random()*w, y = Math.random()*h; g.moveTo(x, y); for (let k = 0; k < 6; k++) { x += (Math.random()-.5)*40; y += Math.random()*30; g.lineTo(x, y); } g.stroke(); }
+    if (!st.planks && !st.tracks && !st.rainbow) { for (let i = 0; i < 9; i++) { g.strokeStyle = 'rgba(10,6,24,.4)'; g.lineWidth = 1.5; g.beginPath(); let x = Math.random()*w, y = Math.random()*h; g.moveTo(x, y); for (let k = 0; k < 6; k++) { x += (Math.random()-.5)*40; y += Math.random()*30; g.lineTo(x, y); } g.stroke(); }
       g.fillStyle = 'rgba(0,0,0,.15)'; g.fillRect(w*0.22, 0, w*0.12, h); g.fillRect(w*0.66, 0, w*0.12, h); }
     if (st.lines !== false) { g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(w*0.035, 0, 7, h); g.fillRect(w*0.965 - 7, 0, 7, h); g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(w/2 - 4, 0, 8, h*0.45); }
     if (st.decal) st.decal(g, w, h);
   }, true);
-  const road = new THREE.Mesh(ribbon(tr, -HALF, HALF, 0.02, 0.02, 26), new THREE.MeshPhongMaterial({ map: asphalt, shininess: st.shine ?? 60, specular: st.spec ?? 0x4a3a7a }));
+  const road = new THREE.Mesh(ribbon(tr, -HALF, HALF, 0.02, 0.02, 26), new THREE.MeshPhongMaterial({ map: asphalt, shininess: st.shine ?? 60, specular: st.spec ?? 0x4a3a7a, ...(st.rainbow ? { emissive: 0xffffff, emissiveMap: asphalt, emissiveIntensity: 0.3 } : {}) }));
   road.receiveShadow = true;
   group.add(road);
   // Neon-Kanten

@@ -61,13 +61,14 @@ const QUESTS = [
 export const ACHIEVEMENTS = [
   { id: 'first', text: 'Erstes Rennen gefahren', ev: 'race', n: 1, icon: '🏁' },
   { id: 'firstwin', text: 'Erster Sieg', ev: 'win', n: 1, icon: '🥇' },
-  { id: 'cup', text: 'Lewolux-Cup gewonnen', ev: 'gpWin', n: 1, icon: '🏆', unlock: 'goldfuchs' },
-  { id: 'cupturbo', text: 'Lewolux-Cup auf „Turbo“ gewonnen', ev: 'gpWinTurbo', n: 1, icon: '🔥' },
+  { id: 'cup', text: 'Einen Grand Prix gewonnen', ev: 'gpWin', n: 1, icon: '🏆', unlock: 'goldfuchs' },
+  { id: 'cupturbo', text: 'Einen Grand Prix auf „Turbo“ gewonnen', ev: 'gpWinTurbo', n: 1, icon: '🔥' },
   { id: 'hits50', text: '50 Treffer gelandet', ev: 'hit', n: 50, icon: '🎯' },
   { id: 'tricks50', text: '50 Trick-Sprünge', ev: 'trick', n: 50, icon: '🤸' },
   { id: 'coins500', text: '500 Münzen gesammelt', ev: 'coin', n: 500, icon: '🪙' },
   { id: 'lvl10', text: 'Einen Fahrer auf Level 10 gebracht', ev: 'lvl10', n: 1, icon: '⭐' },
   { id: 'lvl20', text: 'Einen Fahrer auf Level 20 gebracht', ev: 'lvl20', n: 1, icon: '🌟' },
+  { id: 'allcups', text: 'Alle drei Cups gewonnen', ev: 'allcups', n: 1, icon: '👑' },
   { id: 'alltracks', text: 'Auf jeder Strecke gewonnen', ev: 'alltracks', n: 1, icon: '🗺️' },
 ];
 

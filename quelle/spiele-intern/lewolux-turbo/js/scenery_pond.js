@@ -2,17 +2,24 @@
 import * as THREE from './three.module.min.js';
 import { rnd } from './scenery_common.js';
 
-export function pond(K) {
+export function pond(K, def = {}) {
   const { scene, tr, toon, quality, m4, q, e, s3, p3, WALL, ctex } = K;
-  scene.fog = new THREE.Fog(0xffb08a, 220, 950);
-  K.sky({ top: 0x2a3a8a, mid: 0xff8a7a, hor: 0xffd88a, disc: { c0: '#fff2b0', c1: 'rgba(255,170,90,.55)', size: 260, pos: [-560, 70, -480] }, clouds: { color: 'rgba(255,190,200,.85)', n: 16, y0: 60, y1: 200 } });
-  K.lights({ hemi: [0xffd8c0, 0x3a6a8a, 1.1], sun: [0xffc890, 2.6], dir: [-260, 160, -220] });
+  const night = !!def.night;
+  if (night) {
+    scene.fog = new THREE.Fog(0x14123a, 200, 900);
+    K.sky({ top: 0x050520, mid: 0x1a1450, hor: 0x5a2a6a, stars: true, disc: { c0: '#fff6e0', c1: 'rgba(255,220,170,.4)', size: 200, pos: [-480, 300, -520], moon: true }, clouds: { color: 'rgba(150,120,200,.3)', n: 10, y0: 80, y1: 220 } });
+    K.lights({ hemi: [0x8a7aff, 0x1a2a4a, 0.95], sun: [0xffe0c0, 1.5], dir: [-200, 300, -220] });
+  } else {
+    scene.fog = new THREE.Fog(0xffb08a, 220, 950);
+    K.sky({ top: 0x2a3a8a, mid: 0xff8a7a, hor: 0xffd88a, disc: { c0: '#fff2b0', c1: 'rgba(255,170,90,.55)', size: 260, pos: [-560, 70, -480] }, clouds: { color: 'rgba(255,190,200,.85)', n: 16, y0: 60, y1: 200 } });
+    K.lights({ hemi: [0xffd8c0, 0x3a6a8a, 1.1], sun: [0xffc890, 2.6], dir: [-260, 160, -220] });
+  }
   K.ground([0x1a4a50, 0x225a60, 0x163e44], -5.5, 100);
   const WY = -1.0;
   // Wasser mit bewegter Normalen-Textur
   const nrm = ctex(256, 256, (g, w, h) => { const img = g.createImageData(w, h); for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = (y*w + x)*4; const a = Math.sin(x*0.15 + Math.sin(y*0.07)*2)*0.5 + Math.sin(y*0.21 + x*0.05)*0.5; img.data[i] = 128 + a*50; img.data[i+1] = 128 + Math.cos(x*0.11 - y*0.13)*50; img.data[i+2] = 255; img.data[i+3] = 255; } g.putImageData(img, 0, 0); }, false);
   nrm.wrapS = nrm.wrapT = THREE.RepeatWrapping; nrm.repeat.set(80, 80);
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400), new THREE.MeshPhongMaterial({ color: 0x2a8a9a, shininess: 90, specular: 0xffc890, normalMap: nrm, normalScale: new THREE.Vector2(0.6, 0.6), transparent: true, opacity: 0.9 }));
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400), new THREE.MeshPhongMaterial({ color: night ? 0x163a5a : 0x2a8a9a, shininess: 90, specular: night ? 0xffd8a0 : 0xffc890, normalMap: nrm, normalScale: new THREE.Vector2(0.6, 0.6), transparent: true, opacity: 0.9 }));
   water.rotation.x = -Math.PI/2; water.position.y = WY; water.receiveShadow = true; scene.add(water);
   K.upd.push((t) => { nrm.offset.set(t*0.01, t*0.006); });
   K.groundLevel = -5.5;
@@ -76,9 +83,18 @@ export function pond(K) {
     k.f.position.set(k.x + dx*(c - 0.5), WY + Math.sin(c*Math.PI)*3.5, k.z + dz*(c - 0.5)); k.f.rotation.set(-Math.cos(c*Math.PI)*0.9, Math.atan2(dx, dz), 0); } });
   // Holzbrücken in der Ferne
   for (let k = 0; k < 3; k++) { const sp = K.spots(1, 50, 200)[0]; if (!sp) continue; const arc = new THREE.Mesh(new THREE.TorusGeometry(10, 0.9, 6, 20, Math.PI), toon(0xd0402a)); arc.position.set(sp[0], WY, sp[1]); arc.rotation.y = rnd(0, 3); arc.scale.z = 3; scene.add(arc); }
+  if (night) { // Laternenfest: schwimmende Laternen und aufsteigende Himmelslaternen
+    const wl = K.along(Math.round(140*quality), WALL + 3, WALL + 40).filter(([x, z, d]) => onWater(x, z, d));
+    const wlm = K.inst(new THREE.CylinderGeometry(0.5, 0.6, 0.7, 6), K.glow(0xffffff), wl, ([x, z], i, im) => { m4.compose(p3.set(x, WY + 0.35, z), q.identity(), s3.setScalar(rnd(0.8, 1.3))); im.setColorAt(i, new THREE.Color([0xffb050, 0xff7a4a, 0xffe08a][i % 3])); });
+    void wlm;
+    const sk = []; for (let k = 0; k < Math.round(70*quality + 20); k++) { const sp = K.spots(1, WALL + 10, 260)[0]; if (sp) sk.push({ x: sp[0], z: sp[1], ph: rnd(0, 60), sp: rnd(0.8, 1.6) }); }
+    const skm = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.7, 0.9, 3, 8), K.glow(0xffa040), sk.length); skm.frustumCulled = false; scene.add(skm);
+    const sm = new THREE.Matrix4(), sv = new THREE.Vector3(), sq = new THREE.Quaternion(), ss = new THREE.Vector3(1, 1, 1);
+    K.upd.push(t => { sk.forEach((l, i) => { const y = ((t*l.sp + l.ph) % 60)*2.2 - 2; sm.compose(sv.set(l.x + Math.sin(t*0.4 + l.ph)*2, y, l.z), sq, ss); skm.setMatrixAt(i, sm); }); skm.instanceMatrix.needsUpdate = true; });
+  }
   K.billboards(toon(0xd0402a), 0x5a3a2a);
-  K.mountains(0x8a4a8a, 0x6a3a7a, 0.8);
-  K.motes(Math.round(380*quality), 0xffb0d0, 70, 4, 60, 2, 16, 0.8);
+  if (night) K.mountains(0x2a1a4a, 0x1a1238, 0.8); else K.mountains(0x8a4a8a, 0x6a3a7a, 0.8);
+  if (night) K.motes(Math.round(380*quality), 0xffd08a, 70, 4, 60, 2, 16, 0.8); else K.motes(Math.round(380*quality), 0xffb0d0, 70, 4, 60, 2, 16, 0.8);
   K.motes(Math.round(200*quality), 0xffe08a, 80);
   return K.finish();
 }

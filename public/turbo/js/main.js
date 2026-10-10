@@ -6,7 +6,7 @@ import { buildScenery } from './scenery.js';
 import { createItems, ITEMS } from './items.js';
 import { TRACKS, CUPS, trackById } from './tracks.js';
 import * as PG from './progress.js';
-import { input, touch, pollInput, setupTouch, enableTilt } from './input.js';
+import { input, touch, pollInput, setupTouch, enableTilt, rumble } from './input.js';
 import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
@@ -33,6 +33,7 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.6, 0.45, 0.8); composer.addPass(bloom);
 composer.addPass(new OutputPass());
+let assist = false; try { assist = localStorage.getItem('turboAssist') === '1'; } catch (_) {}
 let useBloom = !Q.has('nobloom');
 let gfx = 'auto'; try { gfx = localStorage.getItem('turboGfx') || 'auto'; } catch (_) {}
 const MAXPR = Math.min(devicePixelRatio || 1, MOBILE ? 1.5 : 2);
@@ -184,7 +185,7 @@ const itemCtx = { toon, sparks, COL, sfx, near,
   onCoins: (n, gained) => { if (gained) stats.coins++; const el = $('#coins'); el.textContent = '🪙 ' + n; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); },
   onHit: (k, by) => {
     if (near(k)) comicPop(k.model.root.position);
-    if (k.isPlayer && !k.auto) { say(k, 'ouch'); if (by && by !== k && !by.isPlayer && Math.random() < 0.7) setTimeout(() => say(by, 'hit'), 1300); shake = 0.5; }
+    if (k.isPlayer && !k.auto) { say(k, 'ouch'); if (by && by !== k && !by.isPlayer && Math.random() < 0.7) setTimeout(() => say(by, 'hit'), 1300); shake = 0.5; rumble(0.9, 350); }
     else if (by && by.isPlayer && by !== k) say(by, 'hit');
     if (by && by !== k && by.isPlayer) stats.hits++;
   },
@@ -214,7 +215,7 @@ function loadTrack(def) {
   world = new THREE.Group(); scene.add(world);
   tr = makeTrack(def);
   buildTrackMeshes(tr, world, toon, def.style);
-  env = buildScenery(world, tr, toon, MOBILE ? 0.6 : 1, def.theme);
+  env = buildScenery(world, tr, toon, MOBILE ? 0.6 : 1, def);
   scene.fog = world.fog; world.fog = null;
   buildPads(def); buildRamps(def);
   items = createItems({ ...itemCtx, scene: world, tr, def });
@@ -241,8 +242,9 @@ function say(k, what) {
   if (!sayClip(k.def.id, SAY_IDX[what] ?? 0)) voice(k.def.pitch, 4 + (line.length / 6 | 0));
 }
 const ann = i => sayClip('ann', i), ann2 = i => sayClip('ann2', i);
-const TRACK_ANN = { dschungel: 2, schulhof: 3, teich: 4, wueste: 5 };
-const musicFor = () => curDef ? curDef.theme : 'menu';
+const TRACK_ANN = { dschungel: 2, schulhof: 3, teich: 4, wueste: 5, schulhof_nacht: 3, wueste_abend: 5 };
+const MUS_ALIAS = { market: 'school', sky: 'jungle' };
+const musicFor = () => curDef ? (MUS_ALIAS[curDef.theme] || curDef.theme) : 'menu';
 function inkScreen(t) {
   const el = $('#ink'); el.innerHTML = '';
   const cols = [['#c23cff', '#5a128a'], ['#ff3fd0', '#7a0a5a'], ['#7a5cff', '#2a1a7a']];
@@ -296,7 +298,19 @@ function setScreen(s) {
 // ---------- Fahrphysik ----------
 function control(k, dt) {
   // liefert {steer, gas, brake, drift, item}
-  if (!k.auto) return { steer: input.steer, gas: input.gas, brake: input.brake, drift: input.drift, item: input.item };
+  if (!k.auto) {
+    let steer = input.steer;
+    if (assist && state === 'race' && k.stun <= 0) { // Lenkhilfe: lenkt sanft zurück, wenn man an den Rand oder falsch herum fährt
+      const L = k.loc, j = (L.i + 10) % tr.N, lane = clamp(L.lat*0.3, -HALF + 4, HALF - 4);
+      const tx = tr.P[j].x + tr.R[j].x*lane - k.pos.x, tz = tr.P[j].z + tr.R[j].z*lane - k.pos.z;
+      const cs = clamp(-wrapA(Math.atan2(tx, tz) - k.h)*3, -1, 1);
+      let w = clamp((Math.abs(L.lat) - (HALF - 3.5))/3, 0, 0.9);
+      if (k.speed > 3) w = Math.max(w, clamp((Math.abs(wrapA(trackAngle(L.i) - k.h)) - 0.6)/0.8, 0, 0.9));
+      if (k.drifting) w *= 0.5;
+      steer = steer*(1 - w) + cs*w;
+    }
+    return { steer, gas: input.gas, brake: input.brake, drift: input.drift, item: input.item };
+  }
   const a = k.ai, i = k.loc.i;
   a.laneT += dt*0.35; let lane = a.lane + Math.sin(a.laneT)*3;
   // Fallen ausweichen
@@ -374,7 +388,7 @@ function physics(k, dt) {
       k.lvl = lvl;
       if (!c.drift || k.speed < 10 || offroad && k.boost <= 0) {
         k.drifting = false;
-        if (k.lvl > 0 && !offroad) { k.boost = Math.max(k.boost, [0, 0.6, 1.05, 1.6][k.lvl]); if (near(k)) { sfx('mini'); ring(k.pos, LVLCOL[k.lvl].getHex(), 3 + k.lvl, 0.5); if (k.lvl === 3 && k.isPlayer) ann(10); } if (k.isPlayer && !k.auto) { stats.drifts++; if (k.lvl === 3) stats.purple = (stats.purple || 0) + 1; } }
+        if (k.lvl > 0 && !offroad) { k.boost = Math.max(k.boost, [0, 0.6, 1.05, 1.6][k.lvl]); if (near(k)) { sfx('mini'); ring(k.pos, LVLCOL[k.lvl].getHex(), 3 + k.lvl, 0.5); if (k.isPlayer) rumble(0.25 + 0.15*k.lvl, 160); if (k.lvl === 3 && k.isPlayer) ann(10); } if (k.isPlayer && !k.auto) { stats.drifts++; if (k.lvl === 3) stats.purple = (stats.purple || 0) + 1; } }
         k.lvl = 0;
       }
     } else {
@@ -398,7 +412,7 @@ function physics(k, dt) {
       k.speed *= 1 - 0.55*into;
       const ta = trackAngle(L.i); const toward = Math.abs(wrapA(ta - k.h)) < Math.PI/2 ? ta : wrapA(ta + Math.PI);
       k.h = wrapA(k.h + wrapA(toward - k.h)*0.35);
-      if (k.bumpCd <= 0 && into > 0.25 && Math.abs(k.speed) > 6) { if (k.isPlayer) { sfx('bump'); shake = 0.25; } k.bumpCd = 0.4;
+      if (k.bumpCd <= 0 && into > 0.25 && Math.abs(k.speed) > 6) { if (k.isPlayer) { sfx('bump'); shake = 0.25; rumble(0.5, 120); } k.bumpCd = 0.4;
         for (let n = 0; n < 6; n++) sparks.emit(k.pos.x + R.x*s*1.2, k.y + 0.6, k.pos.z + R.z*s*1.2, (Math.random() - .5)*6, 3 + Math.random()*3, (Math.random() - .5)*6, COL.white, 0.4); }
     }
     tr.locate(k.pos, L.i, k.loc);
@@ -425,6 +439,12 @@ function physics(k, dt) {
 
   // Turbo-Felder
   for (const p of pads) { let d = Math.abs(s - p.i); d = Math.min(d, N - d); if (d < 5 && Math.abs(k.loc.lat - p.lat) < 3.6 && k.boost < 1.0) { k.boost = 1.2; if (near(k)) sfx('boost'); } }
+  // Windschatten: dicht hinter einem Gegner sammeln, dann kurzer Schub
+  let inDraft = false;
+  if (k.speed > 16 && k.boost <= 0 && k.hop < 0.3 && !offroad && state === 'race') for (const o of racers) { if (o === k) continue; let ds = o.loc.s - s; if (ds < -N/2) ds += N; else if (ds > N/2) ds -= N; if (ds > 2 && ds < 15 && Math.abs(o.loc.lat - k.loc.lat) < 2.4 && o.speed > 12) { inDraft = true; break; } }
+  k.draftT = inDraft ? (k.draftT || 0) + dt : Math.max(0, (k.draftT || 0) - dt*2);
+  if (inDraft && k.draftT > 0.35 && near(k) && Math.random() < 0.6) { const a = Math.random()*6.28; sparks.emit(k.pos.x + Math.cos(a)*1.4 + Math.sin(k.h)*2, k.y + 0.8 + Math.sin(a)*0.8, k.pos.z + Math.cos(k.h)*2, -Math.sin(k.h)*14, 0, -Math.cos(k.h)*14, COL.white, 0.25); }
+  if (k.draftT > 1.4) { k.draftT = 0; k.boost = Math.max(k.boost, 0.9); if (near(k)) { sfx('boost'); ring(k.pos, 0xffffff, 3, 0.6); } if (k.isPlayer && !k.auto) showWarn('Windschatten!'); }
   items.checkPickup(k); items.checkCoins(k);
   // Falsche Richtung
   if (k.isPlayer && state === 'race') {
@@ -679,7 +699,7 @@ function startRace() {
   $('#ghostNote').textContent = session.mode === 'time' ? (PG.state().best[session.track.id] ? '👻 Bestzeit ' + fmt(PG.state().best[session.track.id]) : '') : '';
   if (MOBILE) { input.mode = 'touch'; $('#touch').classList.toggle('tilt', input.touchMode === 'tilt'); }
   engineStart(); stopMusic(); preloadVoices(['ann', 'ann2', ...racers.map(r => r.def.id)]);
-  setTimeout(() => { if (state === 'intro') ann2(session.mode === 'time' ? 6 : TRACK_ANN[session.track.id]); }, 400);
+  setTimeout(() => { if (state === 'intro') { const a = session.mode === 'time' ? 6 : TRACK_ANN[session.track.id]; if (a !== undefined) ann2(a); } }, 400);
   camPos.copy(player.pos).add(new THREE.Vector3(Math.sin(player.h)*14, 4, Math.cos(player.h)*14));
 }
 // Geist aufnehmen/abspielen (Zeitfahren)
@@ -787,6 +807,7 @@ function startPodium() {
   // Belohnungen
   PG.event('gp'); if (place === 1) { PG.event('gpWin'); if (cls.id === 'turbo') PG.event('gpWinTurbo'); }
   PG.cupResult(session.cup.id, cls.id, place || 9);
+  if (CUPS.every(c => Object.entries(PG.state().cups).some(([k, v]) => k.startsWith(c.id + ':') && v === 1))) PG.event('allcups');
   const bonus = place === 1 ? 120 : place === 2 ? 80 : place === 3 ? 50 : 20, coinBonus = place === 1 ? 100 : place === 2 ? 60 : place === 3 ? 30 : 10;
   PG.addCoins(coinBonus);
   const got = PG.addXP(player.def.id, bonus); const done = PG.claim();
@@ -910,10 +931,9 @@ function openTrackSel() {
     for (const c of CUPS) { const best = PG.state().cups[c.id + ':' + cls.id]; const el = document.createElement('button'); el.className = 'tsCard'; el.style.setProperty('--bg', '#7a2cff');
       el.innerHTML = `<b>${c.icon}</b><span>${c.name}</span><i>${c.tracks.map(id => trackById(id).icon).join(' ')}</i><i>${best === 1 ? '🏆 Gold' : best === 2 ? '🥈 Silber' : best === 3 ? '🥉 Bronze' : 'Noch kein Pokal'} (${cls.name})</i>`;
       el.onclick = () => { session = { mode: 'gp', cup: c, idx: 0, points: {}, order: null, track: trackById(c.tracks[0]) }; startRace(); }; L.appendChild(el); }
-    for (const [n, ic] of [['Sternen-Cup', '🌠'], ['Legenden-Cup', '👑']]) { const el = document.createElement('button'); el.className = 'tsCard locked'; el.disabled = true; el.innerHTML = `<b>${ic}</b><span>${n}</span><i>Kommt bald</i>`; L.appendChild(el); }
   } else {
     $('#tsTitle').textContent = session.mode === 'time' ? 'Zeitfahren: Strecke wählen' : 'Strecke wählen';
-    const bg = { jungle: '#4a1a7a', school: '#2a7ad6', pond: '#d0604a', desert: '#d08a3a' };
+    const bg = { jungle: '#4a1a7a', school: '#2a7ad6', pond: '#d0604a', desert: '#d08a3a', market: '#e52a2a', sky: '#2a1a6a' };
     for (const t of TRACKS) { const best = PG.state().best[t.id]; const el = document.createElement('button'); el.className = 'tsCard'; el.style.setProperty('--bg', bg[t.theme]);
       el.innerHTML = `<b>${t.icon}</b><span>${t.name}</span><i>${best ? '⏱️ ' + fmt(best) : PG.state().wins[t.id] ? '🏁 Gewonnen' : '&nbsp;'}</i>`;
       el.onclick = () => { session.track = t; startRace(); }; L.appendChild(el); }
@@ -984,6 +1004,9 @@ $('#btnMenu').onclick = () => goMenu();
 $('#btnChange').onclick = () => goMenu();
 $('#tPause').addEventListener('click', () => togglePause(true));
 $('#btnSound').onclick = () => { setMuted(!audio.muted); $('#btnSound').textContent = audio.muted ? '🔇' : '🔊'; PG.state().muted = audio.muted; PG.save(); };
+const markAssist = () => document.querySelectorAll('[data-assist]').forEach(x => x.classList.toggle('on', (x.dataset.assist === '1') === assist));
+document.querySelectorAll('[data-assist]').forEach(b => b.onclick = () => { assist = b.dataset.assist === '1'; try { localStorage.setItem('turboAssist', assist ? '1' : '0'); } catch (_) {} markAssist(); sfx('click'); });
+markAssist();
 document.querySelectorAll('[data-gfx]').forEach(b => b.onclick = () => { gfx = b.dataset.gfx; try { localStorage.setItem('turboGfx', gfx); } catch (_) {} applyGfx(); sfx('click'); });
 setupTouch($('#touch'));
 if (!MOBILE) document.querySelectorAll('.mobileOnly').forEach(e => e.style.display = 'none');
@@ -995,9 +1018,9 @@ if (PG.state().muted) { setMuted(true); $('#btnSound').textContent = '🔇'; }
 
 loadTrack(TRACKS[Q.has('track') ? Math.max(0, TRACKS.findIndex(t => t.id === Q.get('track'))) : 0]);
 setScreen('title');
-if (AUTO) { selIdx = 3; session.track = trackById(Q.get('track') || 'dschungel'); if (Q.has('gp')) { session = { mode: 'gp', cup: CUPS[0], idx: 0, points: {}, order: null, track: trackById(CUPS[0].tracks[0]) }; } startRace(); }
+if (AUTO) { selIdx = 3; session.track = trackById(Q.get('track') || 'dschungel'); if (Q.has('gp')) { session = { mode: 'gp', cup: CUPS[+Q.get('cup') || 0], idx: 0, points: {}, order: null, track: trackById(CUPS[+Q.get('cup') || 0].tracks[0]) }; } startRace(); }
 window.__qa = (i, side = 0, back = 8, up = 3.2) => { const p = tr.P[i], T = tr.T[i], R = tr.R[i]; camera.clearViewOffset(); camera.position.set(p.x - T.x*back + R.x*side, p.y + up, p.z - T.z*back + R.z*side); camera.lookAt(p.x + T.x*10, p.y + 1.5, p.z + T.z*10); camera.fov = 70; camera.updateProjectionMatrix(); env.follow(p); env.update(clock.elapsedTime, 0.016); if (useBloom) composer.render(); else renderer.render(scene, camera); return canvas.toDataURL('image/jpeg', 0.7); };
 window.__loadTrack = id => loadTrack(trackById(id));
 window.__R = renderer; window.__CMP = composer; window.__S = scene; window.__C = camera; window.__THREE = THREE;
-window.__T = { get state() { return state; }, get racers() { return racers; }, get raceT() { return raceT; }, get fps() { return window.__fps; }, get ents() { return items.ents; }, get items() { return items; }, get session() { return session; }, PG, startRace, showStandings, startPodium, goMenu };
+window.__T = { get state() { return state; }, get assist() { return assist; }, get racers() { return racers; }, get raceT() { return raceT; }, get fps() { return window.__fps; }, get ents() { return items.ents; }, get items() { return items; }, get session() { return session; }, PG, startRace, showStandings, startPodium, goMenu };
 loop();

@@ -2,12 +2,19 @@
 import * as THREE from './three.module.min.js';
 import { rnd } from './scenery_common.js';
 
-export function school(K) {
+export function school(K, def = {}) {
   const { scene, tr, toon, quality, m4, q, e, s3, p3, WALL, ctex } = K;
+  const night = !!def.night;
+  if (night) {
+    scene.fog = new THREE.Fog(0x0a1030, 200, 900);
+    K.sky({ top: 0x040818, mid: 0x0a1a48, hor: 0x2a3a8a, stars: true, disc: { c0: '#f0f4ff', c1: 'rgba(160,190,255,.45)', size: 180, pos: [420, 380, -500], moon: true }, clouds: { color: 'rgba(120,140,220,.35)', n: 10 } });
+    K.lights({ hemi: [0x6a8aff, 0x1a2a3a, 0.9], sun: [0xd8e4ff, 1.5], dir: [160, 300, -120] });
+  } else {
   scene.fog = new THREE.Fog(0xbfe4ff, 260, 1000);
   K.sky({ top: 0x1f6ad6, mid: 0x7ac0ff, hor: 0xe6f6ff, disc: { c0: '#ffffff', c1: 'rgba(255,250,200,.6)', size: 160, pos: [-420, 420, -500] }, clouds: { color: 'rgba(255,255,255,.95)', n: 18, y0: 120, y1: 260 } });
   K.lights({ hemi: [0xffffff, 0x6a8a4a, 1.15], sun: [0xfff4e0, 2.7], dir: [-150, 320, -120] });
-  K.ground([0x4aa84a, 0x5cc05a, 0x3e9440, 0x54b452], -5.5, 120, g => { g.fillStyle = 'rgba(255,255,255,.05)'; for (let x = 0; x < 256; x += 64) g.fillRect(x, 0, 32, 256); });
+  }
+  K.ground(night ? [0x1e4a2a, 0x24582f, 0x1a3e24, 0x22502c] : [0x4aa84a, 0x5cc05a, 0x3e9440, 0x54b452], -5.5, 120, g => { g.fillStyle = 'rgba(255,255,255,.05)'; for (let x = 0; x < 256; x += 64) g.fillRect(x, 0, 32, 256); });
 
   // Fußballplatz im Innenfeld
   const spot = K.bestSpot(48) || K.spots(1, 50, 120)[0];
@@ -84,6 +91,8 @@ export function school(K) {
     const panel = new THREE.Mesh(new THREE.BoxGeometry(7, 4.5, 1), toon(0x6a7080)); panel.position.y = 41; g.add(panel);
     for (let a = 0; a < 3; a++) for (let b = 0; b < 2; b++) { const L = new THREE.Mesh(new THREE.CircleGeometry(0.8, 12), K.glow(0xfffbe8)); L.position.set(-2.2 + a*2.2, 40.1 + b*1.8, 0.55); g.add(L); }
     g.lookAt(p.x, p.y - 5, p.z);
+    if (night) { const h = new THREE.Sprite(new THREE.SpriteMaterial({ map: K.haloT, color: 0xfff6d8, transparent: true, opacity: 0.8, depthWrite: false, blending: THREE.AdditiveBlending })); h.position.set(g.position.x, g.position.y + 41, g.position.z); h.scale.setScalar(26); scene.add(h);
+      const pool = new THREE.Mesh(new THREE.CircleGeometry(26, 32), new THREE.MeshBasicMaterial({ map: K.haloT, color: 0xfff0c0, transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending })); pool.rotation.x = -Math.PI/2; pool.position.set(p.x, p.y + 0.12, p.z); scene.add(pool); }
   }
   // Bäume, Hecken, Blumen
   K.roundTrees([...K.along(Math.round(70*quality), WALL + 8, WALL + 40), ...K.spots(Math.round(80*quality), WALL + 40, 260)]);
@@ -98,9 +107,18 @@ export function school(K) {
     const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, W*2, 12), toon(0xffffff)); bar.position.set(p.x, p.y + H, p.z); bar.lookAt(p.x + r.x, p.y + H, p.z + r.z); bar.rotateX(Math.PI/2); bar.castShadow = true; scene.add(bar);
     for (let k = 0; k < 18; k++) { const t2 = (k + 0.5)/18*2 - 1, sag = (1 - t2*t2)*2.5; const fl = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.6, 3), toon(bunt[k % 5])); fl.position.set(p.x + r.x*t2*W, p.y + H - 0.9 - sag, p.z + r.z*t2*W); fl.rotation.x = Math.PI; scene.add(fl); }
   }
-  K.posts({ pole: 0xffffff, h: 5, every: 40, lamp: [0xe52a2a, 0x2a5ad6], lampGeo: new THREE.BoxGeometry(1.4, 0.9, 0.1), lampMat: toon(0xffffff) });
+  if (night) K.posts({ pole: 0x8a9ab0, h: 6, every: 30, lamp: [0xfff0c0, 0xfff0c0], halo: 0.55 });
+  else K.posts({ pole: 0xffffff, h: 5, every: 40, lamp: [0xe52a2a, 0x2a5ad6], lampGeo: new THREE.BoxGeometry(1.4, 0.9, 0.1), lampMat: toon(0xffffff) });
   K.billboards(toon(0xffffff), 0x8a9ab0);
-  K.mountains(0x8ab8d8, 0xa8cce6, 0.6);
-  K.motes(Math.round(160*quality), 0xffffff, 60, 4, 60, 2, 14);
+  if (night) K.mountains(0x10183a, 0x0a1028, 0.6); else K.mountains(0x8ab8d8, 0xa8cce6, 0.6);
+  if (night) K.motes(Math.round(300*quality), 0xbfe0ff, 70); else K.motes(Math.round(160*quality), 0xffffff, 60, 4, 60, 2, 14);
+  if (night) { // Feuerwerk über dem Stadion
+    const fw = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ size: 2.4, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, map: K.haloT }));
+    const NP = 240, pos = new Float32Array(NP*3), col = new Float32Array(NP*3), vel = new Float32Array(NP*3); fw.geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3)); fw.geometry.setAttribute('color', new THREE.BufferAttribute(col, 3)); fw.frustumCulled = false; scene.add(fw);
+    let tt = 0, burst = 0; const c0 = K.inner.getCenter(new THREE.Vector3());
+    K.upd.push((t, dt) => { tt += dt; if (tt > 1.6) { tt = 0; const x = c0.x + rnd(-120, 120), z = c0.z + rnd(-120, 120), y = rnd(70, 110), cc = new THREE.Color().setHSL(Math.random(), 1, 0.6); for (let i = 0; i < 60; i++) { const k = (burst*60 + i) % NP; const a = rnd(0, 6.28), b = Math.acos(rnd(-1, 1)), v = rnd(14, 20); pos.set([x, y, z], k*3); vel.set([Math.sin(b)*Math.cos(a)*v, Math.cos(b)*v, Math.sin(b)*Math.sin(a)*v], k*3); col.set([cc.r, cc.g, cc.b], k*3); } burst++; }
+      for (let k = 0; k < NP; k++) { vel[k*3+1] -= 9*dt; pos[k*3] += vel[k*3]*dt; pos[k*3+1] += vel[k*3+1]*dt; pos[k*3+2] += vel[k*3+2]*dt; col[k*3] *= 0.985; col[k*3+1] *= 0.985; col[k*3+2] *= 0.985; }
+      fw.geometry.attributes.position.needsUpdate = true; fw.geometry.attributes.color.needsUpdate = true; });
+  }
   return K.finish();
 }
