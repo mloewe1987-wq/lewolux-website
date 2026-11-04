@@ -1,6 +1,18 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="lewomon", group="sammeln", orient="any", ratio="16/10", scene="kritzel", demo="none", wide=True, accent="#12b3a6", src="spiele-intern/lewomon", nodl=True,
+  title="Lewomon – Seelenbinder", short="Lewomon", tagline="Echte Orte. Wilde Lewomon. Dein Seelenbund.",
+  desc="Das Monster-Sammelabenteuer von Lewolux auf echten Karten von Boostedt und Neumünster: Binde über 120 Lewomon mit dem Seelenfaden, kämpfe gegen Trainer und Arenen, gewinne Turniere und seltene Items. Per Tippen reisen oder optional mit echtem GPS laufen.",
+  genres=["Monster sammeln","3D","Abenteuer"], cats="rpg family", status="Neu · Early Access",
+  plats=["web","mobile","pad"], tech=["Three.js","WebGL","OpenStreetMap","GPS"],
+  story="In Boostedt und Neumünster leben wilde Lewomon: Kaulquappen am Teich, Pilzwesen im Wald, Tauben und Uhrwerk-Golems in der Stadt. Als Seelenbinder spürst du sie auf, bindest sie mit dem Seelenfaden und forderst die acht Arenaleitungen jeder Region heraus.",
+  controls=[["Reisen","Auf die Karte tippen · Linker Stick"],["Lewomon binden","Gedrückt halten · A"],["Kamera drehen","Ziehen · Rechter Stick"],["Menü","Mitte-Knopf · Y"]],
+  features=["Über 120 Lewomon in 37 Familien mit Entwicklungen","Echte Karten von Boostedt und Neumünster aus OpenStreetMap","Trainer, 16 Arenen und tägliche Turniere mit Typen und Attacken","Events, Items, Shop und Schnellreise","Optionaler GPS-Modus: in echt laufen und Eier ausbrüten"],
+  shots=["Boostedt: Lewomon, Trainer und Kristall-Stationen auf der echten Karte","Kampf: Schwanenprinz gegen Kornmaus","Lewomon-Detailseite mit Kampfwerten und Attacken"],
+  reel=["Neu","Monster sammeln auf echten Karten","Boostedt und Neumünster, über 120 Lewomon."],
+  tips=["<b>Sofort loslegen</b>, direkt im Browser, ohne Download","<b>GPS-Modus</b> im Profil einschalten und in Boostedt oder Neumünster echt laufen","<b>Am Handy</b> hochkant oder quer spielbar","<b>Fortschritt</b> bleibt in deinem Browser gespeichert"],
+  download=dict(file="downloads/lewomon.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="lewolux-turbo", group="arcade", ratio="16/9", scene="wrestle", demo="none", wide=True, accent="#ff3fd0", src="spiele-intern/lewolux-turbo", nodl=True,
   title="Lewolux Turbo", short="Lewolux Turbo", tagline="Zwölf Strecken. Elf Fahrer. Ein Pokal.",
   desc="Der Fun-Racer von Lewolux: Fahr mit Lux, Kritzel, Pandi, Nervbert und vielen mehr durch 12 verrückte Strecken, drifte für Turbo-Boosts und räum die Konkurrenz mit Items aus unseren Spielen ab. Kostenlos im Browser, mit Controller und am Handy. Auch auf der Xbox spielbar.",
@@ -188,6 +200,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "lewomon": dict(
+  title="Lewomon – Monster sammeln kostenlos im Browser",
+  meta="Lewomon: Monster-Sammelspiel auf echten Karten von Boostedt und Neumünster. 120+ Lewomon, Trainer, Arenen, Turniere und optional GPS.",
+  long=["<strong>Lewomon</strong> ist das Monster-Sammelabenteuer von Lewolux. Gespielt wird auf echten 3D-Karten von <strong>Boostedt und Neumünster</strong>, gebaut aus OpenStreetMap-Daten: Häuser, Straßen, Wald, Felder und Wasser sind da, wo sie wirklich sind. Am Wasser leben andere Lewomon als im Wald oder in der Stadt, manche zeigen sich nur nachts.",
+        "Über <strong>120 Lewomon in 37 Familien</strong> warten darauf, mit dem Seelenfaden gebunden zu werden. Mit Essenz und Lichtstaub werden sie stärker und entwickeln sich. Jedes Lewomon hat Typen, Kampfwerte und Attacken. Damit forderst du Trainer an der Straße, 16 Arenaleitungen und tägliche Turniere heraus und gewinnst seltene Items wie den Meisterstein.",
+        "Du reist per Tippen auf die Karte oder schaltest den <strong>GPS-Modus</strong> ein und läufst in echt. Lewomon läuft kostenlos im Browser, am Handy, am PC und mit Controller. Der Fortschritt bleibt in deinem Browser gespeichert."]),
  "lewolux-turbo": dict(
   title="Lewolux Turbo – Kart-Racer kostenlos im Browser spielen",
   meta="Lewolux Turbo: 3D-Kart-Racer mit 12 Strecken, 11 Fahrern, Grand Prix, Items und Drift-Turbo. Kostenlos im Browser, mit Controller und am Handy.",
@@ -270,6 +288,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Lewomon: Monster sammeln in Boostedt und Neumünster", "spiele/lewomon/"),
  ("Neu", "Lewolux Turbo: der Fun-Racer mit 12 Strecken ist da", "spiele/lewolux-turbo/"),
  ("Großes Update", "Ring Legends ist jetzt online: Markt, Ranglisten, Pop-Report", "#ring-legends-update"),
  ("Bald", "Ring Legends kommt als App in den Play Store", "spiele/wrestling-tcg/#update"),
