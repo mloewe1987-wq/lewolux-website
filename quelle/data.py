@@ -1,6 +1,18 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="omas-dachboden", group="alltag", ratio="9/16", scene="ordnung", demo="none", wide=True, accent="#f2c14e", src="spiele-intern/omas-dachboden", nodl=True,
+  title="Omas Dachboden", short="Omas Dachboden", tagline="Pack aus. Räum ein. Erinnere dich.",
+  desc="Das gemütliche Sortierspiel von Lewolux: Pack die Kisten von Oma Lotte und Opa Heinz aus, putz Fundstücke, sortier Knöpfe, Socken und Christbaumkugeln und entdecke dabei ihre Geschichte. 5 Level, 221 Fundstücke, kein Zeitdruck. Am Handy, am PC und auch auf der Xbox spielbar.",
+  genres=["Gemütlich","Sortieren","Story"], cats="family", status="Neu",
+  plats=["web","mobile","pad","xbox"], tech=["HTML5","SVG","Web Audio"],
+  story="Oma Lotte und Opa Heinz haben dir ihren Dachboden vermacht – und jede Menge Kisten. Darin: Teller, Werkzeug, Christbaumkugeln, Kuscheltiere und Briefe von 1962. Jedes Fundstück, das du einräumst, erzählt ein Stück ihrer Geschichte.",
+  controls=[["Einräumen","Ziehen · A"],["Ecke wechseln","Wischen · LB / RB"],["Putzen / Foto drehen","Antippen und reiben · X"],["Nächstes Fundstück","Kisten-Knopf · Y"]],
+  features=["5 Level: Küche, Werkstatt, Weihnachtskiste, Kinderzimmer und Kleiderschrank","221 Fundstücke und 46 Erinnerungen an Oma und Opa","Putzen, sortieren, stapeln, Paare finden und ein Foto-Puzzle","Stufen mit 10 Fähigkeiten, die das Aufräumen leichter machen","Ruhige Musik, sanfte Klänge und eine Katze, die schnurrt"],
+  shots=["Omas Küchenbuffet und eine Erinnerung an den Verlobungsring","Sonntagskanne putzen und Socken an die Wäscheleine hängen","Weihnachtskiste und Mamas Kinderzimmer"],
+  reel=["Neu","Gemütlich sortieren und entdecken","5 Level, 221 Fundstücke, kein Zeitdruck."],
+  tips=["<b>Sofort loslegen</b>, direkt im Browser, ohne Download","<b>Staubige Sachen</b> antippen und mit dem Finger sauber reiben","<b>Am Handy</b> hochkant spielen, am PC oder mit Xbox-Controller","<b>Fortschritt</b> bleibt in deinem Browser gespeichert"],
+  download=dict(file="downloads/omas-dachboden.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="lewomon", group="sammeln", orient="any", ratio="16/10", scene="kritzel", demo="none", wide=True, accent="#12b3a6", src="spiele-intern/lewomon", nodl=True,
   title="Lewomon – Seelenbinder", short="Lewomon", tagline="Echte Orte. Wilde Lewomon. Dein Seelenbund.",
   desc="Das Monster-Sammelabenteuer von Lewolux auf echten Karten von Boostedt und Neumünster: Binde über 120 Lewomon mit dem Seelenfaden, kämpfe gegen Trainer und Arenen, gewinne Turniere und seltene Items. Per Tippen reisen oder optional mit echtem GPS laufen.",
@@ -200,6 +212,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "omas-dachboden": dict(
+  title="Omas Dachboden – gemütliches Sortierspiel kostenlos",
+  meta="Omas Dachboden: Kisten auspacken, putzen, sortieren und Omas Geschichte entdecken. 5 Level, 221 Fundstücke. Kostenlos im Browser und am Handy.",
+  long=["<strong>Omas Dachboden</strong> ist ein gemütliches Sortier- und Auspackspiel von Lewolux. Oma Lotte und Opa Heinz haben dir ihren Dachboden vermacht. Du packst Kiste für Kiste aus, putzt staubige Fundstücke mit dem Finger sauber und räumst alles an seinen Platz: Tassen an die Haken, Teller in den Ständer, Bücher als Regenbogen ins Regal.",
+        "In <strong>5 Level</strong> (Küche, Opas Werkstatt, Weihnachtskiste, Mamas Kinderzimmer und Omas Kleiderschrank) warten <strong>221 Fundstücke</strong>. Du sortierst Knöpfe, Schrauben und Plätzchen nach Farbe und Form, hängst Sockenpaare an die Leine und klebst ein zerrissenes Foto wieder zusammen. Fotos, Briefe und Andenken erzählen dabei in <strong>46 Erinnerungen</strong> die Geschichte der beiden von 1958 bis 2002.",
+        "Es gibt keinen Zeitdruck. Mit jeder Stufe schaltest du Fähigkeiten frei, zum Beispiel eine größere Ablage oder schnelleres Putzen. Ruhige Musik und sanfte Klänge machen es richtig gemütlich. Omas Dachboden läuft kostenlos im Browser, am Handy hochkant, am PC und mit Xbox-Controller. Der Fortschritt bleibt in deinem Browser gespeichert."]),
  "lewomon": dict(
   title="Lewomon – Monster sammeln kostenlos im Browser",
   meta="Lewomon: Monster-Sammelspiel auf echten Karten von Boostedt und Neumünster. 120+ Lewomon, Trainer, Arenen, Turniere und optional GPS.",
@@ -288,6 +306,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Omas Dachboden: das gemütliche Sortierspiel mit 5 Level", "spiele/omas-dachboden/"),
  ("Neu", "Lewomon: Monster sammeln in Boostedt und Neumünster", "spiele/lewomon/"),
  ("Neu", "Lewolux Turbo: der Fun-Racer mit 12 Strecken ist da", "spiele/lewolux-turbo/"),
  ("Großes Update", "Ring Legends ist jetzt online: Markt, Ranglisten, Pop-Report", "#ring-legends-update"),
@@ -345,7 +364,7 @@ GROUPS = [
  ("sammeln", "Sammelkarten & Online", "Packs öffnen, Karten sammeln und mit anderen Spielern handeln."),
  ("arcade", "Arcade, Physik & Simulation", "Kurze Runden, schnelle Reaktionen und viel Chaos."),
  ("kinder", "Kinder & Familie", "Werbefreie Spiele für Kinder, mit großen Knöpfen und ohne Käufe. Alle auch im Kinderbereich Lewolux Kids."),
- ("alltag", "Alltag & Experimente", "Kleine Prototypen, die aus Alltagsaufgaben ein Spiel machen."),
+ ("alltag", "Gemütlich & Alltag", "Gemütliche Spiele und kleine Prototypen, die aus Aufräumen und Alltag ein Spiel machen."),
 ]
 
 FAQ_BROWSER = [
