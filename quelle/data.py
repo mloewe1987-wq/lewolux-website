@@ -1,6 +1,18 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="wuerfelzauber", group="strategie", ratio="9/16", scene="kritzel", demo="none", wide=True, accent="#ffc93c", src="spiele-intern/wuerfelzauber", nodl=True,
+  title="Würfelzauber", short="Würfelzauber", tagline="Würfeln. Bauen. Zaubern!",
+  desc="Das magische Würfel- und Königreich-Spiel von Lewolux: Würfle Münzen, Kronen und Schilde, bau 10 Königreiche aus, greif mit Löwe Leo und der Schleuder andere Reiche an und sammle 30 Haustiere. Kostenlos im Browser und am Handy.",
+  genres=["Würfeln","Aufbau","Sammeln"], cats="family", status="Neu",
+  plats=["web","mobile"], tech=["HTML5","Three.js","WebGL","Web Audio"],
+  story="Ein Zauberwürfel hat Löwe Leo zu dir geführt. Gemeinsam baut ihr verfallene Königreiche wieder auf: vom blühenden Rosenhain über die Perlenbucht bis in die dunklen Welten von Kürbisnacht und Finsterblüte.",
+  controls=[["Würfeln","Würfeln-Knopf antippen"],["Automatisch würfeln","Würfeln-Knopf gedrückt halten"],["Einsatz ändern","x1-Knopf links"],["Bauen","Bauen-Knopf oder Gebiet antippen"]],
+  features=["10 Königreiche mit je 5 Gebäuden in 5 Ausbaustufen","Angriff mit der Schleuder, Raubzüge und Duelle gegen Rivalen","30 Haustiere in 5 Sets, Ausflüge und goldene Form","Tägliche Aufgaben, Truhen, Glücksrad und Boss-Event","Eigenes Profil mit Avataren, Rahmen und 6 Würfel-Skins"],
+  shots=["Rosenhain und die dunkle Kürbisnacht","Angriff mit der Schleuder auf ein Rivalen-Reich","Neues Haustier und das Haustier-Album"],
+  reel=["Neu","Würfeln, bauen und Haustiere sammeln","10 Königreiche, 30 Haustiere, kostenlos im Browser."],
+  tips=["<b>Sofort loslegen</b>, direkt im Browser, ohne Download","<b>Würfeln-Knopf halten</b> für Auto-Würfeln","<b>Am Handy</b> hochkant spielen, am PC geht es auch","<b>Fortschritt</b> bleibt in deinem Browser gespeichert"],
+  download=dict(file="downloads/wuerfelzauber.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="omas-dachboden", group="alltag", ratio="9/16", scene="ordnung", demo="none", wide=True, accent="#f2c14e", src="spiele-intern/omas-dachboden", nodl=True,
   title="Omas Dachboden", short="Omas Dachboden", tagline="Pack aus. Räum ein. Erinnere dich.",
   desc="Das gemütliche Sortierspiel von Lewolux: Pack die Kisten von Oma Lotte und Opa Heinz aus, putz Fundstücke, sortier Knöpfe, Socken und Christbaumkugeln und entdecke dabei ihre Geschichte. 5 Level, 221 Fundstücke, kein Zeitdruck. Am Handy, am PC und auch auf der Xbox spielbar.",
@@ -212,6 +224,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "wuerfelzauber": dict(
+  title="Würfelzauber – Würfelspiel mit Königreichen kostenlos",
+  meta="Würfelzauber: würfeln, 10 Königreiche bauen, mit der Schleuder angreifen und 30 Haustiere sammeln. Kostenlos im Browser und am Handy.",
+  long=["<strong>Würfelzauber</strong> ist ein magisches Würfel- und Aufbauspiel von Lewolux. Mit jedem Wurf bekommst du Münzen, Kronen, Schilde oder Karten. Mit den Münzen baust du Gebäude aus, bis das ganze Königreich glänzt, dann geht es weiter ins nächste.",
+        "<strong>10 Königreiche</strong> warten: fünf helle Welten wie Rosenhain und Perlenbucht und fünf dunkle wie Kürbisnacht und Finsterblüte. Bei drei Schwertern greifst du mit Löwe Leo und der <strong>Schleuder</strong> ein Rivalen-Reich an, bei Masken gehst du auf Raubzug. Schilde schützen dein eigenes Reich.",
+        "Dazu kommen <strong>30 Haustiere</strong> aus Eiern, die dir Boni geben, Sets, Ausflüge und eine goldene Form. Tägliche Aufgaben, Truhen, Glücksrad, ein Boss-Event, ein eigenes Profil und Würfel-Skins sorgen für Abwechslung. Würfelzauber läuft kostenlos im Browser, am Handy hochkant und am PC. Der Fortschritt bleibt in deinem Browser gespeichert."]),
  "omas-dachboden": dict(
   title="Omas Dachboden – gemütliches Sortierspiel kostenlos",
   meta="Omas Dachboden: Kisten auspacken, putzen, sortieren und Omas Geschichte entdecken. 5 Level, 221 Fundstücke. Kostenlos im Browser und am Handy.",
@@ -306,6 +324,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Würfelzauber: würfeln, Königreiche bauen und Haustiere sammeln", "spiele/wuerfelzauber/"),
  ("Neu", "Omas Dachboden: das gemütliche Sortierspiel mit 5 Level", "spiele/omas-dachboden/"),
  ("Neu", "Lewomon: Monster sammeln in Boostedt und Neumünster", "spiele/lewomon/"),
  ("Neu", "Lewolux Turbo: der Fun-Racer mit 12 Strecken ist da", "spiele/lewolux-turbo/"),
