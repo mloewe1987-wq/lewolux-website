@@ -48,16 +48,41 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .ovl img{display:block;width:100%;height:auto}
 .ovl.gone{opacity:0!important;transform:translate(-50%,-50%) scale(.3)!important}
 .cheek{position:absolute;width:16%;height:9%;border-radius:50%;background:radial-gradient(#ff5a5a,rgba(255,90,90,0) 70%);transform:translate(-50%,-50%);pointer-events:none;transition:opacity .5s;mix-blend-mode:multiply}
-#spot{position:absolute;z-index:5;border-radius:50%;transform:translate(-50%,-50%);display:grid;place-items:center;touch-action:none}
+#spot{position:absolute;z-index:13;pointer-events:none;border-radius:50%;transform:translate(-50%,-50%);display:grid;place-items:center;touch-action:none}
 #spot::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(rgba(255,255,255,.55),rgba(255,240,120,.25) 60%,rgba(255,240,120,0) 72%);box-shadow:0 0 0 5px rgba(255,255,255,.9),0 0 26px 10px rgba(255,214,60,.85);animation:glow 1s ease-in-out infinite}
 #spot svg{position:absolute;inset:-10%;width:120%;height:120%;transform:rotate(-90deg)}
 #spot circle{fill:none;stroke:#4cc26a;stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .12s}
 #hand{position:absolute;left:55%;top:60%;font-size:64px;pointer-events:none;animation:handB .8s ease-in-out infinite;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3))}
 @keyframes handB{50%{transform:translate(-8px,-14px) scale(1.1)}}
 @keyframes glow{50%{transform:scale(1.12);opacity:.75}}
-#toolCur{position:absolute;z-index:14;pointer-events:none;transform:translate(-30%,-75%) rotate(-20deg);filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
+#toolCur{position:absolute;z-index:16;pointer-events:none;transform:translate(-50%,-50%) rotate(-15deg);filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
 #toolCur.work{animation:work .18s ease-in-out infinite}
-@keyframes work{50%{transform:translate(-30%,-75%) rotate(-8deg) translateY(4px)}}
+@keyframes work{50%{transform:translate(-50%,-50%) rotate(-4deg) translateY(5px)}}
+#clinic{touch-action:none}
+.tool.lift{transform:translateY(-8px) scale(1.06)}
+.ovl.em span{display:block;line-height:1;filter:drop-shadow(0 3px 3px rgba(0,0,0,.25))}
+.ovl.target{filter:drop-shadow(0 0 8px rgba(255,230,90,.95))}
+.ovl.germ img{animation:wig .7s ease-in-out infinite}
+.ovl.steam{width:9%;aspect-ratio:1}
+.ovl.steam span{width:100%;height:100%;border-radius:50%;background:radial-gradient(rgba(255,255,255,.95),rgba(255,255,255,.55) 45%,rgba(255,255,255,0) 70%);animation:steamA 1.4s ease-in-out infinite}
+@keyframes steamA{50%{transform:translateY(-10px) scale(1.15)}}
+.tag{position:absolute;z-index:15;transform:translate(-50%,-50%);background:#fff;border-radius:22px;padding:6px 16px;font-size:36px;color:#3b7fc0;box-shadow:0 5px 0 rgba(0,0,0,.15);pointer-events:none;transition:color .3s,transform .3s}
+.tag.hot{color:#e5484d}.tag.boom{transform:translate(-50%,-50%) scale(1.3)}
+.pourui{position:absolute;z-index:14;width:0;height:0;pointer-events:none}
+.pourui .bottle{position:absolute;width:120px;left:-40px;top:-175px;transform-origin:60% 80%;transition:transform .3s;filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
+.pourui .bottle.pour{transform:rotate(-120deg) translate(10px,30px)}
+.pourui .meter{position:absolute;left:-150px;top:-110px;width:26px;height:150px;border-radius:13px;background:#fff;box-shadow:0 4px 0 rgba(0,0,0,.15);overflow:hidden}
+.pourui .meter i{position:absolute;left:0;right:0;bottom:62%;height:38%;background:#bff0c8;border-top:3px solid #4cc26a}
+.pourui .meter b{position:absolute;left:4px;right:4px;bottom:4px;border-radius:9px;background:#a0522d;height:0}
+.spoon{position:absolute;z-index:15;width:0;height:0;pointer-events:none;transition:left .2s,top .2s}
+.spoon.held{transition:none}
+.spoon i{position:absolute;left:-60px;top:-28px;width:120px;height:56px;border-radius:50%;background:radial-gradient(#f4f6f8,#b9c3cc);box-shadow:0 5px 0 #8b97a2,inset 0 4px 8px rgba(0,0,0,.2)}
+.spoon i::after{content:"";position:absolute;left:110px;top:20px;width:90px;height:16px;border-radius:8px;background:#b9c3cc;box-shadow:0 4px 0 #8b97a2}
+.spoon s{position:absolute;left:12px;top:8px;width:96px;height:40px;border-radius:50%;background:radial-gradient(#c96a33,#8a3d14);transform:scale(0);transition:transform .08s}
+.sheart{position:absolute;z-index:17;transform:translate(-50%,-50%);pointer-events:none;line-height:1}
+#vcur{position:absolute;z-index:60;font-size:64px;transform:translate(-30%,-10%);pointer-events:none;filter:drop-shadow(0 0 6px #3be8ff) drop-shadow(0 4px 4px rgba(0,0,0,.4))}
+.demo{display:flex;align-items:flex-end;z-index:95}
+.demo span{margin-left:-30%;line-height:1}
 /* Sprechblase */
 #bub{position:absolute;z-index:12;background:#fff;border-radius:34px;padding:14px 16px;display:flex;gap:10px;align-items:center;box-shadow:0 8px 0 rgba(0,0,0,.12),0 14px 30px rgba(0,0,0,.2);transform-origin:100% 100%;transition:transform .3s cubic-bezier(.3,1.6,.5,1),opacity .2s}
 #bub.off{transform:scale(0);opacity:0;pointer-events:none}
@@ -231,12 +256,12 @@ const TOOLS = /*@@TOOLS*/[
 ]/*@@TOOLS-END*/;
 // Schritte: t = Werkzeug, a = Anker, m = Art (tap/rub/hold), pose = sad|aah
 const ILL = {
- aua:      { icon: 4, steps: [{ t: 3, a: "paw", m: "rub", s: "watte" }, { t: 4, a: "paw", m: "tap", s: "pflaster" }] },
+ aua:      { icon: 4, steps: [{ t: 3, a: "paw", m: "rub", s: "watte" }, { t: 4, a: "paw", m: "tap", s: "pflaster", aim: 1 }] },
  fieber:   { icon: 0, steps: [{ t: 0, a: "mouth", m: "hold", pose: "aah", s: "thermo" }, { t: 1, a: "mouth", m: "tap", pose: "aah", s: "medizin" }, { t: 2, a: "head", m: "tap", s: "kuehl" }] },
  zaehne:   { icon: 6, steps: [{ t: 6, a: "mouth", m: "rub", pose: "aah", s: "zahnb" }, { t: 7, a: "mouth", m: "tap", pose: "aah", s: "wasser" }] },
  schnupfen:{ icon: 8, steps: [{ t: 8, a: "nose", m: "rub", s: "tuch" }, { t: 9, a: "mouth", m: "tap", pose: "aah", s: "tee" }] },
  matsch:   { icon: 10, steps: [{ t: 10, a: "belly", m: "rub", s: "schwamm", big: 1 }, { t: 11, a: "belly", m: "rub", s: "foehn", big: 1 }] },
- splitter: { icon: 5, steps: [{ t: 5, a: "paw", m: "hold", s: "pinzette" }, { t: 4, a: "paw", m: "tap", s: "pflaster" }] },
+ splitter: { icon: 5, steps: [{ t: 5, a: "paw", m: "hold", s: "pinzette" }, { t: 4, a: "paw", m: "tap", s: "pflaster", aim: 1 }] },
  bauchweh: { icon: 13, steps: [{ t: 12, a: "belly", m: "hold", s: "stetho" }, { t: 13, a: "belly", m: "tap", s: "waerm" }] }
 };
 const ILL_ORDER = ["aua", "fieber", "zaehne", "schnupfen", "matsch", "splitter", "bauchweh"];
@@ -253,9 +278,29 @@ const T = /*@@T*/{
  back:"Hallo! Schön, dass du wieder da bist! Die Tiere warten schon.",
  first:"Ein Patient! In der Sprechblase siehst du, was ihm fehlt.",
  howTool:"Tippe unten auf das richtige Werkzeug.",
- howSpot:"Jetzt tippe auf das Tier, da wo es leuchtet!",
- howRub:"Jetzt reibe mit dem Finger über die leuchtende Stelle!",
- howHold:"Jetzt halte den Finger auf die leuchtende Stelle!",
+ dragHint:"Zieh das Werkzeug mit dem Finger zum Tier!",
+ thermoHold:"Halte das Thermometer fest, bis es piept!",
+ holdOn:"Weiter festhalten!",
+ pour:"Halte gedrückt und gieß Medizin in den Löffel. Lass los, wenn er voll ist!",
+ tooMuch:"Hoppla, zu viel! Nochmal.",
+ more:"Noch ein bisschen mehr!",
+ feed:"Jetzt zieh den Löffel zum Mund!",
+ yum:"Mmh, lecker!",
+ sweat:"Wisch die Schweißtropfen weg!",
+ dirt:"Reib den Schmutz weg!",
+ aim:"Genau auf die Wunde!",
+ smooth:"Streich das Pflaster schön glatt!",
+ pull:"Halt den Splitter fest und zieh ihn raus!",
+ pullMore:"Fester ziehen!",
+ brush:"Putz alle Bazillen weg!",
+ gargle:"Halte gedrückt zum Gurgeln!",
+ blow:"Tipp dreimal auf die Nase zum Schnäuzen!",
+ steam:"Der Tee ist heiß! Tipp auf den Dampf zum Pusten!",
+ mud:"Schrubb alle Matschflecken weg!",
+ dry:"Föhn alle Wassertropfen weg!",
+ search:"Such mit dem Hörrohr das Herz! Wo klopft es am lautesten?",
+ found:"Da ist es! Bumm, bumm, bumm!",
+ warmHold:"Halte die Wärmflasche schön fest!",
  wrong:["Hmm, das brauchen wir jetzt nicht. Schau mal, was leuchtet!","Probier ein anderes Werkzeug!"],
  good:["Super!","Toll gemacht!","Prima!","Sehr gut!"],
  aua:"Aua, eine Schramme! Erst sauber machen, dann kommt ein Pflaster drauf.",
@@ -295,7 +340,7 @@ const T = /*@@T*/{
 }/*@@T-END*/;
 
 /* ================= Stimme & Ton ================= */
-const VOX = /*@@VOX*/{"Hallo! Ich bin Doktor Mia, die Tierärztin. Hilfst du mir in meiner Praxis? Die Kuscheltiere brauchen uns!": "c1a0d9e392", "Hallo! Schön, dass du wieder da bist! Die Tiere warten schon.": "609931a524", "Ein Patient! In der Sprechblase siehst du, was ihm fehlt.": "b9737d07e9", "Tippe unten auf das richtige Werkzeug.": "ad5e79b30e", "Jetzt tippe auf die leuchtende Stelle!": "399ba00ae0", "Reibe mit dem Finger über die leuchtende Stelle!": "4b7dcaa4a8", "Halte den Finger auf die leuchtende Stelle!": "70852003b4", "Hmm, das brauchen wir jetzt nicht. Schau mal, was leuchtet!": "30a2d10855", "Probier ein anderes Werkzeug!": "8b7c82155f", "Super!": "81c56fe8d3", "Toll gemacht!": "f8cd792784", "Prima!": "a9be75b37e", "Sehr gut!": "d4075881b3", "Aua, eine Schramme! Erst sauber machen, dann kommt ein Pflaster drauf.": "b7d8bed3c3", "Oh je, du bist ja ganz heiß! Wir messen Fieber.": "eac1b6ef48", "Oh, da sind Bazillen auf den Zähnen! Die putzen wir weg.": "4bee65d5ad", "Hatschi! Da hat jemand Schnupfen. Erst mal Nase putzen!": "08f657d0f1", "Huch, du bist ja ganz voller Matsch! Wir waschen dich sauber.": "2d9ec856b5", "Autsch, ein Splitter in der Pfote! Den ziehen wir ganz vorsichtig raus.": "ac61d7c370", "Oh, Bauchweh? Ich höre mal mit dem Hörrohr.": "39de36bb6b", "Das Fieberthermometer in den Mund. Sag Aaah!": "0c4c78b313", "Oh, Fieber! Jetzt gibt es Medizin.": "6742be18ff", "Ein Löffel Medizin. Lecker!": "a17e317065", "Und ein kühles Kissen auf die Stirn.": "cf2ac295b2", "Mit der Watte sauber machen.": "5965732494", "Jetzt das Pflaster drauf!": "5a6d5e49a7", "Mit der Pinzette ganz vorsichtig ziehen!": "173580e3c9", "Schrubb, schrubb! Zähne putzen!": "5e4d6d4f7e", "Und jetzt den Mund ausspülen.": "2407a61b52", "Schön die Nase putzen!": "4283981b64", "Ein warmer Tee hilft gegen Schnupfen.": "13bce250da", "Mit dem Schwamm den Matsch abwaschen!": "7b0a2ee08c", "Sticker": "5afc261651", "Kuschelbett": "26ecbd3f79", "Rutsche": "41316e754f", "Ball": "253e6fce7e", "Spielzeugkiste": "a716b9b6b1", "Teppich": "a24195cba5", "Sternlampe": "3d496e2b3a", "Pflanze": "c420408ffb", "Bücherregal": "43e7c54771", "Ton": "cdc4c52646", "Geschenk": "f266c91de5", "Tier-Album": "a0f6aae23b", "Behandeln": "1e36feb44a", "Kuschelzimmer": "1859b939e9", "Zurück": "fee0c60c79", "Weiter": "96d1e726f4", "Feierabend! Zwei Sterne! Toll geholfen!": "871e4ff2b7", "Feierabend! Ein Stern! Morgen klappt es noch besser!": "54bf7637b3", "Du hast ein neues Werkzeug!": "d069791d76", "Morgen kommt ein neuer Patient!": "b5f9807d06", "Notfall! Schnell, ein Patient braucht Hilfe! Dafür gibt es doppelt Münzen!": "42e27b1a2e", "Ein Geschenk für dich! Tippe auf das Päckchen!": "4750207ae7", "Juhu! Münzen für dich!": "83114195c5", "Das ist das Kuschelzimmer. Hier spielen alle Tiere, die du gesund gemacht hast. Kauf schöne Sachen für das Zimmer!": "83bf88f263", "Hier ist noch niemand. Mach ein Tier gesund!": "312a2215c8", "Juhu, das ist schön!": "7217738da7", "Dafür brauchst du noch mehr Münzen. Hilf weiter in der Praxis!": "de8991b9e9", "Das ist dein Tier-Album. Hier siehst du alle Patienten.": "dd0219c9b7", "Dieses Tier war noch nicht bei dir.": "25a1de56e9", "Hoppel": "dd9777da0e", "Hallo Hoppel! Was fehlt dir denn?": "6440efb52b", "Wuffi": "e9fee26ce8", "Hallo Wuffi! Was fehlt dir denn?": "0e1017a2de", "Quaki": "4aa4c69ec6", "Hallo Quaki! Was fehlt dir denn?": "c41aa0ed51", "Rosa": "95771f4818", "Hallo Rosa! Was fehlt dir denn?": "a5c3853eb7", "Bambu": "363ff0714b", "Hallo Bambu! Was fehlt dir denn?": "70f07ddb74", "Flinki": "ddc3bdf9b0", "Hallo Flinki! Was fehlt dir denn?": "9a21240bdc", "Trööti": "9fc2d2db16", "Hallo Trööti! Was fehlt dir denn?": "3a38fbcbdc", "Wolke": "7ba0ad4f46", "Hallo Wolke! Was fehlt dir denn?": "ede518f137", "Glitzer": "996615cb6c", "Hallo Glitzer! Was fehlt dir denn?": "e44f6ef49b", "Hüpfi": "14e4ee40cc", "Hallo Hüpfi! Was fehlt dir denn?": "ed0570fd13", "Fieberthermometer": "b9a2cf72d0", "Medizin": "fb17b73d69", "Kühlkissen": "1f2c2e6f5e", "Watte": "a12a280041", "Pflaster": "df15d001e6", "Pinzette": "7ed5991057", "Zahnbürste": "df2b74a210", "Wasser": "f66a03f8f3", "Taschentuch": "77175aa9c1", "Tee": "46eb8fae4b", "Schwamm": "5a182952a5", "Föhn": "a6b8e11fbe", "Hörrohr": "87214b71e8", "Wärmflasche": "c4cb2609cf", "Lutscher": "6c7d14f051", "Jetzt trocken föhnen!": "43b27908c4", "Mal hören. Bumm, bumm, bumm.": "6f5dcf2171", "Eine warme Wärmflasche auf den Bauch.": "5acce33aea", "Geschafft! Such eine Belohnung aus: Lutscher oder Sticker?": "4556854d3a", "Hurra, wieder ganz gesund!": "1fb6006eb7", "Gesund und munter!": "eedd3cf563", "Toll! Das Tierchen ist wieder fit!": "92d62390cf", "Feierabend! Drei Sterne! Du bist ein super Tierarzt!": "646447a2dc", "Jetzt tippe auf das Tier, da wo es leuchtet!": "6bd15ec2b8", "Jetzt reibe mit dem Finger über die leuchtende Stelle!": "ca892b541c", "Jetzt halte den Finger auf die leuchtende Stelle!": "1ef041bf5c", "Oh, Bauchweh? Das schauen wir uns genau an.": "bf0eedec1d", "Nimm das Fieberthermometer! Das kommt in den Mund.": "5d8d50d939", "Oh ja, Fieber!": "5359bf7e0e", "Jetzt gib einen Löffel Medizin!": "f826704ba5", "Jetzt leg das Kühlkissen auf die Stirn!": "f338b56699", "Nimm die Watte und mach die Schramme sauber!": "b3388c8de6", "Jetzt klebe das Pflaster drauf!": "abdf9c6017", "Nimm die Pinzette und zieh den Splitter vorsichtig raus!": "d45ea730a4", "Nimm die Zahnbürste! Schrubb, schrubb!": "50d74065d6", "Jetzt gib ein Glas Wasser zum Ausspülen!": "a890840ca9", "Nimm das Taschentuch und putz die Nase!": "0884d38db8", "Gib einen warmen Tee!": "0806db4de0", "Nimm den Schwamm und wasch den Matsch ab!": "360bdf158f", "Jetzt nimm den Föhn und föhne das Fell trocken!": "3d5324855a", "Nimm das Hörrohr und hör auf den Bauch!": "688239a155", "Leg die Wärmflasche auf den Bauch!": "6b36300387"}/*@@VOX-END*/;
+const VOX = /*@@VOX*/{"Hallo! Ich bin Doktor Mia, die Tierärztin. Hilfst du mir in meiner Praxis? Die Kuscheltiere brauchen uns!": "c1a0d9e392", "Hallo! Schön, dass du wieder da bist! Die Tiere warten schon.": "609931a524", "Ein Patient! In der Sprechblase siehst du, was ihm fehlt.": "b9737d07e9", "Tippe unten auf das richtige Werkzeug.": "ad5e79b30e", "Jetzt tippe auf die leuchtende Stelle!": "399ba00ae0", "Reibe mit dem Finger über die leuchtende Stelle!": "4b7dcaa4a8", "Halte den Finger auf die leuchtende Stelle!": "70852003b4", "Hmm, das brauchen wir jetzt nicht. Schau mal, was leuchtet!": "30a2d10855", "Probier ein anderes Werkzeug!": "8b7c82155f", "Super!": "81c56fe8d3", "Toll gemacht!": "f8cd792784", "Prima!": "a9be75b37e", "Sehr gut!": "d4075881b3", "Aua, eine Schramme! Erst sauber machen, dann kommt ein Pflaster drauf.": "b7d8bed3c3", "Oh je, du bist ja ganz heiß! Wir messen Fieber.": "eac1b6ef48", "Oh, da sind Bazillen auf den Zähnen! Die putzen wir weg.": "4bee65d5ad", "Hatschi! Da hat jemand Schnupfen. Erst mal Nase putzen!": "08f657d0f1", "Huch, du bist ja ganz voller Matsch! Wir waschen dich sauber.": "2d9ec856b5", "Autsch, ein Splitter in der Pfote! Den ziehen wir ganz vorsichtig raus.": "ac61d7c370", "Oh, Bauchweh? Ich höre mal mit dem Hörrohr.": "39de36bb6b", "Das Fieberthermometer in den Mund. Sag Aaah!": "0c4c78b313", "Oh, Fieber! Jetzt gibt es Medizin.": "6742be18ff", "Ein Löffel Medizin. Lecker!": "a17e317065", "Und ein kühles Kissen auf die Stirn.": "cf2ac295b2", "Mit der Watte sauber machen.": "5965732494", "Jetzt das Pflaster drauf!": "5a6d5e49a7", "Mit der Pinzette ganz vorsichtig ziehen!": "173580e3c9", "Schrubb, schrubb! Zähne putzen!": "5e4d6d4f7e", "Und jetzt den Mund ausspülen.": "2407a61b52", "Schön die Nase putzen!": "4283981b64", "Ein warmer Tee hilft gegen Schnupfen.": "13bce250da", "Mit dem Schwamm den Matsch abwaschen!": "7b0a2ee08c", "Sticker": "5afc261651", "Kuschelbett": "26ecbd3f79", "Rutsche": "41316e754f", "Ball": "253e6fce7e", "Spielzeugkiste": "a716b9b6b1", "Teppich": "a24195cba5", "Sternlampe": "3d496e2b3a", "Pflanze": "c420408ffb", "Bücherregal": "43e7c54771", "Ton": "cdc4c52646", "Geschenk": "f266c91de5", "Tier-Album": "a0f6aae23b", "Behandeln": "1e36feb44a", "Kuschelzimmer": "1859b939e9", "Zurück": "fee0c60c79", "Weiter": "96d1e726f4", "Feierabend! Zwei Sterne! Toll geholfen!": "871e4ff2b7", "Feierabend! Ein Stern! Morgen klappt es noch besser!": "54bf7637b3", "Du hast ein neues Werkzeug!": "d069791d76", "Morgen kommt ein neuer Patient!": "b5f9807d06", "Notfall! Schnell, ein Patient braucht Hilfe! Dafür gibt es doppelt Münzen!": "42e27b1a2e", "Ein Geschenk für dich! Tippe auf das Päckchen!": "4750207ae7", "Juhu! Münzen für dich!": "83114195c5", "Das ist das Kuschelzimmer. Hier spielen alle Tiere, die du gesund gemacht hast. Kauf schöne Sachen für das Zimmer!": "83bf88f263", "Hier ist noch niemand. Mach ein Tier gesund!": "312a2215c8", "Juhu, das ist schön!": "7217738da7", "Dafür brauchst du noch mehr Münzen. Hilf weiter in der Praxis!": "de8991b9e9", "Das ist dein Tier-Album. Hier siehst du alle Patienten.": "dd0219c9b7", "Dieses Tier war noch nicht bei dir.": "25a1de56e9", "Hoppel": "dd9777da0e", "Hallo Hoppel! Was fehlt dir denn?": "6440efb52b", "Wuffi": "e9fee26ce8", "Hallo Wuffi! Was fehlt dir denn?": "0e1017a2de", "Quaki": "4aa4c69ec6", "Hallo Quaki! Was fehlt dir denn?": "c41aa0ed51", "Rosa": "95771f4818", "Hallo Rosa! Was fehlt dir denn?": "a5c3853eb7", "Bambu": "363ff0714b", "Hallo Bambu! Was fehlt dir denn?": "70f07ddb74", "Flinki": "ddc3bdf9b0", "Hallo Flinki! Was fehlt dir denn?": "9a21240bdc", "Trööti": "9fc2d2db16", "Hallo Trööti! Was fehlt dir denn?": "3a38fbcbdc", "Wolke": "7ba0ad4f46", "Hallo Wolke! Was fehlt dir denn?": "ede518f137", "Glitzer": "996615cb6c", "Hallo Glitzer! Was fehlt dir denn?": "e44f6ef49b", "Hüpfi": "14e4ee40cc", "Hallo Hüpfi! Was fehlt dir denn?": "ed0570fd13", "Fieberthermometer": "b9a2cf72d0", "Medizin": "fb17b73d69", "Kühlkissen": "1f2c2e6f5e", "Watte": "a12a280041", "Pflaster": "df15d001e6", "Pinzette": "7ed5991057", "Zahnbürste": "df2b74a210", "Wasser": "f66a03f8f3", "Taschentuch": "77175aa9c1", "Tee": "46eb8fae4b", "Schwamm": "5a182952a5", "Föhn": "a6b8e11fbe", "Hörrohr": "87214b71e8", "Wärmflasche": "c4cb2609cf", "Lutscher": "6c7d14f051", "Jetzt trocken föhnen!": "43b27908c4", "Mal hören. Bumm, bumm, bumm.": "6f5dcf2171", "Eine warme Wärmflasche auf den Bauch.": "5acce33aea", "Geschafft! Such eine Belohnung aus: Lutscher oder Sticker?": "4556854d3a", "Hurra, wieder ganz gesund!": "1fb6006eb7", "Gesund und munter!": "eedd3cf563", "Toll! Das Tierchen ist wieder fit!": "92d62390cf", "Feierabend! Drei Sterne! Du bist ein super Tierarzt!": "646447a2dc", "Jetzt tippe auf das Tier, da wo es leuchtet!": "6bd15ec2b8", "Jetzt reibe mit dem Finger über die leuchtende Stelle!": "ca892b541c", "Jetzt halte den Finger auf die leuchtende Stelle!": "1ef041bf5c", "Oh, Bauchweh? Das schauen wir uns genau an.": "bf0eedec1d", "Nimm das Fieberthermometer! Das kommt in den Mund.": "5d8d50d939", "Oh ja, Fieber!": "5359bf7e0e", "Jetzt gib einen Löffel Medizin!": "f826704ba5", "Jetzt leg das Kühlkissen auf die Stirn!": "f338b56699", "Nimm die Watte und mach die Schramme sauber!": "b3388c8de6", "Jetzt klebe das Pflaster drauf!": "abdf9c6017", "Nimm die Pinzette und zieh den Splitter vorsichtig raus!": "d45ea730a4", "Nimm die Zahnbürste! Schrubb, schrubb!": "50d74065d6", "Jetzt gib ein Glas Wasser zum Ausspülen!": "a890840ca9", "Nimm das Taschentuch und putz die Nase!": "0884d38db8", "Gib einen warmen Tee!": "0806db4de0", "Nimm den Schwamm und wasch den Matsch ab!": "360bdf158f", "Jetzt nimm den Föhn und föhne das Fell trocken!": "3d5324855a", "Nimm das Hörrohr und hör auf den Bauch!": "688239a155", "Leg die Wärmflasche auf den Bauch!": "6b36300387", "Zieh das Werkzeug mit dem Finger zum Tier!": "b7566f9c64", "Halte das Thermometer fest, bis es piept!": "3278f6628b", "Weiter festhalten!": "2667ba6b59", "Halte gedrückt und gieß Medizin in den Löffel. Lass los, wenn er voll ist!": "811a9c7fef", "Hoppla, zu viel! Nochmal.": "58007d7edd", "Noch ein bisschen mehr!": "8d997f1ffc", "Jetzt zieh den Löffel zum Mund!": "1cae53606d", "Mmh, lecker!": "78ff0501c5", "Wisch die Schweißtropfen weg!": "9894369f8b", "Reib den Schmutz weg!": "6311e26325", "Genau auf die Wunde!": "ecf148c9d7", "Streich das Pflaster schön glatt!": "7a311ccd6c", "Halt den Splitter fest und zieh ihn raus!": "17b97f6a03", "Fester ziehen!": "5bb18879d3", "Putz alle Bazillen weg!": "27770fe1b9", "Halte gedrückt zum Gurgeln!": "96427c02a7", "Tipp dreimal auf die Nase zum Schnäuzen!": "fca8f4f218", "Der Tee ist heiß! Tipp auf den Dampf zum Pusten!": "d302ccbb8f", "Schrubb alle Matschflecken weg!": "f40e1ea3e1", "Föhn alle Wassertropfen weg!": "62f121610d", "Such mit dem Hörrohr das Herz! Wo klopft es am lautesten?": "07aea1f47b", "Da ist es! Bumm, bumm, bumm!": "6d76b85e53", "Halte die Wärmflasche schön fest!": "f71fca46d1"}/*@@VOX-END*/;
 let soundOn = true; try { soundOn = localStorage.getItem("pd_snd") !== "0"; } catch (e) {}
 let vq = [], vBusy = false, vCur = null, vTok = 0;
 const docEl = $("#doc");
@@ -395,7 +440,7 @@ function docPose(p) { docEl.querySelector("img").src = `assets/doc_${p}.webp?v=1
 
 /* ================= Bildschirme ================= */
 let cur = "title", runTok = 0, greeted = 0, unlocked = false, pend = null;
-function show(id) { $$(".scr").forEach(s => s.hidden = s.id !== id); cur = id; $("#ov").hidden = true; runTok++; $("#toolCur").hidden = true; }
+function show(id) { abortPh(); $$(".scr").forEach(s => s.hidden = s.id !== id); cur = id; $("#ov").hidden = true; runTok++; $("#toolCur").hidden = true; }
 $$(".back").forEach(b => b.onclick = () => goTitle());
 $("#kHome").onclick = () => goTitle();
 function greet(t) { if (unlocked) setTimeout(() => { if (cur === "title") say(t); }, 400); else pend = t; }
@@ -425,7 +470,7 @@ function buildTray() {
   list.forEach(t => {
     const b = document.createElement("button"); b.className = "tool"; b.dataset.t = t; b.setAttribute("aria-label", TOOLS[t].n);
     if ((S.newTools || []).includes(t)) b.classList.add("new");
-    b.innerHTML = `<img src="assets/tool_${t}.webp?v=1" alt="">`; dragTool(t, b); trayEl.appendChild(b);
+    b.innerHTML = `<img src="assets/tool_${t}.webp?v=1" alt="">`; trayEl.appendChild(b);
   });
   const n = list.length, per = PORT ? Math.ceil(n / 2) : n, size = Math.min(PORT ? 128 : 104, Math.floor((SW - 40 - (per - 1) * 10) / per));
   $$(".tool").forEach(b => { b.style.width = b.style.height = size + "px"; });
@@ -470,6 +515,7 @@ async function nextPatient(tok) {
   if (tok !== runTok) return;
   if (K.qi >= K.queue.length) return endDay(tok);
   $$("#prog i").forEach((e, i) => e.classList.toggle("now", i === K.qi));
+  abortPh(); hideCur();
   const { p, ill } = K.queue[K.qi]; K.pat = p; K.ill = ill; K.step = -1; K.tool = -1; K.errs = 0; K.busy = true; K.wrongs = 0;
   clearOvs(); removeSpot(); $$(".tool").forEach(b => b.classList.remove("sel", "hint"));
   sizePat(); setPose("sad"); patEl.hidden = false; bubEl.classList.add("off");
@@ -495,107 +541,377 @@ async function nextPatient(tok) {
   nextStep(tok);
 }
 function sneeze() { if (cur !== "clinic") return; sfx("sneeze"); patEl.classList.add("sneeze"); const r = rectOf(patEl); burst(r.x, r.y - r.h * .1, ["💦", "🤧"], 6, { size: 34, max: 110 }); setTimeout(() => patEl.classList.remove("sneeze"), 650); }
+/* ================= Behandlung: Werkzeug ziehen + Minispiele ================= */
+var H = null, phTok = 0;
+const IN = { down: false, x: 0, y: 0, off: 0, type: "mouse" };
+const hyp = (a, b, x, y) => Math.hypot(a - x, b - y), clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const stXY = (cx, cy) => { const r = stage.getBoundingClientRect(); return [(cx - r.left) / SC, (cy - r.top) / SC]; };
+const toClient = (x, y) => { const r = stage.getBoundingClientRect(); return [r.left + x * SC, r.top + y * SC]; };
+const pbox = () => ({ l: parseFloat(patEl.style.left), t: parseFloat(patEl.style.top), w: parseFloat(patEl.style.width), h: parseFloat(patEl.style.height) });
+function ap(key, dx = 0, dy = 0) { const b = pbox(), a = A(K.pat, K.pose === "happy" ? "sad" : K.pose, key); return [b.l + b.w * (a[0] + dx) / 100, b.t + b.h * (a[1] + dy) / 100]; }
+function onPat(x, y, pad = 30) { if (patEl.hidden) return false; const b = pbox(); return x > b.l - pad && x < b.l + b.w + pad && y > b.t - pad && y < b.t + b.h + pad; }
+function elXY(el) { const r = el.getBoundingClientRect(); return stXY(r.left + r.width / 2, r.top + r.height / 2); }
+const tp = () => [IN.x, IN.y - IN.off];   // Werkzeugspitze (am Handy etwas über dem Finger, damit man sie sieht)
+const ovs = k => $$(`#pat .ovl[data-k^="${k}"]`);
+const goneEl = d => { if (d) d.classList.add("gone"); };
+function addEm(key, ch, anchor, px, dx = 0, dy = 0, cls = "") { const d = document.createElement("div"); d.className = "ovl em " + cls; d.dataset.k = key; d.dataset.a = anchor; d.dataset.dx = dx; d.dataset.dy = dy; d.innerHTML = `<span style="font-size:${px}px">${ch}</span>`; patEl.querySelector(".ovs").appendChild(d); positionOvs(); return d; }
+
+/* --- Eingabe (Finger, Maus, Controller) --- */
+function inDown(cx, cy, type, target) {
+  if (cur !== "clinic" || !$("#ov").hidden) return false;
+  if (target && target.closest && target.closest("#hud,#bub")) return false;
+  if (vBusy) { vq = []; stopVoice(); }                 // Antippen unterbricht Doktor Mia
+  const [x, y] = stXY(cx, cy); Object.assign(IN, { down: true, x, y, type, off: type === "touch" ? 70 : 0 });
+  if (H) { if (H.rem) idle(H.rem, H.tok); H.down && H.down(x, y, target); }
+  return true;
+}
+function inMove(cx, cy) { if (cur !== "clinic") return; const [x, y] = stXY(cx, cy); IN.x = x; IN.y = y; if (H && H.move) H.move(x, y); }
+function inUp(cx, cy) { if (!IN.down) return; IN.down = false; const [x, y] = stXY(cx, cy); IN.x = x; IN.y = y; if (H && H.up) H.up(x, y); }
+const clinicEl = $("#clinic");
+clinicEl.addEventListener("pointerdown", e => { if (inDown(e.clientX, e.clientY, e.pointerType, e.target)) { e.preventDefault(); try { clinicEl.setPointerCapture(e.pointerId); } catch (_) {} } });
+clinicEl.addEventListener("pointermove", e => inMove(e.clientX, e.clientY));
+clinicEl.addEventListener("pointerup", e => inUp(e.clientX, e.clientY));
+clinicEl.addEventListener("pointercancel", e => inUp(e.clientX, e.clientY));
+
+/* Controller: Stick bewegt eine Hand, A = Finger drücken/halten */
+const VC = { x: 0, y: 0, el: null };
+function padGame(p) {
+  const vis = cur === "clinic" && $("#ov").hidden && !$("#bub:not(.off) .rw");
+  if (p.up("a") && IN.down && (!vis || !H)) { const [cx, cy] = toClient(VC.x, VC.y); inUp(cx, cy); }
+  if (!vis) { if (VC.el) VC.el.hidden = true; return false; }
+  if (!H) { if (VC.el) VC.el.hidden = true; if (p.hit("a") && vBusy) { vq = []; stopVoice(); } return !!K.busy; }
+  if (!VC.el) { VC.el = document.createElement("div"); VC.el.id = "vcur"; VC.el.textContent = "👆"; stage.appendChild(VC.el); VC.x = SW / 2; VC.y = SH - L.trayH / 2; }
+  VC.el.hidden = false;
+  let mx = p.lx || 0, my = p.ly || 0; if (!mx && !my) { mx = p.dx || 0; my = p.dy || 0; }
+  const sp = (PORT ? 700 : 820) * (p.dt || .016);
+  if (mx || my) { VC.x = clamp(VC.x + mx * sp, 10, SW - 10); VC.y = clamp(VC.y + my * sp, 100, SH - 10); }
+  VC.el.style.left = VC.x + "px"; VC.el.style.top = VC.y + "px";
+  const [cx, cy] = toClient(VC.x, VC.y);
+  if (p.hit("a")) { VC.el.hidden = true; const t = document.elementFromPoint(cx, cy); VC.el.hidden = false; inDown(cx, cy, "pad", t); }
+  else if (IN.down && (mx || my)) inMove(cx, cy);
+  if (p.up("a")) inUp(cx, cy);
+  return true;
+}
+
+/* --- Phasen --- */
+function phase(setup) {
+  return new Promise(res => {
+    const tok = ++phTok; let fin = false;
+    const done = v => { if (fin || tok !== phTok) return; fin = true; H = null; clearTimeout(K.idleT); res(v); };
+    const h = setup(done) || {}; h.tok = tok; H = fin ? null : h; if (h.rem && !fin) idle(h.rem, tok, 7000);
+  });
+}
+function idle(fn, tok, ms = 8000) { clearTimeout(K.idleT); K.idleT = setTimeout(() => { if (tok !== phTok || cur !== "clinic") return; if (!IN.down && !vBusy) fn(); idle(fn, tok); }, ms); }
+function abortPh() { phTok++; H = null; clearTimeout(K.idleT); IN.down = false; }
+
+/* Werkzeug in der Hand (folgt dem Finger) */
+function showCur(t, x, y, sz) { const cu = $("#toolCur"); const src = `assets/tool_${t}.webp?v=1`; if (cu.dataset.src !== src) { cu.src = src; cu.dataset.src = src; } cu.style.width = (sz || (PORT ? 150 : 130)) + "px"; cu.style.left = x + "px"; cu.style.top = y + "px"; cu.hidden = false; }
+function hideCur() { const cu = $("#toolCur"); cu.hidden = true; cu.classList.remove("work"); }
+/* Leuchtring mit Fortschritt + Zeigehand */
+function ring(x, y, sz = 150) { removeSpot(); const s = document.createElement("div"); s.id = "spot"; Object.assign(s.style, { left: x + "px", top: y + "px", width: sz + "px", height: sz + "px" }); s.innerHTML = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" stroke-dasharray="276.5" stroke-dashoffset="276.5"/></svg><div id="hand">👆</div>`; clinicEl.appendChild(s); return s; }
+function ringP(p) { const c = $("#spot circle"); if (c) c.style.strokeDashoffset = 276.5 * (1 - p); }
+function hideHand() { const h = $("#hand"); if (h) h.remove(); }
+function removeSpot() { const s = $("#spot"); if (s) s.remove(); K.spotA = null; }
+function tag(x, y, txt) { const d = document.createElement("div"); d.className = "tag"; d.textContent = txt; Object.assign(d.style, { left: x + "px", top: y + "px" }); clinicEl.appendChild(d); return d; }
+
+function hintTool() { const st = ILL[K.ill] && ILL[K.ill].steps[K.step]; if (!st) return; const b = $(`.tool[data-t="${st.t}"]`); if (b) b.classList.add("hint"); }
+// zeigt einmal vor: Werkzeug fliegt mit Hand zum Tier
+function demoDrag(t) {
+  const b = $(`.tool[data-t="${t}"]`); if (!b || patEl.hidden) return; const f = rectOf(b), to = rectOf(patEl);
+  const d = document.createElement("div"); d.className = "fly demo"; const sz = 110 * SC; d.innerHTML = `<img src="assets/tool_${t}.webp?v=1" style="width:${sz}px;height:${sz}px;object-fit:contain"><span style="font-size:${60 * SC}px">👆</span>`; document.body.appendChild(d);
+  d.animate([{ transform: `translate(${f.x - sz / 2}px,${f.y - sz / 2}px)`, opacity: 0 }, { transform: `translate(${f.x - sz / 2}px,${f.y - sz / 2}px)`, opacity: 1, offset: .15 }, { transform: `translate(${to.x - sz / 2}px,${to.y - sz / 2}px)`, opacity: 1, offset: .8 }, { transform: `translate(${to.x - sz / 2}px,${to.y - sz / 2}px)`, opacity: 0 }], { duration: 1500, easing: "ease-in-out" }).onfinish = () => d.remove();
+}
+function flyBack(t, b, x, y) { hideCur(); const [cx, cy] = toClient(x, y); flyImg(`assets/tool_${t}.webp?v=1`, { x: cx, y: cy }, rectOf(b), 320, 110); }
+function wrongTool(t, b, count) {
+  if (count) { K.errs++; K.dayErrs++; } K.wrongs++;
+  b.classList.remove("no"); void b.offsetWidth; b.classList.add("no"); sfx("tap");
+  say(TOOLS[t].n, { now: true }); say(T.wrong); hintTool();
+}
+
+/* 1) Werkzeug zum Tier ziehen */
+function bring(st) {
+  return phase(done => {
+    let dr = null;
+    const tray = (x, y) => { const [cx, cy] = toClient(x, y); return $$(".tool").find(b => { const r = b.getBoundingClientRect(); return cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom; }); };
+    return {
+      rem: () => { hintTool(); demoDrag(st.t); say(T[st.s]); },
+      down(x, y, el) {
+        const b = (el && el.closest && el.closest(".tool")) || tray(x, y); if (!b) { if (onPat(x, y, 0)) { hintTool(); demoDrag(st.t); say(T.dragHint, { now: true }); } return; }
+        if (b.classList.contains("new")) { b.classList.remove("new"); S.newTools = (S.newTools || []).filter(z => z !== +b.dataset.t); save(); }
+        dr = { t: +b.dataset.t, b, sx: x, sy: y, mv: false }; b.classList.add("lift");
+      },
+      move(x, y) {
+        if (!dr) return;
+        if (!dr.mv && hyp(x, y, dr.sx, dr.sy) > 12) { dr.mv = true; sfx("pop", .4); }
+        if (dr.mv) { const [px, py] = tp(); showCur(dr.t, px, py); }
+      },
+      up() {
+        if (!dr) return; const d = dr; dr = null; d.b.classList.remove("lift");
+        if (!d.mv) { hideCur(); if (d.t !== st.t) wrongTool(d.t, d.b, false); else { say(T.dragHint, { now: true }); demoDrag(d.t); } return; }
+        const [px, py] = tp();
+        if (!onPat(px, py, 40)) { flyBack(d.t, d.b, px, py); return; }
+        if (d.t !== st.t) { flyBack(d.t, d.b, px, py); wrongTool(d.t, d.b, true); return; }
+        if (st.aim) { const [ax, ay] = ap(st.a); if (hyp(px, py, ax, ay) > 90) { flyBack(d.t, d.b, px, py); say(T.aim, { now: true }); const r = ring(ax, ay, 130); setTimeout(() => { if ($("#spot") === r) r.remove(); }, 1800); return; } }
+        d.b.classList.remove("hint"); $$(".tool").forEach(z => z.classList.toggle("sel", z === d.b)); sfx("pop", .7); hideCur(); done(true);
+      }
+    };
+  });
+}
+
+/* Festhalten: Finger aufs Tier, bis der Ring voll ist */
+function holdPh(o) {
+  return phase(done => {
+    let p = 0, last = performance.now(), warned = 0; ring(o.x, o.y, o.size || 160);
+    const h = {
+      rem: () => say(o.say),
+      down(x, y) { if (onPat(x, y, 20) || hyp(x, y, o.x, o.y) < 120) { hideHand(); o.onDown && o.onDown(); } },
+      up() { o.onUp && o.onUp(); if (p > .04 && p < 1 && o.rel && Date.now() - warned > 2500) { warned = Date.now(); say(o.rel, { now: true }); } }
+    };
+    const loop = now => {
+      if (H !== h) return; const dt = Math.min(60, now - last); last = now;
+      if (H === h && IN.down && (onPat(IN.x, IN.y, 20) || hyp(IN.x, IN.y, o.x, o.y) < 120)) {
+        p = Math.min(1, p + dt / o.dur); ringP(p); o.onP && o.onP(p, dt);
+        if (p >= 1) { removeSpot(); o.onUp && o.onUp(); done(); return; }
+      }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+    return h;
+  });
+}
+/* Reiben/Schrubben: Werkzeug über alle Ziele bewegen */
+function scrubPh(o) {
+  return phase(done => {
+    const tg = o.targets.map(el => ({ el, hp: o.hp, max: o.hp })); let lx = null, ly = null, snd = 0;
+    tg.forEach(g => g.el.classList.add("target"));
+    const total = tg.length * o.hp;
+    const left = () => tg.reduce((s, g) => s + Math.max(0, g.hp), 0);
+    const h = {
+      rem: () => { say(o.say); tg.filter(g => g.hp > 0).forEach(g => g.el.animate([{ scale: 1 }, { scale: 1.4 }, { scale: 1 }], 600)); },
+      down(x, y) { [lx, ly] = o.t != null ? tp() : [x, y]; if (o.t != null) { showCur(o.t, lx, ly, o.sz); $("#toolCur").classList.add("work"); } },
+      move() {
+        if (!IN.down) return; const [x, y] = o.t != null ? tp() : [IN.x, IN.y]; if (o.t != null) showCur(o.t, x, y, o.sz);
+        if (lx === null) { lx = x; ly = y; return; }
+        const d = hyp(x, y, lx, ly); lx = x; ly = y; if (d < 2) return;
+        let hit = false;
+        tg.forEach(g => { if (g.hp <= 0) return; const [gx, gy] = elXY(g.el); if (hyp(x, y, gx, gy) < o.r) { hit = true; g.hp -= d; const f = Math.max(0, g.hp / g.max);
+          if (!o.keep) { g.el.style.opacity = .25 + f * .75; g.el.style.scale = .6 + f * .4; }
+          if (g.hp <= 0) { if (!o.keep) goneEl(g.el); sfx("pop", .6); const [cx, cy] = toClient(gx, gy); burst(cx, cy, o.pop || ["✨"], 5, { size: 30, max: 80 }); } } });
+        if (hit) { const p = 1 - left() / total; o.onP && o.onP(p, x, y); if (Date.now() - snd > 260) { snd = Date.now(); if (o.snd) sfx(o.snd, .6); if (o.fx) { const [cx, cy] = toClient(x, y); burst(cx, cy, o.fx, 1, { size: 30, max: 60 }); } } }
+        if (left() <= 0) { hideCur(); done(); }
+      },
+      up() { lx = ly = null; $("#toolCur").classList.remove("work"); if (o.t != null) hideCur(); }
+    };
+    return h;
+  });
+}
+/* Antippen: alle Ziele wegtippen (Wischen zählt auch) */
+function tapPh(o) {
+  return phase(done => {
+    const tg = o.targets.slice(); tg.forEach(e => e.classList.add("target"));
+    const hitAt = (x, y) => { tg.forEach((e, i) => { if (!e || e.classList.contains("gone")) return; const [gx, gy] = elXY(e); if (hyp(x, y, gx, gy) < o.r) { goneEl(e); tg[i] = null; sfx(o.snd || "pop", .7); const [cx, cy] = toClient(gx, gy); burst(cx, cy, o.pop || ["✨"], 5, { size: 30, max: 80 }); o.onHit && o.onHit(tg.filter(Boolean).length); } }); if (!tg.some(Boolean)) done(); };
+    return {
+      rem: () => { say(o.say); tg.filter(Boolean).forEach(e => e.animate([{ scale: 1 }, { scale: 1.5 }, { scale: 1 }], 600)); },
+      down(x, y) { hitAt(x, y); }, move(x, y) { if (IN.down) hitAt(x, y); }
+    };
+  });
+}
+/* n-mal auf eine Stelle tippen */
+function countPh(o) {
+  return phase(done => {
+    let n = 0; ring(o.x, o.y, 150);
+    return { rem: () => say(o.say), down(x, y) { if (hyp(x, y, o.x, o.y) > 160 && !onPat(x, y, 0)) return; hideHand(); n++; ringP(n / o.n); o.onTap && o.onTap(n); if (n >= o.n) { removeSpot(); done(); } } };
+  });
+}
+/* Ziehen: Splitter greifen und rausziehen */
+function pullPh(o) {
+  return phase(done => {
+    let g = null; ring(o.x, o.y, 120);
+    const h = {
+      rem: () => say(o.say),
+      down(x, y) { if (hyp(x, y, o.x, o.y) > 130) return; hideHand(); g = { x, y }; showCur(o.t, o.x, o.y); sfx("pluck", .4); },
+      move(x, y) { if (!g) return; const dx = x - g.x, dy = y - g.y, d = Math.hypot(dx, dy); showCur(o.t, o.x + dx * .8, o.y + dy * .8); o.el.style.translate = `${dx * .5}px ${dy * .5}px`; if (o.el.firstChild) o.el.firstChild.style.transform = `scaleY(${1 + Math.min(.4, d / 400)})`;
+        if (d > o.d) { g = null; removeSpot(); done([dx, dy]); } },
+      up() { if (!g) return; g = null; o.el.style.translate = ""; if (o.el.firstChild) o.el.firstChild.style.transform = ""; hideCur(); say(o.more, { now: true }); }
+    };
+    return h;
+  });
+}
+/* Herz suchen mit dem Hörrohr */
+function searchPh(o) {
+  return phase(done => {
+    let found = 0, beatT = 0, heart = null;
+    const tick = () => { if (H !== h) { if (heart) heart.remove(); return; }
+      if (IN.down) { const [x, y] = tp(); showCur(o.t, x, y); const d = hyp(x, y, o.hx, o.hy), k = clamp(1 - d / 320, 0, 1);
+        if (!heart) { heart = document.createElement("div"); heart.className = "sheart"; heart.textContent = "💗"; clinicEl.appendChild(heart); }
+        Object.assign(heart.style, { left: (x + 60) + "px", top: (y - 80) + "px", fontSize: (34 + k * 70) + "px", opacity: .4 + k * .6 });
+        if (performance.now() - beatT > 1000 - k * 720) { beatT = performance.now(); sfx("heart", .25 + k * .75); heart.animate([{ scale: 1 }, { scale: 1.35 }, { scale: 1 }], 220); }
+        if (d < 55) { found += 16; if (found > 650) { heart.remove(); heart = null; hideCur(); done(); return; } } else found = 0;
+      } else if (heart) { heart.remove(); heart = null; }
+      requestAnimationFrame(tick); };
+    const h = { rem: () => say(o.say), down() { hideHand(); }, up() { hideCur(); } };
+    requestAnimationFrame(tick); return h;
+  });
+}
+/* Medizin in den Löffel gießen */
+function pourPh(ui) {
+  return phase(done => {
+    let p = 0, pouring = false, last = 0, said = 0;
+    const set = () => { ui.fill.style.transform = `scale(${Math.min(1, p)})`; ui.bar.style.height = Math.min(100, p * 100) + "%"; };
+    const loop = now => { if (H !== h) return; const dt = last ? Math.min(60, now - last) : 16; last = now;
+      if (pouring) { p += dt / 2300; set(); if (Math.random() < .3) { const [cx, cy] = toClient(ui.x + 8, ui.y - 26); burst(cx, cy, ["🟤"], 1, { size: 14, min: 10, max: 30, dir: Math.PI / 2, spread: .2 }); }
+        if (p > 1.02) { pouring = false; ui.bottle.classList.remove("pour"); sfx("squish"); const [cx, cy] = toClient(ui.x, ui.y); burst(cx, cy, ["💧"], 6, { size: 24, dir: Math.PI / 2, spread: 1 }); say(T.tooMuch, { now: true }); p = 0; set(); } }
+      requestAnimationFrame(loop); };
+    const h = {
+      rem: () => say(T.pour),
+      down() { pouring = true; ui.bottle.classList.add("pour"); hideHand(); sfx("bubble", .5); },
+      up() { if (!pouring) return; pouring = false; ui.bottle.classList.remove("pour");
+        if (p >= .62 && p <= 1) { sfx("sparkle", .5); done(); }
+        else if (p > .05 && Date.now() - said > 2000) { said = Date.now(); say(T.more, { now: true }); } }
+    };
+    requestAnimationFrame(loop); return h;
+  });
+}
+/* Löffel zum Mund ziehen */
+function feedPh(ui, mx, my) {
+  return phase(done => {
+    let g = false;
+    return {
+      rem: () => { say(T.feed); ui.spoon.animate([{ scale: 1 }, { scale: 1.3 }, { scale: 1 }], 600); },
+      down(x, y) { const [sx, sy] = elXY(ui.spoon); if (hyp(x, y, sx, sy) < 140) { g = true; ui.spoon.classList.add("held"); } },
+      move() { if (!g) return; const [x, y] = tp(); Object.assign(ui.spoon.style, { left: x + "px", top: y + "px" }); },
+      up() { if (!g) return; g = false; ui.spoon.classList.remove("held"); const [x, y] = tp();
+        if (hyp(x, y, mx, my) < 120) { Object.assign(ui.spoon.style, { left: mx + "px", top: my + "px" }); done(); }
+        else { Object.assign(ui.spoon.style, { left: ui.sx + "px", top: ui.sy + "px" }); } }
+    };
+  });
+}
+function pourUI() {
+  const x = L.tableX - L.tableW * .12, y = L.floor - L.tableH * .42;
+  const d = document.createElement("div"); d.className = "pourui"; Object.assign(d.style, { left: x + "px", top: y + "px" });
+  d.innerHTML = `<img class="bottle" src="assets/tool_1.webp?v=1" alt=""><div class="meter"><i></i><b></b></div>`;
+  const sp = document.createElement("div"); sp.className = "spoon"; sp.innerHTML = `<i><s></s></i>`; Object.assign(sp.style, { left: x + "px", top: (y + 10) + "px" });
+  clinicEl.appendChild(d); clinicEl.appendChild(sp); bubEl.classList.add("off");
+  return { el: d, spoon: sp, fill: sp.querySelector("s"), bar: d.querySelector(".meter b"), bottle: d.querySelector(".bottle"), x, y: y + 10, sx: x, sy: y + 10, remove() { d.remove(); sp.remove(); } };
+}
+
+/* Minispiele je Behandlungsschritt */
+const MG = {
+  async thermo(st) {
+    setPose("aah"); const th = addOv("therm", "assets/tool_0.webp?v=1", "mouth", 30, { rot: -25, dx: 12, dy: -2 }); sfx("pop");
+    const [x, y] = ap("mouth"), lab = tag(x + (PORT ? 95 : 110), y - 70, "36,5°"); say(T.thermoHold, { now: true }); let tc = 0;
+    await holdPh({ x, y, dur: 3200, say: T.thermoHold, rel: T.holdOn, onP: (p, dt) => { lab.textContent = (36.5 + p * 3).toFixed(1).replace(".", ",") + "°"; lab.classList.toggle("hot", p > .5); tc += dt; if (tc > 600) { tc = 0; sfx("tap", .4); } } });
+    sfx("beep"); lab.classList.add("hot", "boom"); const [cx, cy] = toClient(x, y); burst(cx, cy - 40 * SC, ["🌡️", "🔥"], 4, { size: 40 });
+    say(T.thermoRes, { now: true }); await sleep(1500); th.classList.add("gone"); lab.remove();
+  },
+  async medizin() {
+    setPose("sad"); const ui = pourUI(); say(T.pour, { now: true });
+    await pourPh(ui);
+    setPose("aah"); const [mx, my] = ap("mouth"); say(T.feed, { now: true });
+    await feedPh(ui, mx, my);
+    sfx("gulp"); await sleep(250); ui.remove(); placeBubble(); bubEl.classList.remove("off");
+    patEl.classList.add("shake"); setTimeout(() => patEl.classList.remove("shake"), 500); say(T.yum, { now: true }); await sleep(700);
+  },
+  async kuehl() {
+    const pad = addOv("cold", "assets/tool_2.webp?v=1", "head", 24, { dy: 2 }); sfx("squish"); goneEl(ovs("sweat")[0]);
+    const drops = [[-24, 6], [24, 8], [15, -6]].map(([dx, dy], i) => addOv("sw" + i, "assets/sym_9.webp?v=1", "head", 8, { dx, dy }));
+    say(T.sweat, { now: true });
+    await tapPh({ targets: drops, r: 75, say: T.sweat, snd: "bubble", pop: ["💦", "✨"], onHit: n => $$("#pat .cheek").forEach(c => c.style.opacity = n / 3) });
+    const [cx, cy] = toClient(...ap("head")); burst(cx, cy, ["❄️", "✨"], 6, { size: 30 }); await sleep(600); pad.classList.add("gone");
+  },
+  async watte() {
+    const sc = ovs("scr")[0]; const dirt = [[-9, -5], [8, -3], [-3, 6], [7, 6]].map(([dx, dy], i) => addOv("dirt" + i, `assets/sym_${5 + i % 3}.webp?v=1`, "paw", 7, { dx, dy, rot: ri(-40, 40) }));
+    say(T.dirt, { now: true });
+    await scrubPh({ t: 3, targets: dirt, hp: 230, r: 75, say: T.dirt, snd: "squish", onP: p => { if (sc) sc.style.opacity = 1 - p * .5; } });
+    goneEl(sc); addOv("scrc", "assets/sym_0.webp?v=1", "paw", 22).style.opacity = .45;
+  },
+  async pflaster() {
+    ovs("scrc").forEach(goneEl); sfx("plaster");
+    const pl = addOv("plaster", "assets/tool_4.webp?v=1", "paw", 30, { rot: -18 }); const im = pl.querySelector("img"); im.style.transition = "transform .15s"; im.style.transform = "scaleY(.45) skewX(24deg)";
+    say(T.smooth, { now: true });
+    await scrubPh({ t: null, targets: [pl], hp: 520, r: 110, keep: true, say: T.smooth, snd: "plaster", onP: p => { im.style.transform = `scaleY(${.45 + .55 * p}) skewX(${24 * (1 - p)}deg)`; } });
+    im.style.transform = ""; const [cx, cy] = toClient(...elXY(pl)); burst(cx, cy, ["✨", "💖"], 6, { size: 30 });
+  },
+  async pinzette(st) {
+    const sp = ovs("spl")[0]; const [x, y] = sp ? elXY(sp) : ap("paw"); say(T.pull, { now: true });
+    const v = await pullPh({ el: sp, t: 5, x, y, d: 150, say: T.pull, more: T.pullMore });
+    sfx("pluck"); hideCur(); if (sp) { const [cx, cy] = toClient(x + v[0] * .5, y + v[1] * .5); sp.remove(); flyImg("assets/sym_1.webp?v=1", { x: cx, y: cy }, { x: cx + v[0] * 2 * SC, y: cy - 220 * SC }, 500, 40); }
+    addOv("scrc", "assets/sym_0.webp?v=1", "paw", 16).style.opacity = .4; await sleep(400);
+  },
+  async zahnb() {
+    setPose("aah"); const g = ovs("g"); g.forEach(e => e.classList.add("germ")); say(T.brush, { now: true });
+    await scrubPh({ t: 6, targets: g, hp: 380, r: 70, say: T.brush, snd: "brush", fx: ["🫧"], pop: ["✨", "🫧"] });
+  },
+  async wasser() {
+    setPose("aah"); const gl = addOv("glass", "assets/tool_7.webp?v=1", "mouth", 24, { dy: 14 }); sfx("pop");
+    const [x, y] = ap("mouth"); say(T.gargle, { now: true }); let bt = 0;
+    await holdPh({ x, y, dur: 2300, say: T.gargle, rel: T.holdOn, onP: (p, dt) => { bt += dt; if (bt > 260) { bt = 0; sfx("bubble", .5); const [cx, cy] = toClient(x, y); burst(cx, cy, ["🫧"], 2, { size: 26, max: 70 }); } } });
+    patEl.classList.add("shake"); setTimeout(() => patEl.classList.remove("shake"), 500); gl.classList.add("gone"); await sleep(400);
+  },
+  async tuch() {
+    const ti = addOv("tissue", "assets/tool_8.webp?v=1", "nose", 22, { dy: 6 }); const sn = ovs("snot")[0]; const [x, y] = ap("nose", 0, 4);
+    say(T.blow, { now: true });
+    await countPh({ x, y, n: 3, say: T.blow, onTap: n => { sfx(n < 3 ? "sniff" : "sneeze", .8); ti.animate([{ scale: 1 }, { scale: 1.3 }, { scale: 1 }], 300); if (sn) sn.style.opacity = 1 - n / 3; } });
+    goneEl(sn); await sleep(300); ti.classList.add("gone");
+  },
+  async tee() {
+    setPose("sad"); const cup = addOv("cup", "assets/tool_9.webp?v=1", "mouth", 30, { dy: 18 }); sfx("pop");
+    const steam = [[-6, 2], [5, -2], [0, -7]].map(([dx, dy], i) => addEm("steam" + i, "", "mouth", 10, dx, dy, "steam"));
+    say(T.steam, { now: true });
+    await tapPh({ targets: steam, r: 80, say: T.steam, snd: "sniff", pop: ["💨"] });
+    setPose("aah"); sfx("slurp"); await sleep(600); cup.classList.add("gone");
+  },
+  async schwamm() {
+    say(T.mud, { now: true });
+    await scrubPh({ t: 10, targets: ovs("mud"), hp: 260, r: 85, say: T.mud, snd: "squish", fx: ["🫧"], pop: ["🫧", "✨"] });
+  },
+  async foehn() {
+    const pts = (META.p && META.p[K.pat] && META.p[K.pat].pts) || [];
+    const drops = [0, 1, 2, 3, 4].map(i => addEm("drop" + i, "💧", "pt" + (i % Math.max(1, pts.length)), PORT ? 44 : 38, i >= pts.length ? ri(-10, 10) : 0, 0));
+    say(T.dry, { now: true });
+    await scrubPh({ t: 11, targets: drops, hp: 300, r: 90, say: T.dry, snd: "dryer", fx: ["💨"], pop: ["✨"] });
+  },
+  async stetho() {
+    const [bx, by] = ap("belly"), b = pbox(); const hx = bx + rnd(-.18, .18) * b.w, hy = by + rnd(-.1, .08) * b.h;
+    say(T.search, { now: true });
+    await searchPh({ t: 12, hx, hy, say: T.search });
+    sfx("heart"); const [cx, cy] = toClient(hx, hy); burst(cx, cy, ["💗", "💓"], 8, { size: 36 }); say(T.found, { now: true }); await sleep(1200);
+  },
+  async waerm() {
+    const w = addOv("warm", "assets/tool_13.webp?v=1", "belly", 22); sfx("squish"); const pain = ovs("pain")[0]; const [x, y] = ap("belly");
+    say(T.warmHold, { now: true });
+    await holdPh({ x, y, dur: 2600, say: T.warmHold, rel: T.holdOn, onP: p => { if (pain) pain.style.opacity = 1 - p; } });
+    goneEl(pain); const [cx, cy] = toClient(x, y); burst(cx, cy, ["💗", "✨"], 6, { size: 30 }); await sleep(500); w.classList.add("gone");
+  }
+};
+
 function nextStep(tok) {
   if (tok !== runTok) return;
-  K.step++; K.tool = -1; K.wrongs = 0; removeSpot(); $$(".tool").forEach(b => b.classList.remove("sel", "hint"));
+  K.step++; K.tool = -1; K.wrongs = 0; removeSpot(); hideCur(); $$(".tool").forEach(b => b.classList.remove("sel", "hint"));
   const st = ILL[K.ill].steps[K.step];
   if (!st) return reward(tok);
   setPose(st.pose || "sad");
   say(T[st.s]);
-  if (!S.seen.howTool) { S.seen.howTool = 1; save(); say(T.howTool); }
-  K.busy = false; clearTimeout(K.hintT); K.hintT = setTimeout(function rem() { if (K.tool < 0 && cur === "clinic" && !K.busy && K.step >= 0) { hintTool(); say(T[st.s]); K.hintT = setTimeout(rem, 10000); } }, 7000);
+  if (!S.seen.howTool) { S.seen.howTool = 1; save(); say(T.dragHint); }
+  K.busy = false;
+  runStep(st, tok);
 }
-function hintTool() { const st = ILL[K.ill].steps[K.step]; if (!st) return; const b = $(`.tool[data-t="${st.t}"]`); if (b) b.classList.add("hint"); }
-// Werkzeug antippen ODER auf das Tier ziehen
-function dragTool(t, b) {
-  let st0 = null, ghost = null;
-  b.addEventListener("pointerdown", e => { st0 = { x: e.clientX, y: e.clientY, id: e.pointerId }; try { b.setPointerCapture(e.pointerId); } catch (_) {} });
-  b.addEventListener("pointermove", e => { if (!st0) return; if (!ghost && Math.hypot(e.clientX - st0.x, e.clientY - st0.y) > 14) { ghost = document.createElement("img"); ghost.src = `assets/tool_${t}.webp?v=1`; ghost.className = "fly"; const sz = 110 * SC; Object.assign(ghost.style, { width: sz + "px", height: sz + "px", objectFit: "contain", opacity: .95 }); document.body.appendChild(ghost); }
-    if (ghost) { const sz = 110 * SC; ghost.style.transform = `translate(${e.clientX - sz / 2}px,${e.clientY - sz * .8}px) rotate(-12deg)`; } });
-  const end = e => { if (!st0) return; const wasDrag = !!ghost; st0 = null; if (ghost) { ghost.remove(); ghost = null; }
-    if (wasDrag) { const r = patEl.getBoundingClientRect(); const over = !patEl.hidden && e.clientX > r.left - 30 * SC && e.clientX < r.right + 30 * SC && e.clientY > r.top && e.clientY < r.bottom + 30 * SC; if (over) pickTool(t, b, true); }
-    else pickTool(t, b); };
-  b.addEventListener("pointerup", end); b.addEventListener("pointercancel", () => { st0 = null; if (ghost) { ghost.remove(); ghost = null; } });
-  b.addEventListener("click", e => { if (e.detail === 0) pickTool(t, b); });   // Controller/Tastatur
+async function runStep(st, tok) {
+  await bring(st); if (tok !== runTok) return;
+  K.tool = st.t;
+  await MG[st.s](st); if (tok !== runTok) return;
+  finishStep(st, tok);
 }
-function pickTool(t, b, dropped) {
-  if (K.busy || K.step < 0) return;
-  if (b.classList.contains("new")) { b.classList.remove("new"); S.newTools = (S.newTools || []).filter(x => x !== t); save(); }
-  const st = ILL[K.ill].steps[K.step]; if (!st) return;
-  if (K.tool === st.t) { if (dropped && K.addProg) K.addProg(st.m === "tap" ? 1 : .34); else nudgeSpot(); return; }
-  if (t !== st.t) { K.errs++; K.dayErrs++; K.wrongs++; b.classList.remove("no"); void b.offsetWidth; b.classList.add("no"); sfx("tap"); say(TOOLS[t].n, { now: true }); say(T.wrong); hintTool(); return; }
-  K.tool = t; $$(".tool").forEach(x => x.classList.toggle("sel", x === b)); b.classList.remove("hint"); sfx("pop", .6);
-  showSpot(st);
-  if (dropped && K.addProg) K.addProg(st.m === "tap" ? 1 : .34);
-}
-function removeSpot() { if (K.spotAC) { K.spotAC.abort(); K.spotAC = null; } const s = $("#spot"); if (s) s.remove(); K.spotA = null; K.addProg = null; clearTimeout(K.nudgeT); $("#toolCur").hidden = true; }
-function nudgeSpot() { const s = $("#spot"); if (!s || K.busy || cur !== "clinic") return; const st = ILL[K.ill].steps[K.step]; say(st.m === "rub" ? T.howRub : st.m === "hold" ? T.howHold : T.howSpot, { now: true }); s.animate([{ transform: "translate(-50%,-50%) scale(1)" }, { transform: "translate(-50%,-50%) scale(1.35)" }, { transform: "translate(-50%,-50%) scale(1)" }], { duration: 500, iterations: 2 }); clearTimeout(K.nudgeT); K.nudgeT = setTimeout(nudgeSpot, 9000); }
-function showSpot(st) {
-  removeSpot(); K.spotA = st.a; K.prog = 0;
-  const s = document.createElement("button"); s.id = "spot"; s.setAttribute("aria-label", TOOLS[st.t].n); const sz = st.big ? 46 : st.a === "mouth" || st.a === "nose" ? 26 : 30;
-  s.style.width = s.style.height = sz + "%"; s.style.aspectRatio = "1"; s.style.height = "auto";
-  s.innerHTML = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" stroke-dasharray="276.5" stroke-dashoffset="276.5"/></svg>`;
-  patEl.querySelector(".pi").appendChild(s); positionOvs();
-  const cu = $("#toolCur"); cu.src = `assets/tool_${st.t}.webp?v=1`; cu.style.width = (PORT ? 120 : 110) + "px"; cu.hidden = false; placeCur();
-  const hm = st.m === "rub" ? T.howRub : st.m === "hold" ? T.howHold : T.howSpot;
-  say(hm, { now: true });
-  const hand = document.createElement("div"); hand.id = "hand"; hand.textContent = "👆"; s.appendChild(hand);
-  clearTimeout(K.nudgeT); K.nudgeT = setTimeout(nudgeSpot, 6000);
-  let down = false, last = null, holdT = 0, tStart = 0; const myStep = K.step;
-  const add = K.addProg = v => { if (K.busy || K.addProg !== add || K.step !== myStep) { clearInterval(holdT); down = false; return; } const hd = $("#hand"); if (hd) hd.remove(); clearTimeout(K.nudgeT); K.prog = Math.min(1, K.prog + v); s.querySelector("circle").style.strokeDashoffset = 276.5 * (1 - K.prog); onProg(st, K.prog); if (K.prog >= 1) { clearInterval(holdT); down = false; K.addProg = null; finishStep(st); } };
-  const pi = patEl.querySelector(".pi"), ac = new AbortController(); K.spotAC = ac; ac.signal.addEventListener("abort", () => { clearInterval(holdT); down = false; }); const o = { signal: ac.signal };
-  pi.addEventListener("pointerdown", e => { e.preventDefault(); down = true; tStart = Date.now(); last = { x: e.clientX, y: e.clientY }; try { pi.setPointerCapture(e.pointerId); } catch (_) {} cu.classList.add("work"); moveCur(e);
-    if (st.m === "tap") { add(1); }
-    if (st.m === "hold") { clearInterval(holdT); holdT = setInterval(() => { if (down) add(.08); }, 60); toolSnd(st); }
-  }, o);
-  pi.addEventListener("pointermove", e => { if (!down) return; moveCur(e); if (st.m === "rub") { const d = Math.hypot(e.clientX - last.x, e.clientY - last.y) / SC; if (d > 3) { add(d / 900); last = { x: e.clientX, y: e.clientY }; if (Math.random() < .12) toolSnd(st); } } }, o);
-  const up = e => { if (!down) return; down = false; clearInterval(holdT); cu.classList.remove("work"); placeCur(); if (st.m !== "tap" && Date.now() - tStart < 260) { add(.34); toolSnd(st); } };
-  pi.addEventListener("pointerup", up, o); pi.addEventListener("pointercancel", up, o);
-  // Controller/Tastatur (ohne Zeiger)
-  s.addEventListener("click", e => { if (e.detail === 0) { if (st.m === "tap") add(1); else { add(.34); toolSnd(st); } } });
-}
-function moveCur(e) { const cu = $("#toolCur"), sr = stage.getBoundingClientRect(); cu.style.left = (e.clientX - sr.left) / SC + "px"; cu.style.top = (e.clientY - sr.top) / SC + "px"; }
-function placeCur() { const s = $("#spot"), cu = $("#toolCur"); if (!s) return; const r = s.getBoundingClientRect(), sr = stage.getBoundingClientRect(); cu.style.left = (r.left + r.width * .75 - sr.left) / SC + "px"; cu.style.top = (r.top + r.height * .35 - sr.top) / SC + "px"; }
-function toolSnd(st) { const m = { watte: "squish", pinzette: "pluck", zahnb: "brush", tuch: "sniff", schwamm: "squish", foehn: "dryer", stetho: "heart", thermo: "beep" }[st.s]; if (m) sfx(m, .7); }
-function onProg(st, p) {
-  const ovs = k => $$(`#pat .ovl[data-k^="${k}"]`);
-  if (st.s === "watte") ovs("scr").forEach(d => d.style.opacity = 1 - p * .5);
-  if (st.s === "zahnb") ovs("g").forEach((d, i) => { if (p > (i + 1) / 3.2 && !d.classList.contains("gone")) { d.classList.add("gone"); sfx("pop", .6); const r = rectOf(d); burst(r.x, r.y, ["🫧", "✨"], 4, { size: 26, max: 60 }); } });
-  if (st.s === "tuch") ovs("snot").forEach(d => d.style.opacity = 1 - p);
-  if (st.s === "schwamm") { ovs("mud").forEach((d, i, a) => { if (p > (i + 1) / (a.length + .5) && !d.classList.contains("gone")) { d.classList.add("gone"); sfx("bubble", .5); const r = rectOf(d); burst(r.x, r.y, ["🫧", "🫧", "✨"], 5, { size: 30, max: 80 }); } }); if (Math.random() < .25) { const r = rectOf($("#spot")); burst(r.x + rnd(-40, 40) * SC, r.y, ["🫧"], 1, { size: 30, max: 60 }); } }
-  if (st.s === "foehn" && Math.random() < .3) { const r = rectOf($("#spot")); burst(r.x, r.y, ["💨", "✨"], 1, { size: 30, max: 90, dir: Math.PI, spread: .5 }); }
-  if (st.s === "stetho" && Math.random() < .15) { const r = rectOf($("#spot")); burst(r.x, r.y, ["💗"], 1, { size: 30, max: 80 }); }
-  if (st.s === "pinzette") ovs("spl").forEach(d => d.style.translate = `${p * 30}% ${-p * 30}%`);
-}
-async function finishStep(st) {
-  K.busy = true; clearTimeout(K.hintT); const tok = runTok; const sp = $("#spot"); const r = sp ? rectOf(sp) : rectOf(patEl);
-  $("#toolCur").classList.remove("work");
-  const ovs = k => $$(`#pat .ovl[data-k^="${k}"]`);
-  const gone = k => ovs(k).forEach(d => d.classList.add("gone"));
-  removeSpot();
-  switch (st.s) {
-    case "thermo": { sfx("beep"); const t = addOv("therm", "assets/tool_0.webp?v=1", "mouth", 30, { rot: -25, dx: 12, dy: -2 }); await sleep(900); burst(r.x, r.y - 40 * SC, ["🌡️", "🔥"], 4, { size: 40 }); say(T.thermoRes, { now: true }); await sleep(1300); t.classList.add("gone"); break; }
-    case "medizin": { await flyImg("assets/tool_1.webp?v=1", rectOf($('.tool[data-t="1"]')), r, 500, 100); sfx("gulp"); patEl.classList.add("shake"); setTimeout(() => patEl.classList.remove("shake"), 500); break; }
-    case "kuehl": { sfx("squish"); const c = addOv("cold", "assets/tool_2.webp?v=1", "head", 24, { dy: 2 }); await sleep(1100); $$("#pat .cheek").forEach(x => x.style.opacity = 0); gone("sweat"); burst(r.x, r.y, ["❄️", "✨"], 6, { size: 30 }); await sleep(400); c.classList.add("gone"); break; }
-    case "watte": gone("scr"); addOv("scrc", "assets/sym_0.webp?v=1", "paw", 22).style.opacity = .45; burst(r.x, r.y, ["✨"], 5, { size: 30 }); break;
-    case "pflaster": { sfx("plaster"); gone("scrc"); gone("spl"); const pl = addOv("plaster", "assets/tool_4.webp?v=1", "paw", 30, { rot: -18 }); pl.animate([{ transform: "translate(-50%,-50%) scale(1.6)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(1)", opacity: 1 }], 300); burst(r.x, r.y, ["✨", "💖"], 6, { size: 30 }); break; }
-    case "pinzette": { sfx("pluck"); const d = ovs("spl")[0]; if (d) { const dr = rectOf(d); d.remove(); await flyImg("assets/sym_1.webp?v=1", dr, { x: dr.x + 160 * SC, y: dr.y - 200 * SC }, 500, 40); } addOv("scrc", "assets/sym_0.webp?v=1", "paw", 16).style.opacity = .4; break; }
-    case "zahnb": gone("g"); burst(r.x, r.y, ["✨", "🦷"], 6, { size: 30 }); break;
-    case "wasser": case "tee": { await flyImg(`assets/tool_${st.t}.webp?v=1`, rectOf($(`.tool[data-t="${st.t}"]`)), r, 500, 100); sfx(st.s === "tee" ? "slurp" : "gulp"); break; }
-    case "tuch": gone("snot"); sneeze(); break;
-    case "schwamm": gone("mud"); break;
-    case "foehn": burst(r.x, r.y, ["✨", "⭐"], 10, { size: 34 }); break;
-    case "stetho": sfx("heart"); burst(r.x, r.y, ["💗", "💓"], 6, { size: 36 }); break;
-    case "waerm": { const w = addOv("warm", "assets/tool_13.webp?v=1", "belly", 22); await sleep(1100); gone("pain"); burst(r.x, r.y, ["💗", "✨"], 6, { size: 30 }); await sleep(300); w.classList.add("gone"); break; }
-  }
-  if (tok !== runTok) return;
-  sfx("sparkle", .5); say(T.good, { now: st.s !== "thermo" });
+async function finishStep(st, tok) {
+  K.busy = true; removeSpot(); hideCur(); $$(".tool").forEach(b => b.classList.remove("sel"));
+  sfx("sparkle", .5); say(T.good);
   const bi = bubEl.querySelector(".bi"); if (bi && K.step === ILL[K.ill].steps.length - 1) bi.classList.add("done");
-  await sleep(700); await sayDone(); if (tok !== runTok) return;
+  await sleep(500); await sayDone(); if (tok !== runTok) return;
   nextStep(tok);
 }
+
 async function reward(tok) {
-  setPose("sad"); removeSpot(); K.busy = true;
+  abortPh(); setPose("sad"); removeSpot(); hideCur(); K.busy = true;
   bubEl.innerHTML = `<button class="bi rw" data-r="14" data-say="Lutscher" aria-label="Lutscher"><img src="assets/tool_14.webp?v=1" alt=""></button><button class="bi rw" data-r="15" data-say="Sticker" aria-label="Sticker"><img src="assets/tool_15.webp?v=1" alt=""></button>`;
   bubEl.classList.remove("off"); placeBubble(); say(T.reward);
   const pickR = await new Promise(res => { $$("#bub .rw").forEach(b => b.onclick = () => res(+b.dataset.r)); });
@@ -669,11 +985,12 @@ function openAlbum() {
 $("#bPlay").onclick = () => { stopVoice(); startDay(); };
 $("#bAlbum").onclick = () => { stopVoice(); openAlbum(); };
 $("#bRoom").onclick = () => { stopVoice(); openRoom(); };
-addEventListener("load", () => { if (window.LXPAD) LXPAD.back = () => { if (cur !== "title") { goTitle(); return true; } return false; }; });
+addEventListener("load", () => { if (window.LXPAD) LXPAD.game = padGame; if (window.LXPAD) LXPAD.back = () => { if (cur !== "title") { goTitle(); return true; } return false; }; });
 addEventListener("keydown", e => { if (e.key === "Escape" && cur !== "title") goTitle(); });
 layout(); updCoins(); goTitle();
 addEventListener("pointerdown", () => { music(cur === "clinic" ? "clinic" : cur === "room" ? "room" : "menu"); }, { once: true });
 window.__curStep = () => ILL[K.ill].steps[K.step];
+window.__t = { ap: (k, dx, dy) => toClient(...ap(k, dx, dy)), xy: el => toClient(...elXY(el)), H: () => H, IN, VC, padGame, stXY };
 window.__pdTest = (q) => { K.queue = q; K.qi = 0; $("#prog").innerHTML = q.map(o => `<i style="background-image:url(assets/p${o.p + 1}_1.webp?v=1)"></i>`).join(""); runTok++; patEl.hidden = true; nextPatient(runTok); };
 window.__pd = { S, K, T, startDay, openRoom, openAlbum, goTitle, save, layout, nextStep };
 </script>
