@@ -75,9 +75,11 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 @keyframes pulse{50%{transform:scale(1.12) rotate(-8deg)}}
 #dump{position:absolute;z-index:14;width:78px;height:78px;border-radius:50%;background:#fff;box-shadow:0 5px 0 #c9b8e6;display:grid;place-items:center;font-size:40px;transition:transform .2s,opacity .2s}
 #dump.off{transform:scale(0);opacity:0;pointer-events:none}
-#stirS{position:absolute;z-index:13;width:120px;height:220px;pointer-events:none;opacity:0;transform-origin:50% 90%}
+#stirS{position:absolute;z-index:9;width:120px;height:220px;pointer-events:none;opacity:0;transform-origin:50% 90%}
 #stirS.on{opacity:1;animation:stir .5s linear infinite}
-@keyframes stir{0%{transform:translateX(-50px) rotate(-14deg)}25%{transform:translateX(0) translateY(10px) rotate(0)}50%{transform:translateX(50px) rotate(14deg)}75%{transform:translateX(0) translateY(-10px) rotate(0)}100%{transform:translateX(-50px) rotate(-14deg)}}
+@keyframes stir{0%{transform:translateX(-34px) rotate(-12deg)}25%{transform:translateX(0) translateY(8px) rotate(0)}50%{transform:translateX(34px) rotate(12deg)}75%{transform:translateX(0) translateY(-6px) rotate(0)}100%{transform:translateX(-34px) rotate(-12deg)}}
+#soup.sw{opacity:.75!important;animation:swirl .5s ease-in-out infinite}
+@keyframes swirl{50%{transform:scale(1.08,.85) rotate(4deg)}}
 /* Koch */
 #chef{position:absolute;z-index:9;transform-origin:50% 100%}
 #chef .ci{position:relative;height:100%;transform-origin:50% 100%;animation:breathe 2s ease-in-out infinite}
@@ -87,7 +89,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 #chef .hat,#chef2 .hat{position:absolute;width:50%;left:var(--hx,25%);bottom:var(--hy,83%);transform:rotate(var(--hr,-6deg));transform-origin:50% 100%;z-index:2}
 @keyframes talk{50%{transform:scale(1.02,.98) translateY(-4px)}}
 #chef.fx-tiny .ci{transform:scale(.45)!important}
-#chef.fx-giant .ci{transform:scale(1.55)!important}
+#chef.fx-giant .ci{transform:scale(1.3)!important}
 #chef .ci{transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
 #chef.fx-rocket{animation:rocket 3s ease-in-out}
 @keyframes rocket{0%{transform:none}20%{transform:translateY(40px) scale(1.1,.85)}55%{transform:translateY(-700px) rotate(360deg)}75%{transform:translateY(-700px)}100%{transform:none}}
@@ -353,13 +355,13 @@ const stage = $("#stage"); let PORT = false, SW = 1280, SH = 720, SC = 1;
 const L = {}; // Layout-Positionen
 function layout() {
   const w = innerWidth, h = innerHeight; PORT = h > w * 1.05;
-  if (PORT) { SW = 720; SH = Math.max(1280, Math.min(1560, Math.round(720 * h / w))); } else { SH = 720; SW = Math.max(1280, Math.min(1600, Math.round(720 * w / h))); }
+  if (PORT) { SH = Math.max(1280, Math.min(1560, Math.round(720 * h / w))); SW = Math.max(720, Math.min(960, Math.round(SH * w / h))); } else { SH = 720; SW = Math.max(1280, Math.min(1600, Math.round(720 * w / h))); }
   SC = Math.min(w / SW, h / SH);
   Object.assign(stage.style, { width: SW + "px", height: SH + "px", transform: `translate(${-SW * SC / 2}px,${-SH * SC / 2}px) scale(${SC})` });
   stage.classList.toggle("port", PORT);
   const shelfH = PORT ? 300 : 136;
   if (PORT) {
-    Object.assign(L, { monX: 210, monB: SH - shelfH - 330, monH: 400, potX: 255, potW: 320, potB: SH - shelfH - 10, chefX: 560, chefH: 290, chefB: SH - shelfH - 20, spoonX: 590, spoonB: SH - shelfH - 420, dumpX: 60, dumpB: SH - shelfH - 40 });
+    const cx = SW / 2; Object.assign(L, { monX: cx - 210, monB: SH - shelfH - 14, monH: 380, potX: cx + 35, potW: 300, potB: SH - shelfH - 4, chefX: cx + 212, chefH: 285, chefB: SH - shelfH - 8, spoonX: cx + 110, spoonB: SH - shelfH - 330, dumpX: cx + 290, dumpB: SH - shelfH - 380 });
   } else {
     const cx = SW / 2;
     Object.assign(L, { monX: cx - 400, monB: SH - shelfH - 6, monH: 380, potX: cx + 30, potW: 300, potB: SH - shelfH + 6, chefX: cx + 400, chefH: 360, chefB: SH - shelfH + 4, spoonX: cx + 215, spoonB: SH - shelfH - 120, dumpX: cx - 150, dumpB: SH - shelfH - 30 });
@@ -371,7 +373,7 @@ function layout() {
   Object.assign(chefEl.style, { height: L.chefH + "px", left: (L.chefX - L.chefH * .53) + "px", bottom: (SH - L.chefB) + "px" });
   Object.assign($("#spoon").style, { left: (L.spoonX - 75) + "px", bottom: (SH - L.spoonB) + "px" });
   Object.assign($("#dump").style, { left: (L.dumpX - 39) + "px", bottom: (SH - L.dumpB) + "px" });
-  Object.assign($("#stirS").style, { left: (L.potX - 60) + "px", bottom: (SH - L.potB + L.potW * .45) + "px" });
+  Object.assign($("#stirS").style, { left: (L.potX - 60) + "px", bottom: (SH - L.potB + L.potW * .5) + "px" });
   // Titel-Elemente
   const g = $("#gift"), m = $("#motd");
   if (PORT) { Object.assign(g.style, { left: "40px", top: "300px" }); Object.assign(m.style, { right: "30px", left: "auto", top: "290px" }); }
@@ -415,7 +417,7 @@ function flash() { const f = $("#flash"); f.classList.remove("on"); void f.offse
 
 /* ================= Koch-Posen & Mütze ================= */
 const HATPOS = { 1: { c: 56.5, r: 4 }, 2: { c: 49.4, r: 0 }, 3: { c: 49.6, r: 0 }, 4: { c: 48.8, r: -3 } };
-const HATS_FIT = [{ w: 50, b: 86 }, { w: 48, b: 88 }, { w: 72, b: 75 }, { w: 62, b: 86 }, { w: 64, b: 83 }, { w: 48, b: 85 }, { w: 60, b: 84 }, { w: 30, b: 90 }];
+const HATS_FIT = [{ w: 50, b: 81 }, { w: 48, b: 84 }, { w: 72, b: 70 }, { w: 62, b: 81 }, { w: 64, b: 78 }, { w: 48, b: 82 }, { w: 60, b: 79 }, { w: 30, b: 86 }];
 function chefPose(p, el = chefEl) {
   const im = el.querySelector(".ci>img:first-child"); im.src = `assets/chef_${p}.webp`;
   const hp = HATPOS[p], h = el.querySelector(".hat");
@@ -503,10 +505,10 @@ $("#dump").onclick = () => { if (K.busy || !K.pot.length) return; sfx("bubble");
 $("#spoon").onclick = () => { if (K.busy || !K.pot.length) return; K.mode === "magic" ? brewMagic() : cook(); };
 
 async function stirAnim() {
-  const st = $("#stirS"); st.classList.add("on"); chefPose(2); $("#spoon").classList.add("off"); $("#dump").classList.add("off");
+  const st = $("#stirS"); st.classList.add("on"); soupEl.classList.add("sw"); if (!K.pot.length) soupEl.style.background = "#9be04a"; chefPose(2); $("#spoon").classList.add("off"); $("#dump").classList.add("off");
   sfx("stir"); sfx("bubble", .7); const pr = toStage($("#pot"));
   for (let i = 0; i < 6; i++) { burst(pr.x + rnd(-60, 60) * SC, pr.y - pr.h * .3, ["🫧"], 2, { size: 36, max: 120, dir: -Math.PI / 2, spread: .6 }); await sleep(230); if (i === 3) sfx("bubble", .6); }
-  st.classList.remove("on");
+  st.classList.remove("on"); soupEl.classList.remove("sw");
 }
 
 function startShift() {
@@ -523,7 +525,8 @@ function startShift() {
 }
 function orderSize() { const l = S.lvl; if (l === 0) return K.gi < 2 ? 1 : 2; if (l < 3) return 2; if (l < 6) return pick([2, 3]); return pick([2, 3, 3]); }
 function placeBubble() { sizeMon(); const f = K.mon >= 0 ? MSZ[K.mon] : 1, head = L.monB - L.monH * f; const b = bubEl; b.style.top = "auto";
-  if (PORT) { b.style.left = (L.monX + 20) + "px"; b.style.bottom = Math.min(SH - head + 10, SH - 230) + "px"; }
+  const cr = K.mon >= 0 && K.mode === "cook" && K.mon === motd() ? 44 : 0;
+  if (PORT) { b.style.left = Math.max(16, L.monX - 40) + "px"; b.style.bottom = Math.min(SH - head + 14 + cr, SH - 230) + "px"; }
   else { b.style.left = (L.monX + L.monH * f * .28) + "px"; b.style.bottom = Math.min(SH - head - 40, SH - 250) + "px"; } }
 async function nextGuest(tok) {
   if (tok !== runTok) return;
