@@ -124,6 +124,20 @@
 <g class="k-eye"><circle cx="42" cy="38" r="3.4" fill="#1d2350"/><circle cx="58" cy="38" r="3.4" fill="#1d2350"/><circle cx="43" cy="36.8" r="1.1" fill="#fff"/><circle cx="59" cy="36.8" r="1.1" fill="#fff"/></g>
 <path d="M43 47q7 6 14 0" stroke="#a0442a" stroke-width="2.4" fill="none" stroke-linecap="round"/><g fill="#ff9d9d" opacity=".8"><circle cx="35" cy="45" r="3.2"/><circle cx="65" cy="45" r="3.2"/></g>
 <g transform="translate(80 112)"><circle r="11" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M0-5l4.8 3.5-1.8 5.6h-6l-1.8-5.6z" fill="#222"/><path d="M0-5V-11M4.8-1.5l6-2M3 4.1l3.8 5.2M-3 4.1l-3.8 5.2M-4.8-1.5l-6-2" stroke="#222" stroke-width="1.3"/></g></svg>`},
+    // Doktor Mia aus Pfötchen-Doc: orange Katze im Arztkittel mit Hörrohr
+    vetcat:{w:74,h:92,svg:`<svg viewBox="0 0 100 124">
+<g class="lg1"><rect x="36" y="100" width="11" height="18" rx="5" fill="#f29a3a"/><ellipse cx="41" cy="119" rx="8" ry="4.5" fill="#f6b56a"/></g><g class="lg2"><rect x="53" y="100" width="11" height="18" rx="5" fill="#f29a3a"/><ellipse cx="59" cy="119" rx="8" ry="4.5" fill="#f6b56a"/></g>
+<g class="wg1"><path d="M30 64q-11 8-12 22" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="18" cy="88" r="5.5" fill="#f6b56a"/></g>
+<g class="wg2"><path d="M70 64q11 8 12 22" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="82" cy="88" r="5.5" fill="#f6b56a"/></g>
+<path d="M28 60q22-9 44 0l-1 44H29z" fill="#fff" stroke="#d6dde6" stroke-width="1.5"/><path d="M50 58v46" stroke="#d6dde6" stroke-width="1.5"/>
+<rect x="58" y="70" width="10" height="10" rx="2" fill="#ff6f8f"/><circle cx="63" cy="75" r="2" fill="#fff"/>
+<path d="M40 58q-2 14 10 16q12-2 10-16" stroke="#3aa3b5" stroke-width="2.5" fill="none"/><circle cx="50" cy="76" r="3.2" fill="#9fb3c4" stroke="#3aa3b5" stroke-width="1.5"/>
+<path d="M27 28l-3-20 15 10zM73 28l3-20-15 10z" fill="#f29a3a"/><path d="M29 24l-1-10 7 6zM71 24l1-10-7 6z" fill="#ffd2b0"/>
+<circle cx="50" cy="38" r="23" fill="#f6a64a"/><path d="M42 18q8 4 16 0M38 24q12 5 24 0" stroke="#d97a1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<ellipse cx="50" cy="46" rx="11" ry="8" fill="#ffe6cc"/>
+<g class="k-eye"><circle cx="41" cy="37" r="4" fill="#3b2a1a"/><circle cx="59" cy="37" r="4" fill="#3b2a1a"/><circle cx="42.2" cy="35.6" r="1.3" fill="#fff"/><circle cx="60.2" cy="35.6" r="1.3" fill="#fff"/></g>
+<path d="M47.5 43h5l-2.5 3z" fill="#ff7a8a"/><path d="M50 46q-3 4-6 2M50 46q3 4 6 2" stroke="#8a4b2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<path d="M36 45l-9-2M36 48l-9 2M64 45l9-2M64 48l9 2" stroke="#8a4b2a" stroke-width="1" opacity=".6"/></svg>`},
     // Mampfi aus Monster-Küche: grüner Monster-Koch mit Schürze und Kochlöffel
     mampfi:{w:76,h:90,svg:`<svg viewBox="0 0 100 120">
 <g class="lg1"><ellipse cx="38" cy="112" rx="10" ry="6" fill="#8ccf2e"/></g><g class="lg2"><ellipse cx="62" cy="112" rx="10" ry="6" fill="#8ccf2e"/></g>

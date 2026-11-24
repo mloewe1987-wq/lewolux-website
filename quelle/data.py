@@ -1,6 +1,17 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="pfoetchen-doc", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#5aa9e6", src="spiele-intern/pfoetchen-doc", nodl=True,
+  title="Pfötchen-Doc", short="Pfötchen-Doc", tagline="Tierarzt für Kuscheltiere!",
+  desc="Kinderspiel ohne Werbung: Mit Doktor Mia, der Katzen-Tierärztin, machst du kranke Kuscheltiere wieder gesund. Fieber messen, Pflaster kleben, Zähne putzen, Splitter ziehen und Matsch abwaschen. Geheilte Tiere ziehen ins Kuschelzimmer. Alles vorgelesen, ohne Lesen spielbar.",
+  genres=["Kinder","Tierarzt","Kümmern"], cats="family", status="Neu",
+  plats=["web","mobile"], tech=["HTML5","Web Audio","Offline"],
+  story="In der Praxis von Doktor Mia ist viel los: Hase Hoppel hat eine Schramme, Hund Wuffi hat Fieber und Panda Bambu ist voller Matsch. Mit den richtigen Werkzeugen machst du jedes Kuscheltier wieder fit und bekommst dafür Pfötchen-Münzen für das Kuschelzimmer.",
+  controls=[["Werkzeug wählen","Werkzeug unten antippen"],["Behandeln","Leuchtende Stelle antippen, reiben oder festhalten"],["Belohnung","Lutscher oder Sticker antippen"]],
+  features=["10 Kuscheltier-Patienten mit eigener Stimme-Begrüßung","7 Behandlungen: Schramme, Fieber, Zähne, Schnupfen, Matsch, Splitter, Bauchweh","14 Werkzeuge von Thermometer bis Wärmflasche","Kuschelzimmer mit allen geheilten Tieren und 8 Möbeln zum Kaufen","Tier-Album, tägliches Geschenk und Notfall des Tages","Alles vorgelesen, ohne Werbung und ohne Käufe"],
+  shots=["Ein Patient kommt in die Praxis","Behandeln mit dem richtigen Werkzeug","Das Kuschelzimmer"],
+  reel=["Family","Pflegen, heilen, kuscheln","Tierarzt für Kuscheltiere."],
+  download=dict(file="downloads/pfoetchen-doc.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="monster-kueche", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#8ee03a", src="spiele-intern/monster-kueche", nodl=True,
   title="Monster-Küche", short="Monster-Küche", tagline="Koch für hungrige Monster!",
   desc="Kinderspiel ohne Werbung: Mit Mampfi, dem grünen Monster-Koch, kochst du für zehn lustige Monster. In der Sprechblase siehst du, was sie essen wollen: Zutaten in den Topf, umrühren, servieren! Chili lässt Feuer spucken, Eis macht Brrr und Bohnen machen Pups. Alles vorgelesen, ohne Lesen spielbar.",
@@ -268,6 +279,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "pfoetchen-doc": dict(
+  title="Pfötchen-Doc – Tierarzt-Spiel für Kinder kostenlos",
+  meta="Pfötchen-Doc: Kinder machen als Tierarzt kranke Kuscheltiere gesund. Fieber messen, Pflaster kleben, Zähne putzen. Alles vorgelesen, ohne Werbung, ab 4.",
+  long=["<strong>Pfötchen-Doc</strong> ist ein Tierarzt-Spiel für Kinder ab 4 Jahren aus <strong>Lewolux Kids</strong>. Doktor Mia, eine fröhliche Katze im weißen Kittel, braucht Hilfe in ihrer Praxis: Kranke Kuscheltiere warten auf dem Behandlungstisch.",
+        "Was dem Tier fehlt, zeigt ein Bild in der Sprechblase, und Doktor Mia sagt es an. Kinder wählen das richtige Werkzeug und tippen, reiben oder halten auf die leuchtende Stelle: <strong>Fieber messen</strong>, Wunde mit Watte säubern und <strong>Pflaster kleben</strong>, Zähne putzen, Nase putzen, Matsch abwaschen und trocken föhnen, einen Splitter ziehen oder mit dem Hörrohr abhören.",
+        "Geheilte Tiere ziehen ins <strong>Kuschelzimmer</strong>, das man mit Pfötchen-Münzen einrichtet. Dazu gibt es ein Tier-Album, ein tägliches Geschenk und einen Notfall des Tages. Kostenlos, ohne Werbung, ohne Käufe, auf Handy, Tablet und PC."]),
  "monster-kueche": dict(
   title="Monster-Küche – Kochspiel für Kinder kostenlos",
   meta="Monster-Küche: Kinder kochen für zehn lustige Monster, entdecken Lieblingsessen und Geheimrezepte. Alles vorgelesen, ohne Werbung, ab 4 Jahren.",
@@ -392,6 +409,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Pfötchen-Doc: Tierarzt für Kuscheltiere in Lewolux Kids", "kids/"),
  ("Neu", "Monster-Küche: Koch für hungrige Monster in Lewolux Kids", "kids/"),
  ("Neu", "Schiri Pfiff: Sei der Schiedsrichter in Lewolux Kids", "kids/"),
  ("Neu", "Fußball-Boss: der Fußballmanager für Kinder in Lewolux Kids", "kids/"),
@@ -416,6 +434,11 @@ NEWS = [
 # c1/c2 = Farben der Karte, emoji = großes Symbol, age = Altersempfehlung
 # Spiele in dieser Liste werden im Kids-Modus NICHT gesperrt; alle anderen Spiele schon.
 KIDS = [
+ dict(id="pfoetchen-doc", title="Pfötchen-Doc", emoji="🩺", c1="#5aa9e6", c2="#ff8fb8", age="ab 4 Jahren",
+  line="Mach kranke Kuscheltiere wieder gesund",
+  learn="Fürsorge, Werkzeuge erkennen, genau hinschauen",
+  say="Pfötchen-Doc! Hilf Doktor Mia und mach die Kuscheltiere wieder gesund.",
+  mascot="vetcat", crowd=1),
  dict(id="monster-kueche", title="Monster-Küche", emoji="🍲", c1="#8ee03a", c2="#7b4fd6", age="ab 4 Jahren",
   line="Koch lustige Gerichte für hungrige Monster",
   learn="Bilder zuordnen, genau hinschauen, ausprobieren",
