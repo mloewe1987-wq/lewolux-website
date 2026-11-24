@@ -1,6 +1,17 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="monster-kueche", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#8ee03a", src="spiele-intern/monster-kueche", nodl=True,
+  title="Monster-Küche", short="Monster-Küche", tagline="Koch für hungrige Monster!",
+  desc="Kinderspiel ohne Werbung: Mit Mampfi, dem grünen Monster-Koch, kochst du für zehn lustige Monster. In der Sprechblase siehst du, was sie essen wollen: Zutaten in den Topf, umrühren, servieren! Chili lässt Feuer spucken, Eis macht Brrr und Bohnen machen Pups. Alles vorgelesen, ohne Lesen spielbar.",
+  genres=["Kinder","Kochen","Lustig"], cats="family", status="Neu",
+  plats=["web","mobile"], tech=["HTML5","Web Audio","Offline"],
+  story="In Mampfis Monster-Küche ist immer etwas los: Ein Monster nach dem anderen kommt hungrig durch die Tür. Jedes hat eine eigene Bestellung und ein geheimes Lieblingsessen. Findest du heraus, was Blubbo, Funki, Puddi und die anderen am liebsten mögen?",
+  controls=[["Zutat in den Topf","Zutat unten antippen"],["Umrühren und servieren","Löffel-Knopf antippen"],["Topf ausleeren","Mülleimer-Knopf"]],
+  features=["10 lustige Monster mit eigener Bestellung und geheimem Lieblingsessen","12 Zutaten, neue werden nach jedem Arbeitstag freigeschaltet","Witzige Reaktionen: Feuer, Bibbern, Pupsen, Rülpsen und Herzchen","Monster-Album, Mützen-Laden für Mampfi und tägliches Geschenk","Zauberkessel mit 8 Geheimrezepten zum Entdecken","Alles vorgelesen, ohne Werbung und ohne Käufe"],
+  shots=["Ein Monster bestellt","Umrühren und servieren","Lieblingsessen entdeckt!"],
+  reel=["Family","Kochen, mampfen, lachen","Koch für hungrige Monster."],
+  download=dict(file="downloads/monster-kueche.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="schiri-pfiff", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#ffc83d", src="spiele-intern/schiri-pfiff", nodl=True,
   title="Schiri Pfiff", short="Schiri Pfiff", tagline="Sei der Schiedsrichter!",
   desc="Kinderspiel ohne Werbung: Du bist Schiedsrichter Pfiff, ein kleiner Löwe. Bär, Schwein, Fuchs und Pinguin spielen Fußball, und du entscheidest blitzschnell: Foul oder fair? Tor oder kein Tor? Gelbe Karte, Elfmeter oder Einwurf? Alles wird vorgelesen, ohne Lesen spielbar.",
@@ -257,6 +268,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "monster-kueche": dict(
+  title="Monster-Küche – Kochspiel für Kinder kostenlos",
+  meta="Monster-Küche: Kinder kochen für zehn lustige Monster, entdecken Lieblingsessen und Geheimrezepte. Alles vorgelesen, ohne Werbung, ab 4 Jahren.",
+  long=["<strong>Monster-Küche</strong> ist ein lustiges Kochspiel für Kinder ab 4 Jahren aus <strong>Lewolux Kids</strong>. Mampfi, ein kleiner grüner Monster-Koch, braucht Hilfe in seiner Küche, denn hungrige Monster stehen Schlange.",
+        "Jedes Monster zeigt seine Bestellung als Bild in der Sprechblase. Kinder tippen die Zutaten an, sie fliegen in den Topf, dann wird umgerührt und serviert. Die Monster reagieren herrlich albern: <strong>Chili</strong> lässt Feuer spucken, <strong>Eiswürfel</strong> lassen bibbern, <strong>Bohnen</strong> sorgen für einen Pups. Mit einer Extra-Zutat entdeckt man das <strong>geheime Lieblingsessen</strong> jedes Monsters.",
+        "Nach jedem Arbeitstag gibt es Sterne, Münzen und neue Zutaten oder Monster. Im <strong>Monster-Album</strong> sammelt man alle zehn Gäste, im Laden kauft man lustige Mützen für Mampfi, und im <strong>Zauberkessel</strong> warten acht Geheimrezepte. Täglich gibt es ein Geschenk und ein Monster des Tages. Kostenlos, ohne Werbung, ohne Käufe, auf Handy, Tablet und PC."]),
  "schiri-pfiff": dict(
   title="Schiri Pfiff – Schiedsrichter-Spiel für Kinder kostenlos",
   meta="Schiri Pfiff: Kinder sind Schiedsrichter und entscheiden Foul, Tor, Einwurf, Elfmeter und Karten. Lustige Tiere, alles vorgelesen, ohne Werbung.",
@@ -375,6 +392,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Monster-Küche: Koch für hungrige Monster in Lewolux Kids", "kids/"),
  ("Neu", "Schiri Pfiff: Sei der Schiedsrichter in Lewolux Kids", "kids/"),
  ("Neu", "Fußball-Boss: der Fußballmanager für Kinder in Lewolux Kids", "kids/"),
  ("Neu", "Dino-Buddler: Dinos ausgraben in Lewolux Kids", "kids/"),
@@ -398,6 +416,11 @@ NEWS = [
 # c1/c2 = Farben der Karte, emoji = großes Symbol, age = Altersempfehlung
 # Spiele in dieser Liste werden im Kids-Modus NICHT gesperrt; alle anderen Spiele schon.
 KIDS = [
+ dict(id="monster-kueche", title="Monster-Küche", emoji="🍲", c1="#8ee03a", c2="#7b4fd6", age="ab 4 Jahren",
+  line="Koch lustige Gerichte für hungrige Monster",
+  learn="Bilder zuordnen, genau hinschauen, ausprobieren",
+  say="Monster-Küche! Koch für hungrige Monster und finde ihr Lieblingsessen.",
+  mascot="mampfi", crowd=1),
  dict(id="schiri-pfiff", title="Schiri Pfiff", emoji="🦁", c1="#ffc83d", c2="#2fb455", age="ab 5 Jahren",
   line="Sei der Schiedsrichter beim Tier-Fußball",
   learn="Fußballregeln, genau hinschauen, schnell entscheiden",

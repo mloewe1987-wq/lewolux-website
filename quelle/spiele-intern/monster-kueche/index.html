@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Monster-Küche – Lewolux Kids</title>
+<meta name="theme-color" content="#3b2a5e">
+<style>
+@font-face{font-family:F;src:url(fonts/fredoka-700.woff2) format("woff2");font-weight:700;font-display:swap}
+:root{--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);--sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px);--ink:#2b1d45;--lime:#8ee03a;--or:#ff9a1f;--pk:#ff5fa8}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#2b1d45;font-family:F,"Arial Rounded MT Bold",system-ui,sans-serif;color:var(--ink);user-select:none;-webkit-user-select:none;touch-action:manipulation}
+[hidden]{display:none!important}
+img{-webkit-user-drag:none;user-select:none;pointer-events:none}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;touch-action:manipulation}
+#bgb{position:fixed;inset:-40px;background:url(assets/bg.webp) center/cover;filter:blur(18px) brightness(.7)}
+#stage{position:absolute;left:50%;top:50%;transform-origin:0 0;overflow:hidden}
+.scr{position:absolute;inset:0}
+/* ---------- Küche ---------- */
+#kbg{position:absolute;inset:0;background:url(assets/bg.webp) center 70%/cover}
+#hud{position:absolute;left:0;right:0;top:0;height:96px;display:flex;align-items:center;gap:14px;padding:12px 18px;z-index:30}
+.rb{width:76px;height:76px;border-radius:50%;background:#fff;box-shadow:0 6px 0 #c9b8e6,0 10px 18px rgba(0,0,0,.25);display:grid;place-items:center;font-size:40px;flex:none;transition:transform .12s}
+.rb:active{transform:translateY(4px) scale(.95);box-shadow:0 2px 0 #c9b8e6}
+.coins{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.92);border-radius:40px;padding:6px 18px 6px 8px;font-size:34px;box-shadow:0 5px 0 rgba(0,0,0,.18);flex:none}
+.coin{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6b0,#ffd23a 40%,#e89b0c);box-shadow:inset 0 -4px 0 #c87a00,0 2px 0 #9a5d00;display:inline-grid;place-items:center;color:#b06a00;font-size:26px;flex:none}
+.coin::before{content:"★"}
+#guests{display:flex;gap:6px;margin-left:auto;background:rgba(255,255,255,.85);border-radius:40px;padding:6px 10px}
+#guests i{width:54px;height:54px;border-radius:50%;background:#e9e0f7 center/88% no-repeat;display:block;position:relative;opacity:.55}
+#guests i.now{opacity:1;box-shadow:0 0 0 4px var(--or)}
+#guests i.done{opacity:1}
+#guests i.done::after{content:"✔";position:absolute;right:-4px;bottom:-4px;width:26px;height:26px;border-radius:50%;background:#3cc24a;color:#fff;font-size:18px;display:grid;place-items:center}
+#guests i.star::after{content:"★";background:#ffb400}
+/* Monster */
+#mon{position:absolute;z-index:8;transform-origin:50% 100%;will-change:transform}
+#mon img{display:block;height:100%;width:auto;margin:0 auto;transform-origin:50% 100%}
+#mon .mi{height:100%;transform-origin:50% 100%;animation:breathe 1.6s ease-in-out infinite}
+#mon.walk .mi{animation:hop .36s ease-in-out infinite}
+#mon.eat .mi{animation:chomp .22s ease-in-out infinite}
+#mon.yuck .mi{animation:shake .12s linear infinite}
+#mon.happy .mi{animation:jump .5s ease-in-out infinite}
+#mon.ice img{filter:hue-rotate(160deg) saturate(.6) brightness(1.25)}
+#mon.ice .mi{animation:shiver .06s linear infinite}
+#mon.hot img{filter:saturate(1.6) sepia(.4) hue-rotate(-30deg) brightness(1.05)}
+#mon .crown{position:absolute;left:50%;top:-34px;font-size:46px;transform:translateX(-50%);animation:bob 1.2s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.03,.97)}}
+@keyframes hop{0%,100%{transform:translateY(0) scale(1,1)}20%{transform:translateY(0) scale(1.08,.9)}55%{transform:translateY(-34px) scale(.95,1.06)}}
+@keyframes chomp{50%{transform:scale(1.1,.88)}}
+@keyframes shake{25%{transform:translateX(-8px) rotate(-3deg)}75%{transform:translateX(8px) rotate(3deg)}}
+@keyframes jump{50%{transform:translateY(-40px) scale(1.04,.98)}}
+@keyframes shiver{50%{transform:translateX(4px)}}
+@keyframes bob{50%{transform:translate(-50%,-8px)}}
+/* Sprechblase */
+#bub{position:absolute;z-index:12;background:#fff;border-radius:34px;padding:16px 18px;display:flex;gap:10px;box-shadow:0 8px 0 rgba(0,0,0,.15),0 14px 30px rgba(0,0,0,.25);transform-origin:0 100%;transition:transform .3s cubic-bezier(.3,1.6,.5,1),opacity .2s}
+#bub.off{transform:scale(0);opacity:0}
+#bub::after{content:"";position:absolute;left:18px;bottom:-26px;border:16px solid transparent;border-top:22px solid #fff;border-right-width:6px}
+#bub .o{width:96px;height:96px;position:relative;display:grid;place-items:center;border-radius:22px;background:#f4eefc}
+#bub .o img{width:88px;height:88px;object-fit:contain}
+#bub .o.ok{background:#d7f7c9}
+#bub .o.ok::after{content:"✔";position:absolute;right:-8px;top:-8px;width:36px;height:36px;border-radius:50%;background:#3cc24a;color:#fff;font-size:24px;display:grid;place-items:center;animation:pop .3s}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+/* Topf */
+#potw{position:absolute;z-index:10}
+#pot{width:100%;display:block;animation:potIdle 2.4s ease-in-out infinite;transform-origin:50% 100%}
+#pot.wob{animation:potWob .25s ease-in-out 3}
+@keyframes potIdle{50%{transform:scale(1.015,.99)}}
+@keyframes potWob{25%{transform:rotate(-3deg) scale(1.05,.95)}75%{transform:rotate(3deg) scale(1.05,.95)}}
+#soup{position:absolute;left:16%;right:16%;top:13%;height:16%;border-radius:50%;mix-blend-mode:color;opacity:0;transition:opacity .4s,background .6s;pointer-events:none}
+#potIn{position:absolute;left:18%;right:18%;top:2%;height:26%;pointer-events:none}
+#potIn img{position:absolute;width:64px;height:64px;animation:float 2s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px) rotate(12deg)}}
+#spoon{position:absolute;z-index:14;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#fff 60%,#ffe9b8);box-shadow:0 7px 0 #e0a640,0 12px 22px rgba(0,0,0,.3);display:grid;place-items:center;transition:transform .2s,opacity .2s}
+#spoon.off{transform:scale(0);opacity:0;pointer-events:none}
+#spoon.go{animation:pulse 1s ease-in-out infinite}
+#spoon svg{width:110px;height:110px}
+@keyframes pulse{50%{transform:scale(1.12) rotate(-8deg)}}
+#dump{position:absolute;z-index:14;width:78px;height:78px;border-radius:50%;background:#fff;box-shadow:0 5px 0 #c9b8e6;display:grid;place-items:center;font-size:40px;transition:transform .2s,opacity .2s}
+#dump.off{transform:scale(0);opacity:0;pointer-events:none}
+#stirS{position:absolute;z-index:13;width:120px;height:220px;pointer-events:none;opacity:0;transform-origin:50% 90%}
+#stirS.on{opacity:1;animation:stir .5s linear infinite}
+@keyframes stir{0%{transform:translateX(-50px) rotate(-14deg)}25%{transform:translateX(0) translateY(10px) rotate(0)}50%{transform:translateX(50px) rotate(14deg)}75%{transform:translateX(0) translateY(-10px) rotate(0)}100%{transform:translateX(-50px) rotate(-14deg)}}
+/* Koch */
+#chef{position:absolute;z-index:9;transform-origin:50% 100%}
+#chef .ci{position:relative;height:100%;transform-origin:50% 100%;animation:breathe 2s ease-in-out infinite}
+#chef .ci>img:first-child{height:100%;display:block}
+#chef .hat,#chef2 .hat{height:auto}
+#chef.talk .ci{animation:talk .3s ease-in-out infinite}
+#chef .hat,#chef2 .hat{position:absolute;width:50%;left:var(--hx,25%);bottom:var(--hy,83%);transform:rotate(var(--hr,-6deg));transform-origin:50% 100%;z-index:2}
+@keyframes talk{50%{transform:scale(1.02,.98) translateY(-4px)}}
+#chef.fx-tiny .ci{transform:scale(.45)!important}
+#chef.fx-giant .ci{transform:scale(1.55)!important}
+#chef .ci{transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+#chef.fx-rocket{animation:rocket 3s ease-in-out}
+@keyframes rocket{0%{transform:none}20%{transform:translateY(40px) scale(1.1,.85)}55%{transform:translateY(-700px) rotate(360deg)}75%{transform:translateY(-700px)}100%{transform:none}}
+#chef.fx-sugar .ci{animation:sugar .08s linear infinite!important}
+@keyframes sugar{25%{transform:translate(-10px,-6px) rotate(-6deg)}75%{transform:translate(10px,-6px) rotate(6deg)}}
+#chef.fx-sugar img,#chef.fx-rainbow img{animation:rainbow 1s linear infinite}
+@keyframes rainbow{to{filter:hue-rotate(360deg) saturate(1.6)}}
+#chef.fx-stink img{filter:sepia(1) hue-rotate(50deg) saturate(2.5) brightness(.9)}
+#chef.fx-ice img{filter:hue-rotate(150deg) saturate(.5) brightness(1.3)}
+#chef .iceb{position:absolute;inset:-6% -10%;border-radius:30px;background:linear-gradient(135deg,rgba(220,250,255,.75),rgba(140,210,255,.45));box-shadow:inset 0 0 0 6px rgba(255,255,255,.8),0 0 30px #9fe6ff;z-index:3;animation:pop .4s}
+#chef.fx-steam img{filter:brightness(1.2) saturate(1.4) hue-rotate(-20deg)}
+/* Regal */
+#shelf{position:absolute;left:0;right:0;bottom:0;z-index:20;display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:10px;padding:12px 16px calc(12px + var(--sb));background:linear-gradient(#a0653a,#7a4626);border-top:8px solid #c9894f;box-shadow:0 -6px 18px rgba(0,0,0,.3)}
+.ing{width:104px;height:104px;border-radius:24px;background:radial-gradient(circle at 50% 40%,#fff,#f1e5d6);box-shadow:0 6px 0 #5a3018,0 9px 14px rgba(0,0,0,.3);display:grid;place-items:center;position:relative;transition:transform .1s}
+.ing img{width:90px;height:90px;object-fit:contain;transition:transform .15s}
+.ing:active{transform:translateY(5px);box-shadow:0 1px 0 #5a3018}
+.ing.new::before{content:"NEU";position:absolute;top:-10px;right:-10px;background:var(--pk);color:#fff;font-size:16px;padding:3px 8px;border-radius:12px;z-index:2;animation:bob2 1s ease-in-out infinite}
+.ing.hint img{animation:wig .6s ease-in-out infinite}
+@keyframes wig{25%{transform:rotate(-12deg) scale(1.1)}75%{transform:rotate(12deg) scale(1.1)}}
+@keyframes bob2{50%{transform:translateY(-5px)}}
+/* Partikel */
+.pt{position:fixed;left:0;top:0;pointer-events:none;z-index:100;font-size:44px;line-height:1;will-change:transform,opacity}
+.fly{position:fixed;left:0;top:0;pointer-events:none;z-index:90;will-change:transform}
+/* ---------- Titel ---------- */
+#title{background:url(assets/title.webp) center/cover}
+#title .logo{position:absolute;left:50%;top:calc(20px + var(--st));transform:translateX(-50%);font-size:92px;color:#fff;text-align:center;line-height:.9;letter-spacing:1px;-webkit-text-stroke:4px #3b1f6b;paint-order:stroke fill;text-shadow:0 8px 0 #3b1f6b,0 14px 24px rgba(0,0,0,.4);white-space:nowrap;animation:logo 2.6s ease-in-out infinite}
+#title .logo span{color:var(--lime)}
+.pbr{display:none}.port .pbr{display:inline}
+.port #title .logo{top:calc(110px + var(--st));font-size:100px;line-height:.95}
+.port #tmenu{gap:18px}.port .big.play{order:-1;margin:0 calc(50% - 105px)}
+@keyframes logo{50%{transform:translateX(-50%) rotate(-2deg) scale(1.03)}}
+#tmenu{position:absolute;left:0;right:0;bottom:calc(26px + var(--sb));display:flex;justify-content:center;align-items:flex-end;gap:22px;flex-wrap:wrap;padding:0 16px}
+.big{width:150px;height:150px;border-radius:40px;background:#fff;box-shadow:0 9px 0 #b39ddb,0 14px 26px rgba(0,0,0,.35);display:grid;place-items:center;position:relative;transition:transform .12s}
+.big:active{transform:translateY(6px);box-shadow:0 3px 0 #b39ddb}
+.big img{width:116px;height:116px;object-fit:contain}
+.big .em{font-size:84px}
+.big.play{width:210px;height:210px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#c4ff7a,#6fcf1f);box-shadow:0 10px 0 #3f8a0c,0 16px 30px rgba(0,0,0,.4);animation:pulse2 1.4s ease-in-out infinite}
+.big.play svg{width:110px;height:110px;margin-left:14px}
+@keyframes pulse2{50%{transform:scale(1.06)}}
+.badge{position:absolute;top:-10px;right:-10px;min-width:44px;height:44px;border-radius:22px;background:var(--pk);color:#fff;font-size:24px;display:grid;place-items:center;padding:0 8px;box-shadow:0 3px 0 #b02a6c}
+#ttop{position:absolute;left:0;right:0;top:calc(14px + var(--st));display:flex;justify-content:space-between;padding:0 18px;z-index:3}
+#ttop .r{display:flex;gap:12px}
+#gift{position:absolute;z-index:4;width:150px;height:150px;animation:giftW 1.2s ease-in-out infinite}
+#gift .em{font-size:110px;display:block;filter:drop-shadow(0 8px 6px rgba(0,0,0,.4))}
+@keyframes giftW{0%,100%{transform:rotate(0)}10%{transform:rotate(-10deg) scale(1.08)}20%{transform:rotate(10deg) scale(1.08)}30%{transform:rotate(0)}}
+#motd{position:absolute;z-index:3;display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.9);border-radius:30px;padding:10px 14px 8px;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+#motd img{height:120px}
+#motd b{font-size:22px;display:flex;align-items:center;gap:6px}
+/* ---------- Album/Laden/Buch ---------- */
+.panel{position:absolute;inset:0;background:linear-gradient(#5b3d8f,#3b2a5e);display:flex;flex-direction:column}
+.ptop{display:flex;align-items:center;gap:14px;padding:calc(12px + var(--st)) 18px 10px}
+.ptop h2{margin:0;font-size:48px;color:#fff;display:flex;align-items:center;gap:12px;text-shadow:0 4px 0 rgba(0,0,0,.3)}
+.ptop h2 .em{font-size:52px}
+.grid{flex:1;overflow:auto;display:grid;gap:16px;padding:10px 18px calc(18px + var(--sb));align-content:start;scrollbar-width:none}
+.grid::-webkit-scrollbar{display:none}
+.card{background:#fff;border-radius:28px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 7px 0 rgba(0,0,0,.22);position:relative;transition:transform .12s}
+.card:active{transform:scale(.96)}
+.card .pic{height:170px;display:flex;align-items:flex-end;justify-content:center}
+.card .pic img{max-height:170px;max-width:100%}
+.card.lock .pic img{filter:brightness(0) opacity(.35)}
+.card .fav{display:flex;align-items:center;gap:6px;background:#ffe6f1;border-radius:20px;padding:4px 10px;font-size:30px;min-height:56px}
+.card .fav img{width:48px;height:48px}
+.card .fav .q{font-size:36px;color:#c06;width:48px;text-align:center}
+.card .cnt{display:flex;gap:3px}
+.card .cnt i{width:16px;height:16px;border-radius:50%;background:#e4dcef}
+.card .cnt i.on{background:var(--or)}
+.card.sel{box-shadow:0 0 0 6px var(--lime),0 7px 0 rgba(0,0,0,.22)}
+.price{display:flex;align-items:center;gap:6px;font-size:30px}
+.price .coin{width:36px;height:36px;font-size:20px}
+.card .own{font-size:40px;color:#3cc24a}
+.card.poor{opacity:.6}
+#album .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+#shop .grid,#book .grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+#shopL{display:flex;flex:1;min-height:0}
+#shopChef{width:34%;position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:30px}
+#shopChef #chef2{position:relative;height:420px}
+.port #shopL{flex-direction:column-reverse}.port #shopChef{width:100%;flex:1;padding-bottom:30px}.port #shopChef #chef2{height:500px}.port #shop .grid{flex:none!important}
+.rcp{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;min-height:70px}
+.rcp img{width:56px;height:56px}
+.rcp .pl{font-size:28px;color:#8a7aa8}
+.rcp .q{width:56px;height:56px;border-radius:16px;background:#ece5f6;display:grid;place-items:center;font-size:30px;color:#a493c4}
+.card .rfx{font-size:70px;height:90px;display:grid;place-items:center}
+.card.lock .rfx{filter:grayscale(1) opacity(.3)}
+/* ---------- Overlay ---------- */
+#ov{position:absolute;inset:0;z-index:60;background:rgba(30,15,60,.6);display:grid;place-items:center;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.box{background:#fff;border-radius:44px;padding:28px 34px;display:flex;flex-direction:column;align-items:center;gap:18px;box-shadow:0 12px 0 #b39ddb,0 20px 50px rgba(0,0,0,.4);animation:boxIn .45s cubic-bezier(.3,1.6,.5,1);max-width:92%}
+@keyframes boxIn{from{transform:scale(.3)}}
+.stars{display:flex;gap:12px}
+.stars i{font-style:normal;font-size:110px;color:#e4dcef;line-height:1;text-shadow:0 6px 0 rgba(0,0,0,.12)}
+.stars i.on{color:#ffc21a;animation:starIn .5s cubic-bezier(.3,1.8,.5,1) both;text-shadow:0 6px 0 #d48a00}
+@keyframes starIn{from{transform:scale(0) rotate(-180deg)}}
+.row{display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap}
+.got{display:flex;align-items:center;gap:10px;font-size:52px}
+.newi{display:flex;flex-direction:column;align-items:center;background:#fff4d6;border-radius:26px;padding:10px 16px;position:relative}
+.newi img{height:110px;animation:wig 1s ease-in-out infinite}
+.newi.mon img{height:150px;filter:brightness(0) opacity(.5);animation:bob2 1s ease-in-out infinite}
+.newi::before{content:"NEU";position:absolute;top:-12px;background:var(--pk);color:#fff;font-size:20px;padding:3px 10px;border-radius:12px}
+.go{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#c4ff7a,#6fcf1f);box-shadow:0 8px 0 #3f8a0c;display:grid;place-items:center}
+.go svg{width:62px;height:62px;margin-left:8px}
+.go:active{transform:translateY(5px);box-shadow:0 3px 0 #3f8a0c}
+#flash{position:absolute;inset:0;z-index:55;pointer-events:none;background:radial-gradient(circle,#fff,rgba(255,255,255,0) 70%);opacity:0}
+#flash.on{animation:flash .7s}
+@keyframes flash{30%{opacity:.9}}
+#rtitle{position:absolute;left:50%;top:22%;z-index:56;transform:translateX(-50%);font-size:72px;color:#fff;-webkit-text-stroke:4px #5b2a8f;paint-order:stroke fill;text-shadow:0 6px 0 #5b2a8f;white-space:nowrap;pointer-events:none;animation:rt 2.6s ease both}
+@keyframes rt{0%{transform:translateX(-50%) scale(0)}15%{transform:translateX(-50%) scale(1.15)}25%,80%{transform:translateX(-50%) scale(1)}100%{transform:translateX(-50%) scale(1);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<div id="bgb"></div>
+<div id="stage">
+  <!-- Titel -->
+  <section id="title" class="scr">
+    <div class="logo">Monster-<br class="pbr"><span>Küche</span></div>
+    <div id="ttop"><span class="coins"><span class="coin"></span><b class="cv">0</b></span><span class="r"><button class="rb snd" data-say="Ton" aria-label="Ton">🔊</button></span></div>
+    <button id="gift" hidden data-say="Geschenk" aria-label="Geschenk"><span class="em">🎁</span></button>
+    <div id="motd" hidden><b><span>👑</span><span class="coin" style="width:30px;height:30px;font-size:16px"></span><span>×2</span></b><img alt=""></div>
+    <div id="tmenu">
+      <button class="big" id="bAlbum" data-say="Monster-Album" aria-label="Monster-Album"><img src="assets/m1_1.webp" alt=""><span class="badge" hidden id="albN"></span></button>
+      <button class="big" id="bShop" data-say="Mützen-Laden" aria-label="Mützen-Laden"><img src="assets/hat_1.webp" alt=""></button>
+      <button class="big play" id="bPlay" data-say="Kochen" aria-label="Kochen"><svg viewBox="0 0 24 24"><path d="M5 3.5v17l15-8.5z" fill="#fff" stroke="#2f6a08" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+      <button class="big" id="bMagic" data-say="Zauberkessel" aria-label="Zauberkessel"><img src="assets/pot.webp" alt="" style="filter:hue-rotate(200deg) saturate(1.4)"><span class="badge" style="background:#8a4fff;box-shadow:0 3px 0 #5a24c0">✨</span></button>
+      <button class="big" id="bBook" data-say="Rezeptbuch" aria-label="Rezeptbuch"><span class="em">📖</span><span class="badge" hidden id="bookN"></span></button>
+    </div>
+  </section>
+
+  <!-- Küche (auch Zauberkessel) -->
+  <section id="kitchen" class="scr" hidden>
+    <div id="kbg"></div>
+    <div id="hud"><button class="rb" id="kHome" data-say="Zurück" aria-label="Zurück">🏠</button><span class="coins"><span class="coin"></span><b class="cv">0</b></span><div id="guests"></div></div>
+    <div id="mon" hidden><div class="mi"><img alt=""></div></div>
+    <div id="bub" class="off"></div>
+    <div id="chef"><div class="ci"><img src="assets/chef_1.webp" alt=""><img class="hat" alt="" hidden></div></div>
+    <div id="potw"><img id="pot" src="assets/pot.webp" alt=""><div id="soup"></div><div id="potIn"></div></div>
+    <div id="stirS"><svg viewBox="0 0 60 220"><ellipse cx="30" cy="190" rx="22" ry="28" fill="#c98a4b" stroke="#7a4626" stroke-width="5"/><rect x="25" y="4" width="10" height="170" rx="5" fill="#d9a066" stroke="#7a4626" stroke-width="4"/></svg></div>
+    <button id="spoon" class="off" data-say="Umrühren" aria-label="Umrühren"><svg viewBox="0 0 60 120"><g transform="rotate(30 30 60)"><ellipse cx="30" cy="96" rx="20" ry="24" fill="#c98a4b" stroke="#7a4626" stroke-width="5"/><rect x="25" y="4" width="10" height="80" rx="5" fill="#d9a066" stroke="#7a4626" stroke-width="4"/></g></svg></button>
+    <button id="dump" class="off" data-say="Ausschütten" aria-label="Ausschütten">🗑️</button>
+    <div id="shelf"></div>
+    <div id="flash"></div>
+  </section>
+
+  <!-- Album -->
+  <section id="album" class="scr panel" hidden>
+    <div class="ptop"><button class="rb back" data-say="Zurück" aria-label="Zurück">🏠</button><h2><span class="em">📒</span><span id="albC">0/10</span></h2></div>
+    <div class="grid" id="albG"></div>
+  </section>
+
+  <!-- Laden -->
+  <section id="shop" class="scr panel" hidden>
+    <div class="ptop"><button class="rb back" data-say="Zurück" aria-label="Zurück">🏠</button><h2><span class="em">🎩</span></h2><span class="coins" style="margin-left:auto"><span class="coin"></span><b class="cv">0</b></span></div>
+    <div id="shopL"><div id="shopChef"><div id="chef2" class="chefP"><div class="ci" style="position:relative;height:100%"><img src="assets/chef_3.webp" alt="" style="height:100%;display:block"><img class="hat" alt="" hidden></div></div></div><div class="grid" id="shopG" style="flex:1"></div></div>
+  </section>
+
+  <!-- Rezeptbuch -->
+  <section id="book" class="scr panel" hidden>
+    <div class="ptop"><button class="rb back" data-say="Zurück" aria-label="Zurück">🏠</button><h2><span class="em">📖</span><span id="bookC">0/8</span></h2></div>
+    <div class="grid" id="bookG"></div>
+  </section>
+
+  <div id="ov" hidden></div>
+</div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const rnd = (a, b) => a + Math.random() * (b - a), ri = (a, b) => Math.floor(rnd(a, b + 1)), pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const KEY = "monsterkueche_v1";
+const today = () => { const d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
+let S = { coins: 0, lvl: 0, met: {}, fav: {}, fed: {}, hats: [0], hat: 0, rec: {}, gift: "", seen: {}, best: [], newIng: [] };
+try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) S = Object.assign(S, s); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+/* ================= Daten ================= */
+const ING = /*@@ING*/[
+ {n:"Pilz",c:"#b5764a"},{n:"Fisch",c:"#3d8bff"},{n:"Schokolade",c:"#6b3a1e"},{n:"Chili",c:"#ff2a1a"},
+ {n:"Eiswürfel",c:"#8fe3ff"},{n:"Banane",c:"#ffe23a"},{n:"Käse",c:"#ffc21a"},{n:"Gummiwurm",c:"#ff5fd0"},
+ {n:"Spiegelei",c:"#fff3a0"},{n:"Möhre",c:"#ff8a1f"},{n:"Cupcake",c:"#ff8ac8"},{n:"Bohnen",c:"#c0502a"}
+]/*@@ING-END*/;
+const ING_ORDER = [9, 5, 0, 6, 1, 8, 2, 3, 4, 7, 10, 11]; // Freischalt-Reihenfolge
+const MON = /*@@MON*/[
+ {n:"Blubbo",fav:1},{n:"Schlabber",fav:0},{n:"Funki",fav:3},{n:"Zippel",fav:7},{n:"Puddi",fav:10},
+ {n:"Professor Piks",fav:6},{n:"Klotzi",fav:11},{n:"Tinti",fav:8},{n:"Huschi",fav:4},{n:"Zottel",fav:2}
+]/*@@MON-END*/;
+const HATS = [{p:0},{p:25},{p:15},{p:30},{p:20},{p:12},{p:18},{p:10}];
+const RECIPES = [
+ {i:[3,4],n:"Dampf-Zauber!",fx:"steam",e:"♨️"},{i:[3,11],n:"Raketen-Pups!",fx:"rocket",e:"🚀"},
+ {i:[2,5,10],n:"Zucker-Schock!",fx:"sugar",e:"⚡"},{i:[1,6],n:"Stinke-Suppe!",fx:"stink",e:"🦨"},
+ {i:[0,7],n:"Schrumpf-Trank!",fx:"tiny",e:"🐜"},{i:[8,9],n:"Riesen-Trank!",fx:"giant",e:"🦕"},
+ {i:[1,4],n:"Pinguin-Eis!",fx:"ice",e:"🧊"},{i:[2,3],n:"Regenbogen-Zauber!",fx:"rainbow",e:"🌈"}
+];
+const GUESTS = 5;
+const ingN = () => Math.min(12, 6 + S.lvl), monN = () => Math.min(10, 3 + S.lvl);
+const unlockedIng = () => ING_ORDER.slice(0, ingN());
+const motd = () => { const d = today(); let h = 0; for (const c of d) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h) % monN(); };
+
+/* ================= Texte (Mampfi) ================= */
+const T = /*@@T*/{
+ hello:"Hallo! Ich bin Mampfi, der Monster-Koch! Hilfst du mir in meiner Monster-Küche?",
+ guest1:"Ein Gast! In der Sprechblase siehst du, was er essen möchte.",
+ tapIng:"Tippe auf die Zutaten. Sie fliegen in den Topf!",
+ stir1:"Jetzt umrühren! Tippe auf den Löffel!",
+ order:"Die Bestellung:",
+ stir:["Jetzt umrühren!","Umrühren, bitte!"],
+ full:"Der Topf ist voll! Rühr um!",
+ ok:["Mmmh, lecker!","Super gekocht!","Volltreffer! Genau richtig!","Du bist ein Sternekoch!","Das schmeckt! Klasse!"],
+ extra:"Lecker! Mit einer Extra-Zutat!",
+ fav:"Wow! Das ist sein Lieblingsessen! Schau mal ins Monster-Album!",
+ yuck:["Bäh! Da fehlt noch was. Schau nochmal in die Sprechblase!","Igitt! Probier es nochmal!"],
+ chili:"Oh oh, scharf! Feuer!",ice:"Brrr! Eiskalt!",beans:"Hihi, ein Pups!",burp:"Na hoppla, ein Rülpser!",
+ hint:"Psst! Vielleicht mag er noch eine Extra-Zutat?",
+ end3:"Feierabend! Drei Sterne! Du bist ein Super-Koch!",end2:"Feierabend! Zwei Sterne! Toll gekocht!",end1:"Feierabend! Ein Stern! Morgen klappt es noch besser!",
+ newIng:"Neue Zutat freigeschaltet!",newMon:"Ein neues Monster kommt bald zu Besuch!",
+ gift:"Ein Geschenk für dich! Tippe auf die Kiste!",giftGot:"Juhu! Münzen für dich!",
+ motd:"Heute ist Monster des Tages! Bei ihm gibt es doppelt Münzen!",
+ shop:"Hier kannst du Mützen für mich kaufen!",buy:"Juhu, eine neue Mütze!",poor:"Dafür brauchst du noch mehr Münzen. Koch weiter!",wear:"Steht mir gut!",
+ album:"Das ist das Monster-Album. Findest du von jedem Monster das Lieblingsessen? Probier mal eine Extra-Zutat!",
+ favIs:"Lieblingsessen:",unknown:"Das Lieblingsessen ist noch geheim!",notMet:"Dieses Monster hast du noch nicht getroffen.",
+ magic:"Der Zauberkessel! Wirf Zutaten hinein und rühr um. Was passiert wohl?",
+ secret:"Geheimrezept entdeckt!",
+ nothing:["Blubb! Nichts passiert. Probier eine andere Mischung!","Hui! Fast! Probier was anderes!","Puff! Nur Blubberblasen. Mische mal anders!"],
+ book:"Das ist das Rezeptbuch. Hier siehst du alle Geheimrezepte, die du gefunden hast.",
+ bookAll:"Du hast alle Geheimrezepte gefunden! Du bist ein Zauberkoch!",
+ albumAll:"Du kennst alle Lieblingsessen! Du bist der beste Monster-Koch der Welt!",
+ comes:["Da kommt","Hallo"],
+ back:"Hallo! Schön, dass du wieder da bist! Lass uns kochen!"
+}/*@@T-END*/;
+
+/* ================= Stimme & Ton ================= */
+const VOX = /*@@VOX*/{"Hallo! Ich bin Mampfi, der Monster-Koch! Hilfst du mir in meiner Monster-Küche?": "0e82ae66d7", "Ein Gast! In der Sprechblase siehst du, was er essen möchte.": "3dda63dd28", "Tippe auf die Zutaten. Sie fliegen in den Topf!": "e9ff791b1f", "Jetzt umrühren! Tippe auf den Löffel!": "bce6912902", "Die Bestellung:": "134f4d07fb", "Jetzt umrühren!": "b92e6ea8a9", "Umrühren, bitte!": "92361ec321", "Der Topf ist voll! Rühr um!": "8b752d8687", "Mmmh, lecker!": "54ac5c4f57", "Super gekocht!": "1bdf79ac30", "Volltreffer! Genau richtig!": "cabc821c5a", "Du bist ein Sternekoch!": "47cb21118c", "Das schmeckt! Klasse!": "5f05e26f4e", "Lecker! Mit einer Extra-Zutat!": "129004fd8f", "Wow! Das ist sein Lieblingsessen! Schau mal ins Monster-Album!": "b9f04dc9b7", "Bäh! Da fehlt noch was. Schau nochmal in die Sprechblase!": "33b91cf4fb", "Igitt! Probier es nochmal!": "fe883c3d8c", "Oh oh, scharf! Feuer!": "43c7438050", "Brrr! Eiskalt!": "b8ed2f2e97", "Hihi, ein Pups!": "943eb9bc18", "Na hoppla, ein Rülpser!": "2637c6f6b7", "Psst! Vielleicht mag er noch eine Extra-Zutat?": "3f8af9c281", "Feierabend! Drei Sterne! Du bist ein Super-Koch!": "0290f6e0ac", "Feierabend! Zwei Sterne! Toll gekocht!": "8115f777ff", "Feierabend! Ein Stern! Morgen klappt es noch besser!": "a7f71daae1", "Neue Zutat freigeschaltet!": "bc264dae81", "Ein neues Monster kommt bald zu Besuch!": "4ef1ffca9e", "Ein Geschenk für dich! Tippe auf die Kiste!": "8d6acf712f", "Juhu! Münzen für dich!": "19ef8ada55", "Heute ist Monster des Tages! Bei ihm gibt es doppelt Münzen!": "048d4caea9", "Chili": "3c6fb5482d", "Eiswürfel": "70d7e9d318", "Banane": "c434578aae", "Käse": "fb9bac4a43", "Gummiwurm": "f7fce7b6be", "Spiegelei": "4bde4fbfaa", "Möhre": "476bf96923", "Cupcake": "ccc0fa9b25", "Bohnen": "832b0aaf09", "Blubbo": "9b4f6680de", "Da kommt Blubbo!": "92417b4203", "Hallo Blubbo!": "1b8fcb0e2a", "Schlabber": "2165f98e1c", "Da kommt Schlabber!": "8d3f922d42", "Hallo Schlabber!": "f2b13674d5", "Funki": "7b678cfcc4", "Da kommt Funki!": "171388e510", "Hallo Funki!": "235c8462d5", "Zippel": "60ddd2b73c", "Da kommt Zippel!": "83eca55e5a", "Hallo Zippel!": "4b7816c032", "Puddi": "7b7118e0d5", "Da kommt Puddi!": "c01dde1c4e", "Hallo Puddi!": "0f2984153e", "Professor Piks": "9ed3b6abe5", "Da kommt Professor Piks!": "6be213d0cd", "Hallo Professor Piks!": "31872e9f8f", "Klotzi": "b6060cbefc", "Da kommt Klotzi!": "b50a5ed693", "Hallo Klotzi!": "4a78dabce3", "Tinti": "a9a2baca97", "Da kommt Tinti!": "673f9d28e0", "Hallo Tinti!": "c9903756b4", "Huschi": "f90dc7290a", "Da kommt Huschi!": "76e0c55b07", "Hallo Huschi!": "031761dc50", "Zottel": "81f45591d0", "Da kommt Zottel!": "86489091bd", "Hallo Zottel!": "976efd11be", "Dampf-Zauber!": "ed1417f634", "Raketen-Pups!": "a69be71a38", "Zucker-Schock!": "b92f2f79c8", "Stinke-Suppe!": "21d84b8840", "Schrumpf-Trank!": "630570503b", "Riesen-Trank!": "a45f65ea26", "Pinguin-Eis!": "83301429ab", "Regenbogen-Zauber!": "3da2a24b90", "Ton": "448f887053", "Geschenk": "1af970ce54", "Monster-Album": "448767486f", "Mützen-Laden": "edda6c354d", "Kochen": "11fd412e56", "Zauberkessel": "4904c86a68", "Rezeptbuch": "eca125f581", "Zurück": "4c214f1b1a", "Umrühren": "af46050a74", "Ausschütten": "fe5b176221", "Weiter kochen": "bedcb0204c", "Blubb! Nichts passiert. Probier eine andere Mischung!": "6cf16eabbc", "Hui! Fast! Probier was anderes!": "0f9287b35e", "Puff! Nur Blubberblasen. Mische mal anders!": "fb202f03e6", "Das ist das Rezeptbuch. Hier siehst du alle Geheimrezepte, die du gefunden hast.": "7f36d26bca", "Du hast alle Geheimrezepte gefunden! Du bist ein Zauberkoch!": "fd18d26e0e", "Du kennst alle Lieblingsessen! Du bist der beste Monster-Koch der Welt!": "3d52bc4ab3", "Hallo! Schön, dass du wieder da bist! Lass uns kochen!": "480de1114e", "Pilz": "54fc904028", "Fisch": "eda1758729", "Schokolade": "8a4ef0cb4c", "Hier kannst du Mützen für mich kaufen!": "1cc22e7caa", "Juhu, eine neue Mütze!": "0abf141d52", "Dafür brauchst du noch mehr Münzen. Koch weiter!": "90c2104f2e", "Steht mir gut!": "d474e94677", "Das ist das Monster-Album. Findest du von jedem Monster das Lieblingsessen? Probier mal eine Extra-Zutat!": "64f70afe20", "Lieblingsessen:": "ff45a0a6b1", "Das Lieblingsessen ist noch geheim!": "afcec9ec2b", "Dieses Monster hast du noch nicht getroffen.": "34197f47d7", "Der Zauberkessel! Wirf Zutaten hinein und rühr um. Was passiert wohl?": "b2269d4eaa", "Geheimrezept entdeckt!": "0fa6d07a04"}/*@@VOX-END*/;
+let soundOn = true; try { soundOn = localStorage.getItem("mk_snd") !== "0"; } catch (e) {}
+let vq = [], vBusy = false, vCur = null, vTok = 0;
+const chefEl = $("#chef");
+function say(t, opt = {}) { if (!t || !soundOn) return; if (Array.isArray(t)) t = pick(t); if (opt.now) { vq = []; stopVoice(); play(t); return; } if (vBusy) { vq.push(t); return; } play(t); }
+function stopVoice() { vTok++; if (vCur) { try { vCur.onended = vCur.onerror = null; vCur.pause(); } catch (e) {} vCur = null; } try { speechSynthesis.cancel(); } catch (e) {} vBusy = false; chefEl.classList.remove("talk"); duck(false); }
+function vDone(tok) { if (tok !== vTok) return; vBusy = false; vCur = null; chefEl.classList.remove("talk"); duck(false); const n = vq.shift(); if (n) setTimeout(() => { if (!vBusy) play(n); }, 90); }
+function play(t) {
+  vTok++; const tok = vTok; vBusy = true; chefEl.classList.add("talk"); duck(true);
+  const id = VOX[t];
+  if (id) { const a = new Audio(`voice/${id}.mp3`); vCur = a; a.onended = a.onerror = () => vDone(tok); a.play().catch(() => vDone(tok)); setTimeout(() => { if (tok === vTok && vBusy && a.paused && !a.currentTime) vDone(tok); }, 8000); return; }
+  try { const u = new SpeechSynthesisUtterance(t); u.lang = "de-DE"; const v = speechSynthesis.getVoices().find(v => /^de/i.test(v.lang)); if (v) u.voice = v; u.onend = u.onerror = () => vDone(tok); speechSynthesis.speak(u); setTimeout(() => { if (tok === vTok && vBusy && !speechSynthesis.speaking) vDone(tok); }, 8000); } catch (e) { vDone(tok); }
+}
+const sayDone = () => new Promise(r => { const ck = () => (!vBusy && !vq.length) ? r() : setTimeout(ck, 120); ck(); });
+let AC = null; const ac = () => { if (!AC) try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} if (AC && AC.state === "suspended") AC.resume(); return AC; };
+function tone(f, d, type = "sine", v = .15, delay = 0, f2) { const c = ac(); if (!c || !soundOn) return; const t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .01); g.gain.exponentialRampToValueAtTime(.001, t + d); o.connect(g).connect(c.destination); o.start(t); o.stop(t + d + .05); }
+const SFXN = ["brr", "bubble", "burp", "chomp", "coins", "fire", "giggle", "plop", "pop", "sneeze", "sparkle", "steps", "stir", "toot", "yuck"];
+const SFX = {}; SFXN.forEach(n => { SFX[n] = []; for (let i = 1; i <= 2; i++) { const a = new Audio(`sfx/${n}${i}.mp3`); a.preload = "auto"; a.onerror = () => { SFX[n] = SFX[n].filter(x => x !== a); }; SFX[n].push(a); } });
+const SYN = { tap: () => tone(700, .06, "triangle"), plop: () => tone(500, .12, "sine", .2, 0, 120), chomp: () => [0, .15, .3].forEach(d => tone(180, .08, "square", .08, d, 90)), burp: () => tone(120, .5, "sawtooth", .12, 0, 70), toot: () => tone(140, .45, "sawtooth", .1, 0, 90), bubble: () => [0, .1, .2].forEach(d => tone(rnd(300, 600), .08, "sine", .1, d, 900)), sparkle: () => [1046, 1318, 1568, 2093].forEach((f, i) => tone(f, .2, "triangle", .08, i * .07)), coins: () => [1318, 1760].forEach((f, i) => tone(f, .15, "square", .05, i * .08)), yuck: () => tone(300, .4, "sawtooth", .08, 0, 150), bell: () => [880, 660].forEach((f, i) => tone(f, .4, "sine", .15, i * .3)), giggle: () => [700, 800, 700, 900].forEach((f, i) => tone(f, .07, "triangle", .08, i * .08)), fire: () => tone(200, .6, "sawtooth", .05, 0, 900), brr: () => [0, .06, .12, .18, .24].forEach(d => tone(220, .04, "square", .05, d)), pop: () => tone(900, .06, "sine", .2, 0, 300), stir: () => tone(300, .3, "sine", .04, 0, 500), steps: () => tone(150, .1, "sine", .15, 0, 90), sneeze: () => tone(900, .3, "sawtooth", .06, 0, 200) };
+function sfx(n, vol = 1) { if (!soundOn) return; const ok = (SFX[n] || []).filter(a => a.readyState >= 2); if (ok.length) { const a = pick(ok); try { a.currentTime = 0; a.volume = vol; a.play().catch(() => {}); } catch (e) {} } else if (SYN[n]) SYN[n](); }
+const MUS = {}; let musNow = null;
+function music(n) { if (musNow === n && MUS[n] && !MUS[n].paused) return; musNow = n; Object.entries(MUS).forEach(([k, a]) => { if (k !== n) a.pause(); }); if (!soundOn || !n) return; let a = MUS[n]; if (!a) { a = MUS[n] = new Audio(`sfx/music_${n}.mp3`); a.loop = true; } a.volume = vBusy ? .07 : .22; a.play().catch(() => {}); }
+function duck(on) { Object.values(MUS).forEach(a => { if (!a.paused) a.volume = on ? .07 : .22; }); }
+document.addEventListener("visibilitychange", () => { if (document.hidden) { Object.values(MUS).forEach(a => a.pause()); } else if (musNow && soundOn && MUS[musNow]) MUS[musNow].play().catch(() => {}); });
+document.addEventListener("pointerdown", e => { ac(); if (musNow && soundOn && MUS[musNow] && MUS[musNow].paused) MUS[musNow].play().catch(() => {}); const el = e.target.closest("[data-say]"); if (el && !el.dataset.quiet) say(el.dataset.say, { now: true }); }, true);
+function setSnd() { $$(".snd").forEach(b => b.textContent = soundOn ? "🔊" : "🔇"); }
+$$(".snd").forEach(b => b.onclick = () => { soundOn = !soundOn; try { localStorage.setItem("mk_snd", soundOn ? "1" : "0"); } catch (e) {} setSnd(); if (!soundOn) { stopVoice(); Object.values(MUS).forEach(a => a.pause()); } else music(musNow || "menu"); });
+setSnd();
+
+/* ================= Bühne / Layout ================= */
+const stage = $("#stage"); let PORT = false, SW = 1280, SH = 720, SC = 1;
+const L = {}; // Layout-Positionen
+function layout() {
+  const w = innerWidth, h = innerHeight; PORT = h > w * 1.05;
+  if (PORT) { SW = 720; SH = Math.max(1280, Math.min(1560, Math.round(720 * h / w))); } else { SH = 720; SW = Math.max(1280, Math.min(1600, Math.round(720 * w / h))); }
+  SC = Math.min(w / SW, h / SH);
+  Object.assign(stage.style, { width: SW + "px", height: SH + "px", transform: `translate(${-SW * SC / 2}px,${-SH * SC / 2}px) scale(${SC})` });
+  stage.classList.toggle("port", PORT);
+  const shelfH = PORT ? 300 : 136;
+  if (PORT) {
+    Object.assign(L, { monX: 210, monB: SH - shelfH - 330, monH: 400, potX: 255, potW: 320, potB: SH - shelfH - 10, chefX: 560, chefH: 290, chefB: SH - shelfH - 20, spoonX: 590, spoonB: SH - shelfH - 420, dumpX: 60, dumpB: SH - shelfH - 40 });
+  } else {
+    const cx = SW / 2;
+    Object.assign(L, { monX: cx - 400, monB: SH - shelfH - 6, monH: 380, potX: cx + 30, potW: 300, potB: SH - shelfH + 6, chefX: cx + 400, chefH: 360, chefB: SH - shelfH + 4, spoonX: cx + 215, spoonB: SH - shelfH - 120, dumpX: cx - 150, dumpB: SH - shelfH - 30 });
+  }
+  L.shelfH = shelfH;
+  const sh = $("#shelf"); sh.style.height = shelfH + "px";
+  sizeMon();
+  const pw = $("#potw"); Object.assign(pw.style, { width: L.potW + "px", left: (L.potX - L.potW / 2) + "px", bottom: (SH - L.potB) + "px" });
+  Object.assign(chefEl.style, { height: L.chefH + "px", left: (L.chefX - L.chefH * .53) + "px", bottom: (SH - L.chefB) + "px" });
+  Object.assign($("#spoon").style, { left: (L.spoonX - 75) + "px", bottom: (SH - L.spoonB) + "px" });
+  Object.assign($("#dump").style, { left: (L.dumpX - 39) + "px", bottom: (SH - L.dumpB) + "px" });
+  Object.assign($("#stirS").style, { left: (L.potX - 60) + "px", bottom: (SH - L.potB + L.potW * .45) + "px" });
+  // Titel-Elemente
+  const g = $("#gift"), m = $("#motd");
+  if (PORT) { Object.assign(g.style, { left: "40px", top: "300px" }); Object.assign(m.style, { right: "30px", left: "auto", top: "290px" }); }
+  else { Object.assign(g.style, { left: "60px", top: "200px" }); Object.assign(m.style, { right: "60px", left: "auto", top: "180px" }); }
+}
+const MSZ = [.92, .78, 1, 1.06, .8, .98, .86, .92, .84, 1.08];
+function sizeMon() { const f = K.mon >= 0 ? MSZ[K.mon] : 1, hh = L.monH * f; Object.assign(monEl.style, { height: hh + "px", width: hh + "px", left: (L.monX - hh / 2) + "px", top: (L.monB - hh) + "px" }); }
+addEventListener("resize", () => { layout(); if (cur === "kitchen") placeBubble(); });
+const toStage = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; };
+
+/* ================= Effekte ================= */
+function burst(x, y, chars, n = 10, o = {}) {
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement("span"); s.className = "pt"; s.textContent = Array.isArray(chars) ? pick(chars) : chars;
+    s.style.fontSize = (o.size || 44) * SC * rnd(.7, 1.3) + "px"; document.body.appendChild(s);
+    const a = (o.dir ?? -Math.PI / 2) + rnd(-(o.spread ?? Math.PI), o.spread ?? Math.PI), d = rnd(o.min ?? 60, o.max ?? 200) * SC;
+    const dx = Math.cos(a) * d, dy = Math.sin(a) * d + (o.grav ?? 0) * SC;
+    s.animate([{ transform: `translate(${x}px,${y}px) translate(-50%,-50%) scale(.3)`, opacity: 1 }, { transform: `translate(${x + dx * .6}px,${y + dy * .6}px) translate(-50%,-50%) scale(1.1) rotate(${rnd(-40, 40)}deg)`, opacity: 1, offset: .5 }, { transform: `translate(${x + dx}px,${y + dy}px) translate(-50%,-50%) scale(.8) rotate(${rnd(-90, 90)}deg)`, opacity: 0 }], { duration: (o.dur || 900) * rnd(.8, 1.3), easing: "cubic-bezier(.2,.7,.3,1)", delay: (o.stag || 0) * i }).onfinish = () => s.remove();
+  }
+}
+function flyImg(src, from, to, dur = 520, size = 90) {
+  return new Promise(res => {
+    const im = document.createElement("img"); im.src = src; im.className = "fly"; const sz = size * SC; im.style.width = im.style.height = sz + "px"; document.body.appendChild(im);
+    const mx = (from.x + to.x) / 2, my = Math.min(from.y, to.y) - 180 * SC;
+    const k = []; for (let i = 0; i <= 12; i++) { const t = i / 12, x = (1 - t) ** 2 * from.x + 2 * (1 - t) * t * mx + t * t * to.x, y = (1 - t) ** 2 * from.y + 2 * (1 - t) * t * my + t * t * to.y; k.push({ transform: `translate(${x - sz / 2}px,${y - sz / 2}px) rotate(${t * 360}deg) scale(${1 - t * .35})` }); }
+    im.animate(k, { duration: dur, easing: "linear" }).onfinish = () => { im.remove(); res(); };
+  });
+}
+function coinFly(from, n, to) {
+  to = to || toStage($$(".cv").find(e => e.offsetParent) || document.body);
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement("span"); c.className = "coin fly"; const sz = 46 * SC; Object.assign(c.style, { width: sz + "px", height: sz + "px", fontSize: 26 * SC + "px" }); document.body.appendChild(c);
+    const sx = from.x + rnd(-60, 60) * SC, sy = from.y + rnd(-40, 40) * SC;
+    c.animate([{ transform: `translate(${from.x - sz / 2}px,${from.y - sz / 2}px) scale(.2)` }, { transform: `translate(${sx - sz / 2}px,${sy - 80 * SC}px) scale(1.2)`, offset: .3 }, { transform: `translate(${to.x - sz / 2}px,${to.y - sz / 2}px) scale(.7)` }], { duration: 900, delay: i * 70, easing: "ease-in-out", fill: "backwards" }).onfinish = () => { c.remove(); if (i === 0) sfx("coins", .5); };
+  }
+}
+function addCoins(n, from) { S.coins += n; save(); if (from) { coinFly(from, Math.min(n, 12)); setTimeout(updCoins, 900); } else updCoins(); }
+function updCoins() { $$(".cv").forEach(e => { e.textContent = S.coins; e.parentElement.animate([{ transform: "scale(1.2)" }, { transform: "scale(1)" }], 300); }); }
+function bigText(t) { const d = document.createElement("div"); d.id = "rtitle"; d.textContent = t; stage.appendChild(d); setTimeout(() => d.remove(), 2700); }
+function flash() { const f = $("#flash"); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
+
+/* ================= Koch-Posen & Mütze ================= */
+const HATPOS = { 1: { c: 56.5, r: 4 }, 2: { c: 49.4, r: 0 }, 3: { c: 49.6, r: 0 }, 4: { c: 48.8, r: -3 } };
+const HATS_FIT = [{ w: 50, b: 86 }, { w: 48, b: 88 }, { w: 72, b: 75 }, { w: 62, b: 86 }, { w: 64, b: 83 }, { w: 48, b: 85 }, { w: 60, b: 84 }, { w: 30, b: 90 }];
+function chefPose(p, el = chefEl) {
+  const im = el.querySelector(".ci>img:first-child"); im.src = `assets/chef_${p}.webp`;
+  const hp = HATPOS[p], h = el.querySelector(".hat");
+  if (S.hat >= 0) { h.hidden = false; h.src = `assets/hat_${S.hat}.webp`; const f = HATS_FIT[S.hat]; h.style.width = f.w + "%"; el.style.setProperty("--hx", (hp.c - f.w / 2) + "%"); el.style.setProperty("--hy", f.b + "%"); el.style.setProperty("--hr", hp.r + "deg"); } else h.hidden = true;
+}
+
+/* ================= Bildschirme ================= */
+let cur = "title", runTok = 0, greeted = 0, unlocked = false, pend = null;
+function greet(t) { if (unlocked) setTimeout(() => { if (cur === "title") say(t); }, 400); else pend = t; }
+document.addEventListener("pointerdown", () => { if (unlocked) return; unlocked = true; if (pend && cur === "title") { const t = pend; pend = null; setTimeout(() => { if (!vBusy) say(t); }, 250); } }, true);
+function show(id) {
+  $$(".scr").forEach(s => s.hidden = s.id !== id); cur = id; $("#ov").hidden = true; runTok++;
+  if (id !== "kitchen") { $("#mon").hidden = true; }
+}
+$$(".back").forEach(b => b.onclick = () => goTitle());
+$("#kHome").onclick = () => goTitle();
+
+function goTitle() {
+  stopVoice(); show("title"); music("menu"); updCoins(); chefEl.className = "";
+  const gOk = S.gift !== today(); $("#gift").hidden = !gOk;
+  const m = motd(); const md = $("#motd"); md.hidden = !S.seen.hello; md.querySelector("img").src = `assets/m${m + 1}_1.webp`;
+  const albK = Object.keys(S.fav).length; $("#albN").hidden = !albK; $("#albN").textContent = albK + "/10";
+  const bk = Object.keys(S.rec).length; $("#bookN").hidden = !bk; $("#bookN").textContent = bk + "/8";
+  $("#bBook").hidden = !S.seen.magic && !bk;
+  if (!S.seen.hello) { S.seen.hello = 1; save(); greeted = 1; greet(T.hello); }
+  else if (gOk) greet(T.gift);
+  else if (!greeted) { greeted = 1; greet(T.back); }
+}
+$("#gift").onclick = () => {
+  if (S.gift === today()) return; S.gift = today(); save(); const r = toStage($("#gift")); sfx("sparkle"); burst(r.x, r.y, ["✨", "⭐", "🎉"], 18);
+  $("#gift").hidden = true; addCoins(ri(10, 20), r); say(T.giftGot, { now: true });
+  setTimeout(() => { say(T.motd); const md = $("#motd"); md.hidden = false; md.animate([{ transform: "scale(0)" }, { transform: "scale(1.2)" }, { transform: "scale(1)" }], 500); }, 1300);
+};
+$("#motd").onclick = () => say(T.motd, { now: true });
+
+/* ================= Küche: Schicht ================= */
+const K = { mode: "cook", guests: [], gi: 0, pot: [], order: [], mon: -1, tries: 0, firstOk: 0, busy: false, earned: 0 };
+const shelfEl = $("#shelf"), bubEl = $("#bub"), monEl = $("#mon"), potIn = $("#potIn"), soupEl = $("#soup");
+function buildShelf() {
+  shelfEl.innerHTML = "";
+  const list = K.mode === "magic" ? unlockedIng() : unlockedIng();
+  list.forEach(i => {
+    const b = document.createElement("button"); b.className = "ing"; b.dataset.i = i; b.dataset.say = ING[i].n; b.setAttribute("aria-label", ING[i].n);
+    if ((S.newIng || []).includes(i)) b.classList.add("new");
+    b.innerHTML = `<img src="assets/ing_${i}.webp" alt="">`; b.onclick = () => addIng(i, b); shelfEl.appendChild(b);
+  });
+  const n = list.length; const per = PORT ? (n <= 6 ? 3 : Math.ceil(n / 2)) : n;
+  const avail = (SW - 40), size = Math.min(PORT ? 128 : 104, Math.floor((avail - (per - 1) * 10) / per));
+  $$(".ing").forEach(b => { b.style.width = b.style.height = size + "px"; b.querySelector("img").style.width = b.querySelector("img").style.height = (size - 14) + "px"; });
+  if (PORT) shelfEl.style.padding = `14px ${Math.max(16, (SW - per * size - (per - 1) * 10) / 2 - 2)}px`;
+  else shelfEl.style.padding = "";
+}
+function potReset() { K.pot = []; potIn.innerHTML = ""; soupEl.style.opacity = 0; $("#spoon").classList.add("off"); $("#dump").classList.add("off"); $$("#bub .o").forEach(o => o.classList.remove("ok")); }
+function mixColor() {
+  if (!K.pot.length) return "transparent";
+  let r = 0, g = 0, b = 0; K.pot.forEach(i => { const c = ING[i].c; r += parseInt(c.substr(1, 2), 16); g += parseInt(c.substr(3, 2), 16); b += parseInt(c.substr(5, 2), 16); });
+  const n = K.pot.length; return `rgb(${r / n | 0},${g / n | 0},${b / n | 0})`;
+}
+async function addIng(i, btn) {
+  if (K.busy) return;
+  const max = K.mode === "magic" ? 4 : 5;
+  if (K.pot.length >= max) { say(T.full, { now: true }); $("#spoon").animate([{ transform: "scale(1.3)" }, { transform: "scale(1)" }], 400); return; }
+  if (K.mode === "cook" && !K.order.length) return;
+  if (btn.classList.contains("new")) { btn.classList.remove("new"); S.newIng = (S.newIng || []).filter(x => x !== i); save(); }
+  K.pot.push(i); sfx("tap", .5);
+  const from = toStage(btn), pr = toStage($("#pot")), to = { x: pr.x + rnd(-30, 30) * SC, y: pr.y - pr.h * .3 };
+  await flyImg(`assets/ing_${i}.webp`, from, to, 480, 90);
+  sfx("plop"); burst(to.x, to.y, ["💧", "🫧"], 6, { size: 30, max: 90, grav: 40 }); $("#pot").classList.remove("wob"); void $("#pot").offsetWidth; $("#pot").classList.add("wob");
+  const im = document.createElement("img"); im.src = `assets/ing_${i}.webp`; im.alt = ""; const k = potIn.children.length;
+  Object.assign(im.style, { left: (8 + (k * 19) % 70) + "%", top: (k % 2 ? 18 : 0) + "%", animationDelay: (-k * .4) + "s" }); potIn.appendChild(im);
+  soupEl.style.background = mixColor(); soupEl.style.opacity = .55;
+  if (K.mode === "cook") { const o = $$("#bub .o").find(o => +o.dataset.i === i && !o.classList.contains("ok")); if (o) { o.classList.add("ok"); sfx("pop", .6); } }
+  $("#spoon").classList.remove("off"); $("#dump").classList.remove("off");
+  const done = K.mode === "cook" && K.order.every(x => K.pot.includes(x));
+  $("#spoon").classList.toggle("go", done || K.mode === "magic");
+  if (done) { if (!S.seen.stir) { S.seen.stir = 1; save(); say(T.stir1); } else if (Math.random() < .4) say(T.stir); maybeHint(); }
+}
+let hintT = 0;
+function maybeHint() {
+  clearTimeout(hintT); if (K.mode !== "cook" || K.mon < 0) return;
+  const m = K.mon; if (S.fav[m]) return;
+  hintT = setTimeout(() => { if (K.busy || cur !== "kitchen" || K.mon !== m) return; if (Math.random() < .5) { say(T.hint); const b = $(`.ing[data-i="${MON[m].fav}"]`); if (b && Math.random() < .5) { b.classList.add("hint"); setTimeout(() => b.classList.remove("hint"), 3000); } } }, 2600);
+}
+$("#dump").onclick = () => { if (K.busy || !K.pot.length) return; sfx("bubble"); const r = toStage($("#pot")); burst(r.x, r.y - r.h * .3, ["🫧", "💦"], 10, { size: 34 }); potReset(); };
+$("#spoon").onclick = () => { if (K.busy || !K.pot.length) return; K.mode === "magic" ? brewMagic() : cook(); };
+
+async function stirAnim() {
+  const st = $("#stirS"); st.classList.add("on"); chefPose(2); $("#spoon").classList.add("off"); $("#dump").classList.add("off");
+  sfx("stir"); sfx("bubble", .7); const pr = toStage($("#pot"));
+  for (let i = 0; i < 6; i++) { burst(pr.x + rnd(-60, 60) * SC, pr.y - pr.h * .3, ["🫧"], 2, { size: 36, max: 120, dir: -Math.PI / 2, spread: .6 }); await sleep(230); if (i === 3) sfx("bubble", .6); }
+  st.classList.remove("on");
+}
+
+function startShift() {
+  K.mode = "cook"; show("kitchen"); music("cook"); layout(); buildShelf(); potReset(); chefPose(1); chefEl.className = "";
+  const pool = [...Array(monN()).keys()]; const md = motd();
+  let g = shuffle(pool); while (g.length < GUESTS) g = g.concat(shuffle(pool));
+  g = g.slice(0, GUESTS); if (!g.includes(md) && Math.random() < .7) g[ri(1, GUESTS - 1)] = md;
+  // neues Monster zuerst
+  const newM = pool.find(m => !S.met[m]); if (newM !== undefined && !g.includes(newM)) g[0] = newM;
+  K.guests = g; K.gi = 0; K.firstOk = 0; K.earned = 0; K.busy = false;
+  $("#guests").innerHTML = g.map(m => `<i style="background-image:url(assets/m${m + 1}_1.webp)"></i>`).join("");
+  $("#bub").innerHTML = ""; bubEl.classList.add("off"); updCoins();
+  const tok = runTok; nextGuest(tok);
+}
+function orderSize() { const l = S.lvl; if (l === 0) return K.gi < 2 ? 1 : 2; if (l < 3) return 2; if (l < 6) return pick([2, 3]); return pick([2, 3, 3]); }
+function placeBubble() { sizeMon(); const f = K.mon >= 0 ? MSZ[K.mon] : 1, head = L.monB - L.monH * f; const b = bubEl; b.style.top = "auto";
+  if (PORT) { b.style.left = (L.monX + 20) + "px"; b.style.bottom = Math.min(SH - head + 10, SH - 230) + "px"; }
+  else { b.style.left = (L.monX + L.monH * f * .28) + "px"; b.style.bottom = Math.min(SH - head - 40, SH - 250) + "px"; } }
+async function nextGuest(tok) {
+  if (tok !== runTok) return;
+  if (K.gi >= K.guests.length) return endShift(tok);
+  $$("#guests i").forEach((e, i) => e.classList.toggle("now", i === K.gi));
+  const m = K.guests[K.gi]; K.mon = m; K.tries = 0; K.order = []; K.busy = true; potReset(); chefPose(1);
+  const im = monEl.querySelector("img"); im.src = `assets/m${m + 1}_1.webp`; monEl.className = "walk"; monEl.hidden = false; placeBubble(); bubEl.classList.add("off");
+  monEl.querySelector(".crown")?.remove(); if (m === motd()) { const c = document.createElement("span"); c.className = "crown"; c.textContent = "👑"; monEl.appendChild(c); }
+  sfx("bell"); const dist = L.monX + L.monH;
+  monEl.animate([{ transform: `translateX(${-dist}px)` }, { transform: "translateX(0)" }], { duration: 1400, easing: "ease-out" });
+  sfx("steps", .6); await sleep(1400); if (tok !== runTok) return;
+  monEl.className = ""; sfx("giggle", .8);
+  const first = !S.met[m]; S.met[m] = 1; save();
+  say([T.comes[0] + " " + MON[m].n + "!"].concat(first ? [] : [T.comes[1] + " " + MON[m].n + "!"]));
+  // Bestellung
+  const pool = shuffle(unlockedIng().filter(i => i !== MON[m].fav));
+  K.order = pool.slice(0, orderSize());
+  bubEl.innerHTML = K.order.map(i => `<div class="o" data-i="${i}"><img src="assets/ing_${i}.webp" alt=""></div>`).join("");
+  placeBubble(); await sleep(250); if (tok !== runTok) return; bubEl.classList.remove("off"); sfx("pop"); K.busy = false;
+  if (!S.seen.guest1) { S.seen.guest1 = 1; save(); say(T.guest1); say(T.tapIng); }
+  else { say(T.order); }
+  K.order.forEach(i => say(ING[i].n));
+  if (m === motd() && !S.seen["motd" + today()]) { S.seen["motd" + today()] = 1; save(); say(T.motd); }
+  maybeHint();
+}
+async function cook() {
+  K.busy = true; clearTimeout(hintT); stopVoice(); const tok = runTok;
+  await stirAnim(); if (tok !== runTok) return;
+  // Essen fliegt zum Monster
+  const pr = toStage($("#pot")), mr = toStage(monEl); const mouth = { x: mr.x, y: mr.y - mr.h * .05 };
+  const pot = K.pot.slice(); potReset(); chefPose(1);
+  for (let k = 0; k < pot.length; k++) { flyImg(`assets/ing_${pot[k]}.webp`, { x: pr.x, y: pr.y - pr.h * .3 }, mouth, 560, 80); await sleep(110); }
+  await sleep(520); if (tok !== runTok) return;
+  const m = K.mon, ok = K.order.every(x => pot.includes(x)), fav = pot.includes(MON[m].fav), extra = pot.filter(x => !K.order.includes(x));
+  const im = monEl.querySelector("img");
+  im.src = `assets/m${m + 1}_2.webp`; monEl.className = "eat"; sfx("chomp"); await sleep(1100); if (tok !== runTok) return;
+  K.tries++;
+  if (!ok) {
+    im.src = `assets/m${m + 1}_3.webp`; monEl.className = "yuck"; sfx("yuck"); burst(mouth.x, mouth.y, ["🤢", "💚", "🟢"], 8, { size: 40 });
+    chefPose(4); say(T.yuck, { now: true }); await sleep(1500); if (tok !== runTok) return;
+    im.src = `assets/m${m + 1}_1.webp`; monEl.className = ""; chefPose(1);
+    $$("#bub .o").forEach(o => o.classList.remove("ok")); bubEl.animate([{ transform: "scale(1)" }, { transform: "scale(1.15)" }, { transform: "scale(1)" }], 500);
+    K.busy = false; return;
+  }
+  // geschafft!
+  bubEl.classList.add("off");
+  const fx = [];
+  if (pot.includes(3)) fx.push("chili"); if (pot.includes(4)) fx.push("ice"); if (pot.includes(11)) fx.push("beans");
+  let coins = 3 + K.order.length; if (K.tries === 1) { K.firstOk++; coins += 2; }
+  if (m === motd()) coins *= 2;
+  S.fed[m] = (S.fed[m] || 0) + 1;
+  if (fav) {
+    const isNew = !S.fav[m]; S.fav[m] = 1; coins += 6; monEl.className = "happy"; im.src = `assets/m${m + 1}_2.webp`; chefPose(3);
+    sfx("sparkle"); flash(); burst(mouth.x, mouth.y, ["❤️", "💖", "💕", "✨"], 22, { size: 54, max: 260 });
+    if (isNew) { bigText("❤️ " + MON[m].n + " ❤️"); say(T.fav, { now: true }); } else say(T.ok, { now: true });
+  } else {
+    monEl.className = "happy"; chefPose(3); sfx("sparkle", .6); burst(mouth.x, mouth.y, ["⭐", "✨", "😋"], 12, { size: 46 });
+    say(extra.length ? T.extra : T.ok, { now: true });
+  }
+  await sleep(1300); if (tok !== runTok) return;
+  // lustige Reaktionen
+  for (const f of fx) {
+    if (f === "chili") { monEl.className = "hot"; sfx("fire"); say(T.chili); const r = toStage(monEl); for (let i = 0; i < 4; i++) { burst(r.x + r.w * .3, r.y - r.h * .05, ["🔥", "🔥", "💥"], 6, { size: 60, dir: 0, spread: .35, min: 150, max: 420, dur: 700 }); await sleep(220); } await sleep(500); }
+    if (f === "ice") { monEl.className = "ice"; sfx("brr"); say(T.ice); const r = toStage(monEl); burst(r.x, r.y - r.h * .3, ["❄️", "🧊", "❄️"], 14, { size: 44 }); await sleep(1500); }
+    if (f === "beans") { monEl.className = "happy"; await sleep(300); sfx("toot"); say(T.beans); const r = toStage(monEl); burst(r.x - r.w * .35, r.y + r.h * .3, ["💨", "💨", "☁️"], 10, { size: 60, dir: Math.PI, spread: .5, min: 80, max: 260 }); sfx("giggle"); await sleep(1300); }
+    if (tok !== runTok) return;
+  }
+  if (!fx.length && Math.random() < .35) { await sleep(200); sfx("burp"); say(T.burp); const r = toStage(monEl); burst(r.x, r.y - r.h * .1, ["💭", "🫧"], 5, { size: 50 }); await sleep(1100); }
+  monEl.className = "happy"; im.src = `assets/m${m + 1}_2.webp`;
+  addCoins(coins, toStage(monEl)); K.earned += coins; save();
+  const gi = $$("#guests i")[K.gi]; gi.classList.add("done"); if (K.tries === 1) gi.classList.add("star");
+  await sleep(1000); if (tok !== runTok) return;
+  // geht hüpfend raus
+  monEl.className = "walk"; im.src = `assets/m${m + 1}_1.webp`;
+  monEl.animate([{ transform: "translateX(0)" }, { transform: `translateX(${-(L.monX + L.monH)}px)` }], { duration: 1100, easing: "ease-in", fill: "forwards" }).onfinish = a => { a.target?.cancel?.(); };
+  sfx("steps", .5); await sleep(1150);
+  monEl.hidden = true; monEl.getAnimations().forEach(a => a.cancel()); chefPose(1);
+  K.gi++; await sayDone(); await sleep(250); nextGuest(tok);
+}
+async function endShift(tok) {
+  await sayDone(); if (tok !== runTok) return;
+  const stars = K.firstOk >= 5 ? 3 : K.firstOk >= 3 ? 2 : 1;
+  const prevIng = ingN(), prevMon = monN();
+  S.lvl++; const bonus = stars * 5; S.best[S.lvl - 1] = Math.max(S.best[S.lvl - 1] || 0, stars);
+  const newI = ingN() > prevIng ? ING_ORDER[prevIng] : -1, newM = monN() > prevMon ? prevMon : -1;
+  if (newI >= 0) S.newIng = (S.newIng || []).concat([newI]);
+  save(); chefPose(3); music("menu");
+  const ov = $("#ov"); ov.hidden = false;
+  ov.innerHTML = `<div class="box"><div class="stars">${[1, 2, 3].map(i => `<i class="${i <= stars ? "on" : ""}" style="animation-delay:${i * .35}s">★</i>`).join("")}</div>
+   <div class="got"><span class="coin" style="width:64px;height:64px;font-size:36px"></span>+${K.earned + bonus}</div>
+   <div class="row">${newI >= 0 ? `<div class="newi"><img src="assets/ing_${newI}.webp" alt=""></div>` : ""}${newM >= 0 ? `<div class="newi mon"><img src="assets/m${newM + 1}_1.webp" alt=""></div>` : ""}</div>
+   <div class="row"><button class="rb" id="oHome" data-say="Zurück" aria-label="Zurück">🏠</button><button class="go" id="oNext" data-say="Weiter kochen" aria-label="Weiter kochen"><svg viewBox="0 0 24 24"><path d="M5 3.5v17l15-8.5z" fill="#fff" stroke="#2f6a08" stroke-width="1.6" stroke-linejoin="round"/></svg></button></div></div>`;
+  [1, 2, 3].forEach(i => { if (i <= stars) setTimeout(() => { sfx("sparkle", .7); }, i * 350 + 200); });
+  setTimeout(() => { const r = toStage(ov.querySelector(".got")); addCoins(bonus, null); coinFly(r, 8); burst(r.x, r.y - 120 * SC, ["🎉", "⭐", "✨", "🎊"], 24, { size: 50, max: 320 }); }, 1300);
+  say(stars === 3 ? T.end3 : stars === 2 ? T.end2 : T.end1, { now: true });
+  if (newI >= 0) say(T.newIng); if (newM >= 0) say(T.newMon);
+  $("#oHome").onclick = () => goTitle(); $("#oNext").onclick = () => { stopVoice(); startShift(); };
+  const a = $("#oNext"); setTimeout(() => { if (!ov.hidden) a.focus({ preventScroll: true }); }, 400);
+}
+
+/* ================= Zauberkessel ================= */
+function startMagic() {
+  K.mode = "magic"; K.order = []; K.mon = -1; K.busy = false; show("kitchen"); music("magic"); layout(); buildShelf(); potReset(); chefPose(1); chefEl.className = "";
+  $("#guests").innerHTML = RECIPES.map((r, i) => `<i style="display:grid;place-items:center;font-size:32px;background:${S.rec[i] ? "#fff" : "#e9e0f7"};font-style:normal">${S.rec[i] ? r.e : "?"}</i>`).join("");
+  $$("#guests i").forEach(i => i.style.opacity = 1);
+  bubEl.classList.add("off"); monEl.hidden = true; $("#spoon").classList.add("off");
+  if (!S.seen.magic) { S.seen.magic = 1; save(); }
+  say(T.magic, { now: true });
+}
+async function brewMagic() {
+  K.busy = true; stopVoice(); const tok = runTok; const pot = K.pot.slice().sort((a, b) => a - b);
+  await stirAnim(); if (tok !== runTok) return;
+  const pr = toStage($("#pot")); sfx("pop"); flash(); burst(pr.x, pr.y - pr.h * .3, ["✨", "💫", "⭐", "🫧"], 24, { size: 50, max: 300 });
+  potReset(); chefPose(4);
+  const hit = RECIPES.findIndex(r => r.i.length === pot.length && r.i.every(x => pot.includes(x)))
+    , part = hit < 0 ? RECIPES.findIndex(r => r.i.every(x => pot.includes(x))) : -1;
+  const idx = hit >= 0 ? hit : part;
+  if (idx >= 0) {
+    const r = RECIPES[idx], isNew = !S.rec[idx]; S.rec[idx] = 1; save();
+    sfx("sparkle"); bigText(r.e + " " + r.n);
+    if (isNew) { say(T.secret, { now: true }); say(r.n); addCoins(10, pr); const gi = $$("#guests i")[idx]; if (gi) { gi.textContent = r.e; gi.style.background = "#fff"; gi.animate([{ transform: "scale(2)" }, { transform: "scale(1)" }], 500); } }
+    else say(r.n, { now: true });
+    await magicFx(r.fx, tok);
+    if (isNew && Object.keys(S.rec).length === RECIPES.length) { say(T.bookAll); bigText("📖 8/8 🏆"); }
+  } else {
+    const generic = pick(["hiccup", "color", "sneeze"]);
+    if (generic === "sneeze") { sfx("sneeze"); const c = toStage(chefEl); burst(c.x, c.y - c.h * .2, ["💦", "🤧"], 10, { size: 46 }); }
+    else if (generic === "color") { chefEl.classList.add("fx-rainbow"); sfx("bubble"); }
+    else { for (let i = 0; i < 3; i++) { sfx("pop", .6); const c = toStage(chefEl); burst(c.x, c.y - c.h * .2, ["🫧"], 4, { size: 40, max: 120 }); await sleep(400); } }
+    say(T.nothing, { now: true }); await sleep(1800); chefEl.className = "";
+  }
+  chefPose(1); K.busy = false;
+}
+async function magicFx(fx, tok) {
+  const c = () => toStage(chefEl);
+  chefEl.className = "fx-" + fx;
+  if (fx === "steam") { sfx("fire"); for (let i = 0; i < 8; i++) { const r = c(); burst(r.x, r.y - r.h * .35, ["💨", "☁️", "♨️"], 4, { size: 56, dir: -Math.PI / 2, spread: .7, max: 300 }); await sleep(300); } }
+  else if (fx === "rocket") { sfx("toot"); await sleep(500); sfx("fire"); for (let i = 0; i < 6; i++) { const r = c(); burst(r.x, r.y + r.h * .45, ["🔥", "💨"], 5, { size: 50, dir: Math.PI / 2, spread: .5 }); await sleep(250); } await sleep(1200); sfx("giggle"); }
+  else if (fx === "sugar") { sfx("giggle"); for (let i = 0; i < 8; i++) { const r = c(); burst(r.x, r.y - r.h * .2, ["⚡", "🍬", "✨"], 3, { size: 44 }); await sleep(300); } }
+  else if (fx === "stink") { sfx("toot"); for (let i = 0; i < 8; i++) { const r = c(); burst(r.x + rnd(-80, 80) * SC, r.y - r.h * .2, ["🪰", "💚", "〰️"], 2, { size: 40 }); await sleep(300); } sfx("sneeze"); }
+  else if (fx === "tiny") { sfx("pop"); await sleep(400); sfx("giggle"); await sleep(2200); }
+  else if (fx === "giant") { sfx("steps"); await sleep(300); sfx("steps"); await sleep(300); sfx("burp"); await sleep(2000); }
+  else if (fx === "ice") { const b = document.createElement("div"); b.className = "iceb"; chefEl.querySelector(".ci").appendChild(b); sfx("brr"); await sleep(600); sfx("brr"); for (let i = 0; i < 4; i++) { const r = c(); burst(r.x, r.y - r.h * .2, ["❄️"], 4, { size: 40 }); await sleep(400); } b.remove(); }
+  else if (fx === "rainbow") { sfx("sparkle"); for (let i = 0; i < 6; i++) { const r = c(); burst(r.x, r.y - r.h * .3, ["🌈", "⭐", "💖"], 3, { size: 50 }); await sleep(380); } }
+  await sleep(500); if (tok === runTok) chefEl.className = "";
+}
+
+/* ================= Album ================= */
+function openAlbum() {
+  show("album"); music("menu");
+  const g = $("#albG"); g.innerHTML = "";
+  MON.forEach((m, i) => {
+    const met = S.met[i], fav = S.fav[i], fed = S.fed[i] || 0;
+    const c = document.createElement("button"); c.className = "card" + (met ? "" : " lock"); c.setAttribute("aria-label", met ? m.n : "?");
+    c.innerHTML = `<div class="pic"><img src="assets/m${i + 1}_${fav ? 2 : 1}.webp" alt=""></div><div class="fav">❤️${fav ? `<img src="assets/ing_${m.fav}.webp" alt="">` : `<span class="q">?</span>`}</div><div class="cnt">${[0, 1, 2, 3, 4].map(k => `<i class="${fed > k * 2 ? "on" : ""}"></i>`).join("")}</div>`;
+    c.onclick = () => {
+      stopVoice(); if (!met) { say(T.notMet); return; }
+      const im = c.querySelector(".pic img"); im.src = `assets/m${i + 1}_2.webp`; im.animate([{ transform: "scale(1)" }, { transform: "scale(1.15,.9)" }, { transform: "scale(1)" }], { duration: 300, iterations: 2 }); sfx("giggle");
+      say(m.n); if (fav) { say(T.favIs); say(ING[m.fav].n); } else say(T.unknown);
+      setTimeout(() => im.src = `assets/m${i + 1}_${fav ? 2 : 1}.webp`, 1500);
+    };
+    g.appendChild(c);
+  });
+  const k = Object.keys(S.fav).length; $("#albC").textContent = k + "/10";
+  if (k === 10) say(T.albumAll); else if (!S.seen.album) { S.seen.album = 1; save(); say(T.album); }
+}
+/* ================= Laden ================= */
+function openShop() {
+  show("shop"); music("menu"); updCoins(); chefPose(3, $("#chef2")); const g = $("#shopG"); g.innerHTML = "";
+  HATS.forEach((h, i) => {
+    const own = S.hats.includes(i); const c = document.createElement("button");
+    c.className = "card" + (S.hat === i ? " sel" : "") + (!own && S.coins < h.p ? " poor" : "");
+    c.innerHTML = `<div class="pic" style="height:130px;align-items:center"><img src="assets/hat_${i}.webp" alt="" style="max-height:120px"></div>${own ? `<div class="own">${S.hat === i ? "✔" : "👆"}</div>` : `<div class="price"><span class="coin"></span>${h.p}</div>`}`;
+    c.onclick = () => {
+      stopVoice();
+      if (own) { S.hat = i; save(); say(T.wear); sfx("pop"); }
+      else if (S.coins >= h.p) { S.coins -= h.p; S.hats.push(i); S.hat = i; save(); sfx("sparkle"); const r = toStage(c); burst(r.x, r.y, ["✨", "🎉", "⭐"], 16); say(T.buy); }
+      else { sfx("yuck", .5); say(T.poor); c.animate([{ transform: "translateX(-10px)" }, { transform: "translateX(10px)" }, { transform: "none" }], 250); return; }
+      openShop();
+    };
+    g.appendChild(c);
+  });
+  if (!S.seen.shop) { S.seen.shop = 1; save(); say(T.shop); }
+}
+/* ================= Rezeptbuch ================= */
+function openBook() {
+  show("book"); music("menu"); const g = $("#bookG"); g.innerHTML = "";
+  RECIPES.forEach((r, i) => {
+    const got = S.rec[i]; const c = document.createElement("button"); c.className = "card" + (got ? "" : " lock");
+    c.innerHTML = `<div class="rfx">${got ? r.e : "❔"}</div><div class="rcp">${r.i.map(x => got ? `<img src="assets/ing_${x}.webp" alt="">` : `<span class="q">?</span>`).join('<span class="pl">+</span>')}</div>`;
+    c.onclick = () => { stopVoice(); if (got) { say(r.n); } else { say(T.magic); } };
+    g.appendChild(c);
+  });
+  $("#bookC").textContent = Object.keys(S.rec).length + "/8";
+  if (!S.seen.book) { S.seen.book = 1; save(); say(T.book); }
+}
+
+$("#bPlay").onclick = () => { stopVoice(); startShift(); };
+$("#bAlbum").onclick = () => { stopVoice(); openAlbum(); };
+$("#bShop").onclick = () => { stopVoice(); openShop(); };
+$("#bMagic").onclick = () => { stopVoice(); startMagic(); };
+$("#bBook").onclick = () => { stopVoice(); openBook(); };
+// Controller: B = zurück
+window.LXPAD_HOOK = () => {};
+if (window.LXPAD) LXPAD.back = () => { if (cur !== "title") { goTitle(); return true; } return false; };
+addEventListener("load", () => { if (window.LXPAD) LXPAD.back = () => { if (!$("#ov").hidden) { goTitle(); return true; } if (cur !== "title") { goTitle(); return true; } return false; }; });
+addEventListener("keydown", e => { if (e.key === "Escape" && cur !== "title") goTitle(); });
+
+layout(); updCoins(); goTitle();
+addEventListener("pointerdown", () => { music(cur === "kitchen" ? (K.mode === "magic" ? "magic" : "cook") : "menu"); }, { once: true });
+// Testhilfe
+window.chefPoseT = p => chefPose(p);
+window.__mk = { S, K, T, startShift, startMagic, openAlbum, openShop, openBook, goTitle, save };
+</script>
+</body>
+</html>

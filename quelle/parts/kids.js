@@ -124,6 +124,16 @@
 <g class="k-eye"><circle cx="42" cy="38" r="3.4" fill="#1d2350"/><circle cx="58" cy="38" r="3.4" fill="#1d2350"/><circle cx="43" cy="36.8" r="1.1" fill="#fff"/><circle cx="59" cy="36.8" r="1.1" fill="#fff"/></g>
 <path d="M43 47q7 6 14 0" stroke="#a0442a" stroke-width="2.4" fill="none" stroke-linecap="round"/><g fill="#ff9d9d" opacity=".8"><circle cx="35" cy="45" r="3.2"/><circle cx="65" cy="45" r="3.2"/></g>
 <g transform="translate(80 112)"><circle r="11" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M0-5l4.8 3.5-1.8 5.6h-6l-1.8-5.6z" fill="#222"/><path d="M0-5V-11M4.8-1.5l6-2M3 4.1l3.8 5.2M-3 4.1l-3.8 5.2M-4.8-1.5l-6-2" stroke="#222" stroke-width="1.3"/></g></svg>`},
+    // Mampfi aus Monster-Küche: grüner Monster-Koch mit Schürze und Kochlöffel
+    mampfi:{w:76,h:90,svg:`<svg viewBox="0 0 100 120">
+<g class="lg1"><ellipse cx="38" cy="112" rx="10" ry="6" fill="#8ccf2e"/></g><g class="lg2"><ellipse cx="62" cy="112" rx="10" ry="6" fill="#8ccf2e"/></g>
+<g class="wg1"><path d="M24 66q-12 4-14 16" stroke="#a6e03c" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+<g class="wg2"><path d="M76 66q12 2 14 14" stroke="#a6e03c" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M90 80l6-34" stroke="#b77a3d" stroke-width="4" stroke-linecap="round"/><ellipse cx="96" cy="42" rx="5" ry="7" fill="#c98a4b"/></g>
+<path d="M50 8q30 0 30 48v32q0 20-30 20t-30-20V56Q20 8 50 8z" fill="#a6e03c" stroke="#7fb82a" stroke-width="2"/>
+<path d="M31 14l-5-10 11 6zM69 14l5-10-11 6z" fill="#e9c9a8"/>
+<path d="M28 74h44v22q0 10-22 10t-22-10z" fill="#fff" stroke="#e6e0d8" stroke-width="1.5"/><path d="M60 82l1.5 3 3.2.3-2.4 2 .8 3.2-3.1-1.7-3.1 1.7.8-3.2-2.4-2 3.2-.3z" fill="#ffc21a"/>
+<g class="k-eye"><circle cx="40" cy="40" r="8" fill="#fff"/><circle cx="60" cy="40" r="8" fill="#fff"/><circle cx="41" cy="41" r="4.5" fill="#3b2a1a"/><circle cx="61" cy="41" r="4.5" fill="#3b2a1a"/><circle cx="42.5" cy="39.3" r="1.6" fill="#fff"/><circle cx="62.5" cy="39.3" r="1.6" fill="#fff"/></g>
+<path d="M38 56q12 12 24 0q-2 9-12 9t-12-9z" fill="#a8323a"/><path d="M44 61q6 3 12 0q-2 3-6 3t-6-3z" fill="#ff7a8a"/><g fill="#ff9d9d" opacity=".6"><circle cx="31" cy="52" r="4"/><circle cx="69" cy="52" r="4"/></g></svg>`},
     // Pfiff aus Schiri Pfiff: kleiner Löwe im Schiri-Trikot mit Pfeife
     lionref:{w:74,h:90,svg:`<svg viewBox="0 0 100 124">
 <g class="lg1"><rect x="36" y="96" width="11" height="22" rx="4" fill="#f2b04a"/><ellipse cx="40" cy="119" rx="9" ry="4.5" fill="#222"/></g><g class="lg2"><rect x="53" y="96" width="11" height="22" rx="4" fill="#f2b04a"/><ellipse cx="60" cy="119" rx="9" ry="4.5" fill="#222"/></g>
