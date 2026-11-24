@@ -102,13 +102,13 @@ const CARDS = {
 };
 const cardCost = lv => 20 + lv * 25;
 const RIVALS = ['Kira', 'Taro', 'Yuki', 'Ren', 'Mika', 'Sora', 'Haru', 'Aiko', 'Kenta', 'Nami', 'Ryo', 'Emi'].map((n, i) => ({ n, av: i }));
-const BETS = [{ m: 1, lv: 1 }, { m: 2, lv: 1 }, { m: 3, lv: 3 }, { m: 5, lv: 5 }, { m: 10, lv: 8 }, { m: 20, lv: 12 }, { m: 50, lv: 18 }];
+const BETS = [{ m: 1, lv: 1 }, { m: 2, lv: 1 }, { m: 3, lv: 1 }, { m: 5, lv: 1 }, { m: 10, lv: 2 }, { m: 20, lv: 4 }, { m: 50, lv: 6 }, { m: 100, lv: 9 }];
 const MAXR = 50, REGEN = 360;
 const WHEEL = [
-  { t: 'rolls', v: 10, ic: 'ic_star', l: '10 Würfe' }, { t: 'coins', v: 8, ic: 'ic_coin', l: 'Münzen' },
-  { t: 'gems', v: 5, ic: 'ic_gem', l: '5 Kristalle' }, { t: 'rolls', v: 25, ic: 'ic_star', l: '25 Würfe' },
+  { t: 'rolls', v: 5, ic: 'ic_star', l: '5 Würfe' }, { t: 'coins', v: 8, ic: 'ic_coin', l: 'Münzen' },
+  { t: 'gems', v: 5, ic: 'ic_gem', l: '5 Kristalle' }, { t: 'rolls', v: 15, ic: 'ic_star', l: '15 Würfe' },
   { t: 'egg', v: 0, ic: 'ic_egg', l: 'Ei' }, { t: 'crowns', v: 15, ic: 'ic_crowntok', l: '15 Kronen' },
-  { t: 'shield', v: 1, ic: 'ic_shield', l: 'Schild' }, { t: 'rolls', v: 50, ic: 'ic_star', l: '50 Würfe' },
+  { t: 'shield', v: 1, ic: 'ic_shield', l: 'Schild' }, { t: 'rolls', v: 30, ic: 'ic_star', l: '30 Würfe' },
 ];
 const DAILY = [{ t: 'rolls', v: 10 }, { t: 'coins', v: 10 }, { t: 'crowns', v: 10 }, { t: 'rolls', v: 20 }, { t: 'gems', v: 10 }, { t: 'egg', v: 1 }, { t: 'rolls', v: 60 }];
 const EV_MS = [60, 150, 300, 500, 800, 1200, 1700, 2400];
@@ -154,7 +154,7 @@ const KG = () => KINGDOMS[G.k % KINGDOMS.length];
 const kScale = (k = G.k) => Math.pow(1.8, k);
 const base = () => 50 * kScale();
 // Kosten wachsen pro Königreich schneller als die Einnahmen: K1 ≈ ½ Tag, K2 ≈ 1 Tag, K5 ≈ 2 Tage, K10 ≈ 4 Tage (siehe tools/balance.js)
-const costF = k => k === 0 ? .55 : 1.1 + .6 * (k - 1);
+const costF = k => k === 0 ? .38 : .7 + .38 * (k - 1); // Test-Feedback 24.11.: Gebäude ca. 35 % günstiger
 const stageCost = (slot, s) => Math.round(base() * STAGE_COST[s] * SLOT_MUL[slot] * costF(G.k) / 10) * 10;
 const repairCost = slot => Math.round(stageCost(slot, Math.max(0, G.st[slot] - 1)) * 0.35 / 10) * 10;
 const xpNeed = lv => 60 + lv * 40;
@@ -369,7 +369,7 @@ async function roll() {
   if (busy || ovStack.length || gameOpen) return;
   if (tut.block && tut.block !== 'roll') return;
   regen();
-  const m = betM(), jk = jokerOn();
+  const jk = jokerOn(), m = jk ? Math.min(betM(), 5) : betM(); // Joker: gratis, aber höchstens ×5
   if (!jk && G.rolls < m) {
     auto = false; setAuto();
     if (G.rolls > 0 && G.bet > 0) { G.bet = 0; hud(); toast('Einsatz auf ×1 gesetzt'); return; }
@@ -408,7 +408,7 @@ async function resolve(res, m) {
   switch (res.t) {
     case 'coin': { leoMood('cheer'); lionJump(); dice.glow(true); flash(); banner('MÜNZREGEN!'); snd.play('jackpot', 0.7); const c = give(B * 15, true); result(`${tri('ic_coin')} Münzregen`, c); sparks(trayC.x, trayC.y, 24, 120); await wait(1100); dice.glow(false); break; }
     case 'crown': { leoMood('cheer', 2200); lionJump(); dice.glow(true); flash(); banner('KRONEN-JACKPOT!', '#ffcf6b'); snd.play('jackpot'); const c = give(B * 40, true); G.gems += 3 * Math.min(m, 5); result(`${tri('ic_crown')} Jackpot + ${3 * Math.min(m, 5)} ${icon('ic_gem', 18)}`, c); flyCoins(5, trayC, '#pGems', 'ic_gem'); sparks(trayC.x, trayC.y, 40, 160); await wait(1400); dice.glow(false); break; }
-    case 'star': flash(); banner(`WÜRFELREGEN! +${10 * m}`, '#9be7ff'); snd.play('star'); G.rolls += 10 * m; result(`${tri('ic_star')} +${10 * m} Würfe`); sparks(trayC.x, trayC.y, 24, 120); await wait(1000); break;
+    case 'star': flash(); banner(`WÜRFELREGEN! +${5 * m}`, '#9be7ff'); snd.play('star'); G.rolls += 5 * m; result(`${tri('ic_star')} +${5 * m} Würfe`); sparks(trayC.x, trayC.y, 24, 120); await wait(1000); break;
     case 'shield':
       snd.play('shield'); flash();
       if (G.shields < maxShields()) { G.shields++; banner('SCHILD!', '#7fd0ff'); result(`${tri('ic_shield')} +1 Schild`); flyCoins(1, trayC, '#shields', 'ic_shield'); }
@@ -453,7 +453,7 @@ function payPanel() {
    ${row(tri('ic_swords'), 'Angriff', `bis ${fmt(B * 33 * cardMul('attack'))}`)}
    ${row(tri('ic_card'), 'Karte', 'Raub, Beutezug …')}
    ${row(tri('ic_shield'), 'Schild', `+1 (max. ${maxShields()})`)}
-   ${row(tri('ic_star'), 'Würfelregen', `+${10 * betM()} Würfe`)}
+   ${row(tri('ic_star'), 'Würfelregen', `+${5 * betM()} Würfe`)}
    ${row(icon('ic_coin', 24), 'je Münze', fmt(B * cb))}
    ${row(icon('ic_crown', 24), 'je Krone', fmt(B * 2 * cb))}
    ${row('', 'sonst', fmt(B * .5 * cb))}
@@ -486,7 +486,7 @@ async function drawCard(m) {
   else if (id === 'raid') await raidFlow(m);
   else if (id === 'fight') await fightFlow(m);
   else if (id === 'coins') { const c = Math.round(B * 20); G.coins += c; flyCoins(14, p); snd.play('coins'); floatTxt('+' + fmt(c), 195, H * .5, '#ffe27a', 30); }
-  else if (id === 'rolls') { const n = Math.round(12 * m * cardMul(id)); G.rolls += n; snd.play('star'); floatTxt(`+${n} Würfe`, 195, H * .5, '#9be7ff', 28); }
+  else if (id === 'rolls') { const n = Math.round(6 * m * cardMul(id)); G.rolls += n; snd.play('star'); floatTxt(`+${n} Würfe`, 195, H * .5, '#9be7ff', 28); }
   else if (id === 'joker') { G.joker = Date.now() + 60000 * cardMul(id); banner('JOKER! Gratis würfeln!', '#ff8ab8'); snd.play('jackpot'); }
   else if (id === 'egg') gainEgg(cardLv('egg') >= 5 ? 1 : 0);
   save(); hud();
@@ -549,10 +549,10 @@ function addXP(n) {
     setTimeout(() => {
       snd.play('levelup');
       panel(`<h2>Stufe ${lv}!</h2><img src="assets/hero.webp" style="height:190px;margin:0 auto">
-        <p>Toll gemacht! Du bekommst <b>${10 + lv * 2} Würfe</b> und <b>5 Kristalle</b>.</p>
+        <p>Toll gemacht! Du bekommst <b>${5 + lv} Würfe</b> und <b>5 Kristalle</b>.</p>
         ${nb ? `<p class="r3"><b>Neu: Einsatz ×${nb.m} freigeschaltet!</b></p>` : ''}${ns ? `<p class="r1"><b>Neu: Platz für ${maxShields()} Schilde!</b></p>` : ''}
         <div class="btn gold" data-close>Super!</div>`);
-      G.rolls += 10 + lv * 2; G.gems += 5; save();
+      G.rolls += 5 + lv; G.gems += 5; save();
     }, 700);
   }
 }
@@ -562,11 +562,11 @@ function kingdomDone() {
   const unlock = Object.entries(CARDS).filter(([id, c]) => c.k === G.k + 1 && !cardLv(id));
   panel(`<h2>👑 ${KG().name} vollendet!</h2><img src="assets/hero.webp" style="height:200px;margin:0 auto">
     <p>Lia: „Wunderschön! Die Bewohner feiern dich!"</p>
-    <p><b>Belohnung:</b> 60 Würfe · 25 Kristalle · ${20 + G.k * 10} Kronen · 1 seltenes Ei</p>
+    <p><b>Belohnung:</b> 40 Würfe · 25 Kristalle · ${20 + G.k * 10} Kronen · 1 seltenes Ei</p>
     ${unlock.length ? `<p class="r3"><b>Neue Karten: ${unlock.map(([, c]) => c.n).join(', ')}</b></p>` : ''}
     <div class="btn gold" data-close>Weiter nach ${next.name}</div>`, {
     onClose: () => {
-      G.rolls += 60; G.gems += 25; G.crowns += 20 + G.k * 10; gainEgg(1, true);
+      G.rolls += 40; G.gems += 25; G.crowns += 20 + G.k * 10; gainEgg(1, true);
       unlock.forEach(([id]) => G.cards[id] = 1);
       G.k++; G.st = [0, 0, 0, 0, 0]; G.dmg = [0, 0, 0, 0, 0]; save(); renderKingdom(); hud();
       banner(KG().name, '#9be7ff');
@@ -649,7 +649,7 @@ function petPanel() {
     toast(`${p.n}: +${Math.round(p.bv * (1 + (lv - 1) * .5))} % ${BTXT[p.bt]}`); showPet();
   });
   ov.querySelector('#goExp').onclick = () => { snd.play('click'); ov.close(); expPanel(); };
-  ov.querySelectorAll('[data-set]').forEach(b => b.onclick = () => { const si = +b.dataset.set; G.sets[si] = 1; const p = pos(b); grant({ t: 'rolls', v: 50 }, p); grant({ t: 'crowns', v: 30 }, p); grant({ t: 'gems', v: 20 }, p); snd.play('jackpot'); banner(SETS[si].n + ' komplett!'); save(); ov.close(); petPanel(); });
+  ov.querySelectorAll('[data-set]').forEach(b => b.onclick = () => { const si = +b.dataset.set; G.sets[si] = 1; const p = pos(b); grant({ t: 'rolls', v: 30 }, p); grant({ t: 'crowns', v: 30 }, p); grant({ t: 'gems', v: 20 }, p); snd.play('jackpot'); banner(SETS[si].n + ' komplett!'); save(); ov.close(); petPanel(); });
 }
 function showPet() {
   let e = $('#petOnTray');
@@ -1295,7 +1295,12 @@ rb.addEventListener('pointerup', () => { if (tut.block) { roll(); return; } if (
 rb.addEventListener('pointerleave', () => { if (holdT) { clearTimeout(holdT); holdT = null; } });
 const gate = f => () => { if (tut.block) return; snd.play('click'); f(); };
 $('#auto').onclick = gate(() => { auto = !auto; setAuto(); if (auto) roll(); });
-$('#bet').onclick = gate(() => { const av = BETS.filter(b => b.lv <= G.lv); G.bet = (G.bet + 1) % av.length; hud(); toast(G.bet ? `Einsatz ×${betM()}: Gewinn ×${betM()}, kostet ${betM()} Würfe` : 'Einsatz ×1'); save(); });
+$('#bet').onclick = gate(() => {
+  const btns = BETS.map((b, i) => { const lock = b.lv > G.lv, poor = b.m > Math.max(1, G.rolls);
+    return `<div class="btn ${i === G.bet ? 'gold' : ''} ${lock || poor ? 'off' : ''}" data-b="${i}" style="width:100% !important;max-width:none;box-sizing:border-box;min-width:0;height:66px;padding:0;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:18px;font-size:22px;line-height:1.05">×${b.m}${lock ? `<small style="display:block;font-size:11px">ab Stufe ${b.lv}</small>` : poor ? `<small style="display:block;font-size:11px">zu wenig Würfe</small>` : ''}</div>`; }).join('');
+  const ov = panel(`<h2>Einsatz wählen</h2><p>Mehr Einsatz = mehr Gewinn pro Wurf, kostet aber so viele Würfe.</p><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0">${btns}</div>`);
+  ov.querySelectorAll('[data-b]').forEach(el => el.onclick = () => { if (el.classList.contains('off')) return; G.bet = +el.dataset.b; snd.play('click'); ov.close(); hud(); save(); toast(G.bet ? `Einsatz ×${betM()}: Gewinn ×${betM()}, kostet ${betM()} Würfe` : 'Einsatz ×1'); });
+});
 $('#bBuild').onclick = gate(buildPanel);
 $('#bEggs').onclick = gate(eggPanel);
 $('#bPets').onclick = gate(petPanel);
