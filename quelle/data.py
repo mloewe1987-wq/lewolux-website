@@ -1,6 +1,17 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="fussball-boss", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#2fa84f", src="spiele-intern/fussball-boss", nodl=True,
+  title="Fußball-Boss", short="Fußball-Boss", tagline="Der Fußballmanager für Kinder!",
+  desc="Fußballmanager für Kinder ab 7: Stell deine Mannschaft auf, kauf und verkauf Spieler, bau dein Stadion aus und führe deinen Verein von der Bezirksliga bis zur Meisterschaft. Die Spiele schaust du live, vorgespult oder nur als Ergebnis. Co-Trainer Kalle erklärt alles mit Stimme.",
+  genres=["Kinder","Fußball","Manager"], cats="family", status="Neu",
+  plats=["web","mobile"], tech=["HTML5","Web Audio","Offline"],
+  story="Du bist der neue Boss eines kleinen Fußballvereins ganz unten in der Bezirksliga. Mit Co-Trainer Kalle stellst du die Elf auf, holst neue Spieler und baust das Stadion aus. Schaffst du den Aufstieg bis in die Profiliga und holst den Pokal?",
+  controls=[["Aufstellen","Platz antippen, dann Spieler antippen"],["Spiel","Live ansehen, vorspulen oder überspringen"],["Wechseln","Im Spiel auf Wechseln tippen"],["Hilfe","Fragezeichen oder Kalle antippen"]],
+  features=["24 Vereine in 3 Ligen mit Auf- und Abstieg","Pokal mit Elfmeterschießen","Live-Spiele zum Zuschauen, vorspulen bis x8 oder überspringen","Aufstellung, 5 Formationen, Taktik und Wechsel","Transfermarkt, Training, Finanzen, Sponsor und Stadionausbau","Co-Trainer Kalle erklärt alles mit Stimme, ohne Werbung und ohne Käufe"],
+  shots=["Das Büro mit dem nächsten Spiel","Die Aufstellung auf dem Feld","Ein Spiel live verfolgen"],
+  reel=["Family","Aufstellen, kaufen, Meister werden","Der Fußballmanager für Kinder."],
+  download=dict(file="downloads/fussball-boss.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="dino-buddler", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#ffb84d", src="spiele-intern/dino-buddler", nodl=True,
   title="Dino-Buddler", short="Dino-Buddler", tagline="Grab Dinos aus und erwecke sie zum Leben!",
   desc="Kinderspiel ohne Werbung: Mit Buddel, dem kleinen Forscher-Dino, gräbst du Dino-Knochen aus dem Sand, baust die Skelette zusammen und erweckst zehn Dinos zum Leben. Danach fütterst du sie, ziehst ihnen Kostüme an und bringst sie ins Bett. Alles wird vorgelesen, ohne Lesen spielbar.",
@@ -235,6 +246,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "fussball-boss": dict(
+  title="Fußball-Boss – Fußballmanager für Kinder kostenlos",
+  meta="Fußball-Boss: der einfache Fußballmanager für Kinder ab 7. Aufstellen, Transfers, Stadion, Tabellen und Pokal. Alles vorgelesen, ohne Werbung.",
+  long=["<strong>Fußball-Boss</strong> ist ein Fußballmanager für Kinder ab 7 Jahren aus <strong>Lewolux Kids</strong>. Viele Kinder lieben Fußball, aber echte Managerspiele sind viel zu kompliziert. Hier ist alles einfach erklärt: Co-Trainer Kalle liest jeden Hinweis vor, Lesen hilft, ist aber kein Muss.",
+        "Du übernimmst einen kleinen Verein in der <strong>Bezirksliga</strong>. Es gibt <strong>24 Vereine in drei Ligen</strong> mit Tabelle, Spielplan und Torjägerliste. Die ersten zwei steigen auf, die letzten zwei ab. Dazu kommt ein <strong>Pokal</strong> mit Elfmeterschießen. Du stellst die Elf auf, wählst Formation und Taktik und wechselst im Spiel.",
+        "Jedes Spiel kannst du <strong>live ansehen</strong>, bis achtfach vorspulen oder überspringen. Auf dem Transfermarkt kaufst und verkaufst du Spieler, im Training machst du junge Talente stärker, und mit dem Geld baust du dein Stadion aus. Fußball-Boss ist kostenlos, ohne Werbung, ohne Käufe und läuft im Browser auf Handy, Tablet und PC. Der Spielstand bleibt im Browser gespeichert."]),
  "dino-buddler": dict(
   title="Dino-Buddler – Dino-Spiel für Kinder kostenlos",
   meta="Dino-Buddler: Kinder graben Dinos aus, bauen Skelette zusammen und erwecken 10 Dinos zum Leben. Alles vorgelesen, ohne Werbung, ohne Käufe.",
@@ -341,6 +358,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Fußball-Boss: der Fußballmanager für Kinder in Lewolux Kids", "kids/"),
  ("Neu", "Dino-Buddler: Dinos ausgraben in Lewolux Kids", "kids/"),
  ("Neu", "Würfelzauber: würfeln, Königreiche bauen und Haustiere sammeln", "spiele/wuerfelzauber/"),
  ("Neu", "Omas Dachboden: das gemütliche Sortierspiel mit 5 Level", "spiele/omas-dachboden/"),
@@ -362,6 +380,11 @@ NEWS = [
 # c1/c2 = Farben der Karte, emoji = großes Symbol, age = Altersempfehlung
 # Spiele in dieser Liste werden im Kids-Modus NICHT gesperrt; alle anderen Spiele schon.
 KIDS = [
+ dict(id="fussball-boss", title="Fußball-Boss", emoji="🏆", c1="#2fa84f", c2="#1f6fa8", age="ab 7 Jahren",
+  line="Der Fußballmanager für Kinder",
+  learn="Planen, Zahlen vergleichen, mit Geld umgehen",
+  say="Fußball-Boss! Stell deine Mannschaft auf, kauf neue Spieler und werde Meister.",
+  mascot="coach", crowd=1),
  dict(id="dino-buddler", title="Dino-Buddler", emoji="🦖", c1="#ffb84d", c2="#ff7a59", age="ab 3 Jahren",
   line="Dinos ausgraben, zusammenbauen und zum Leben erwecken",
   learn="Feinmotorik, Puzzeln, erstes Dino-Wissen",

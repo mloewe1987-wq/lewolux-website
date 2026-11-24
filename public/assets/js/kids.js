@@ -147,6 +147,17 @@ window.lxInstall=function(btn,title,lead){
 <g class="k-eye"><circle cx="42" cy="38" r="3.4" fill="#1d2350"/><circle cx="58" cy="38" r="3.4" fill="#1d2350"/><circle cx="43" cy="36.8" r="1.1" fill="#fff"/><circle cx="59" cy="36.8" r="1.1" fill="#fff"/></g>
 <path d="M43 47q7 6 14 0" stroke="#a0442a" stroke-width="2.4" fill="none" stroke-linecap="round"/><g fill="#ff9d9d" opacity=".8"><circle cx="35" cy="45" r="3.2"/><circle cx="65" cy="45" r="3.2"/></g>
 <g transform="translate(80 112)"><circle r="11" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M0-5l4.8 3.5-1.8 5.6h-6l-1.8-5.6z" fill="#222"/><path d="M0-5V-11M4.8-1.5l6-2M3 4.1l3.8 5.2M-3 4.1l-3.8 5.2M-4.8-1.5l-6-2" stroke="#222" stroke-width="1.3"/></g></svg>`},
+    // Kalle aus Fußball-Boss: Co-Trainer mit Kappe und Klemmbrett
+    coach:{w:72,h:92,svg:`<svg viewBox="0 0 100 128">
+<g class="lg1"><rect x="36" y="100" width="11" height="22" rx="4" fill="#1f3a6e"/><ellipse cx="40" cy="123" rx="9" ry="4.5" fill="#fff"/></g><g class="lg2"><rect x="53" y="100" width="11" height="22" rx="4" fill="#1f3a6e"/><ellipse cx="60" cy="123" rx="9" ry="4.5" fill="#fff"/></g>
+<path d="M28 62q22-10 44 0l-2 42H30z" fill="#2f6fd0" stroke="#1d4f9e" stroke-width="1.5"/><path d="M50 58v46" stroke="#fff" stroke-width="2.5"/><path d="M31 70h8M61 70h8" stroke="#fff" stroke-width="3"/>
+<g class="wg1"><path d="M30 64q-10 10-10 24" stroke="#2f6fd0" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="20" cy="90" r="5" fill="#f2c49e"/></g>
+<g class="wg2"><path d="M70 64q8 8 4 20" stroke="#2f6fd0" stroke-width="10" fill="none" stroke-linecap="round"/><rect x="66" y="76" width="20" height="26" rx="2" fill="#a0683a" transform="rotate(10 76 89)"/><rect x="69" y="80" width="14" height="18" fill="#fff" transform="rotate(10 76 89)"/><path d="M72 86l3 3m0-3l-3 3M79 91a2 2 0 1 0 .1 0" stroke="#333" stroke-width="1.2" fill="none" transform="rotate(10 76 89)"/></g>
+<circle cx="50" cy="38" r="21" fill="#f2c49e"/><path d="M33 46q17 16 34 0q-2 12-17 13q-15-1-17-13z" fill="#8a5a3a"/>
+<path d="M27 32q2-20 23-20q21 0 23 20z" fill="#e8484a"/><path d="M27 31h52q2 4-6 5H27z" fill="#c62f31"/><circle cx="50" cy="13" r="2.5" fill="#c62f31"/>
+<g class="k-eye"><circle cx="42" cy="40" r="3.4" fill="#1d2350"/><circle cx="58" cy="40" r="3.4" fill="#1d2350"/><circle cx="43" cy="38.8" r="1.1" fill="#fff"/><circle cx="59" cy="38.8" r="1.1" fill="#fff"/></g>
+<path d="M43 49q7 5 14 0" stroke="#5a2a1a" stroke-width="2.4" fill="none" stroke-linecap="round"/><g fill="#ff9d9d" opacity=".7"><circle cx="35" cy="46" r="3"/><circle cx="65" cy="46" r="3"/></g>
+<g transform="translate(20 116)"><circle r="9" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M0-4l3.8 2.8-1.4 4.5h-4.8l-1.4-4.5z" fill="#222"/></g></svg>`},
     // Buddel aus Dino-Buddler: Baby-Dino mit Forscherhut
     dino:{w:76,h:88,svg:`<svg viewBox="0 0 100 116">
 <path d="M22 84q-16 4-20-6q8 4 18-2z" fill="#f2b98f"/>
