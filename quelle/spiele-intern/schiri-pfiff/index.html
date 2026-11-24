@@ -34,7 +34,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.92);border-radius:999px;padding:6px 14px 6px 8px;font-size:22px;box-shadow:0 3px 0 rgba(0,0,0,.15)}
 .pill img{width:34px;height:34px}
 .sp{flex:1}
-#path{position:absolute;inset:calc(var(--st) + 84px) calc(var(--sr) + 10px) calc(var(--sb) + 110px) calc(var(--sl) + 10px)}
+#path{position:absolute;inset:calc(var(--st) + 140px) calc(var(--sr) + 10px) calc(var(--sb) + 110px) calc(var(--sl) + 10px)}
 #path svg{position:absolute;inset:0;width:100%;height:100%}
 .node{position:absolute;transform:translate(-50%,-50%);width:min(19vw,24vh,112px);aspect-ratio:1;border-radius:50%;background:#fff;box-shadow:0 6px 0 #c9d6e3,0 10px 20px rgba(0,0,0,.2);display:grid;place-items:center;font-size:min(9vw,48px);color:#2a3b55}
 .node.locked{background:#d9e2ea;color:#9aa8b6}
@@ -42,7 +42,16 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 @keyframes bob{50%{transform:translate(-50%,-58%)}}
 .node .st{position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);font-size:min(5vw,22px);white-space:nowrap;letter-spacing:-2px}
 .node img{width:62%;height:62%;object-fit:contain}
-#endless{position:absolute;left:50%;bottom:calc(var(--sb) + 18px);transform:translateX(-50%)}
+#liga{position:absolute;left:50%;top:calc(var(--st) + 80px);transform:translateX(-50%);display:flex;gap:6px;z-index:6}
+#liga .lg{background:rgba(255,255,255,.75);border-radius:999px;padding:6px 12px;font-size:min(4.4vw,22px);box-shadow:0 3px 0 rgba(0,0,0,.15);white-space:nowrap}
+#liga .lg.on{background:#ffd23f;box-shadow:0 3px 0 #c98f00;transform:scale(1.08)}
+#liga .lg.lock{opacity:.6}
+#map[data-liga="1"]{background:linear-gradient(rgba(190,210,255,.35),rgba(190,210,255,.15)),url(assets/bg.webp) center/cover #5cc777}
+#map[data-liga="2"]{background:linear-gradient(rgba(255,215,90,.35),rgba(255,200,60,.15)),url(assets/bg.webp) center/cover #5cc777}
+.node .num{position:absolute;top:-8px;left:-8px;min-width:30px;height:30px;border-radius:15px;background:#2f7de1;color:#fff;font-size:17px;display:grid;place-items:center;padding:0 6px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.node.locked .num{background:#9aa8b6}
+.node.final{box-shadow:0 0 0 5px #ffd23f,0 6px 0 #c9d6e3,0 10px 20px rgba(0,0,0,.2)}
+#endless{position:absolute;left:50%;bottom:calc(var(--sb) + 18px);transform:translateX(-50%);white-space:nowrap}
 /* Spiel */
 #game{background:#1e7a3c}
 #cv{position:absolute;left:0;top:0;display:block}
@@ -85,8 +94,8 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .stars .off{filter:grayscale(1);opacity:.3}
 .card .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 #load{position:fixed;inset:0;z-index:50;background:#1e7a3c;display:grid;place-items:center;color:#fff;font-size:40px}
-@media (orientation:landscape){#title .logo{left:calc(var(--sl) + 3vw);right:auto;text-align:left;font-size:min(9vw,19vh,110px)}}
-@media (orientation:portrait){#lion{height:min(17vh,150px)}#bubble{left:calc(var(--sl) + 12px);bottom:calc(var(--sb) + min(17vh,150px) + 6px);font-size:18px}#ask{padding-left:calc(var(--sl) + min(26vw,120px));bottom:calc(var(--sb) + 10px);gap:2vw}.opt{width:min(22vw,120px);border-radius:20px}}
+@media (orientation:landscape){#liga{top:calc(var(--st) + 14px)}#path{top:calc(var(--st) + 84px)!important}#timer{top:calc(var(--st) + 26px);width:min(36vw,380px)}#replay{top:calc(var(--st) + 84px)}.opt{width:min(17vw,27vh,150px)}#title .logo{left:calc(var(--sl) + 3vw);right:auto;text-align:left;font-size:min(9vw,19vh,110px)}}
+@media (orientation:portrait){#lion{height:min(17vh,150px)}#bubble{left:calc(var(--sl) + 12px);bottom:calc(var(--sb) + min(17vh,150px) + 6px);font-size:18px}#ask{padding-left:calc(var(--sl) + min(26vw,120px));bottom:calc(var(--sb) + 10px);gap:2vw}.opt{width:min(27vw,140px);border-radius:20px}}
 </style>
 </head>
 <body>
@@ -99,6 +108,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 
 <section class="scr" id="map">
   <div class="top"><button class="round" id="mHome" aria-label="Start" data-say="Zurück">🏠</button><span class="sp"></span><div class="pill"><img src="assets/ic_star.webp" alt=""><span id="mStars">0</span></div><button class="round" id="mSnd" aria-label="Ton">🔊</button></div>
+  <div id="liga"></div>
   <div id="path"></div>
   <button class="btn blue" id="endless" data-say="Endlos-Spiel" hidden>♾️ Endlos-Spiel</button>
 </section>
@@ -126,7 +136,7 @@ try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) S = Obje
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 
 /* ================= Stimme & Ton ================= */
-const VOX = /*@@VOX*/{"Hallo! Ich bin Pfiff, der Schiedsrichter. Hilfst du mir? Schau genau hin und entscheide schnell!": "0410cfc7df", "Tippe auf das nächste Spiel. Für jedes Spiel bekommst du bis zu drei Sterne.": "876733f8af", "Anpfiff! Pass gut auf!": "9a9006037d", "Richtig! Super gepfiffen!": "313e1b57a2", "Genau so! Du bist ein toller Schiri!": "e12beeb797", "Klasse Entscheidung!": "4c6c775dc5", "Ja, das war richtig!": "37c08eba1f", "Oh, zu langsam! Du musst schneller entscheiden.": "496047cb7f", "Was sagst du, Schiri?": "8e72ada422", "Wir schauen es uns nochmal an.": "9f5c615b93", "Wow! Drei Sterne! Du bist der beste Schiri!": "4468c0d44a", "Super! Zwei Sterne!": "93c45934c9", "Gut gemacht! Ein Stern. Versuch es nochmal für mehr Sterne!": "318f212aa9", "Das war schwer. Probier es gleich nochmal!": "efd872934c", "Du hast alle Spiele geschafft! Hier ist dein Pokal! Jetzt kannst du das Endlos-Spiel spielen.": "d88272e271", "Endlos-Spiel! Du hast drei Herzen. Wie viele richtige Entscheidungen schaffst du?": "a53a413d86", "Keine Herzen mehr! Das war ein tolles Spiel!": "21fed6ec3f", "Achtung! Wenn ein Spieler nur den Ball spielt, ist alles fair. Dann rufst du: Weiterspielen! Aber wenn er das Bein trifft, ist es ein Foul. Dann gibt es Freistoß!": "e6af16f241", "Neu: Wenn der Ball über die Linie rollt, ist er im Aus. Wer hat ihn zuletzt berührt? Die andere Mannschaft bekommt den Einwurf!": "0bafc38fc7", "Neu: Ist der Ball ganz im Tor? Dann ist es ein Tor! Prallt er an den Pfosten oder hält der Torwart, ist es kein Tor.": "3c2ae2401a", "Neu: Handspiel! Wenn der Ball an die Hand geht, ist es ein Foul. Trifft der Ball nur den Bauch, wird weitergespielt.": "ddf49f1827", "Neu: Ein Foul im großen Strafraum vor dem Tor? Dann gibt es Elfmeter!": "fa29482d03", "Neu: Bei einem richtig wilden Foul zeigst du die gelbe Karte!": "336d5748e5", "Neu: Manche Spieler fallen einfach hin, obwohl sie keiner berührt hat. Das ist eine Schwalbe! Dann rufst du: Weiterspielen!": "b8eeae19d9", "Neu: Bei einem ganz, ganz wilden Foul von hinten gibt es die rote Karte!": "f0b828aa6b", "Schau: Er hat nur den Ball getroffen. Das war fair, also weiterspielen!": "aa1fae074e", "Schau: Er hat das Bein getroffen und nicht den Ball. Das ist ein Foul, also Freistoß!": "dd7427cb81", "Das Team Blau hat den Ball zuletzt berührt. Darum bekommt Team Orange den Einwurf!": "5bc51f8467", "Das Team Orange hat den Ball zuletzt berührt. Darum bekommt Team Blau den Einwurf!": "12a00027c8", "Der Ball war ganz im Tor. Das ist ein Tor!": "99a0b5ee75", "Der Ball war nicht im Tor. Also kein Tor!": "58cd2853dc", "Der Ball ging an die Hand. Das ist Handspiel, also Freistoß!": "00f4e7a480", "Handspiel im Strafraum! Das gibt Elfmeter!": "917f9c658b", "Der Ball traf nur den Bauch. Das ist kein Handspiel, also weiterspielen!": "f1c070e985", "Das Foul war im Strafraum. Darum gibt es Elfmeter!": "c01c436be4", "Das war ein ganz wildes Foul. Dafür gibt es die gelbe Karte!": "62dc8b5a75", "Keiner hat ihn berührt! Er ist einfach hingefallen. Weiterspielen!": "3b7faddb6b", "Das war ein sehr gefährliches Foul von hinten. Dafür gibt es die rote Karte!": "5e71cde89e", "Elfmeter verwandelt! Tor!": "1f2b1b1ee2", "Gehalten! Der Torwart hat den Elfmeter gehalten!": "3c274da5e1", "Einwurf für Blau": "416d59536e", "Einwurf für Orange": "4489b903d8", "Elfmeter": "b721239ac4", "Endlos-Spiel": "f7b3473592", "Freistoß": "fcf572b4be", "Gelbe Karte": "e5f66237fa", "Kein Tor": "67cb45432b", "Los geht's": "db3e0477a0", "Nochmal": "8cfa032207", "Nochmal ansehen": "75d0fe14b4", "Rote Karte": "914d149b9b", "Spiel 1": "910f944786", "Spiel 2": "9d0107c736", "Spiel 3": "c0859bf3d9", "Spiel 4": "111f28b2b9", "Spiel 5": "67de68ecda", "Spiel 6": "993935807d", "Spiel 7": "c1b759d471", "Spiel 8": "55b60f95c0", "Tor": "68537e1375", "Weiter": "0dcfb4eff3", "Weiterspielen": "45382b2479", "Zurück": "fec5b1517a", "Noch gesperrt": "72d110ec7b"}/*@@VOX-END*/;
+const VOX = /*@@VOX*/{"Hallo! Ich bin Pfiff, der Schiedsrichter. Hilfst du mir? Schau genau hin und entscheide schnell!": "0410cfc7df", "Tippe auf das nächste Spiel. Für jedes Spiel bekommst du bis zu drei Sterne.": "876733f8af", "Anpfiff! Pass gut auf!": "9a9006037d", "Richtig! Super gepfiffen!": "313e1b57a2", "Genau so! Du bist ein toller Schiri!": "e12beeb797", "Klasse Entscheidung!": "4c6c775dc5", "Ja, das war richtig!": "37c08eba1f", "Oh, zu langsam! Du musst schneller entscheiden.": "496047cb7f", "Was sagst du, Schiri?": "8e72ada422", "Wir schauen es uns nochmal an.": "9f5c615b93", "Wow! Drei Sterne! Du bist der beste Schiri!": "4468c0d44a", "Super! Zwei Sterne!": "93c45934c9", "Gut gemacht! Ein Stern. Versuch es nochmal für mehr Sterne!": "318f212aa9", "Das war schwer. Probier es gleich nochmal!": "efd872934c", "Du hast alle Spiele geschafft! Hier ist dein Pokal! Jetzt kannst du das Endlos-Spiel spielen.": "d88272e271", "Endlos-Spiel! Du hast drei Herzen. Wie viele richtige Entscheidungen schaffst du?": "a53a413d86", "Keine Herzen mehr! Das war ein tolles Spiel!": "21fed6ec3f", "Achtung! Wenn ein Spieler nur den Ball spielt, ist alles fair. Dann rufst du: Weiterspielen! Aber wenn er das Bein trifft, ist es ein Foul. Dann gibt es Freistoß!": "e6af16f241", "Neu: Wenn der Ball über die Linie rollt, ist er im Aus. Wer hat ihn zuletzt berührt? Die andere Mannschaft bekommt den Einwurf!": "0bafc38fc7", "Neu: Ist der Ball ganz im Tor? Dann ist es ein Tor! Prallt er an den Pfosten oder hält der Torwart, ist es kein Tor.": "3c2ae2401a", "Neu: Handspiel! Wenn der Ball an die Hand geht, ist es ein Foul. Trifft der Ball nur den Bauch, wird weitergespielt.": "ddf49f1827", "Neu: Ein Foul im großen Strafraum vor dem Tor? Dann gibt es Elfmeter!": "fa29482d03", "Neu: Bei einem richtig wilden Foul zeigst du die gelbe Karte!": "336d5748e5", "Neu: Manche Spieler fallen einfach hin, obwohl sie keiner berührt hat. Das ist eine Schwalbe! Dann rufst du: Weiterspielen!": "b8eeae19d9", "Neu: Bei einem ganz, ganz wilden Foul von hinten gibt es die rote Karte!": "f0b828aa6b", "Schau: Er hat nur den Ball getroffen. Das war fair, also weiterspielen!": "aa1fae074e", "Schau: Er hat das Bein getroffen und nicht den Ball. Das ist ein Foul, also Freistoß!": "dd7427cb81", "Das Team Blau hat den Ball zuletzt berührt. Darum bekommt Team Orange den Einwurf!": "5bc51f8467", "Das Team Orange hat den Ball zuletzt berührt. Darum bekommt Team Blau den Einwurf!": "12a00027c8", "Der Ball war ganz im Tor. Das ist ein Tor!": "99a0b5ee75", "Der Ball war nicht im Tor. Also kein Tor!": "58cd2853dc", "Der Ball ging an die Hand. Das ist Handspiel, also Freistoß!": "00f4e7a480", "Handspiel im Strafraum! Das gibt Elfmeter!": "917f9c658b", "Der Ball traf nur den Bauch. Das ist kein Handspiel, also weiterspielen!": "f1c070e985", "Das Foul war im Strafraum. Darum gibt es Elfmeter!": "c01c436be4", "Das war ein ganz wildes Foul. Dafür gibt es die gelbe Karte!": "62dc8b5a75", "Keiner hat ihn berührt! Er ist einfach hingefallen. Weiterspielen!": "3b7faddb6b", "Das war ein sehr gefährliches Foul von hinten. Dafür gibt es die rote Karte!": "5e71cde89e", "Elfmeter verwandelt! Tor!": "1f2b1b1ee2", "Gehalten! Der Torwart hat den Elfmeter gehalten!": "3c274da5e1", "Einwurf für Blau": "416d59536e", "Einwurf für Orange": "4489b903d8", "Elfmeter": "b721239ac4", "Endlos-Spiel": "f7b3473592", "Freistoß": "fcf572b4be", "Gelbe Karte": "e5f66237fa", "Kein Tor": "67cb45432b", "Los geht's": "db3e0477a0", "Nochmal": "8cfa032207", "Nochmal ansehen": "75d0fe14b4", "Rote Karte": "914d149b9b", "Spiel 1": "910f944786", "Spiel 2": "9d0107c736", "Spiel 3": "c0859bf3d9", "Spiel 4": "111f28b2b9", "Spiel 5": "67de68ecda", "Spiel 6": "993935807d", "Spiel 7": "c1b759d471", "Spiel 8": "55b60f95c0", "Tor": "68537e1375", "Weiter": "0dcfb4eff3", "Weiterspielen": "45382b2479", "Zurück": "fec5b1517a", "Noch gesperrt": "72d110ec7b", "Der Torwart hat den Ball gefangen. Also kein Tor!": "fa57d4a9db", "Der Ball flog über das Tor. Also kein Tor!": "353e0561a5", "Neu: Ecke oder Abstoß! Geht der Ball neben dem Tor über die Linie, schau genau hin. Hat Team Blau ihn zuletzt berührt, gibt es Ecke. Hat Team Orange ihn ins Aus geschossen, gibt es Abstoß.": "d2700bb59e", "Neu: Der Torwart darf den Ball in seinem Strafraum mit den Händen fangen. Das ist kein Handspiel! Dann rufst du: Weiterspielen!": "877dc7ef3f", "Team Blau hat den Ball zuletzt berührt. Darum gibt es Ecke!": "41faba0ba7", "Team Orange hat den Ball neben das Tor geschossen. Darum gibt es Abstoß!": "af8f75e2f7", "Der Torwart darf den Ball im Strafraum mit den Händen fangen. Also weiterspielen!": "9c047dda9e", "Super! Du hast Liga 1 geschafft! Hier ist deine Medaille. Jetzt geht es in Liga 2!": "05b331b190", "Toll! Liga 2 geschafft! Jetzt kommt Liga 3 mit den Profis. Die spielen ganz schön schnell!": "f0f6b0e7ca", "Diese Liga ist noch gesperrt. Schaff zuerst alle Spiele davor!": "cb66da3929", "Ecke": "7ef26834cd", "Abstoß": "ad0a0a7a81", "Spiel 9": "a1444550dd", "Spiel 10": "35e53ec18e", "Spiel 11": "80ff9192d8", "Spiel 12": "39e3475161", "Spiel 13": "6ad3693dbc", "Spiel 14": "6de4fb3d82", "Spiel 15": "41e80a2e6a", "Spiel 16": "18adecb194", "Spiel 17": "ccdee303c5", "Spiel 18": "e2f9eaea0c", "Spiel 19": "0cc5ebd0a9", "Spiel 20": "92c9b067b0", "Spiel 21": "a0258b8455", "Spiel 22": "6f80e1ff2d", "Spiel 23": "5ed6f74489", "Spiel 24": "bf8568c437", "Liga 1": "ee9252452f", "Liga 2": "0cffbdbd24", "Liga 3": "de9a0c5504"}/*@@VOX-END*/;
 let soundOn = true; try { soundOn = localStorage.getItem("sp_snd") !== "0"; } catch (e) {}
 let vq = [], vBusy = false, vCur = null, vTok = 0;
 const lionEl = $("#lion");
@@ -183,6 +193,8 @@ const T = {
   ex_outB: "Das Team Orange hat den Ball zuletzt berührt. Darum bekommt Team Blau den Einwurf!",
   ex_goal: "Der Ball war ganz im Tor. Das ist ein Tor!",
   ex_nogoal: "Der Ball war nicht im Tor. Also kein Tor!",
+  ex_save: "Der Torwart hat den Ball gefangen. Also kein Tor!",
+  ex_over: "Der Ball flog über das Tor. Also kein Tor!",
   ex_hand: "Der Ball ging an die Hand. Das ist Handspiel, also Freistoß!",
   ex_handpen: "Handspiel im Strafraum! Das gibt Elfmeter!",
   ex_belly: "Der Ball traf nur den Bauch. Das ist kein Handspiel, also weiterspielen!",
@@ -190,13 +202,22 @@ const T = {
   ex_yellow: "Das war ein ganz wildes Foul. Dafür gibt es die gelbe Karte!",
   ex_dive: "Keiner hat ihn berührt! Er ist einfach hingefallen. Weiterspielen!",
   ex_red: "Das war ein sehr gefährliches Foul von hinten. Dafür gibt es die rote Karte!",
+  learn_corner: "Neu: Ecke oder Abstoß! Geht der Ball neben dem Tor über die Linie, schau genau hin. Hat Team Blau ihn zuletzt berührt, gibt es Ecke. Hat Team Orange ihn ins Aus geschossen, gibt es Abstoß.",
+  learn_keeper: "Neu: Der Torwart darf den Ball in seinem Strafraum mit den Händen fangen. Das ist kein Handspiel! Dann rufst du: Weiterspielen!",
+  ex_ecke: "Team Blau hat den Ball zuletzt berührt. Darum gibt es Ecke!",
+  ex_abstoss: "Team Orange hat den Ball neben das Tor geschossen. Darum gibt es Abstoß!",
+  ex_keeper: "Der Torwart darf den Ball im Strafraum mit den Händen fangen. Also weiterspielen!",
+  liga1: "Super! Du hast Liga 1 geschafft! Hier ist deine Medaille. Jetzt geht es in Liga 2!",
+  liga2: "Toll! Liga 2 geschafft! Jetzt kommt Liga 3 mit den Profis. Die spielen ganz schön schnell!",
+  ligaLock: "Diese Liga ist noch gesperrt. Schaff zuerst alle Spiele davor!",
   penGoal: "Elfmeter verwandelt! Tor!",
   penSave: "Gehalten! Der Torwart hat den Elfmeter gehalten!",
 };
 const OPT = {
   weiter: ["ic_play", "Weiter", "Weiterspielen"], frei: ["ic_whistle", "Freistoß", "Freistoß"], elf: ["ic_spot", "Elfmeter", "Elfmeter"],
   gelb: ["ic_yellow", "Gelb", "Gelbe Karte"], rot: ["ic_red", "Rot", "Rote Karte"], tor: ["ic_goal", "Tor", "Tor"], kein: ["ic_x", "Kein Tor", "Kein Tor"],
-  einO: ["bear_1", "Einwurf", "Einwurf für Orange", "or"], einB: ["fox_1", "Einwurf", "Einwurf für Blau", "bl"]
+  einO: ["bear_1", "Einwurf", "Einwurf für Orange", "or"], einB: ["fox_1", "Einwurf", "Einwurf für Blau", "bl"],
+  ecke: ["ic_corner", "Ecke", "Ecke", "or"], abstoss: ["hippo_1", "Abstoß", "Abstoß", "bl"]
 };
 
 /* ================= Bilder ================= */
@@ -213,14 +234,14 @@ const MY = y => 480 + (y - 560) * .75;
 // Blickrichtung der Bilder: 1 = nach rechts, -1 = nach links, 0 = von vorne
 const NAT = { bear: [1, 1, 1, 0], pig: [1, 1, 1, 0], fox: [-1, -1, 1, 0], peng: [1, -1, -1, 0], hippo: [0, -1, 0, 0] };
 const cv = $("#cv"), cx = cv.getContext("2d"); let scale = 1, offX = 0, offY = 0, dpr = 1;
-const CAM = { x: 800, y: 560, z: 1.6, tx: 800, ty: 560 };
+const CAM = { x: 800, y: 560, z: 1.6, tx: 800, ty: 560, zm: 1, tzm: 1, fr: .5 };
 function resize() {
   const vw = innerWidth, vh = innerHeight; dpr = Math.min(2, devicePixelRatio || 1);
   // Querformat: Bild füllt alles (Ränder dürfen abgeschnitten werden). Hochformat: volle Breite, Hintergrund wird oben/unten verlängert.
   scale = vw > vh ? Math.max(vw / W, vh / H) : vw / W;
   cv.width = vw * dpr; cv.height = vh * dpr; cv.style.width = vw + "px"; cv.style.height = vh + "px";
   offX = (vw - W * scale) / 2; offY = (vh - H * scale) / 2;
-  CAM.z = vw > vh ? 1.7 : Math.min(2.9, vh / (H * scale));
+  CAM.z = vw > vh ? 1.7 : Math.min(4.4, .98 / scale);
 }
 addEventListener("resize", () => { resize(); if (cur === "map") openMap(); });
 const depth = y => .72 + (y - PITCH.y0) / (PITCH.y1 - PITCH.y0) * .4;
@@ -254,17 +275,21 @@ function drawBall() {
   cx.restore();
 }
 function camTarget() {
-  // Mitte zwischen Angreifer, Verteidiger und Ball (bei Torschüssen zählt der Ball mehr)
+  // Entscheidende Stelle (z. B. Torlinie, Hand, Foul) groß und über den Knöpfen zeigen
+  const land = innerWidth > innerHeight;
+  if (sit && sit.focus && (state === "ask" || state === "after" || st >= (sit.focusT ?? 99))) { CAM.tx = sit.focus[0]; CAM.ty = sit.focus[1]; CAM.tzm = (sit.zoom || 1.2) * (state === "ask" || state === "after" ? 1 : .92); CAM.fr = land ? .43 : .46; return; }
+  CAM.tzm = 1; CAM.fr = land ? .46 : .5;
   const pts = [], w = []; if (ACT.A.vis) { pts.push(ACT.A); w.push(1); } if (ACT.D.vis && Math.abs(ACT.D.x - ACT.A.x) < 500) { pts.push(ACT.D); w.push(1); } if (BALL.vis) { pts.push(BALL); w.push(sit && sit.type === "goal" ? 2.5 : .6); }
-  if (!pts.length) return; let sw = 0, x = 0, y = 0; pts.forEach((p, i) => { x += p.x * w[i]; y += p.y * w[i]; sw += w[i]; }); CAM.tx = x / sw; CAM.ty = y / sw - 90;
+  if (!pts.length) return; let sw = 0, x = 0, y = 0; pts.forEach((p, i) => { x += p.x * w[i]; y += p.y * w[i]; sw += w[i]; }); CAM.tx = x / sw; CAM.ty = y / sw - 70;
 }
 function draw(t) {
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.fillStyle = "#3fae55"; cx.fillRect(0, 0, cv.width, cv.height);
   // Kamera: zoomt heran und folgt dem Ball, bleibt im Bild
-  const vw = innerWidth, vh = innerHeight, k = scale * CAM.z;
+  CAM.zm += (CAM.tzm - CAM.zm) * .05;
+  const vw = innerWidth, vh = innerHeight, k = scale * CAM.z * CAM.zm;
   const hw = vw / 2 / k, hh = vh / 2 / k;
-  CAM.x += (CAM.tx - CAM.x) * .06; CAM.y += (CAM.ty - CAM.y) * .06;
-  const cxw = Math.max(hw, Math.min(W - hw, CAM.x)), cyw = hh * 2 >= H - 1 ? H / 2 : Math.max(hh, Math.min(H - hh, CAM.y));
+  CAM.x += (CAM.tx - CAM.x) * .07; CAM.y += (CAM.ty - CAM.y) * .07;
+  const cxw = Math.max(hw, Math.min(W - hw, CAM.x)), cyw = Math.max(hh - 250, Math.min(H - hh + 220, CAM.y + (.5 - CAM.fr) * 2 * hh));
   cx.setTransform(dpr * k, 0, 0, dpr * k, dpr * (vw / 2 - cxw * k), dpr * (vh / 2 - cyw * k));
   if (IM.bg) { const gs = cx.createLinearGradient(0, -900, 0, 0); gs.addColorStop(0, "#5fb8ea"); gs.addColorStop(1, "#87d3f0"); cx.fillStyle = gs; cx.fillRect(-400, -900, W + 800, 902); const gg = cx.createLinearGradient(0, H, 0, H + 900); gg.addColorStop(0, "#939e4e"); gg.addColorStop(1, "#5d7a2c"); cx.fillStyle = gg; cx.fillRect(-400, H - 2, W + 800, 902); cx.drawImage(IM.bg, 0, 0, W, H); }
   // Strafraum-Markierung (dezent), damit Kinder ihn sehen
@@ -273,10 +298,29 @@ function draw(t) {
   if (BALL.vis) list.push({ y: BALL.y + .5, f: drawBall });
   FX.filter(f => f.under).forEach(f => f.draw(t));
   list.sort((a, b) => a.y - b.y).forEach(o => o.f());
+  if (BALL.vis && inGoal(BALL.x, BALL.y)) netOver(BALL.x, BALL.y - BALL.z - 17 * depth(BALL.y), 34 * depth(BALL.y) + 10);
   FX.filter(f => !f.under).forEach(f => f.draw(t));
+  if (sit && sit.mark && (state === "ask" || (st >= sit.mark.t && st < sit.mark.t + 1.2))) { const m = sit.mark, pu = 1 + Math.sin(t * 7) * .08; cx.save(); cx.lineWidth = 7; cx.strokeStyle = "rgba(255,255,255,.95)"; cx.shadowColor = "rgba(255,220,40,1)"; cx.shadowBlur = 18; cx.beginPath(); cx.arc(m.x, m.y, m.r * pu, 0, 7); cx.stroke(); cx.restore(); }
+  if (endFlash > 0) { cx.save(); cx.strokeStyle = `rgba(255,240,80,${endFlash})`; cx.shadowColor = "#fff36b"; cx.shadowBlur = 20; cx.lineWidth = 9; cx.beginPath(); cx.moveTo(1060, goalLineY(1060)); cx.lineTo(1600, goalLineY(1600)); cx.stroke(); cx.restore(); }
   if (lineFlash > 0) { cx.save(); cx.strokeStyle = `rgba(255,240,80,${lineFlash})`; cx.shadowColor = "#fff36b"; cx.shadowBlur = 20; cx.lineWidth = 10; cx.beginPath(); cx.moveTo(150, PITCH.lineY); cx.lineTo(1600, PITCH.lineY); cx.stroke(); cx.restore(); }
 }
-let highlightBox = 0, lineFlash = 0;
+let highlightBox = 0, lineFlash = 0, endFlash = 0;
+/* Tor im Hintergrundbild: vorne links/rechts (Pfostenfüße), Latte, hinten rechts */
+const GL = { L: [1245, 522], R: [1390, 580], TL: [1245, 338], TR: [1390, 345], B: [1538, 575], BT: [1538, 362] };
+const goalLineY = x => 522 + (x - 1245) * .4;
+function inGoal(x, y) { const fx = 1245 + (y - 522) / .4, bx = 1393 + (y - 517) / .4; return y > 500 && y < 585 && x > fx + 6 && x < bx; }
+// Seitennetz (vorne rechts) liegt vor dem Ball, wenn der Ball im Tor ist
+function netOver(bx, by, r, wob = 0, t = 0) {
+  cx.save(); if (r) { cx.beginPath(); cx.arc(bx, by, r, 0, 7); cx.clip(); }
+  cx.strokeStyle = "rgba(245,245,245,.92)"; cx.lineWidth = 2.4; cx.lineCap = "round";
+  const P = (u, v) => { const tx = GL.TR[0] + (GL.BT[0] - GL.TR[0]) * u, ty = GL.TR[1] + (GL.BT[1] - GL.TR[1]) * u, bx2 = GL.R[0] + (GL.B[0] - GL.R[0]) * u, by2 = GL.R[1] + (GL.B[1] - GL.R[1]) * u; let x = tx + (bx2 - tx) * v, y = ty + (by2 - ty) * v; if (wob) { const d = Math.hypot(x - bx, y - by); x += Math.sin(d * .08 - t * 18) * wob * Math.max(0, 1 - d / 160); } return [x, y]; };
+  cx.beginPath(); for (let i = 0; i <= 13; i++) { const u = i / 13; for (let j = 0; j <= 20; j++) { const [x, y] = P(u, j / 20); j ? cx.lineTo(x, y) : cx.moveTo(x, y); } }
+  for (let j = 0; j <= 20; j++) { const v = j / 20; for (let i = 0; i <= 13; i++) { const [x, y] = P(i / 13, v); i ? cx.lineTo(x, y) : cx.moveTo(x, y); } } cx.stroke();
+  // vorderer rechter Pfosten
+  cx.strokeStyle = "#8d969e"; cx.lineWidth = 11; cx.beginPath(); cx.moveTo(GL.TR[0], GL.TR[1]); cx.lineTo(GL.R[0], GL.R[1]); cx.stroke(); cx.strokeStyle = "#c9d0d6"; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(GL.TR[0] - 2, GL.TR[1]); cx.lineTo(GL.R[0] - 2, GL.R[1]); cx.stroke();
+  cx.restore();
+}
+function netShake(x, y) { const p = { x, y, life: 1 }; p.draw = t => { cx.save(); cx.globalAlpha = p.life; netOver(p.x, p.y, 0, 9 * p.life, t); cx.restore(); }; p.upd = dt => { p.life -= dt * .9; }; FX.push(p); }
 
 /* ================= Effekte ================= */
 function dust(x, y, n = 8) { y = MY(y); for (let i = 0; i < n; i++) { const p = { x, y, vx: rnd(-90, 90), vy: rnd(-60, -10), r: rnd(10, 22), life: 1, under: false }; p.draw = () => { cx.fillStyle = `rgba(235,225,200,${p.life * .8})`; cx.beginPath(); cx.arc(p.x, p.y, p.r * (1.6 - p.life * .6), 0, 7); cx.fill(); }; p.upd = dt => { p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt * 1.6; }; FX.push(p); } }
@@ -289,7 +333,7 @@ function ring(x, y) { y = MY(y); const p = { x, y, life: 1 }; p.draw = () => { c
 function Scene() { this.tr = {}; this.ball = []; this.ev = []; this.slow = []; }
 const EASE = { lin: t => t, out: t => 1 - (1 - t) * (1 - t), in: t => t * t, io: t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2 };
 Scene.prototype.mv = function (id, t0, t1, x0, y0, x1, y1, o = {}) { if (!o.noMap) { y0 = MY(y0); y1 = MY(y1); } (this.tr[id] = this.tr[id] || []).push(Object.assign({ t0, t1, x0, y0, x1, y1, pose: 1, e: "lin", z: 0, r0: 0, r1: 0 }, o)); return this; };
-Scene.prototype.bl = function (t0, t1, x0, y0, x1, y1, o = {}) { y0 = MY(y0); y1 = MY(y1); this.ball.push(Object.assign({ t0, t1, x0, y0, x1, y1, h: 0, e: "out", spin: 1 }, o)); return this; };
+Scene.prototype.bl = function (t0, t1, x0, y0, x1, y1, o = {}) { if (!o.noMap) { y0 = MY(y0); y1 = MY(y1); } this.ball.push(Object.assign({ t0, t1, x0, y0, x1, y1, h: 0, e: "out", spin: 1 }, o)); return this; };
 Scene.prototype.at = function (t, f) { this.ev.push({ t, f, done: false }); return this; };
 Scene.prototype.sl = function (t0, t1, v) { this.slow.push([t0, t1, v]); return this; };
 function segAt(list, t) { let s = null; for (const g of list) if (g.t0 <= t) s = g; return s; }
@@ -301,7 +345,7 @@ function applyScene(sc, t) {
     a.pose = g.pose; a.rot = g.r0 + (g.r1 - g.r0) * e; a.moving = k < 1 && (g.x0 !== g.x1 || g.y0 !== g.y1); a.flip = !!g.flip; a.sq = g.sq ? Math.sin(k * Math.PI) * g.sq : 0;
   });
   const b = segAt(sc.ball, t);
-  if (b) { BALL.vis = !b.hide; const k = Math.max(0, Math.min(1, (t - b.t0) / Math.max(.001, b.t1 - b.t0))), e = EASE[b.e](k); BALL.x = b.x0 + (b.x1 - b.x0) * e; BALL.y = b.y0 + (b.y1 - b.y0) * e; BALL.z = b.h ? Math.sin(k * Math.PI) * b.h : (b.z || 0); if (k < 1) BALL.rot += .25 * b.spin; }
+  if (b) { BALL.vis = !b.hide; const k = Math.max(0, Math.min(1, (t - b.t0) / Math.max(.001, b.t1 - b.t0))), e = EASE[b.e](k); BALL.x = b.x0 + (b.x1 - b.x0) * e; BALL.y = b.y0 + (b.y1 - b.y0) * e; BALL.z = (b.z1 !== undefined ? b.z0 + (b.z1 - b.z0) * EASE[b.ze || "lin"](k) : (b.z || 0)) + (b.h ? Math.sin(k * Math.PI) * b.h : 0); if (k < 1) BALL.rot += .25 * b.spin; }
   sc.ev.forEach(ev => { if (!ev.done && t >= ev.t) { ev.done = true; ev.f(); } });
 }
 
@@ -322,6 +366,14 @@ function swapCast() { // abwechselnd andere Tiere vorne
   ACT.A.sheet = a ? "bear" : "pig"; ACT.A.h = a ? 165 : 150; ACT.A2.sheet = a ? "pig" : "bear"; ACT.A2.h = a ? 150 : 165;
   ACT.D.sheet = d ? "fox" : "peng"; ACT.D.h = d ? 165 : 140; ACT.D2.sheet = d ? "peng" : "fox"; ACT.D2.h = d ? 140 : 165;
 }
+// Stelle an der Figur (Hand oben links oder Bauch) in Weltkoordinaten
+const REL = { hand: { fox: [.10, .17], peng: [.07, .19] }, belly: { fox: [.36, .6], peng: [.45, .62] } };
+function contactPt(a, pose, x, y, part) {
+  const img = IM[`${a.sheet}_${pose}`], ref = IM[`${a.sheet}_1`]; if (!img || !ref) return { x: x - 30, y: y - 90 };
+  const s = depth(y) * a.h / ref.height, w = img.width * s, hh = img.height * s, nat = (NAT[a.sheet] || [])[pose - 1] || 0, flip = nat !== 0 && nat !== -1;
+  let [rx, ry] = REL[part][a.sheet] || [.4, .5]; if (flip) rx = 1 - rx;
+  return { x: x - w / 2 + rx * w, y: y - hh + ry * hh };
+}
 const SIT = {
   tackle(inBox) { // faire Grätsche
     const sc = new Scene(), y = pick(LANES), x = inBox ? 1080 : 760;
@@ -330,7 +382,7 @@ const SIT = {
     sc.bl(1.5, 1.68, x - 75, y + 4, x - 20, y + 4).bl(1.68, 2.4, x - 20, y + 4, x - 330, y + 70, { h: 40, spin: -1 });
     sc.mv("A", 1.5, 1.75, x - 120, y, x - 60, y).mv("A", 1.75, 2.25, x - 60, y, x + 70, y, { jump: 70 }).mv("A", 2.25, 9, x + 70, y, x + 110, y);
     sc.at(1.68, () => { sfx("kick"); dust(x - 20, y, 6); ring(x - 20, y - 10); }).at(1.85, () => dust(x - 60, y, 10)).sl(1.55, 2.2, .35);
-    return { sc, freeze: 2.35, opts: inBox ? ["weiter", "elf"] : ["weiter", "frei"], ok: "weiter", ex: "ex_tackle", type: "tackle" };
+    return { sc, freeze: 2.35, focus: [x - 30, MY(y) - 60], focusT: 1.5, opts: inBox ? ["weiter", "elf"] : ["weiter", "frei"], ok: "weiter", ex: "ex_tackle", type: "tackle" };
   },
   foul(inBox, wild) { // Bein getroffen
     const sc = new Scene(), y = pick(LANES), x = inBox ? 1090 : 760;
@@ -343,7 +395,7 @@ const SIT = {
     if (inBox) sc.at(.2, () => { highlightBox = 1; });
     const ok = wild === 2 ? "rot" : wild ? "gelb" : inBox ? "elf" : "frei";
     const opts = wild === 2 ? ["gelb", "rot"] : wild ? ["frei", "gelb", "weiter"] : inBox ? ["weiter", "frei", "elf"] : ["weiter", "frei"];
-    return { sc, freeze: 2.45, opts, ok, ex: wild === 2 ? "ex_red" : wild ? "ex_yellow" : inBox ? "ex_pen" : "ex_foul", type: wild === 2 ? "red" : wild ? "yellow" : inBox ? "pen" : "tackle", fouled: true };
+    return { sc, freeze: 2.45, focus: [x, MY(y) - 60], focusT: 1.5, opts, ok, ex: wild === 2 ? "ex_red" : wild ? "ex_yellow" : inBox ? "ex_pen" : "ex_foul", type: wild === 2 ? "red" : wild ? "yellow" : inBox ? "pen" : "tackle", fouled: true };
   },
   redfoul() { // von hinten
     const sc = new Scene(), y = pick(LANES), x = 760;
@@ -353,55 +405,94 @@ const SIT = {
     sc.bl(1.5, 2.5, x + 45, y + 4, x + 330, y + 40);
     sc.mv("K", 0, 99, PITCH.goalX - 40, 720, PITCH.goalX - 40, 720).mv("A2", 0, 3, 120, 600, x - 330, 590).mv("D2", 0, 3, 1450, 820, x + 420, 815);
     sc.at(1.62, () => { sfx("bonk"); bang(x, y - 70, "💥"); dust(x, y, 16); }).at(2.2, () => { sfx("fall"); dust(x + 140, y + 15, 12); ACT.A.stars = 1; ACT.A.bubble = "😭"; ACT.D.bubble = "😈"; }).sl(1.3, 2.1, .35);
-    return { sc, freeze: 2.45, opts: ["frei", "gelb", "rot"], ok: "rot", ex: "ex_red", type: "red", fouled: true };
+    return { sc, freeze: 2.45, focus: [x + 60, MY(y) - 60], focusT: 1.4, opts: ["frei", "gelb", "rot"], ok: "rot", ex: "ex_red", type: "red", fouled: true };
   },
   out() { // Ball ins Aus unten
     const sc = new Scene(), y = 800, x = 680, lastO = Math.random() < .5;
     sc.mv("A", 0, 1.4, 400, y - 20, x - 40, y - 10).bl(0, 1.4, 445, y - 16, x + 5, y - 6, { e: "lin" }).mv("D", 0, 1.4, 1250, y - 60, x + 80, y - 20);
     sc.mv("K", 0, 99, PITCH.goalX - 40, 680, PITCH.goalX - 40, 680).mv("A2", 0, 3, 200, 600, x - 260, 600).mv("D2", 0, 3, 1300, 600, x + 330, 605);
     if (lastO) { // Orange schießt, prallt am Fuß von Blau ab? Nein: Orange tritt ins Aus
-      sc.mv("A", 1.4, 1.7, x - 40, y - 10, x, y - 6, { pose: 2 }).bl(1.4, 1.62, x + 5, y - 6, x + 30, y - 4).bl(1.62, 2.6, x + 30, y - 4, x + 180, 960, { h: 30 });
+      sc.mv("A", 1.4, 1.7, x - 40, y - 10, x, y - 6, { pose: 2 }).bl(1.4, 1.62, x + 5, y - 6, x + 30, y - 4).bl(1.62, 2.6, x + 30, y - 4, x + 170, 900, { h: 30 });
       sc.at(1.62, () => { sfx("kick"); ring(x + 30, y - 10); ACT.A.glow = 1; ACT.A.bubble = "😮"; });
     } else {
-      sc.mv("D", 1.4, 1.7, x + 80, y - 20, x + 50, y - 6, { pose: 2 }).bl(1.4, 1.62, x + 5, y - 6, x + 40, y - 4).bl(1.62, 2.6, x + 40, y - 4, x - 120, 960, { h: 30, spin: -1 });
+      sc.mv("D", 1.4, 1.7, x + 80, y - 20, x + 50, y - 6, { pose: 2 }).bl(1.4, 1.62, x + 5, y - 6, x + 40, y - 4).bl(1.62, 2.6, x + 40, y - 4, x - 110, 900, { h: 30, spin: -1 });
       sc.at(1.62, () => { sfx("kick"); ring(x + 40, y - 10); ACT.D.glow = 1; ACT.D.bubble = "😮"; });
     }
     sc.at(2.15, () => { lineFlash = 1; sfx("whoosh"); }).sl(1.5, 2.1, .4);
-    return { sc, freeze: 2.5, opts: ["einO", "einB"], ok: lastO ? "einB" : "einO", ex: lastO ? "ex_outB" : "ex_outO", type: "out" };
+    return { sc, freeze: 2.5, focus: [x + 60, 600], focusT: 1.7, zoom: .9, opts: ["einO", "einB"], ok: lastO ? "einB" : "einO", ex: lastO ? "ex_outB" : "ex_outO", type: "out" };
   },
-  shot(kind) { // kind: goal | post | save
-    const sc = new Scene(), y = pick([660, 700]), x = 1080, gy = (PITCH.goalTop + PITCH.goalBot) / 2 + 30;
-    sc.mv("A", 0, 1.3, 520, y, x, y).bl(0, 1.3, 565, y + 4, x + 45, y + 4, { e: "lin" }).mv("D", 0, 1.3, 1250, y + 70, x + 120, y + 60).mv("A2", 0, 3, 300, y - 70, x - 200, y - 60).mv("D2", 0, 3, 1350, y - 80, x + 160, y - 90);
+  shot(kind) { // kind: goal | post | save | over
+    const sc = new Scene(), y = pick([640, 680]), x = 1060, bx0 = x + 50, by0 = MY(y + 4), K0 = [1300, 560];
+    sc.mv("A", 0, 1.3, 500, y, x, y).bl(0, 1.3, 545, y + 4, x + 45, y + 4, { e: "lin" }).mv("D", 0, 1.3, 1180, y + 90, x + 70, y + 95).mv("A2", 0, 3, 300, y - 70, x - 260, y - 60).mv("D2", 0, 3, 1100, 600, x - 140, 590);
     sc.mv("A", 1.3, 1.6, x, y, x + 20, y, { pose: 2 }).mv("A", 1.6, 9, x + 20, y, x + 30, y, { pose: 1 });
-    const kx = PITCH.goalX - 40, ky = gy + 10;
+    sc.mv("K", 0, 1.5, K0[0], K0[1], K0[0], K0[1], { noMap: 1 });
+    let focus = [1385, 478], freeze = 2.55, zoom = 1.25;
     if (kind === "goal") {
-      sc.bl(1.42, 2.0, x + 50, y + 4, PITCH.goalX + 60, gy - 10, { h: 60, e: "lin" }).bl(2.0, 2.3, PITCH.goalX + 60, gy - 10, PITCH.goalX + 75, gy, { z: 10 });
-      sc.mv("K", 0, 1.55, kx, ky, kx, ky).mv("K", 1.55, 2.0, kx, ky, kx + 10, ky + 70, { pose: 2, e: "out" }).mv("K", 2.0, 9, kx + 10, ky + 70, kx + 10, ky + 70, { pose: 3 });
-      sc.at(2.0, () => { sfx("whoosh"); ring(PITCH.goalX + 60, gy - 30); });
+      const C = [1372, goalLineY(1372)], E = [1448, 551];
+      sc.bl(1.42, 1.92, bx0, by0, C[0], C[1], { noMap: 1, z0: 0, z1: 100, e: "lin" }).bl(1.92, 2.15, C[0], C[1], E[0], E[1], { noMap: 1, z0: 100, z1: 0, ze: "in", e: "lin" }).bl(2.15, 2.45, E[0], E[1], E[0] + 8, E[1] - 2, { noMap: 1, h: 14, e: "out" });
+      sc.mv("K", 1.5, 1.9, K0[0], K0[1], 1255, 548, { noMap: 1, pose: 2, e: "out", jump: 40 }).mv("K", 1.9, 9, 1255, 548, 1255, 548, { noMap: 1, pose: 3 });
+      sc.at(2.12, () => { sfx("whoosh"); netShake(E[0], E[1] - 40); });
     } else if (kind === "post") {
-      sc.bl(1.42, 1.95, x + 50, y + 4, PITCH.goalX - 68, PITCH.goalTop - 50, { h: 50, e: "lin" }).bl(1.95, 2.6, PITCH.goalX - 68, PITCH.goalTop - 50, PITCH.goalX - 300, PITCH.goalTop + 60, { h: 50, spin: -1 });
-      sc.mv("K", 0, 9, kx, ky + 30, kx, ky + 30);
-      sc.at(1.95, () => { sfx("boing"); bang(PITCH.goalX - 68, PITCH.goalTop - 150, "💫"); });
-    } else {
-      sc.bl(1.42, 1.95, x + 50, y + 4, kx - 40, ky - 20, { h: 45, e: "lin" }).bl(1.95, 9, kx - 40, ky - 20, kx - 30, ky - 15, { z: 60, hide: 1 });
-      sc.mv("K", 0, 1.5, kx, ky, kx, ky).mv("K", 1.5, 1.95, kx, ky, kx - 30, ky - 10, { pose: 2, e: "out" }).mv("K", 1.95, 9, kx - 30, ky - 10, kx - 30, ky - 10, { pose: 4 });
-      sc.at(1.95, () => { sfx("bonk"); ring(kx - 40, ky - 80); ACT.K.bubble = "😎"; });
+      const P = [1386, 579];
+      sc.bl(1.42, 1.9, bx0, by0, P[0], P[1], { noMap: 1, z0: 0, z1: 125, e: "lin" }).bl(1.9, 2.5, P[0], P[1], 1205, 640, { noMap: 1, z0: 125, z1: 0, ze: "in", h: 40, spin: -1, e: "out" }).bl(2.5, 9, 1205, 640, 1190, 644, { noMap: 1, e: "out", spin: -1 });
+      sc.mv("K", 1.5, 1.9, K0[0], K0[1], 1258, 548, { noMap: 1, pose: 2, e: "out", jump: 40 }).mv("K", 1.9, 9, 1258, 548, 1258, 548, { noMap: 1, pose: 3 });
+      sc.at(1.9, () => { sfx("boing"); bang(P[0] + 20, P[1] - 170, "💫", true); });
+      focus = [1320, 500]; freeze = 2.65;
+    } else if (kind === "over") {
+      sc.bl(1.42, 2.0, bx0, by0, 1340, goalLineY(1340), { noMap: 1, z0: 0, z1: 265, ze: "out", e: "lin" }).bl(2.0, 2.6, 1340, goalLineY(1340), 1470, 520, { noMap: 1, z0: 265, z1: 420, e: "lin" }).bl(2.6, 9, 1470, 520, 1470, 520, { noMap: 1, hide: 1 });
+      sc.mv("K", 1.5, 2.0, K0[0], K0[1], K0[0] + 10, K0[1], { noMap: 1, pose: 2, jump: 70 }).mv("K", 2.0, 9, K0[0] + 10, K0[1], K0[0] + 10, K0[1], { noMap: 1, pose: 1 });
+      sc.at(2.0, () => sfx("whoosh"));
+      focus = [1340, 360]; freeze = 2.02; zoom = 1.15;
+    } else { // save: Torwart fängt
+      sc.bl(1.42, 1.85, bx0, by0, 1296, 561, { noMap: 1, z0: 0, z1: 135, e: "lin" }).bl(1.85, 9, 1296, 561, 1296, 561, { noMap: 1, hide: 1 });
+      sc.mv("K", 1.5, 1.85, K0[0], K0[1], K0[0], K0[1] + 1, { noMap: 1, pose: 2, jump: 25 }).mv("K", 1.85, 9, K0[0], K0[1] + 1, K0[0], K0[1] + 1, { noMap: 1, pose: 4 });
+      sc.at(1.85, () => { sfx("bonk"); ring(1296, 520); });
+      focus = [1300, 470]; freeze = 2.35;
     }
     sc.at(1.42, () => sfx("kick")).sl(1.45, 2.2, .45);
-    return { sc, freeze: 2.45, opts: ["tor", "kein"], ok: kind === "goal" ? "tor" : "kein", ex: kind === "goal" ? "ex_goal" : "ex_nogoal", type: "goal", goal: kind === "goal" };
+    return { sc, freeze, focus, focusT: 1.55, zoom, opts: ["tor", "kein"], ok: kind === "goal" ? "tor" : "kein", ex: kind === "goal" ? "ex_goal" : kind === "save" ? "ex_save" : kind === "over" ? "ex_over" : "ex_nogoal", type: "goal", goal: kind === "goal" };
   },
   hand(isHand, inBox) {
-    const sc = new Scene(), y = pick([660, 720]), x = inBox ? 980 : 640, dx = inBox ? 1190 : 880;
-    sc.mv("A", 0, 1.3, 400, y, x, y).bl(0, 1.3, 445, y + 4, x + 45, y + 4, { e: "lin" }).mv("D", 0, 1.3, 1350, y, dx, y);
+    const sc = new Scene(), y = pick([660, 720]), x = inBox ? 960 : 620, dx = inBox ? 1170 : 860, gy = MY(y), pose = isHand ? 4 : 1;
+    sc.mv("A", 0, 1.3, 380, y, x, y).bl(0, 1.3, 425, y + 4, x + 45, y + 4, { e: "lin" }).mv("D", 0, 1.3, 1350, y, dx, y);
     sc.mv("A", 1.3, 1.6, x, y, x + 20, y, { pose: 2 }).mv("A", 1.6, 9, x + 20, y, x + 30, y);
-    sc.mv("K", 0, 99, PITCH.goalX - 40, 700, PITCH.goalX - 40, 700).mv("A2", 0, 3, 150, 600, x - 280, 590).mv("D2", 0, 3, 1450, 820, Math.min(1180, dx + 200), 815);
-    const hy = isHand ? 150 : 70; // Treffhöhe
-    sc.mv("D", 1.3, 1.6, dx, y, dx, y, { pose: isHand ? 4 : 1 }).mv("D", 1.6, 1.95, dx, y, dx + 20, y, { pose: isHand ? 4 : 1, jump: isHand ? 30 : 0 }).mv("D", 1.95, 9, dx + 20, y, dx + 20, y, { pose: isHand ? 4 : 3 });
-    sc.bl(1.42, 1.8, x + 50, y + 4, dx - 20, y, { z: hy * depth(y), e: "lin" }).bl(1.8, 2.6, dx - 20, y, dx - 220, y + 40, { h: 40, spin: -1 });
-    sc.at(1.42, () => sfx("kick")).at(1.8, () => { sfx("bonk"); bang(dx - 10, y - hy, isHand ? "✋" : "💢", false, true); ACT.D.bubble = isHand ? "😳" : "😖"; }).sl(1.5, 2.2, .35);
+    sc.mv("K", 0, 99, PITCH.goalX - 20, 700, PITCH.goalX - 20, 700).mv("A2", 0, 3, 150, 600, x - 280, 590).mv("D2", 0, 3, 1450, 830, Math.min(1180, dx + 230), 830);
+    sc.mv("D", 1.3, 9, dx, y, dx, y, { pose });
+    const c = contactPt(ACT.D, pose, dx, gy, isHand ? "hand" : "belly"), r = 17 * depth(gy), bgx = c.x - r * .9, bz = gy - c.y - r;
+    sc.bl(1.42, 1.86, x + 50, gy + 3, bgx, gy + 1, { noMap: 1, z0: 0, z1: bz, e: "lin" }).bl(1.86, 2.7, bgx, gy + 1, bgx - 170, gy + 30, { noMap: 1, z0: bz, z1: 0, ze: "in", h: 30, spin: -1 });
+    sc.at(1.42, () => sfx("kick")).at(1.86, () => { sfx("bonk"); }).sl(1.5, 1.9, .3);
     if (inBox) sc.at(.2, () => { highlightBox = 1; });
     const ok = isHand ? (inBox ? "elf" : "frei") : "weiter";
-    return { sc, freeze: 2.4, opts: inBox ? ["weiter", "frei", "elf"] : ["weiter", "frei"], ok, ex: isHand ? (inBox ? "ex_handpen" : "ex_hand") : "ex_belly", type: "hand", fouled: isHand };
+    return { sc, freeze: 1.9, focus: [c.x + 20, (c.y + gy) / 2], focusT: 1.5, zoom: 1.35, mark: { x: c.x, y: c.y, r: 40, t: 1.86 }, opts: inBox ? ["weiter", "frei", "elf"] : ["weiter", "frei"], ok, ex: isHand ? (inBox ? "ex_handpen" : "ex_hand") : "ex_belly", type: "hand", fouled: isHand, isHand };
+  },
+  corner(byD) { // Ball geht neben dem Tor über die Grundlinie: Ecke oder Abstoß
+    const sc = new Scene(), x = 1150, y = 680, gy = MY(y), K0 = [1292, 552];
+    sc.mv("A", 0, 1.3, 620, y, x, y).bl(0, 1.3, 665, y + 4, x + 45, y + 4, { e: "lin" }).mv("A2", 0, 3, 400, 600, x - 330, 600).mv("D2", 0, 3, 700, 820, x - 180, 820);
+    sc.mv("K", 0, 9, K0[0], K0[1], K0[0], K0[1], { noMap: 1 });
+    const bx = x + 50, E = [1500, 601];
+    if (byD) {
+      const P = [1330, 612];
+      sc.mv("D", 0, 1.3, 1450, 700, 1360, 615, { noMap: 1 }).mv("D", 1.3, 1.6, 1360, 615, P[0] + 10, P[1] + 2, { noMap: 1, pose: 2, e: "out" }).mv("D", 1.6, 9, P[0] + 10, P[1] + 2, P[0] + 10, P[1] + 2, { noMap: 1, pose: 2 });
+      sc.mv("A", 1.3, 1.6, x, y, x + 20, y, { pose: 2 }).mv("A", 1.6, 9, x + 20, y, x + 30, y);
+      sc.bl(1.42, 1.7, bx, gy + 3, P[0] - 20, P[1], { noMap: 1, e: "lin" }).bl(1.7, 2.5, P[0] - 20, P[1], E[0], E[1], { noMap: 1, h: 25, e: "out" }).bl(2.5, 9, E[0], E[1], E[0] + 6, E[1] - 1, { noMap: 1, e: "out" });
+      sc.at(1.42, () => sfx("kick")).at(1.7, () => { sfx("bonk"); ring(P[0] - 20, P[1] - 15); ACT.D.glow = 1; ACT.D.bubble = "😮"; });
+    } else {
+      sc.mv("D", 0, 1.3, 1450, 720, 1380, 650, { noMap: 1 }).mv("D", 1.3, 9, 1380, 650, 1370, 648, { noMap: 1 });
+      sc.mv("A", 1.3, 1.6, x, y, x + 20, y, { pose: 2 }).mv("A", 1.6, 9, x + 20, y, x + 30, y);
+      sc.bl(1.42, 2.4, bx, gy + 3, E[0], E[1], { noMap: 1, h: 45, e: "out" }).bl(2.4, 9, E[0], E[1], E[0] + 6, E[1] - 1, { noMap: 1, e: "out" });
+      sc.at(1.42, () => { sfx("kick"); ring(bx, gy - 10); ACT.A.glow = 1; ACT.A.bubble = "😮"; });
+    }
+    sc.at(2.05, () => { endFlash = 1; sfx("whoosh"); }).sl(1.45, 2.3, .45);
+    return { sc, freeze: 2.6, focus: [1380, 555], focusT: 1.6, zoom: 1, opts: ["ecke", "abstoss"], ok: byD ? "ecke" : "abstoss", ex: byD ? "ex_ecke" : "ex_abstoss", type: "corner" };
+  },
+  keeper() { // Torwart fängt den Ball mit den Händen: erlaubt
+    const sc = new Scene(), y = 640, x = 1000, K0 = [1300, 560];
+    sc.mv("A", 0, 1.3, 460, y, x, y).bl(0, 1.3, 505, y + 4, x + 45, y + 4, { e: "lin" }).mv("D", 0, 1.3, 1200, 720, x + 140, 700).mv("A2", 0, 3, 300, 600, x - 260, 590).mv("D2", 0, 3, 1100, 820, x - 120, 820);
+    sc.mv("A", 1.3, 1.6, x, y, x + 20, y, { pose: 2 }).mv("A", 1.6, 9, x + 20, y, x + 30, y);
+    sc.mv("K", 0, 1.55, K0[0], K0[1], K0[0], K0[1], { noMap: 1 }).mv("K", 1.55, 1.95, K0[0], K0[1], K0[0] - 30, K0[1] + 8, { noMap: 1, pose: 2, jump: 50, e: "out" }).mv("K", 1.95, 9, K0[0] - 30, K0[1] + 8, K0[0] - 30, K0[1] + 8, { noMap: 1, pose: 4 });
+    sc.bl(1.42, 1.95, x + 50, MY(y + 4), K0[0] - 34, K0[1] + 9, { noMap: 1, z0: 0, z1: 150, h: 120, e: "lin" }).bl(1.95, 9, K0[0] - 34, K0[1] + 9, K0[0] - 34, K0[1] + 9, { noMap: 1, hide: 1 });
+    sc.at(1.42, () => sfx("kick")).at(1.95, () => { sfx("bonk"); ring(K0[0] - 30, 440); highlightBox = 1; }).sl(1.5, 2.1, .45);
+    return { sc, freeze: 2.45, focus: [1270, 500], focusT: 1.6, zoom: 1.15, opts: ["weiter", "frei"], ok: "weiter", ex: "ex_keeper", type: "keeper" };
   },
   dive() {
     const sc = new Scene(), y = pick(LANES), x = 760;
@@ -410,31 +501,47 @@ const SIT = {
     sc.bl(1.4, 2.4, x - 75, y + 4, x + 120, y + 20);
     sc.mv("A", 1.4, 1.7, x - 120, y, x - 30, y).mv("A", 1.7, 2.2, x - 30, y, x + 60, y + 6, { pose: 3, r0: 0, r1: 1.1, jump: 60 }).mv("A", 2.2, 9, x + 60, y + 6, x + 70, y + 6, { pose: 3, r0: 1.1, r1: 1.15 });
     sc.at(1.8, () => { ACT.A.bubble = "😩"; }).at(2.2, () => { sfx("fall"); dust(x + 60, y + 6, 10); ACT.D.bubble = "🤷"; }).sl(1.5, 2.2, .4);
-    return { sc, freeze: 2.5, opts: ["weiter", "frei", "gelb"], ok: "weiter", ex: "ex_dive", type: "dive" };
+    return { sc, freeze: 2.5, focus: [x + 80, MY(y) - 60], focusT: 1.5, opts: ["weiter", "frei", "gelb"], ok: "weiter", ex: "ex_dive", type: "dive" };
   }
 };
 // Situationen je Regel
 const MAKE = {
   tackle: () => Math.random() < .5 ? SIT.tackle(false) : SIT.foul(false),
   out: () => SIT.out(),
-  goal: () => SIT.shot(pick(["goal", "goal", "post", "save"])),
+  goal: () => SIT.shot(pick(["goal", "goal", "post", "save", "over"])),
   hand: () => SIT.hand(Math.random() < .55, false),
   pen: () => pick([() => SIT.foul(true), () => SIT.foul(true), () => SIT.tackle(true), () => SIT.hand(true, true)])(),
   yellow: () => Math.random() < .6 ? SIT.foul(false, 1) : SIT.foul(false),
   dive: () => SIT.dive(),
-  red: () => Math.random() < .6 ? SIT.redfoul() : SIT.foul(false, 1)
+  red: () => Math.random() < .6 ? SIT.redfoul() : SIT.foul(false, 1),
+  corner: () => SIT.corner(Math.random() < .5),
+  keeper: () => Math.random() < .7 ? SIT.keeper() : SIT.hand(true, false)
 };
+const ALL = ["tackle", "out", "goal", "hand", "pen", "yellow", "dive", "red", "corner", "keeper"];
 const LEVELS = [
-  { learn: "tackle", pool: ["tackle"], time: 8 },
-  { learn: "out", pool: ["tackle", "out"], time: 7.5 },
-  { learn: "goal", pool: ["tackle", "out", "goal"], time: 7 },
-  { learn: "hand", pool: ["tackle", "out", "goal", "hand"], time: 6.5 },
-  { learn: "pen", pool: ["tackle", "goal", "hand", "pen"], time: 6 },
-  { learn: "yellow", pool: ["tackle", "out", "pen", "yellow"], time: 5.5 },
-  { learn: "dive", pool: ["tackle", "goal", "hand", "yellow", "dive"], time: 5 },
-  { learn: "red", pool: ["tackle", "out", "goal", "hand", "pen", "yellow", "dive", "red"], time: 4.5 }
+  // Liga 1
+  { learn: "tackle", pool: ["tackle"], time: 8, n: 8 },
+  { learn: "out", pool: ["tackle", "out"], time: 7.5, n: 8 },
+  { learn: "goal", pool: ["tackle", "out", "goal"], time: 7, n: 8 },
+  { learn: "hand", pool: ["tackle", "out", "goal", "hand"], time: 6.5, n: 8 },
+  { learn: "pen", pool: ["tackle", "goal", "hand", "pen"], time: 6, n: 8 },
+  { learn: "yellow", pool: ["tackle", "out", "pen", "yellow"], time: 5.5, n: 8 },
+  { learn: "dive", pool: ["tackle", "goal", "hand", "yellow", "dive"], time: 5, n: 8 },
+  { learn: "red", pool: ["tackle", "out", "goal", "hand", "pen", "yellow", "dive", "red"], time: 4.5, n: 8 },
+  // Liga 2
+  { learn: "corner", pool: ["tackle", "out", "goal", "corner"], time: 6.5, n: 8 },
+  { pool: ["goal", "hand", "corner", "yellow", "out"], time: 6.2, n: 8 },
+  { learn: "keeper", pool: ["keeper", "goal", "hand", "pen"], time: 6, n: 8 },
+  { pool: ["tackle", "corner", "keeper", "pen", "dive"], time: 5.8, n: 9 },
+  { pool: ["goal", "hand", "yellow", "red", "corner"], time: 5.6, n: 9 },
+  { pool: ALL, time: 5.4, n: 9 },
+  { pool: ALL, time: 5.2, n: 10 },
+  { pool: ALL, time: 5, n: 10 },
+  // Liga 3 (Profis)
+  { pool: ALL, time: 4.8, n: 10 }, { pool: ALL, time: 4.6, n: 10 }, { pool: ALL, time: 4.4, n: 10 }, { pool: ALL, time: 4.2, n: 10 },
+  { pool: ALL, time: 4, n: 10 }, { pool: ALL, time: 3.8, n: 10 }, { pool: ALL, time: 3.6, n: 11 }, { pool: ALL, time: 3.4, n: 12 }
 ];
-const PER_MATCH = 8;
+let PER_MATCH = 8;
 
 /* ================= Spielablauf ================= */
 let cur = "", mode = "level", lvl = 0, queue = [], qi = 0, res = [], score = [0, 0], hearts = 3, streak = 0, best = 0;
@@ -447,9 +554,9 @@ function big(t) { $("#big").innerHTML = `<div>${t}</div>`; setTimeout(() => { $(
 function speakAnd(key, cb, delay = 0) { const t = T[key] || key; bubble(t); say(t, { now: true }); const tok = vTok; const wait = () => { if (vBusy && tok === vTok) setTimeout(wait, 150); else { setTimeout(() => { hideBubble(); cb && cb(); }, delay); } }; setTimeout(wait, 400); }
 
 function startLevel(i) {
-  mode = "level"; lvl = i; const L = LEVELS[i]; queue = [];
-  // neue Regel zweimal, Rest gemischt
-  queue.push(L.learn); queue.push(L.learn);
+  mode = "level"; lvl = i; const L = LEVELS[i]; queue = []; PER_MATCH = L.n || 8;
+  // neue Regel zweimal, Rest gemischt (jede Art höchstens 3-mal hintereinander gemischt)
+  if (L.learn) { queue.push(L.learn); queue.push(L.learn); }
   while (queue.length < PER_MATCH) queue.push(pick(L.pool));
   queue = [queue[0]].concat(queue.slice(1).sort(() => Math.random() - .5));
   askDur = L.time; begin();
@@ -459,7 +566,7 @@ function begin() {
   qi = 0; res = []; score = [0, 0]; show("game"); renderHud(); clearStage(); lion(1);
   const L = mode === "level" ? LEVELS[lvl] : null;
   const first = () => { sfx("whistle"); speakAnd("kickoff", nextSit); };
-  if (L && !S.seen[L.learn]) { S.seen[L.learn] = 1; save(); setTimeout(() => speakAnd("learn_" + L.learn, first, 300), 400); }
+  if (L && L.learn && !S.seen[L.learn]) { S.seen[L.learn] = 1; save(); setTimeout(() => speakAnd("learn_" + L.learn, first, 300), 400); }
   else if (mode === "endless") setTimeout(() => speakAnd("endlessIntro", first), 400);
   else setTimeout(first, 400);
 }
@@ -468,13 +575,13 @@ function renderHud() {
   if (mode === "level") { $("#dots").hidden = false; $("#hearts").hidden = true; $("#dots").innerHTML = Array.from({ length: PER_MATCH }, (_, i) => `<i class="${res[i] === true ? "ok" : res[i] === false ? "no" : i === qi ? "now" : ""}"></i>`).join(""); }
   else { $("#dots").hidden = true; $("#hearts").hidden = false; $("#hearts").textContent = "❤️".repeat(hearts) + "🤍".repeat(3 - hearts) + "  ⭐" + streak; }
 }
-function clearStage() { Object.values(ACT).forEach(a => { a.vis = false; a.stars = 0; a.bubble = null; a.glow = 0; a.rot = 0; }); BALL.vis = false; FX = []; highlightBox = 0; lineFlash = 0; }
+function clearStage() { Object.values(ACT).forEach(a => { a.vis = false; a.stars = 0; a.bubble = null; a.glow = 0; a.rot = 0; }); BALL.vis = false; FX = []; highlightBox = 0; lineFlash = 0; endFlash = 0; }
 function nextSit() {
   if (cur !== "game") return;
   if (mode === "level" && qi >= PER_MATCH) return endLevel();
   let type;
   if (mode === "level") type = queue[qi]; else { const pool = Object.keys(MAKE); type = pick(pool); askDur = Math.max(3, 6.5 - streak * .15); }
-  clearStage(); swapCast(); sit = MAKE[type](); SC = sit.sc; st = 0; replays = 0; state = "play"; timeScale = 1; applyScene(SC, 0); camTarget(); CAM.x = CAM.tx; CAM.y = CAM.ty;
+  clearStage(); swapCast(); sit = (mode === "level" && qi < 2 && type === "keeper") ? SIT.keeper() : MAKE[type](); SC = sit.sc; st = 0; replays = 0; state = "play"; timeScale = 1; applyScene(SC, 0); camTarget(); CAM.x = CAM.tx; CAM.y = CAM.ty;
   renderHud(); lion(1, false);
 }
 function replay() { if (state !== "ask" || replays > 1) return; replays++; clearStage(); sit.sc.ev.forEach(e => e.done = false); st = 0; state = "play"; hideAsk(); say(T.replay, { now: true }); }
@@ -512,6 +619,7 @@ function answer(k, btn) {
 }
 function reactions(right) {
   const ok = sit.ok;
+  if (sit.type === "hand" && sit.mark) bang(sit.mark.x, sit.mark.y - 10, sit.isHand ? "✋" : "👍", true, true);
   if (["frei", "elf", "gelb", "rot"].includes(ok)) { ACT.A.bubble = "😊"; ACT.D.bubble = ok === "gelb" || ok === "rot" ? "😱" : "😤"; }
   if (ok === "weiter" && sit.type === "dive") { ACT.A.bubble = "😳"; ACT.D.bubble = "😁"; }
   if (ok === "tor") { ACT.A.bubble = "🥳"; ACT.K.bubble = "😩"; }
@@ -537,15 +645,16 @@ function penalty() {
 }
 function goNext() { if (cur !== "game") return; if (mode === "endless" && hearts <= 0) return endEndless(); state = "idle"; setTimeout(nextSit, 300); }
 function endLevel() {
-  state = "idle"; const n = res.filter(Boolean).length, stars = n >= 8 ? 3 : n >= 6 ? 2 : n >= 4 ? 1 : 0;
+  state = "idle"; const n = res.filter(Boolean).length, N = PER_MATCH, stars = n >= N - (N >= 10 ? 1 : 0) ? 3 : n >= Math.ceil(N * .75) ? 2 : n >= Math.ceil(N * .5) ? 1 : 0;
   const prev = S.lvl[lvl] || 0; if (stars > prev) S.lvl[lvl] = stars; save();
   sfx(stars ? "win" : "boo"); if (stars) confetti(90); lion(stars ? 5 : 1);
-  const last = lvl === LEVELS.length - 1 && stars > 0;
-  $("#card").innerHTML = `<div class="stars">${[0, 1, 2].map(i => `<span class="${i < stars ? "" : "off"}">⭐</span>`).join("")}</div><h2>${n} von ${PER_MATCH} richtig</h2>${last ? `<img src="assets/ic_trophy.webp" style="width:120px" alt="">` : ""}<div class="row"><button class="btn blue" id="cAgain" data-say="Nochmal">🔁</button><button class="btn" id="cMap" data-say="Weiter">▶️</button></div>`;
+  const last = lvl === LEVELS.length - 1 && stars > 0, ligaEnd = (lvl === 7 || lvl === 15) && stars > 0;
+  $("#card").innerHTML = `<div class="stars">${[0, 1, 2].map(i => `<span class="${i < stars ? "" : "off"}">⭐</span>`).join("")}</div><h2>${n} von ${PER_MATCH} richtig</h2>${last ? `<img src="assets/ic_trophy.webp" style="width:120px" alt="">` : ligaEnd ? `<img src="assets/ic_medal.webp" style="width:110px" alt="">` : ""}<div class="row"><button class="btn blue" id="cAgain" data-say="Nochmal">🔁</button><button class="btn" id="cMap" data-say="Weiter">▶️</button></div>`;
   $("#ov").classList.add("on");
   $("#cAgain").onclick = () => { $("#ov").classList.remove("on"); startLevel(lvl); };
   $("#cMap").onclick = () => { $("#ov").classList.remove("on"); openMap(); };
-  say(T["end" + stars], { now: true }); if (last && !S.trophy) { S.trophy = 1; save(); say(T.trophy); }
+  say(T["end" + stars], { now: true }); if (last && !S.cup) { S.cup = 1; save(); say(T.trophy); }
+  if (ligaEnd) { const k = lvl === 7 ? "liga1" : "liga2"; if (!S.seen[k]) { S.seen[k] = 1; save(); say(T[k]); } }
 }
 function endEndless() {
   state = "idle"; const n = res.filter(Boolean).length; if (n > (S.endless || 0)) S.endless = n; save();
@@ -574,6 +683,7 @@ function loop(now) {
     FX.forEach(f => f.upd && f.upd(dt)); FX = FX.filter(f => f.life > 0);
     Object.values(ACT).forEach(a => { if (a.glow > 0 && state !== "ask") a.glow = Math.max(0, a.glow - dt * .4); });
     if (lineFlash > 0) lineFlash = Math.max(0, lineFlash - dt * .5);
+    if (endFlash > 0) endFlash = Math.max(0, endFlash - dt * .5);
     draw(now / 1000);
   }
   requestAnimationFrame(loop);
@@ -582,14 +692,22 @@ function loop(now) {
 /* ================= Karte ================= */
 const NODES_P = [[14, 82], [38, 70], [64, 78], [86, 62], [66, 44], [38, 40], [16, 24], [46, 12]];
 const NODES_L = [[7, 70], [20, 30], [33, 70], [46, 30], [59, 70], [72, 30], [85, 70], [95, 25]];
-function openMap() {
+let page = -1;
+const unlocked = i => i === 0 || (S.lvl[i - 1] || 0) > 0;
+function openMap(pg) {
   show("map"); const total = S.lvl.reduce((s, v) => s + (v || 0), 0); $("#mStars").textContent = total;
-  const unlocked = i => i === 0 || (S.lvl[i - 1] || 0) > 0;
+  const nextI = (() => { for (let i = 0; i < LEVELS.length; i++) if (unlocked(i) && !S.lvl[i]) return i; return LEVELS.length - 1; })();
+  if (pg === undefined) pg = Math.floor(nextI / 8); page = pg;
   const NODES = innerWidth > innerHeight ? NODES_L : NODES_P; const pts = NODES.map(([x, y]) => `${x},${y}`).join(" ");
+  const ICON = { tackle: "ic_whistle", out: "ic_throw", goal: "ic_goal", hand: "ic_ball", pen: "ic_spot", yellow: "ic_yellow", dive: "ic_star", red: "ic_red", corner: "ic_corner", keeper: "hippo_4" };
+  const MIX = ["ic_whistle", "ic_goal", "ic_ball", "ic_spot", "ic_yellow", "ic_red", "ic_throw", "ic_star"];
   $("#path").innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="3 2.4" stroke-linecap="round" opacity=".9"/></svg>` +
-    NODES.map(([x, y], i) => { const st = S.lvl[i] || 0, un = unlocked(i), next = un && !st; const ic = { tackle: "ic_whistle", out: "ic_throw", goal: "ic_goal", hand: "ic_ball", pen: "ic_spot", yellow: "ic_yellow", dive: "ic_star", red: "ic_red" }[LEVELS[i].learn];
-      return `<button class="node ${un ? "" : "locked"} ${next ? "next" : ""}" style="left:${x}%;top:${y}%" data-i="${i}" data-say="${un ? "Spiel " + (i + 1) : "Noch gesperrt"}">${un ? `<img src="assets/${ic}.webp" alt="">` : "🔒"}<span class="st">${un ? "⭐".repeat(st) + "☆".repeat(3 - st) : ""}</span></button>`; }).join("");
+    NODES.map(([x, y], j) => { const i = pg * 8 + j, st = S.lvl[i] || 0, un = unlocked(i), next = un && !st, L = LEVELS[i]; const ic = i === 23 ? "ic_trophy" : L.learn ? ICON[L.learn] : MIX[i % MIX.length];
+      return `<button class="node ${un ? "" : "locked"} ${next ? "next" : ""} ${i === 23 ? "final" : ""}" style="left:${x}%;top:${y}%" data-i="${i}" data-say="${un ? "Spiel " + (i + 1) : "Noch gesperrt"}">${un ? `<img src="assets/${ic}.webp" alt="">` : "🔒"}<span class="num">${i + 1}</span><span class="st">${un ? "⭐".repeat(st) + "☆".repeat(3 - st) : ""}</span></button>`; }).join("");
   $$("#path .node").forEach(b => b.onclick = () => { const i = +b.dataset.i; if (!unlocked(i)) { sfx("boo"); return; } sfx("tap"); startLevel(i); });
+  const lg = $("#liga"); lg.innerHTML = [0, 1, 2].map(k => `<button class="lg ${k === pg ? "on" : ""} ${unlocked(k * 8) ? "" : "lock"}" data-k="${k}" data-say="${unlocked(k * 8) ? "Liga " + (k + 1) : "Noch gesperrt"}">${["🥉", "🥈", "🥇"][k]} ${unlocked(k * 8) ? "Liga " + (k + 1) : "🔒"}</button>`).join("");
+  $$("#liga .lg").forEach(b => b.onclick = () => { const k = +b.dataset.k; if (!unlocked(k * 8)) { sfx("boo"); say(T.ligaLock); return; } sfx("tap"); openMap(k); });
+  $("#map").dataset.liga = pg;
   $("#endless").hidden = !(S.lvl[2] > 0);
   if (!S.seen.map) { S.seen.map = 1; save(); setTimeout(() => say(T.map, { now: true }), 300); }
 }
@@ -602,13 +720,13 @@ $("#mSnd").textContent = soundOn ? "🔊" : "🔇";
 // Im Kinderbereich (iframe) gibt es oben „Beenden“ – das Haus führt nur zum Titel, das bleibt.
 
 (async function boot() {
-  const names = ["bg", "title", "ic_ball", "ic_whistle", "ic_spot", "ic_yellow", "ic_red", "ic_goal", "ic_x", "ic_play", "ic_star", "ic_trophy", "ic_throw"];
+  const names = ["bg", "title", "ic_corner", "ic_medal", "ic_ball", "ic_whistle", "ic_spot", "ic_yellow", "ic_red", "ic_goal", "ic_x", "ic_play", "ic_star", "ic_trophy", "ic_throw"];
   Object.entries(CH).forEach(([c, n]) => { for (let i = 1; i <= n; i++) names.push(`${c}_${i}`); });
   await Promise.all(names.map(loadImg));
   $("#load").remove(); resize(); show("title"); requestAnimationFrame(loop);
   addEventListener("pointerdown", () => { if (cur === "title") music("menu"); }, { once: true });
 })();
-window.__sp = { SIT, MAKE, playSit(f) { mode = "level"; lvl = 0; queue = []; qi = 0; res = []; show("game"); renderHud(); clearStage(); swapCast(); sit = f(); SC = sit.sc; st = 0; replays = 0; state = "play"; applyScene(SC, 0); camTarget(); CAM.x = CAM.tx; CAM.y = CAM.ty; }, get S() { return S; }, startLevel, startEndless, openMap, answer, get sit() { return sit; }, get state() { return state; }, ACT, PITCH, set ts(v) { timeScale = v; } };
+window.__sp = { SIT, MAKE, playSit(f) { hideAsk(); $("#ask").innerHTML = ""; mode = "level"; lvl = 0; queue = []; qi = 0; res = []; show("game"); renderHud(); clearStage(); swapCast(); sit = f(); SC = sit.sc; st = 0; replays = 0; state = "play"; applyScene(SC, 0); camTarget(); CAM.x = CAM.tx; CAM.y = CAM.ty; }, get S() { return S; }, startLevel, openMap, startEndless, openMap, answer, get sit() { return sit; }, get state() { return state; }, ACT, PITCH, set ts(v) { timeScale = v; } };
 </script>
 </body>
 </html>
