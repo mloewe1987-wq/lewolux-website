@@ -147,6 +147,16 @@ window.lxInstall=function(btn,title,lead){
 <g class="k-eye"><circle cx="42" cy="38" r="3.4" fill="#1d2350"/><circle cx="58" cy="38" r="3.4" fill="#1d2350"/><circle cx="43" cy="36.8" r="1.1" fill="#fff"/><circle cx="59" cy="36.8" r="1.1" fill="#fff"/></g>
 <path d="M43 47q7 6 14 0" stroke="#a0442a" stroke-width="2.4" fill="none" stroke-linecap="round"/><g fill="#ff9d9d" opacity=".8"><circle cx="35" cy="45" r="3.2"/><circle cx="65" cy="45" r="3.2"/></g>
 <g transform="translate(80 112)"><circle r="11" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M0-5l4.8 3.5-1.8 5.6h-6l-1.8-5.6z" fill="#222"/><path d="M0-5V-11M4.8-1.5l6-2M3 4.1l3.8 5.2M-3 4.1l-3.8 5.2M-4.8-1.5l-6-2" stroke="#222" stroke-width="1.3"/></g></svg>`},
+    // Pfiff aus Schiri Pfiff: kleiner Löwe im Schiri-Trikot mit Pfeife
+    lionref:{w:74,h:90,svg:`<svg viewBox="0 0 100 124">
+<g class="lg1"><rect x="36" y="96" width="11" height="22" rx="4" fill="#f2b04a"/><ellipse cx="40" cy="119" rx="9" ry="4.5" fill="#222"/></g><g class="lg2"><rect x="53" y="96" width="11" height="22" rx="4" fill="#f2b04a"/><ellipse cx="60" cy="119" rx="9" ry="4.5" fill="#222"/></g>
+<path d="M29 62q21-9 42 0l-2 38H31z" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M38 59v41M47 57v43M56 57v43M64 59v41" stroke="#222" stroke-width="4"/>
+<g class="wg1"><path d="M31 65q-10 9-10 22" stroke="#f2b04a" stroke-width="10" fill="none" stroke-linecap="round"/><rect x="12" y="78" width="13" height="17" rx="2" fill="#ffd21f" transform="rotate(-12 18 86)"/></g>
+<g class="wg2"><path d="M69 65q9 8 6 20" stroke="#f2b04a" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+<circle cx="50" cy="36" r="27" fill="#d9822b"/><circle cx="50" cy="38" r="20" fill="#f6c25a"/><circle cx="33" cy="20" r="6" fill="#f6c25a"/><circle cx="67" cy="20" r="6" fill="#f6c25a"/>
+<g class="k-eye"><circle cx="43" cy="36" r="3.3" fill="#1d2350"/><circle cx="57" cy="36" r="3.3" fill="#1d2350"/><circle cx="44" cy="34.8" r="1.1" fill="#fff"/><circle cx="58" cy="34.8" r="1.1" fill="#fff"/></g>
+<ellipse cx="50" cy="44" rx="4" ry="3" fill="#8a4b2a"/><path d="M46 50q4 3 8 0" stroke="#8a4b2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M50 52q0 10 6 12" stroke="#555" stroke-width="1.5" fill="none"/><rect x="54" y="62" width="10" height="6" rx="3" fill="#c9ced6" stroke="#777"/></svg>`},
     // Kalle aus Fußball-Boss: Co-Trainer mit Kappe und Klemmbrett
     coach:{w:72,h:92,svg:`<svg viewBox="0 0 100 128">
 <g class="lg1"><rect x="36" y="100" width="11" height="22" rx="4" fill="#1f3a6e"/><ellipse cx="40" cy="123" rx="9" ry="4.5" fill="#fff"/></g><g class="lg2"><rect x="53" y="100" width="11" height="22" rx="4" fill="#1f3a6e"/><ellipse cx="60" cy="123" rx="9" ry="4.5" fill="#fff"/></g>

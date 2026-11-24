@@ -1,6 +1,17 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="schiri-pfiff", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#ffc83d", src="spiele-intern/schiri-pfiff", nodl=True,
+  title="Schiri Pfiff", short="Schiri Pfiff", tagline="Sei der Schiedsrichter!",
+  desc="Kinderspiel ohne Werbung: Du bist Schiedsrichter Pfiff, ein kleiner Löwe. Bär, Schwein, Fuchs und Pinguin spielen Fußball, und du entscheidest blitzschnell: Foul oder fair? Tor oder kein Tor? Gelbe Karte, Elfmeter oder Einwurf? Alles wird vorgelesen, ohne Lesen spielbar.",
+  genres=["Kinder","Fußball","Reaktion"], cats="family", status="Neu",
+  plats=["web","mobile"], tech=["HTML5","Web Audio","Offline"],
+  story="Auf dem Tierplatz ist heute Spieltag, aber der Schiedsrichter braucht Hilfe! Mit Pfiff, dem kleinen Löwen, schaust du jedem Zweikampf genau zu und triffst die richtige Entscheidung, bevor die Zeit abläuft.",
+  controls=[["Entscheiden","Großen Bild-Knopf antippen"],["Nochmal ansehen","Pfeil-Knopf oben rechts"],["Zur Karte","Knopf oben links"]],
+  features=["Lustige Live-Szenen mit Bär, Schwein, Fuchs, Pinguin und Torwart Nilpferd","8 Spiele, jedes bringt eine neue Regel","Foul, Einwurf, Tor, Handspiel, Elfmeter, Gelb, Schwalbe, Rot","Zeitlupe, Nochmal-ansehen-Knopf und Erklärung bei Fehlern","Sterne sammeln, Pokal und Endlos-Spiel mit drei Herzen","Alles vorgelesen, ohne Werbung und ohne Käufe"],
+  shots=["Faire Grätsche oder Foul?","Pfiff entscheidet","Die Karte mit den Spielen"],
+  reel=["Family","Pfeifen, entscheiden, lachen","Sei der Schiedsrichter."],
+  download=dict(file="downloads/schiri-pfiff.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="fussball-boss", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#2fa84f", src="spiele-intern/fussball-boss", nodl=True,
   title="Fußball-Boss", short="Fußball-Boss", tagline="Der Fußballmanager für Kinder!",
   desc="Fußballmanager für Kinder ab 7: Stell deine Mannschaft auf, kauf und verkauf Spieler, bau dein Stadion aus und führe deinen Verein von der Bezirksliga bis zur Meisterschaft. Die Spiele schaust du live, vorgespult oder nur als Ergebnis. Co-Trainer Kalle erklärt alles mit Stimme.",
@@ -246,6 +257,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "schiri-pfiff": dict(
+  title="Schiri Pfiff – Schiedsrichter-Spiel für Kinder kostenlos",
+  meta="Schiri Pfiff: Kinder sind Schiedsrichter und entscheiden Foul, Tor, Einwurf, Elfmeter und Karten. Lustige Tiere, alles vorgelesen, ohne Werbung.",
+  long=["<strong>Schiri Pfiff</strong> ist ein Fußballspiel für Kinder aus <strong>Lewolux Kids</strong>, bei dem man nicht selbst kickt, sondern pfeift. Du bist Pfiff, ein kleiner Löwe im Schiedsrichter-Trikot. Auf dem Platz spielen Bär und Schwein gegen Fuchs, Pinguin und Torwart Nilpferd.",
+        "Jede Szene läuft live ab, dann friert das Bild ein und du entscheidest mit großen Bild-Knöpfen: <strong>Weiterspielen oder Freistoß</strong>, Tor oder kein Tor, Einwurf für Orange oder Blau, Handspiel, Elfmeter, <strong>Gelbe oder Rote Karte</strong> und sogar die Schwalbe. Eine Zeitleiste sorgt für Spannung, mit dem Nochmal-Knopf schaust du die Szene in Ruhe an.",
+        "In <strong>8 Spielen</strong> lernen Kinder Schritt für Schritt die wichtigsten Fußballregeln, Pfiff erklärt jede neue Regel mit Stimme. Danach wartet das Endlos-Spiel. Schiri Pfiff ist kostenlos, ohne Werbung, ohne Käufe und läuft im Browser auf Handy, Tablet und PC."]),
  "fussball-boss": dict(
   title="Fußball-Boss – Fußballmanager für Kinder kostenlos",
   meta="Fußball-Boss: der einfache Fußballmanager für Kinder ab 7. Aufstellen, Transfers, Stadion, Tabellen und Pokal. Alles vorgelesen, ohne Werbung.",
@@ -358,6 +375,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Schiri Pfiff: Sei der Schiedsrichter in Lewolux Kids", "kids/"),
  ("Neu", "Fußball-Boss: der Fußballmanager für Kinder in Lewolux Kids", "kids/"),
  ("Neu", "Dino-Buddler: Dinos ausgraben in Lewolux Kids", "kids/"),
  ("Neu", "Würfelzauber: würfeln, Königreiche bauen und Haustiere sammeln", "spiele/wuerfelzauber/"),
@@ -380,6 +398,11 @@ NEWS = [
 # c1/c2 = Farben der Karte, emoji = großes Symbol, age = Altersempfehlung
 # Spiele in dieser Liste werden im Kids-Modus NICHT gesperrt; alle anderen Spiele schon.
 KIDS = [
+ dict(id="schiri-pfiff", title="Schiri Pfiff", emoji="🦁", c1="#ffc83d", c2="#2fb455", age="ab 5 Jahren",
+  line="Sei der Schiedsrichter beim Tier-Fußball",
+  learn="Fußballregeln, genau hinschauen, schnell entscheiden",
+  say="Schiri Pfiff! Sei der Schiedsrichter und entscheide: Foul oder fair?",
+  mascot="lionref", crowd=1),
  dict(id="fussball-boss", title="Fußball-Boss", emoji="🏆", c1="#2fa84f", c2="#1f6fa8", age="ab 7 Jahren",
   line="Der Fußballmanager für Kinder",
   learn="Planen, Zahlen vergleichen, mit Geld umgehen",
