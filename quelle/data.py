@@ -1,6 +1,17 @@
 # Inhalte der Website: Spiele, Software, FAQ
 # ratio = Seitenverhältnis des Spiels im Browser (RPG Maker MZ Standard: 816/624). Hochkant-Spiele z. B. 9/16.
 GAMES = [
+ dict(id="dino-buddler", group="kinder", orient="any", ratio="16/10", scene="kritzel", demo="none", accent="#ffb84d", src="spiele-intern/dino-buddler", nodl=True,
+  title="Dino-Buddler", short="Dino-Buddler", tagline="Grab Dinos aus und erwecke sie zum Leben!",
+  desc="Kinderspiel ohne Werbung: Mit Buddel, dem kleinen Forscher-Dino, gräbst du Dino-Knochen aus dem Sand, baust die Skelette zusammen und erweckst zehn Dinos zum Leben. Danach fütterst du sie, ziehst ihnen Kostüme an und bringst sie ins Bett. Alles wird vorgelesen, ohne Lesen spielbar.",
+  genres=["Kinder","Dinos","Puzzle"], cats="family", status="Neu",
+  plats=["web","mobile","pad"], tech=["HTML5","Web Audio","Offline"],
+  story="Im Urzeit-Tal sind Dinos im Sand versteckt. Buddel, der kleine Forscher-Dino, braucht deine Hilfe: Wisch den Sand weg, finde alle Knochen und bau den Dino zusammen. Dann passiert der Dino-Zauber!",
+  controls=[["Sand wegwischen","Mit dem Finger wischen"],["Knochen einsetzen","Ziehen und loslassen"],["Füttern","Futter zum Dino ziehen"],["Zurück","Knopf oben links"]],
+  features=["10 Dinos zum Ausgraben, von T-Rex bis Flugsaurier","Skelett-Puzzle und Dino-Zauber","Füttern, Kostüme, Tag und Nacht im Dino-Park","Jeden Tag ein Überraschungs-Ei","8 Schätze wie Bernstein und Ammonit","Alles vorgelesen, ohne Werbung und ohne Käufe"],
+  shots=["Der Dino-Park mit Buddel","Knochen aus dem Sand graben","Das Skelett wird lebendig"],
+  reel=["Family","Graben, puzzeln, staunen","Zehn Dinos für kleine Forscher."],
+  download=dict(file="downloads/dino-buddler.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="wuerfelzauber", group="strategie", ratio="9/16", scene="kritzel", demo="none", wide=True, accent="#ffc93c", src="spiele-intern/wuerfelzauber", nodl=True,
   title="Würfelzauber", short="Würfelzauber", tagline="Würfeln. Bauen. Zaubern!",
   desc="Das magische Würfel- und Königreich-Spiel von Lewolux: Würfle Münzen, Kronen und Schilde, bau 10 Königreiche aus, greif mit Löwe Leo und der Schleuder andere Reiche an und sammle 30 Haustiere. Kostenlos im Browser und am Handy.",
@@ -224,6 +235,12 @@ DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 
 # SEO: Seitentitel (max. ~60 Zeichen), Meta-Beschreibung (~150 Zeichen), Langtext für die Spielseite
 SEO = {
+ "dino-buddler": dict(
+  title="Dino-Buddler – Dino-Spiel für Kinder kostenlos",
+  meta="Dino-Buddler: Kinder graben Dinos aus, bauen Skelette zusammen und erwecken 10 Dinos zum Leben. Alles vorgelesen, ohne Werbung, ohne Käufe.",
+  long=["<strong>Dino-Buddler</strong> ist ein Dino-Spiel für Kinder ab 3 Jahren aus <strong>Lewolux Kids</strong>. Buddel, der kleine Forscher-Dino mit Hut, führt durch das Spiel und liest alles vor. Lesen muss niemand.",
+        "Mit dem Finger wischen Kinder Sand weg und finden Knochen. Danach bauen sie das Skelett wie ein Puzzle zusammen, und mit dem <strong>Dino-Zauber</strong> wird es lebendig. So kommen nach und nach <strong>10 Dinos</strong> in den eigenen Park: T-Rex, Triceratops, Brachiosaurus, Stegosaurus, Flugsaurier und mehr. Jeder Dino stellt sich mit einem kleinen Fakt vor.",
+        "Im Park werden die Dinos gefüttert. Dabei lernen Kinder nebenbei, wer Pflanzen und wer Fleisch frisst. Jeden Tag wartet ein Überraschungs-Ei mit Kostümen wie Krone, Zylinder oder Partyhut. Dino-Buddler ist kostenlos, ohne Werbung, ohne Käufe und läuft im Browser auf Tablet, Handy und PC."]),
  "wuerfelzauber": dict(
   title="Würfelzauber – Würfelspiel mit Königreichen kostenlos",
   meta="Würfelzauber: würfeln, 10 Königreiche bauen, mit der Schleuder angreifen und 30 Haustiere sammeln. Kostenlos im Browser und am Handy.",
@@ -324,6 +341,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Dino-Buddler: Dinos ausgraben in Lewolux Kids", "kids/"),
  ("Neu", "Würfelzauber: würfeln, Königreiche bauen und Haustiere sammeln", "spiele/wuerfelzauber/"),
  ("Neu", "Omas Dachboden: das gemütliche Sortierspiel mit 5 Level", "spiele/omas-dachboden/"),
  ("Neu", "Lewomon: Monster sammeln in Boostedt und Neumünster", "spiele/lewomon/"),
@@ -344,6 +362,11 @@ NEWS = [
 # c1/c2 = Farben der Karte, emoji = großes Symbol, age = Altersempfehlung
 # Spiele in dieser Liste werden im Kids-Modus NICHT gesperrt; alle anderen Spiele schon.
 KIDS = [
+ dict(id="dino-buddler", title="Dino-Buddler", emoji="🦖", c1="#ffb84d", c2="#ff7a59", age="ab 3 Jahren",
+  line="Dinos ausgraben, zusammenbauen und zum Leben erwecken",
+  learn="Feinmotorik, Puzzeln, erstes Dino-Wissen",
+  say="Dino-Buddler! Grab Dinos aus, bau ihre Knochen zusammen und erwecke sie zum Leben.",
+  mascot="dino", crowd=1),
  dict(id="kritzelheld", title="Kritzelheld", emoji="🦉", c1="#3ec97a", c2="#19a7e0", age="ab 4 Jahren",
   line="Buchstaben und Zahlen malen mit Eule Kritzel",
   learn="Buchstaben und Zahlen schreiben, Feinmotorik",   # für Eltern (Übersichtsseite /kinderspiele-kostenlos/)

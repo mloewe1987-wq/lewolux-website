@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#8fd3f4">
+<meta name="description" content="Dino-Buddler – grab Dinos aus, bau ihre Knochen zusammen und erwecke sie zum Leben. Lewolux Kids: ohne Werbung, ohne Käufe, ohne Lesen.">
+<title>Dino-Buddler | Lewolux Kids</title>
+<style>
+@font-face{font-family:F;src:url(fonts/fredoka-700.woff2) format("woff2");font-weight:700;font-display:swap}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#8fd3f4;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;font-family:F,"Trebuchet MS",system-ui,sans-serif;color:#4a2e1a}
+img{-webkit-user-drag:none;user-drag:none;pointer-events:none}
+.scr{position:fixed;inset:0;display:none;overflow:hidden}
+.scr.on{display:block}
+.bg{position:absolute;inset:0;background-size:cover;background-position:center bottom}
+/* runde Knöpfe */
+.b{position:absolute;z-index:30;border:0;outline:0;cursor:pointer;padding:0;border-radius:50%;width:var(--bs);height:var(--bs);background:radial-gradient(circle at 50% 35%,#fff,#ffeccc);box-shadow:0 calc(var(--bs)*.07) 0 #d99b54,0 calc(var(--bs)*.12) calc(var(--bs)*.2) rgba(80,40,10,.28);display:grid;place-items:center;transition:transform .12s,opacity .3s;touch-action:manipulation}
+.b img{width:78%;height:78%;object-fit:contain}
+.b svg{width:56%;height:56%}
+.b:active,.b.pr{transform:translateY(4px) scale(.94)}
+.b:focus-visible{outline:4px solid #fff;outline-offset:3px}
+.b.big{--bs:calc(var(--u)*13)}
+.b.pulse{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+:root{--u:min(1vw,1.6vh);--bs:calc(var(--u)*9.5);--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);--sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px)}
+@media (orientation:portrait){:root{--u:min(1.9vw,1vh)}}
+.tl{left:calc(var(--sl) + var(--u)*2.2);top:calc(var(--st) + var(--u)*2.2)}
+.tr{right:calc(var(--sr) + var(--u)*2.2);top:calc(var(--st) + var(--u)*2.2)}
+/* Titel */
+#title .bg{background-color:#8fd3f4}
+#title h1{position:absolute;left:0;right:0;top:calc(var(--st) + 6vh);margin:0;text-align:center;font-size:calc(var(--u)*11);line-height:1;color:#fff;letter-spacing:.02em;text-shadow:0 .08em 0 #c8611f,0 .14em .2em rgba(90,40,10,.35);-webkit-text-stroke:.06em #c8611f;paint-order:stroke fill;animation:wob 3s ease-in-out infinite}
+#title h1 span{display:inline-block;animation:hop 2.4s ease-in-out infinite}
+@keyframes hop{0%,70%,100%{transform:translateY(0)}80%{transform:translateY(-.18em)}}
+@keyframes wob{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+#play{left:50%;bottom:calc(var(--sb) + 7vh);--bs:calc(var(--u)*18);margin-left:calc(var(--bs)/-2);background:radial-gradient(circle at 50% 35%,#a8ff7a,#3fbf3a);box-shadow:0 calc(var(--bs)*.07) 0 #23852a,0 calc(var(--bs)*.14) calc(var(--bs)*.22) rgba(20,60,10,.35);animation:pulse 1.4s ease-in-out infinite}
+#play svg{width:50%;height:50%;margin-left:8%}
+/* Park */
+#park .bg{transition:filter 1.2s}
+#night{position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,20,70,.86),rgba(40,30,90,.62) 55%,rgba(20,20,60,.7));opacity:0;transition:opacity 1.2s;pointer-events:none;z-index:5}
+.night #night{opacity:1}
+#stars{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity 1.5s}
+.night #stars{opacity:1}
+#stars i{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff;animation:tw 2s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.2}to{opacity:1}}
+#dinos{position:absolute;inset:0;z-index:6}
+.dino{position:absolute;left:0;top:0;transform-origin:50% 100%;will-change:transform;cursor:pointer}
+.dino .in{position:relative;transform-origin:50% 100%}
+.dino img.body{display:block;width:100%;height:100%;object-fit:contain}
+.dino .acc{position:absolute;pointer-events:none}
+.dino .shadow{position:absolute;left:12%;right:12%;bottom:-4%;height:9%;border-radius:50%;background:rgba(40,60,10,.28);filter:blur(3px)}
+.dino.fly .shadow{display:none}
+.zz{position:absolute;font-size:calc(var(--u)*3.4);color:#fff;text-shadow:0 2px 6px rgba(0,0,40,.6);animation:zz 2.4s ease-out forwards;pointer-events:none;z-index:9}
+@keyframes zz{from{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:1}to{opacity:0;transform:translate(30px,-70px) scale(1.3)}}
+.heart{position:absolute;width:calc(var(--u)*5);pointer-events:none;z-index:40;animation:heart 1.3s ease-out forwards}
+@keyframes heart{0%{opacity:0;transform:translate(-50%,0) scale(.3)}25%{opacity:1;transform:translate(-50%,-30%) scale(1.15)}100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),-260%) scale(.8)}}
+/* Sammelleiste oben */
+#strip{position:absolute;z-index:20;top:calc(var(--st) + var(--u)*2.4);left:50%;transform:translateX(-50%);display:flex;gap:calc(var(--u)*.6);padding:calc(var(--u)*.8) calc(var(--u)*1.4);background:rgba(255,255,255,.55);border-radius:999px;box-shadow:0 4px 14px rgba(60,40,10,.15);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);max-width:calc(100vw - var(--bs)*2 - var(--u)*10)}
+#strip button{width:calc(var(--u)*5.4);height:calc(var(--u)*5.4);border:0;padding:0;background:none;cursor:pointer;flex:none}
+#strip img{width:100%;height:100%;object-fit:contain}
+#strip .no img{filter:brightness(0) opacity(.25)}
+@media (orientation:portrait){#strip{flex-wrap:wrap;justify-content:center;width:calc(var(--u)*34);border-radius:calc(var(--u)*3)}}
+/* Leiste unten */
+#bar{position:absolute;z-index:30;left:50%;bottom:calc(var(--sb) + var(--u)*2.2);transform:translateX(-50%);display:flex;gap:calc(var(--u)*2.4);align-items:flex-end}
+#bar .b{position:relative}
+.badge{position:absolute;top:-6%;right:-6%;width:34%;height:34%;border-radius:50%;background:#ff4d5a;color:#fff;display:grid;place-items:center;font-size:calc(var(--u)*2.2);box-shadow:0 2px 0 #b8222e;animation:pulse 1s infinite}
+/* Buddel */
+#buddel{position:absolute;z-index:35;left:calc(var(--sl) + var(--u)*1);bottom:calc(var(--sb) + var(--u)*1);width:calc(var(--u)*15);cursor:pointer;transform-origin:50% 100%;animation:idle 2.6s ease-in-out infinite;pointer-events:auto}
+#buddel img{width:100%;display:block}
+#buddel.talk{animation:talk .32s ease-in-out infinite}
+@keyframes idle{0%,100%{transform:scale(1,1)}50%{transform:scale(1.02,.97)}}
+@keyframes talk{0%,100%{transform:scale(1,1) rotate(0)}50%{transform:scale(1.05,.95) rotate(-2deg)}}
+#bubble{position:absolute;z-index:36;left:calc(var(--sl) + var(--u)*13);bottom:calc(var(--sb) + var(--u)*12);min-width:calc(var(--u)*7);height:calc(var(--u)*6);padding:0 calc(var(--u)*1.6);border-radius:calc(var(--u)*3);background:#fff;box-shadow:0 4px 12px rgba(60,40,10,.2);display:flex;align-items:center;gap:calc(var(--u)*.6);opacity:0;transform:scale(.4);transform-origin:0 100%;transition:opacity .25s,transform .25s;pointer-events:none}
+#bubble.on{opacity:1;transform:scale(1)}
+#bubble i{width:calc(var(--u)*1.2);height:calc(var(--u)*1.2);border-radius:50%;background:#e0893c;animation:dots 1s infinite}
+#bubble i:nth-child(2){animation-delay:.15s}#bubble i:nth-child(3){animation-delay:.3s}
+@keyframes dots{0%,100%{transform:translateY(0)}50%{transform:translateY(-35%)}}
+/* Nest mit Tages-Ei */
+#nest{position:absolute;z-index:7;width:calc(var(--u)*11);cursor:pointer;display:none}
+#nest.on{display:block}
+#nest img{width:100%;animation:eggw 1.6s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes eggw{0%,100%{transform:rotate(0)}20%{transform:rotate(-9deg)}40%{transform:rotate(8deg)}60%{transform:rotate(0)}}
+/* Futter */
+#tray{position:absolute;z-index:31;left:50%;bottom:calc(var(--sb) + var(--u)*17);transform:translate(-50%,30px);display:flex;gap:calc(var(--u)*1.6);padding:calc(var(--u)*1.2) calc(var(--u)*2);border-radius:calc(var(--u)*4);background:rgba(255,248,235,.92);box-shadow:0 8px 24px rgba(60,40,10,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#tray.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#tray .food{width:calc(var(--u)*10);height:calc(var(--u)*10);cursor:grab;touch-action:none;display:grid;place-items:center;border-radius:calc(var(--u)*2.4);background:#fff;box-shadow:0 3px 0 #ecd2ad}
+#tray .food img{width:82%;height:82%;object-fit:contain}
+.drag{position:fixed;z-index:80;width:calc(var(--u)*10);height:calc(var(--u)*10);pointer-events:none;transform:translate(-50%,-60%) scale(1.15);filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
+.drag img{width:100%;height:100%;object-fit:contain}
+/* Graben */
+#dig .bg{filter:saturate(1.05)}
+#pit{position:absolute;z-index:5;border-radius:calc(var(--u)*3);overflow:hidden;box-shadow:0 0 0 calc(var(--u)*.9) #a8692f,0 0 0 calc(var(--u)*1.6) #f6d39a,0 18px 40px rgba(70,30,0,.4);background:#c88a4c}
+#layer{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,#c98d55,#a5672f)}
+#layer::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(255,220,170,.25),transparent 40%),radial-gradient(circle at 70% 75%,rgba(90,40,10,.18),transparent 45%)}
+.item{position:absolute;transform-origin:50% 50%;filter:drop-shadow(0 3px 2px rgba(60,20,0,.35))}
+.item canvas,.item img{width:100%;height:100%;display:block}
+#sand,#fx{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#sand{cursor:none}
+#fx{pointer-events:none}
+#brush{position:absolute;z-index:8;width:calc(var(--u)*11);pointer-events:none;transform-origin:20% 90%;display:none;filter:drop-shadow(0 6px 6px rgba(0,0,0,.3))}
+#found{position:absolute;z-index:20;left:50%;bottom:calc(var(--sb) + var(--u)*1.6);transform:translateX(-50%);display:flex;gap:calc(var(--u)*1.2);padding:calc(var(--u)*1) calc(var(--u)*1.6);border-radius:calc(var(--u)*3);background:rgba(255,246,228,.85);box-shadow:0 4px 14px rgba(60,40,10,.2)}
+#found .slot{width:calc(var(--u)*8);height:calc(var(--u)*8);border-radius:calc(var(--u)*2);border:calc(var(--u)*.35) dashed #d1a36d;display:grid;place-items:center;transition:transform .3s}
+#found .slot.got{border-style:solid;border-color:#ffb43c;background:#fff6dd;animation:popin .45s}
+#found .slot canvas,#found .slot img{max-width:86%;max-height:86%}
+@keyframes popin{0%{transform:scale(.6)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.fly{position:fixed;z-index:90;pointer-events:none;transition:all .8s cubic-bezier(.5,-0.3,.4,1.2)}
+/* Puzzle */
+#puz .bg{filter:blur(4px) brightness(.8)}
+#board{position:absolute;z-index:5}
+#ghost{position:absolute;inset:0;width:100%;height:100%;filter:brightness(0) opacity(.18);object-fit:fill}
+.piece{position:absolute;z-index:10;touch-action:none;cursor:grab;transition:transform .2s,filter .2s;filter:drop-shadow(0 6px 6px rgba(40,20,0,.35))}
+.piece.dragging{z-index:50;transform:scale(1.08)!important;transition:none;filter:drop-shadow(0 14px 12px rgba(40,20,0,.35))}
+.piece.done{cursor:default;filter:none;transition:left .25s,top .25s,transform .25s}
+.piece canvas{width:100%;height:100%;display:block}
+#magic{position:absolute;z-index:60;pointer-events:none}
+#alive{position:absolute;z-index:61;pointer-events:none;opacity:0}
+#flash{position:absolute;inset:0;z-index:70;background:#fff;opacity:0;pointer-events:none}
+#confetti{position:absolute;inset:0;z-index:75;pointer-events:none;width:100%;height:100%}
+#nextBtn{left:50%;bottom:calc(var(--sb) + var(--u)*4);--bs:calc(var(--u)*15);margin-left:calc(var(--bs)/-2);display:none;background:radial-gradient(circle at 50% 35%,#a8ff7a,#3fbf3a);box-shadow:0 calc(var(--bs)*.07) 0 #23852a,0 calc(var(--bs)*.14) calc(var(--bs)*.22) rgba(20,60,10,.35);animation:pulse 1.4s infinite;z-index:80}
+/* Overlays */
+.ov{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:rgba(60,30,10,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.ov.on{display:grid;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.panel{position:relative;background:linear-gradient(180deg,#fff8ea,#ffe9c4);border-radius:calc(var(--u)*4);padding:calc(var(--u)*4);box-shadow:0 calc(var(--u)*1) 0 #e0a65c,0 20px 50px rgba(60,30,0,.35);max-width:calc(100vw - 24px);max-height:calc(100vh - 24px);overflow:auto;animation:popin .35s}
+.panel .x{position:absolute;right:calc(var(--u)*1);top:calc(var(--u)*1);--bs:calc(var(--u)*8)}
+.grid{display:grid;grid-template-columns:repeat(4,calc(var(--u)*13));gap:calc(var(--u)*1.8)}
+@media (orientation:portrait){.grid{grid-template-columns:repeat(3,calc(var(--u)*13))}}
+.cell{width:calc(var(--u)*13);height:calc(var(--u)*13);border-radius:calc(var(--u)*3);background:#fff;box-shadow:0 4px 0 #ecd2ad;display:grid;place-items:center;border:0;cursor:pointer;padding:0}
+.cell img{width:80%;height:80%;object-fit:contain}
+.cell.no img{filter:brightness(0) opacity(.2)}
+.cell.sel{outline:calc(var(--u)*.7) solid #ffb43c}
+.ptitle{display:flex;justify-content:center;margin:0 0 calc(var(--u)*2.4)}
+.ptitle img{width:calc(var(--u)*10)}
+#wardrobe .panel{padding:calc(var(--u)*2.4) calc(var(--u)*3)}
+#wardrobe .stage{width:calc(var(--u)*34);height:calc(var(--u)*19);position:relative;margin:calc(var(--u)*5) auto calc(var(--u)*1)}
+#wardrobe .row{display:flex;gap:calc(var(--u)*1.4);justify-content:center;flex-wrap:wrap;margin-top:calc(var(--u)*1.6)}
+#wardrobe .row{gap:calc(var(--u)*1)}
+#wardrobe .row .cell{width:calc(var(--u)*8);height:calc(var(--u)*8);border-radius:calc(var(--u)*2)}
+#wDinos{max-width:calc(var(--u)*56);margin-inline:auto}
+#eggOv .egg{width:calc(var(--u)*30);height:calc(var(--u)*30);position:relative;cursor:pointer;display:grid;place-items:center}
+#eggOv .egg img{width:70%}
+#eggOv .egg .prize{position:absolute;width:55%;opacity:0;transform:scale(.2)}
+.crack{animation:crack .5s}
+@keyframes crack{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg) scale(1.05)}75%{transform:rotate(12deg) scale(1.05)}}
+#loading{position:fixed;inset:0;z-index:200;background:#8fd3f4;display:grid;place-items:center;color:#fff;font-size:calc(var(--u)*5);text-shadow:0 3px 0 #3c8fb8}
+#loading .bar{width:calc(var(--u)*40);height:calc(var(--u)*2.4);border-radius:99px;background:rgba(255,255,255,.4);overflow:hidden;margin-top:calc(var(--u)*2)}
+#loading .bar i{display:block;height:100%;width:0;background:#fff;transition:width .2s}
+
+/* Buddel oben rechts beim Graben und Puzzeln */
+body.bud-top #buddel{left:auto;bottom:auto;right:calc(var(--sr) + var(--u)*1.5);top:calc(var(--st) + var(--u)*1);width:calc(var(--u)*12)}
+body.bud-top #bubble{left:auto;bottom:auto;right:calc(var(--sr) + var(--u)*13);top:calc(var(--st) + var(--u)*3);transform-origin:100% 0}
+@media (orientation:portrait){
+  #bar{gap:calc(var(--u)*1.2);bottom:calc(var(--sb) + var(--u)*1.6)}
+  #bar .b{--bs:calc(var(--u)*7.6)}
+  #bar .b.big{--bs:calc(var(--u)*10.5)}
+  body:not(.bud-top) #buddel{width:calc(var(--u)*11);bottom:calc(var(--sb) + var(--u)*13)}
+  body:not(.bud-top) #bubble{bottom:calc(var(--sb) + var(--u)*22);left:calc(var(--sl) + var(--u)*9)}
+  #tray{bottom:calc(var(--sb) + var(--u)*14)}
+  #tray .food{width:calc(var(--u)*8.5);height:calc(var(--u)*8.5)}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<div id="loading"><div style="text-align:center"><div>🦖</div><div class="bar"><i id="lbar"></i></div></div></div>
+
+<!-- TITEL -->
+<section class="scr" id="title">
+  <div class="bg" style="background-image:url(assets/title.webp)"></div>
+  <h1 aria-label="Dino-Buddler"><span>Dino</span>-<span style="animation-delay:.25s">Buddler</span></h1>
+  <button class="b" id="play" aria-label="Spielen"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="#fff" stroke="#23852a" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+  <button class="b tl" id="exit1" aria-label="Zurück zu Lewolux Kids"><img src="assets/ic_home.webp" alt=""></button>
+</section>
+
+<!-- PARK -->
+<section class="scr" id="park">
+  <div class="bg" style="background-image:url(assets/bg_park.webp)"></div>
+  <div id="stars"></div>
+  <div id="night"></div>
+  <div id="nest"><img src="assets/ic_egg.webp" alt=""></div>
+  <div id="dinos"></div>
+  <div id="strip" aria-label="Gefundene Dinos"></div>
+  <button class="b tl" id="exit2" aria-label="Zurück zu Lewolux Kids"><img src="assets/ic_home.webp" alt=""></button>
+  <button class="b tr" id="snd" aria-label="Ton an oder aus"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#e0893c"/><path id="sndw" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#e0893c" stroke-width="2" stroke-linecap="round"/></svg></button>
+  <div id="tray"></div>
+  <div id="bar">
+    <button class="b" id="bFood" aria-label="Füttern"><img src="assets/food_berry.webp" alt=""></button>
+    <button class="b" id="bWard" aria-label="Verkleiden"><img src="assets/acc_crown.webp" alt=""></button>
+    <button class="b big pulse" id="bDig" aria-label="Ausgraben"><img src="assets/ic_shovel.webp" alt=""></button>
+    <button class="b" id="bChest" aria-label="Schatzkiste"><img src="assets/ic_chest.webp" alt=""></button>
+    <button class="b" id="bNight" aria-label="Tag und Nacht"><img src="assets/ic_moon.webp" alt="" id="nightIc"></button>
+  </div>
+</section>
+
+<!-- GRABEN -->
+<section class="scr" id="dig">
+  <div class="bg" style="background-image:url(assets/bg_dig.webp)"></div>
+  <div id="pit"><div id="layer"></div><div id="items"></div><canvas id="sand"></canvas><canvas id="fx"></canvas></div>
+  <img id="brush" src="assets/ic_brush.webp" alt="">
+  <div id="found"></div>
+  <button class="b tl" id="back1" aria-label="Zurück zum Park"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="#e0893c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</section>
+
+<!-- PUZZLE -->
+<section class="scr" id="puz">
+  <div class="bg" style="background-image:url(assets/bg_dig.webp)"></div>
+  <div id="board"><img id="ghost" alt=""></div>
+  <div id="magic"></div>
+  <img id="alive" alt="">
+  <div id="flash"></div>
+  <canvas id="confetti"></canvas>
+  <button class="b" id="nextBtn" aria-label="Ab in den Park"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="#fff" stroke="#23852a" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+  <button class="b tl" id="back2" aria-label="Zurück zum Park"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="#e0893c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</section>
+
+<!-- Buddel (immer da) -->
+<div id="buddel" role="button" aria-label="Buddel – nochmal sagen"><img src="assets/buddel_1.webp" alt="" id="budImg"></div>
+<div id="bubble"><i></i><i></i><i></i></div>
+
+<!-- Schatzkiste -->
+<div class="ov" id="chestOv"><div class="panel"><button class="b x" data-close aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#e0893c" stroke-width="3.2" stroke-linecap="round"/></svg></button><div class="ptitle"><img src="assets/ic_chest.webp" alt=""></div><div class="grid" id="chestGrid"></div></div></div>
+<!-- Verkleiden -->
+<div class="ov" id="wardrobe"><div class="panel"><button class="b x" data-close aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#e0893c" stroke-width="3.2" stroke-linecap="round"/></svg></button><div class="stage" id="wStage"></div><div class="row" id="wAcc"></div><div class="row" id="wDinos"></div></div></div>
+<!-- Tages-Ei -->
+<div class="ov" id="eggOv"><div class="panel"><div class="egg" id="eggBig"><img src="assets/ic_egg.webp" alt="" id="eggImg"><img class="prize" id="eggPrize" alt=""></div></div></div>
+
+<script>
+"use strict";
+/* ===================== Daten ===================== */
+// head: [x, y, Breite] als Anteil am Bild – dort sitzt das Kostüm (oben auf dem Kopf)
+const DINOS = [
+ {id:"rex",    name:"Rexi",   kind:"T-Rex",           diet:"c", fav:"meat",  h:1.00, head:[.68,.03,.34], eye:[.66,.10]},
+ {id:"trike",  name:"Trixi",  kind:"Triceratops",     diet:"h", fav:"leaf",  h:.86,  head:[.52,.03,.30], eye:[.73,.44]},
+ {id:"stego",  name:"Stegi",  kind:"Stegosaurus",     diet:"h", fav:"leaf",  h:.80,  head:[.90,.33,.20], eye:[.86,.40]},
+ {id:"ptera",  name:"Flatter",kind:"Flugsaurier",     diet:"c", fav:"fish",  h:.80,  head:[.71,.12,.17], eye:[.73,.22], fly:1},
+ {id:"brachio",name:"Lotte",  kind:"Brachiosaurus",   diet:"h", fav:"leaf",  h:1.30, head:[.89,.01,.17], eye:[.90,.05]},
+ {id:"anky",   name:"Anki",   kind:"Ankylosaurus",    diet:"h", fav:"berry", h:.70,  head:[.88,.32,.18], eye:[.85,.40]},
+ {id:"paro",   name:"Tröti",  kind:"Parasaurolophus", diet:"h", fav:"berry", h:.98,  head:[.84,.14,.20], eye:[.87,.25]},
+ {id:"raptor", name:"Flitzi", kind:"Velociraptor",    diet:"c", fav:"meat",  h:.86,  head:[.80,.10,.24], eye:[.83,.20]},
+ {id:"spino",  name:"Spino",  kind:"Spinosaurus",     diet:"c", fav:"fish",  h:.98,  head:[.86,.08,.20], eye:[.88,.15]},
+ {id:"pachy",  name:"Bummi",  kind:"Pachycephalosaurus", diet:"h", fav:"berry", h:.92, head:[.82,.01,.28], eye:[.80,.22]}
+];
+const INTRO = {
+ rex:"Ich bin Rexi, ein T-Rex! Ich habe ganz kleine Ärmchen, aber einen riesigen Kopf.",
+ trike:"Ich bin Trixi, ein Triceratops! Ich habe drei Hörner.",
+ stego:"Ich bin Stegi, ein Stegosaurus! Auf meinem Rücken habe ich große Platten.",
+ ptera:"Ich bin Flatter, ein Flugsaurier! Ich fliege hoch über das Meer.",
+ brachio:"Ich bin Lotte, ein Brachiosaurus! Mit meinem langen Hals komme ich an die höchsten Blätter.",
+ anky:"Ich bin Anki, ein Ankylosaurus! Ich habe einen Panzer und eine Keule am Schwanz.",
+ paro:"Ich bin Tröti, ein Parasaurolophus! Mit meinem Kamm kann ich tröten wie eine Trompete.",
+ raptor:"Ich bin Flitzi, ein Velociraptor! Ich bin superschnell und habe Federn.",
+ spino:"Ich bin Spino, ein Spinosaurus! Ich schwimme gern und fange Fische.",
+ pachy:"Ich bin Bummi, ein Pachycephalosaurus! Mein Kopf ist hart wie ein Helm."
+};
+const ALIVE = {rex:"Hurra! Rexi lebt!",trike:"Hurra! Trixi lebt!",stego:"Hurra! Stegi lebt!",ptera:"Hurra! Flatter lebt!",brachio:"Hurra! Lotte lebt!",anky:"Hurra! Anki lebt!",paro:"Hurra! Tröti lebt!",raptor:"Hurra! Flitzi lebt!",spino:"Hurra! Spino lebt!",pachy:"Hurra! Bummi lebt!"};
+const FOODS = [{id:"leaf",type:"h"},{id:"berry",type:"h"},{id:"fish",type:"c"},{id:"meat",type:"c"}];
+const TREAS = [
+ {id:"amber",  say:"Ein Bernstein! Das ist uraltes Baumharz."},
+ {id:"ammo",   say:"Ein Ammonit! Das war ein Meerestier mit Schneckenhaus."},
+ {id:"trilo",  say:"Ein Trilobit! Der krabbelte schon vor den Dinos durchs Meer."},
+ {id:"tooth",  say:"Ein Haizahn! Der ist ganz schön spitz."},
+ {id:"crystal",say:"Ein Kristall! Der funkelt so schön."},
+ {id:"gold",   say:"Ein Goldklumpen! Wir sind reich!"},
+ {id:"leaf",   say:"Ein versteinertes Blatt! Das ist Millionen Jahre alt."},
+ {id:"foot",   say:"Ein Dino-Fußabdruck! Der ist riesig!"}
+];
+const ACCS = ["crown","tophat","bow","glasses","party","hat"];
+const T = {
+ title:"Dino-Buddler! Tippe auf den grünen Knopf!",
+ hello:"Hallo! Ich bin Buddel. Hier im Sand sind Dinos versteckt. Tippe auf die Schaufel und grab sie aus!",
+ back:"Willkommen zurück! Deine Dinos haben dich vermisst!",
+ digHint:"Tippe auf die Schaufel. Wir graben einen neuen Dino aus!",
+ digStart:"Wisch mit dem Finger über den Sand!",
+ digIdle:"Weiter wischen! Da ist bestimmt noch etwas!",
+ bone:["Ein Knochen!","Noch ein Knochen!","Super gefunden!","Toll gemacht!"],
+ allBones:"Alle Knochen gefunden! Jetzt bauen wir den Dino zusammen!",
+ puzStart:"Zieh die Knochen an die richtige Stelle!",
+ placed:["Passt!","Super!","Richtig!","Klasse!"],
+ magic:"Fertig! Und jetzt der Dino-Zauber!",
+ toPark:"Ab in den Park!",
+ feed:"Zieh das Futter zu einem Dino!",
+ yum:["Mmmh, lecker!","Mein Lieblingsessen!","Danke!"],
+ noMeat:"Bäh! Ich fresse nur Pflanzen!",
+ noPlant:"Bäh! Ich fresse lieber Fleisch und Fisch!",
+ night:"Gute Nacht, Dinos! Schlaft schön!",
+ day:"Guten Morgen! Aufwachen!",
+ chest:"Deine Schatzkiste!",
+ chestNo:"Diesen Schatz hast du noch nicht gefunden.",
+ dinoNo:"Diesen Dino musst du noch ausgraben!",
+ allDinos:"Wow! Du hast alle zehn Dinos gefunden! Du bist ein echter Dino-Forscher!",
+ tickle:"Hihi, das kitzelt!",
+ egg:"Schau mal, ein Überraschungs-Ei! Tippe drauf!",
+ eggOpen:"Ein Kostüm für deine Dinos!",
+ ward:"Such dir ein Kostüm aus!",
+ wardNo:"Das Kostüm findest du in einem Überraschungs-Ei.",
+ wardEmpty:"Grab erst einen Dino aus, dann kannst du ihn verkleiden!",
+ love:"Ich hab dich lieb!",
+ dance:"Juhu! Ich bin so glücklich!",
+ bye:"Tschüss! Bis bald!"
+};
+
+/* ===================== Hilfen ===================== */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const rnd = (a,b) => a + Math.random()*(b-a), pick = a => a[Math.random()*a.length|0];
+const today = () => new Date().toISOString().slice(0,10);
+const KEY = "dino_buddler_v1";
+let S = {found:[], treas:[], accs:[], wear:{}, love:{}, digs:0, egg:"", last:"", sound:1, night:0};
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const D = id => DINOS.find(d => d.id === id);
+let W = innerWidth, H = innerHeight, U = 1;
+const calcU = () => { W = innerWidth; H = innerHeight; U = W > H ? Math.min(W/100, H*1.6/100) : Math.min(W*1.9/100, H/100); };
+calcU();
+
+/* ===================== Ton ===================== */
+let AC = null;
+const ac = () => { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } if (AC && AC.state === "suspended") AC.resume(); return AC; };
+const SFX = {}; // Dateien aus sfx/ (falls vorhanden), sonst Synth
+const SFX_LIST = ["tap","brush","bone","treasure","place","magic","poof","roar","chomp","yuck","pop","whoosh","egg","cheer","sleep"];
+function loadSfx(){ SFX_LIST.forEach(n => { const a = []; for (let i = 1; i <= 3; i++) { const au = new Audio(`sfx/${n}${i}.mp3`); au.preload = "auto"; au.onerror = () => { const k = a.indexOf(au); if (k >= 0) a.splice(k, 1); }; a.push(au); } SFX[n] = a; }); }
+function tone(f, d, type="sine", v=.18, slide=0, delay=0){
+  const c = ac(); if (!c || !S.sound) return;
+  const t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f*slide), t + d);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(.001, t + d);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t + d + .05);
+}
+function noise(d, v=.12, hp=800, delay=0){
+  const c = ac(); if (!c || !S.sound) return;
+  const len = c.sampleRate*d|0, b = c.createBuffer(1, len, c.sampleRate), x = b.getChannelData(0);
+  for (let i = 0; i < len; i++) x[i] = (Math.random()*2-1) * (1 - i/len);
+  const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  f.type = "highpass"; f.frequency.value = hp; s.buffer = b; g.gain.value = v;
+  s.connect(f).connect(g).connect(c.destination); s.start(c.currentTime + delay);
+}
+const SYN = {
+  tap:()=>tone(660,.08,"triangle",.15,1.4),
+  brush:()=>noise(.09,.05,2400),
+  bone:()=>{tone(523,.12,"triangle",.2);tone(784,.16,"triangle",.2,1,.1);tone(1046,.25,"triangle",.18,1,.2)},
+  treasure:()=>{[784,988,1175,1568].forEach((f,i)=>tone(f,.3,"sine",.15,1,i*.08))},
+  place:()=>{tone(392,.1,"square",.08);tone(587,.18,"triangle",.18,1,.06)},
+  magic:()=>{for(let i=0;i<14;i++)tone(600+i*90,.25,"sine",.08,1.5,i*.06)},
+  poof:()=>{noise(.5,.2,300);tone(180,.5,"sine",.25,.4)},
+  roar:()=>{tone(140,.6,"sawtooth",.16,.6);tone(210,.5,"sawtooth",.1,.5,.05);noise(.4,.06,600)},
+  chomp:()=>{noise(.06,.18,500);noise(.06,.18,500,.14);noise(.06,.18,500,.28)},
+  yuck:()=>{tone(300,.35,"sawtooth",.1,.5)},
+  pop:()=>tone(880,.1,"sine",.2,1.8),
+  whoosh:()=>noise(.35,.1,1500),
+  egg:()=>{noise(.08,.2,900);tone(500,.1,"triangle",.12,1.5,.05)},
+  cheer:()=>{[523,659,784,1046].forEach((f,i)=>tone(f,.35,"triangle",.17,1,i*.11))},
+  sleep:()=>{[523,440,392].forEach((f,i)=>tone(f,.5,"sine",.12,1,i*.35))}
+};
+const sfxOk = n => SFX[n] && SFX[n].length && SFX[n].some(a => a.readyState >= 2);
+function sfx(n, vol=1){
+  if (!S.sound) return;
+  if (sfxOk(n)) { const a = pick(SFX[n].filter(x => x.readyState >= 2)); try { a.currentTime = 0; a.volume = Math.min(1, vol); a.play().catch(()=>{}); } catch(e) {} }
+  else if (SYN[n]) SYN[n]();
+}
+/* Musik */
+const MUS = {};
+let musNow = null;
+function music(name){
+  if (musNow === name) return; musNow = name;
+  Object.entries(MUS).forEach(([k,a]) => { if (k !== name) fadeTo(a, 0, () => a.pause()); });
+  if (!S.sound || !name) return;
+  let a = MUS[name];
+  if (!a) { a = MUS[name] = new Audio(`sfx/music_${name}.mp3`); a.loop = true; a.volume = 0; }
+  a.play().then(() => fadeTo(a, name === "night" ? .32 : .26)).catch(()=>{});
+}
+function fadeTo(a, v, done){ const s = a.volume, t0 = performance.now(); const f = t => { const k = Math.min(1, (t - t0)/700); a.volume = Math.max(0, Math.min(1, s + (v - s)*k)); if (k < 1) requestAnimationFrame(f); else if (done) done(); }; requestAnimationFrame(f); }
+function duck(on){ Object.values(MUS).forEach(a => { if (!a.paused) a.volume = on ? .08 : (musNow === "night" ? .32 : .26); }); }
+
+/* ===================== Stimme (ElevenLabs, sonst Gerätestimme) ===================== */
+const VOX = /*@@VOX*/{"Dino-Buddler! Tippe auf den grünen Knopf!":"842e2ccb9d","Hallo! Ich bin Buddel. Hier im Sand sind Dinos versteckt. Tippe auf die Schaufel und grab sie aus!":"6410c8bf7d","Willkommen zurück! Deine Dinos haben dich vermisst!":"c947bbb139","Tippe auf die Schaufel. Wir graben einen neuen Dino aus!":"d8c65ed8a4","Wisch mit dem Finger über den Sand!":"47f84b5d04","Weiter wischen! Da ist bestimmt noch etwas!":"80d098aa60","Ein Knochen!":"56c9d8cc03","Noch ein Knochen!":"73f9b069d4","Super gefunden!":"2cca5c426c","Toll gemacht!":"e04be1b851","Alle Knochen gefunden! Jetzt bauen wir den Dino zusammen!":"64e849a046","Zieh die Knochen an die richtige Stelle!":"cfb49e841c","Passt!":"048d5f5654","Super!":"7265776574","Richtig!":"392ebbbab3","Klasse!":"70f3a80d43","Fertig! Und jetzt der Dino-Zauber!":"bbe539349e","Ab in den Park!":"83512fdad2","Zieh das Futter zu einem Dino!":"9dba9a4b43","Mmmh, lecker!":"941c260fd9","Mein Lieblingsessen!":"ba4b4883e8","Danke!":"f4613d2841","Bäh! Ich fresse nur Pflanzen!":"359e7047c3","Bäh! Ich fresse lieber Fleisch und Fisch!":"8a8aa12ccd","Gute Nacht, Dinos! Schlaft schön!":"3772d29bf8","Guten Morgen! Aufwachen!":"9a2a73f7de","Deine Schatzkiste!":"0e6da5b1c6","Diesen Schatz hast du noch nicht gefunden.":"d1fd7a5ef8","Diesen Dino musst du noch ausgraben!":"75f35b81dc","Wow! Du hast alle zehn Dinos gefunden! Du bist ein echter Dino-Forscher!":"fa0a76d8f8","Hihi, das kitzelt!":"a6aa5c368a","Schau mal, ein Überraschungs-Ei! Tippe drauf!":"30bda82e81","Ein Kostüm für deine Dinos!":"9c0d6c1a10","Such dir ein Kostüm aus!":"d66be50167","Das Kostüm findest du in einem Überraschungs-Ei.":"72a2e29921","Grab erst einen Dino aus, dann kannst du ihn verkleiden!":"eabae88af5","Ich hab dich lieb!":"9a19a4147a","Juhu! Ich bin so glücklich!":"8e75e39cb6","Tschüss! Bis bald!":"279d5bc70c","Ich bin Rexi, ein T-Rex! Ich habe ganz kleine Ärmchen, aber einen riesigen Kopf.":"b96b67ca55","Ich bin Trixi, ein Triceratops! Ich habe drei Hörner.":"d0637351fe","Ich bin Stegi, ein Stegosaurus! Auf meinem Rücken habe ich große Platten.":"716d1bf2aa","Ich bin Flatter, ein Flugsaurier! Ich fliege hoch über das Meer.":"2871b18836","Ich bin Lotte, ein Brachiosaurus! Mit meinem langen Hals komme ich an die höchsten Blätter.":"c9e09d90db","Ich bin Anki, ein Ankylosaurus! Ich habe einen Panzer und eine Keule am Schwanz.":"45f183dc5f","Ich bin Tröti, ein Parasaurolophus! Mit meinem Kamm kann ich tröten wie eine Trompete.":"0c3edbe585","Ich bin Flitzi, ein Velociraptor! Ich bin superschnell und habe Federn.":"24452c675f","Ich bin Spino, ein Spinosaurus! Ich schwimme gern und fange Fische.":"f99e05ee8f","Ich bin Bummi, ein Pachycephalosaurus! Mein Kopf ist hart wie ein Helm.":"b3b500066c","Hurra! Rexi lebt!":"831497ef17","Hurra! Trixi lebt!":"826ab4aca1","Hurra! Stegi lebt!":"58ad316f18","Hurra! Flatter lebt!":"293a42f275","Hurra! Lotte lebt!":"80a6c3177b","Hurra! Anki lebt!":"e1c902cdc6","Hurra! Tröti lebt!":"c8764163df","Hurra! Flitzi lebt!":"a0595ec9c0","Hurra! Spino lebt!":"b501147590","Hurra! Bummi lebt!":"8d6b2a4663","Ein Bernstein! Das ist uraltes Baumharz.":"ef8712bc34","Ein Ammonit! Das war ein Meerestier mit Schneckenhaus.":"fc1d3cb72f","Ein Trilobit! Der krabbelte schon vor den Dinos durchs Meer.":"c094ee1152","Ein Haizahn! Der ist ganz schön spitz.":"d8416c8631","Ein Kristall! Der funkelt so schön.":"50b7f0e23d","Ein Goldklumpen! Wir sind reich!":"fe4b28fe98","Ein versteinertes Blatt! Das ist Millionen Jahre alt.":"8cf2208c6a","Ein Dino-Fußabdruck! Der ist riesig!":"dfb8718089","Ich bin Rexi, ein T-Rex!":"0a7e639c91","Ich bin Trixi, ein Triceratops!":"275ddc81d0","Ich bin Stegi, ein Stegosaurus!":"dd47fc4e48","Ich bin Flatter, ein Flugsaurier!":"af76d8f82b","Ich bin Lotte, ein Brachiosaurus!":"b8b36c7159","Ich bin Anki, ein Ankylosaurus!":"416593093e","Ich bin Tröti, ein Parasaurolophus!":"0e6e867f24","Ich bin Flitzi, ein Velociraptor!":"eb471d91de","Ich bin Spino, ein Spinosaurus!":"17ddfc1183","Ich bin Bummi, ein Pachycephalosaurus!":"66af8dffa0"}/*@@VOX-END*/;
+let vxCur = null, vxTok = 0, lastSay = "";
+const bud = $("#buddel"), bubble = $("#bubble");
+function talking(on){ bud.classList.toggle("talk", on); bubble.classList.toggle("on", on); duck(on); }
+function say(t, opt={}){
+  if (!t) return; lastSay = t;
+  vxTok++; const tok = vxTok;
+  if (vxCur) { try { vxCur.pause(); } catch(e) {} vxCur = null; }
+  try { speechSynthesis.cancel(); } catch(e) {}
+  if (!S.sound) return;
+  const id = VOX[t];
+  if (id) {
+    const a = new Audio(`voice/${id}.mp3`); vxCur = a; talking(true);
+    a.onended = a.onerror = () => { if (tok === vxTok) { talking(false); vxCur = null; if (opt.done) opt.done(); } };
+    a.play().catch(() => { talking(false); });
+    return;
+  }
+  try {
+    const u = new SpeechSynthesisUtterance(t); u.lang = "de-DE"; u.rate = .92; u.pitch = 1.25;
+    const v = speechSynthesis.getVoices().find(v => /^de/i.test(v.lang)); if (v) u.voice = v;
+    u.onend = () => { if (tok === vxTok) { talking(false); if (opt.done) opt.done(); } };
+    talking(true); speechSynthesis.speak(u);
+    setTimeout(() => { if (tok === vxTok && !speechSynthesis.speaking) talking(false); }, 6000);
+  } catch(e) {}
+}
+bud.addEventListener("pointerdown", () => { sfx("tap"); budPose(2, 1200); say(lastSay || T.hello); });
+const budImg = $("#budImg"); let budT = 0;
+function budPose(n, ms){ budImg.src = `assets/buddel_${n}.webp`; clearTimeout(budT); if (ms) budT = setTimeout(() => budImg.src = `assets/buddel_${S.night && cur === "park" ? 4 : 1}.webp`, ms); }
+
+/* ===================== Bildschirme ===================== */
+let cur = "";
+function show(id){
+  $$(".scr").forEach(s => s.classList.toggle("on", s.id === id)); cur = id;
+  bud.style.display = bubble.style.display = (id === "title") ? "none" : "";
+  document.body.classList.toggle("bud-top", id === "dig" || id === "puz");
+  if (id === "park") { music(S.night ? "night" : "park"); parkEnter(); }
+  else if (id === "dig") music("dig");
+  else if (id === "puz") music("dig");
+  else music("park");
+}
+function exitGame(){ say(T.bye); setTimeout(() => { if (/\/games\//.test(location.pathname)) location.href = "/kids/"; else history.back(); }, 900); }
+$("#exit1").onclick = $("#exit2").onclick = () => { sfx("tap"); exitGame(); };
+$("#snd").onclick = () => { S.sound = S.sound ? 0 : 1; save(); $("#sndw").style.display = S.sound ? "" : "none"; if (!S.sound) { Object.values(MUS).forEach(a => a.pause()); musNow = null; try { speechSynthesis.cancel(); } catch(e) {} } else { sfx("tap"); music(S.night ? "night" : "park"); } };
+$("#sndw").style.display = S.sound ? "" : "none";
+$("#play").onclick = () => { ac(); sfx("pop"); show("park"); };
+$$("[data-close]").forEach(b => b.onclick = () => { sfx("tap"); b.closest(".ov").classList.remove("on"); });
+
+/* ===================== Park ===================== */
+const dinosEl = $("#dinos"), strip = $("#strip");
+const actors = [];
+function dinoSize(d){ const base = Math.min(H*.25, W*(W > H ? .2 : .36)); return base * d.h; }
+function makeActor(d, enter){
+  const el = document.createElement("div"); el.className = "dino" + (d.fly ? " fly" : "");
+  el.innerHTML = `<div class="shadow"></div><div class="in"><img class="body" src="assets/dino_${d.id}.webp" alt="${d.name}"></div>`;
+  dinosEl.appendChild(el);
+  const img = el.querySelector("img"), a = {d, el, inner: el.querySelector(".in"), img, x: rnd(.15,.85)*W, y: 0, dir: Math.random() < .5 ? -1 : 1, v: rnd(.4,.9), wait: rnd(0,3), t: rnd(0,10), jump: 0, ar: 1, eat: 0, nope: 0, dance: 0};
+  img.onload = () => { a.ar = img.naturalWidth / img.naturalHeight; layoutActor(a); };
+  if (enter) { a.x = -dinoSize(d); a.dir = 1; a.wait = 0; a.enter = W*.4; }
+  a.lane = Math.random();
+  layoutActor(a); wearAcc(a);
+  el.addEventListener("pointerdown", e => { e.stopPropagation(); tapDino(a); });
+  actors.push(a);
+  return a;
+}
+function layoutActor(a){
+  const h = dinoSize(a.d), w = h * a.ar;
+  a.w = w; a.h = h; a.el.style.width = w + "px"; a.el.style.height = h + "px";
+  a.inner.style.width = w + "px"; a.inner.style.height = h + "px";
+  a.y = a.d.fly ? H*(.16 + a.lane*.16) + h : H*(.6 + a.lane*.28);
+  a.y = Math.min(a.y, H - (W > H ? U*15 : U*20));
+  placeAcc(a);
+}
+function wearAcc(a){
+  let acc = a.el.querySelector(".acc");
+  const id = S.wear[a.d.id];
+  if (!id) { if (acc) acc.remove(); return; }
+  if (!acc) { acc = document.createElement("img"); acc.className = "acc"; a.inner.appendChild(acc); }
+  acc.src = `assets/acc_${id}.webp`; acc.dataset.k = id; placeAcc(a);
+}
+const ACC_FIT = {crown:[1,0.04],tophat:[.95,0.04],bow:[.9,.12],glasses:[1,0],party:[.7,0.04],hat:[1.2,.06]}; // Breite relativ zum Kopf, Verschiebung nach unten
+function placeAcc(a, box){
+  const acc = (box || a.el).querySelector(".acc"); if (!acc) return;
+  const w = box ? box.clientWidth : a.w, h = box ? box.clientHeight : a.h;
+  const [hx, hy, hw] = a.d.head, k = acc.dataset.k, f = ACC_FIT[k] || [1,0];
+  if (k === "glasses") { const [ex, ey] = a.d.eye, aw = Math.max(hw*w*.85, w*.16); acc.style.width = aw + "px"; acc.style.left = (ex*w - aw*.45) + "px"; acc.style.top = (ey*h - aw*.2) + "px"; return; }
+  const aw = hw * w * f[0];
+  acc.style.width = aw + "px"; acc.style.left = (hx*w - aw/2) + "px";
+  const ar = acc.naturalWidth ? acc.naturalHeight/acc.naturalWidth : .6;
+  acc.style.top = (hy*h - aw*ar*.8 + f[1]*aw) + "px";
+  if (!acc.naturalWidth && !acc.dataset.w8) { acc.dataset.w8 = 1; acc.addEventListener("load", () => placeAcc(a, box), {once: true}); }
+}
+function renderStrip(){
+  strip.innerHTML = DINOS.map(d => `<button class="${S.found.includes(d.id) ? "" : "no"}" data-id="${d.id}" aria-label="${d.name}"><img src="assets/dino_${d.id}.webp" alt=""></button>`).join("");
+  strip.querySelectorAll("button").forEach(b => b.onclick = () => {
+    const id = b.dataset.id;
+    if (!S.found.includes(id)) { sfx("tap"); say(T.dinoNo); return; }
+    const a = actors.find(x => x.d.id === id); if (a) tapDino(a);
+  });
+}
+function hearts(x, y, n=3){
+  for (let i = 0; i < n; i++) setTimeout(() => {
+    const h = document.createElement("img"); h.src = "assets/ic_heart.webp"; h.className = "heart";
+    h.style.left = x + rnd(-20,20) + "px"; h.style.top = y + "px"; h.style.setProperty("--dx", rnd(-40,40) + "px");
+    document.body.appendChild(h); setTimeout(() => h.remove(), 1400);
+  }, i*140);
+  sfx("pop", .6);
+}
+let tickles = {};
+function tapDino(a){
+  if (S.night) { sfx("sleep"); zz(a); return; }
+  a.jump = 1; sfx("roar", .8); hearts(a.x, a.y - a.h, 2);
+  tickles[a.d.id] = (tickles[a.d.id] || 0) + 1;
+  addLove(a, 1);
+  if (tickles[a.d.id] % 3 === 0) say(T.tickle); else say(INTRO[a.d.id]);
+}
+function addLove(a, n){
+  S.love[a.d.id] = (S.love[a.d.id] || 0) + n; save();
+  if (S.love[a.d.id] % 12 === 0) { a.dance = 2.4; setTimeout(() => { say(T.dance); sfx("cheer"); hearts(a.x, a.y - a.h, 6); }, 600); }
+}
+function zz(a){ const z = document.createElement("div"); z.className = "zz"; z.textContent = "Z"; z.style.left = (a.x + a.w*.3) + "px"; z.style.top = (a.y - a.h*.9) + "px"; dinosEl.appendChild(z); setTimeout(() => z.remove(), 2500); }
+let lastT = performance.now();
+function loop(t){
+  const dt = Math.min(.05, (t - lastT)/1000); lastT = t;
+  if (cur === "park") {
+    for (const a of actors) {
+      a.t += dt;
+      let bob = 0, rot = 0, sx = 1, sy = 1;
+      if (S.night) {
+        sy = .93 + Math.sin(a.t*1.2)*.02; sx = 1.04;
+        if (Math.random() < dt*.25) zz(a);
+      } else if (a.dance > 0) {
+        a.dance -= dt; bob = Math.abs(Math.sin(a.t*10))*a.h*.12; rot = Math.sin(a.t*10)*8;
+      } else if (a.eat > 0) {
+        a.eat -= dt; sy = 1 + Math.sin(a.t*22)*.05; sx = 1 - Math.sin(a.t*22)*.03;
+      } else if (a.nope > 0) {
+        a.nope -= dt; rot = Math.sin(a.t*30)*6;
+      } else {
+        if (a.wait > 0) { a.wait -= dt; sy = 1 + Math.sin(a.t*2.5)*.015; }
+        else {
+          const sp = a.v * U * (a.d.fly ? 12 : 8) * (a.enter !== undefined ? 4 : 1);
+          a.x += a.dir * sp * dt;
+          bob = a.d.fly ? Math.sin(a.t*2)*U*2 : Math.abs(Math.sin(a.t*7))*U*.7;
+          rot = a.d.fly ? Math.sin(a.t*2)*4 : Math.sin(a.t*7)*2;
+          if (a.enter !== undefined) { if (a.x >= a.enter) { a.enter = undefined; a.wait = 1.5; a.jump = 1; } }
+          else if (Math.random() < dt*.25) { a.wait = rnd(1,4); if (Math.random() < .5) a.dir *= -1; }
+          const m = a.w*.5;
+          if (a.x < m && a.enter === undefined) { a.x = m; a.dir = 1; }
+          if (a.x > W - m) { a.x = W - m; a.dir = -1; }
+        }
+      }
+      if (a.jump > 0) { a.jump -= dt*2.2; bob += Math.sin(Math.max(0,a.jump)*Math.PI)*a.h*.25; }
+      a.el.style.transform = `translate(${a.x - a.w/2}px,${a.y - a.h - bob}px)`;
+      a.el.style.zIndex = Math.round(a.y);
+      a.inner.style.transform = `scale(${a.dir*sx},${sy}) rotate(${rot*a.dir}deg)`;
+    }
+  }
+  if (cur === "dig") digLoop(dt);
+  confLoop(dt);
+  requestAnimationFrame(loop);
+}
+let parkBuilt = false;
+function buildPark(){
+  dinosEl.innerHTML = ""; actors.length = 0;
+  S.found.forEach(id => makeActor(D(id)));
+  renderStrip(); parkBuilt = true;
+}
+function parkEnter(newId){
+  if (!parkBuilt) buildPark();
+  setNight(S.night, true);
+  $("#bDig").classList.toggle("pulse", S.found.length < DINOS.length || true);
+  updEgg();
+  const first = !S.last, newDay = S.last && S.last !== today();
+  if (pendingNew) { const a = makeActor(D(pendingNew), true); renderStrip(); setTimeout(() => { say(INTRO[pendingNew]); budPose(2, 2500); }, 900); pendingNew = null; if (S.found.length === DINOS.length) setTimeout(() => { say(T.allDinos); sfx("cheer"); confetti(); }, 6500); }
+  else if (first) { setTimeout(() => { say(T.hello); budPose(3, 4000); }, 400); }
+  else if (newDay) { setTimeout(() => { say(T.back); budPose(2, 3000); actors.forEach(a => { a.jump = 1; }); }, 500); }
+  else if (!S.found.length) setTimeout(() => say(T.digHint), 400);
+  S.last = today(); save();
+}
+let pendingNew = null;
+function setNight(on, quiet){
+  S.night = on ? 1 : 0; save();
+  $("#park").classList.toggle("night", !!on);
+  $("#nightIc").src = on ? "assets/ic_sun.webp" : "assets/ic_moon.webp";
+  budPose(on ? 4 : 1);
+  if (!quiet) { if (on) { say(T.night); sfx("sleep"); } else { say(T.day); sfx("cheer"); actors.forEach(a => a.jump = 1); } music(on ? "night" : "park"); }
+}
+$("#bNight").onclick = () => { setNight(!S.night); };
+(function makeStars(){ const s = $("#stars"); for (let i = 0; i < 60; i++) { const e = document.createElement("i"); e.style.left = rnd(0,100) + "%"; e.style.top = rnd(0,50) + "%"; e.style.animationDelay = rnd(0,2) + "s"; const z = rnd(2,5); e.style.width = e.style.height = z + "px"; s.appendChild(e); } })();
+/* Futter */
+const tray = $("#tray");
+tray.innerHTML = FOODS.map(f => `<div class="food" data-f="${f.id}"><img src="assets/food_${f.id}.webp" alt=""></div>`).join("");
+$("#bFood").onclick = () => {
+  sfx("tap"); if (S.night) setNight(false);
+  if (!S.found.length) { say(T.digHint); return; }
+  const on = !tray.classList.contains("on"); tray.classList.toggle("on", on); if (on) say(T.feed);
+};
+tray.querySelectorAll(".food").forEach(f => f.addEventListener("pointerdown", e => {
+  e.preventDefault(); sfx("tap");
+  const id = f.dataset.f, g = document.createElement("div"); g.className = "drag"; g.innerHTML = `<img src="assets/food_${id}.webp" alt="">`;
+  document.body.appendChild(g);
+  const mv = ev => { g.style.left = ev.clientX + "px"; g.style.top = ev.clientY + "px"; };
+  mv(e);
+  const up = ev => {
+    removeEventListener("pointermove", mv); removeEventListener("pointerup", up); removeEventListener("pointercancel", up); g.remove();
+    let best = null, bd = 1e9;
+    for (const a of actors) { const r = a.el.getBoundingClientRect(); if (ev.clientX > r.left - 20 && ev.clientX < r.right + 20 && ev.clientY > r.top - 20 && ev.clientY < r.bottom + 20) { const d = Math.hypot(ev.clientX - (r.left + r.right)/2, ev.clientY - (r.top + r.bottom)/2); if (d < bd) { bd = d; best = a; } } }
+    if (best) feed(best, id);
+  };
+  addEventListener("pointermove", mv); addEventListener("pointerup", up); addEventListener("pointercancel", up);
+}));
+function feed(a, f){
+  const food = FOODS.find(x => x.id === f);
+  if (food.type !== a.d.diet) { a.nope = .8; sfx("yuck"); say(a.d.diet === "h" ? T.noMeat : T.noPlant); return; }
+  a.eat = 1.2; sfx("chomp");
+  const fav = f === a.d.fav;
+  setTimeout(() => { hearts(a.x, a.y - a.h, fav ? 6 : 3); say(fav ? T.yum[1] : pick([T.yum[0], T.yum[2]])); if (fav) a.dance = 1.6; }, 700);
+  addLove(a, fav ? 3 : 2);
+}
+/* Tages-Ei */
+const nest = $("#nest");
+function updEgg(){
+  const has = S.found.length > 0 && S.egg !== today();
+  nest.classList.toggle("on", has);
+  if (has) { nest.style.left = (W*.12) + "px"; nest.style.top = (H*.62 - U*8) + "px"; }
+  $("#bWard").querySelector(".badge")?.remove();
+}
+nest.onclick = () => { sfx("egg"); openEgg(); };
+function openEgg(){
+  const ov = $("#eggOv"), eg = $("#eggImg"), pr = $("#eggPrize");
+  ov.classList.add("on"); eg.style.opacity = 1; eg.style.transform = ""; pr.style.opacity = 0; pr.style.transform = "scale(.2)";
+  let taps = 0; say(T.egg);
+  $("#eggBig").onclick = () => {
+    taps++; sfx("egg"); eg.classList.remove("crack"); void eg.offsetWidth; eg.classList.add("crack");
+    if (taps < 3) return;
+    $("#eggBig").onclick = null;
+    const next = ACCS.find(a => !S.accs.includes(a));
+    S.egg = today();
+    if (next) { S.accs.push(next); pr.src = `assets/acc_${next}.webp`; }
+    else { const t = TREAS.find(x => !S.treas.includes(x.id)) || pick(TREAS); if (!S.treas.includes(t.id)) S.treas.push(t.id); pr.src = `assets/tr_${t.id}.webp`; }
+    save();
+    sfx("poof"); eg.style.transition = "all .4s"; eg.style.opacity = 0; eg.style.transform = "scale(1.4)";
+    pr.style.transition = "all .5s cubic-bezier(.3,1.6,.5,1)"; setTimeout(() => { pr.style.opacity = 1; pr.style.transform = "scale(1)"; sfx("cheer"); confetti(); say(next ? T.eggOpen : T.chest); }, 250);
+    setTimeout(() => { ov.classList.remove("on"); updEgg(); if (next) openWardrobe(next); }, 3200);
+  };
+}
+/* Verkleiden */
+let wSel = null;
+function openWardrobe(preAcc){
+  sfx("tap");
+  if (!S.found.length) { say(T.wardEmpty); return; }
+  const ov = $("#wardrobe"); ov.classList.add("on");
+  wSel = wSel && S.found.includes(wSel) ? wSel : S.found[S.found.length - 1];
+  if (preAcc) S.wear[wSel] = preAcc;
+  say(T.ward);
+  renderWard();
+}
+function renderWard(){
+  const d = D(wSel), st = $("#wStage");
+  st.innerHTML = `<div style="position:absolute;inset:0;display:grid;place-items:end center"><div class="wbox" style="position:relative;height:100%;"><img src="assets/dino_${d.id}.webp" style="height:100%;display:block" alt=""></div></div>`;
+  const box = st.querySelector(".wbox"), img = box.querySelector("img");
+  const put = () => { box.style.width = img.clientWidth + "px"; const id = S.wear[d.id]; if (id) { const acc = document.createElement("img"); acc.className = "acc"; acc.style.position = "absolute"; acc.dataset.k = id; acc.src = `assets/acc_${id}.webp`; box.appendChild(acc); placeAcc({d}, box); } };
+  if (img.complete) put(); else img.onload = put;
+  $("#wAcc").innerHTML = `<button class="cell ${S.wear[d.id] ? "" : "sel"}" data-a="" aria-label="Kein Kostüm"><svg viewBox="0 0 24 24" width="50%"><circle cx="12" cy="12" r="8" fill="none" stroke="#d1a36d" stroke-width="2.4"/><path d="M6.5 6.5l11 11" stroke="#d1a36d" stroke-width="2.4"/></svg></button>` +
+    ACCS.map(a => `<button class="cell ${S.accs.includes(a) ? "" : "no"} ${S.wear[d.id] === a ? "sel" : ""}" data-a="${a}"><img src="assets/acc_${a}.webp" alt=""></button>`).join("");
+  $("#wDinos").innerHTML = S.found.map(id => `<button class="cell ${id === wSel ? "sel" : ""}" data-d="${id}"><img src="assets/dino_${id}.webp" alt=""></button>`).join("");
+  $$("#wAcc .cell").forEach(b => b.onclick = () => {
+    const a = b.dataset.a;
+    if (a && !S.accs.includes(a)) { sfx("tap"); say(T.wardNo); return; }
+    sfx(a ? "pop" : "tap"); if (a) S.wear[d.id] = a; else delete S.wear[d.id]; save(); renderWard();
+    const act = actors.find(x => x.d.id === d.id); if (act) wearAcc(act);
+    if (a) { hearts(innerWidth/2, innerHeight*.4, 3); }
+  });
+  $$("#wDinos .cell").forEach(b => b.onclick = () => { sfx("tap"); wSel = b.dataset.d; renderWard(); say(INTRO[wSel].split("!")[0] + "!"); });
+}
+$("#bWard").onclick = () => openWardrobe();
+/* Schatzkiste */
+$("#bChest").onclick = () => {
+  sfx("tap"); $("#chestOv").classList.add("on"); say(T.chest);
+  $("#chestGrid").innerHTML = TREAS.map(t => `<button class="cell ${S.treas.includes(t.id) ? "" : "no"}" data-t="${t.id}"><img src="assets/tr_${t.id}.webp" alt=""></button>`).join("");
+  $$("#chestGrid .cell").forEach(b => b.onclick = () => { const t = TREAS.find(x => x.id === b.dataset.t); sfx(S.treas.includes(t.id) ? "treasure" : "tap"); say(S.treas.includes(t.id) ? t.say : T.chestNo); });
+};
+$("#bDig").onclick = () => { sfx("whoosh"); tray.classList.remove("on"); if (S.night) setNight(false, true); startDig(); };
+
+/* ===================== Graben ===================== */
+const pit = $("#pit"), sand = $("#sand"), sx = sand.getContext("2d"), fx = $("#fx"), fxx = fx.getContext("2d"), itemsEl = $("#items"), brush = $("#brush"), foundEl = $("#found");
+let dig = null, sandImg = null, skelCache = {};
+function nextDino(){ const left = DINOS.filter(d => !S.found.includes(d.id)); return left.length ? left[0] : pick(DINOS); }
+function loadImg(src){ return new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; }); }
+/* Skelett in 4 Teile schneiden (gleich viel Knochen pro Teil) */
+async function pieces(id){
+  if (skelCache[id]) return skelCache[id];
+  const img = await loadImg(`assets/skel_${id}.webp`);
+  const w = img.naturalWidth, h = img.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
+  const x = c.getContext("2d"); x.drawImage(img, 0, 0);
+  const a = x.getImageData(0, 0, w, h).data, col = new Float64Array(w);
+  for (let i = 0; i < w; i++) for (let j = 0; j < h; j += 2) col[i] += a[(j*w + i)*4 + 3];
+  const tot = col.reduce((s,v) => s + v, 0); let acc = 0; const cuts = [0];
+  for (let i = 0; i < w && cuts.length < 4; i++) { acc += col[i]; if (acc >= tot*cuts.length/4) cuts.push(i); }
+  cuts.push(w);
+  const out = [];
+  for (let k = 0; k < 4; k++) {
+    const x0 = cuts[k], x1 = cuts[k+1], pc = document.createElement("canvas"); pc.width = Math.max(1, x1 - x0); pc.height = h;
+    pc.getContext("2d").drawImage(c, x0, 0, x1 - x0, h, 0, 0, x1 - x0, h);
+    // obere/untere leere Zeilen merken
+    const pd = pc.getContext("2d").getImageData(0, 0, pc.width, h).data; let top = h, bot = 0;
+    for (let j = 0; j < h; j++) for (let i = 0; i < pc.width; i += 2) if (pd[(j*pc.width + i)*4 + 3] > 30) { if (j < top) top = j; if (j > bot) bot = j; break; }
+    out.push({c: pc, x0, x1, top, bot, w: x1 - x0, h});
+  }
+  return skelCache[id] = {img, w, h, parts: out};
+}
+const clone = (cv) => { const c = document.createElement("canvas"); c.width = cv.width; c.height = cv.height; c.getContext("2d").drawImage(cv, 0, 0); return c; };
+async function startDig(){
+  show("dig");
+  const d = nextDino(), sk = await pieces(d.id);
+  if (!sandImg) sandImg = await loadImg("assets/sand.webp");
+  // Grube anlegen
+  const ar = W > H ? 1.45 : .8, top = (W > H ? U*4 : U*15), bottom = U*14, avW = W - U*4, avH = H - top - bottom - (W > H ? 0 : U*2);
+  let pw = Math.min(avW, avH*ar), ph = pw/ar; if (ph > avH) { ph = avH; pw = ph*ar; }
+  Object.assign(pit.style, {width: pw + "px", height: ph + "px", left: (W - pw)/2 + "px", top: top + (avH - ph)/2 + "px"});
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  [sand, fx].forEach(c => { c.width = pw*dpr; c.height = ph*dpr; });
+  sx.setTransform(dpr,0,0,dpr,0,0); fxx.setTransform(dpr,0,0,dpr,0,0);
+  drawSand(pw, ph);
+  // Fundstücke verteilen
+  itemsEl.innerHTML = ""; foundEl.innerHTML = "";
+  const list = [];
+  const sc = (pw*.62)/sk.w; // ganzes Skelett ~62 % der Breite
+  sk.parts.forEach((p, k) => list.push({type:"bone", k, c: p.c, w: p.w*sc, h: p.h*sc, part: p}));
+  const tr = TREAS.find(t => !S.treas.includes(t.id)) || (Math.random() < .4 ? pick(TREAS) : null);
+  if (tr) list.push({type:"treas", t: tr, w: pw*.13, h: pw*.13});
+  // Plätze: Raster mit Zufall, keine Überlappung
+  const placed = [];
+  for (const it of list) {
+    let best = null;
+    for (let tries = 0; tries < 80; tries++) {
+      const rot = it.type === "bone" ? rnd(-35,35) : rnd(-15,15);
+      const bw = Math.min(it.w, pw*.4), bh = it.h*(bw/it.w);
+      const x = rnd(bw*.55, pw - bw*.55), y = rnd(bh*.5, ph - bh*.5);
+      const box = {x: x - bw/2, y: y - bh/2, w: bw, h: bh};
+      const ov = placed.reduce((s, b) => s + Math.max(0, Math.min(b.x + b.w, box.x + box.w) - Math.max(b.x, box.x)) * Math.max(0, Math.min(b.y + b.h, box.y + box.h) - Math.max(b.y, box.y)), 0);
+      if (!best || ov < best.ov) best = {box, rot, ov, bw, bh};
+      if (ov === 0) break;
+    }
+    placed.push(best.box); Object.assign(it, best);
+    const el = document.createElement("div"); el.className = "item";
+    Object.assign(el.style, {left: best.box.x + "px", top: best.box.y + "px", width: best.bw + "px", height: best.bh + "px", transform: `rotate(${best.rot}deg)`});
+    if (it.type === "bone") el.appendChild(clone(it.c)); else { const im = new Image(); im.src = `assets/tr_${it.t.id}.webp`; el.appendChild(im); }
+    itemsEl.appendChild(el); it.el = el;
+    // Slot unten
+    const s = document.createElement("div"); s.className = "slot"; foundEl.appendChild(s); it.slot = s;
+  }
+  // Raster für „freigelegt?“
+  const cs = Math.max(8, pw/60), gw = Math.ceil(pw/cs), gh = Math.ceil(ph/cs);
+  dig = {d, sk, list, pw, ph, cs, gw, gh, grid: new Uint8Array(gw*gh), idle: 0, last: null, done: false, dust: [], n: 0, sparks: []};
+  for (const it of list) {
+    const b = it.box, cells = [];
+    for (let gy = Math.floor((b.y + b.h*.2)/cs); gy <= Math.floor((b.y + b.h*.8)/cs); gy++) for (let gx = Math.floor((b.x + b.w*.2)/cs); gx <= Math.floor((b.x + b.w*.8)/cs); gx++) if (gx >= 0 && gy >= 0 && gx < gw && gy < gh) cells.push(gy*gw + gx);
+    it.cells = cells; it.got = false;
+  }
+  setTimeout(() => { say(T.digStart); budPose(3, 3000); }, 300);
+}
+function drawSand(w, h){
+  sx.globalCompositeOperation = "source-over";
+  if (sandImg) { const k = Math.max(w/sandImg.width, h/sandImg.height); sx.drawImage(sandImg, (w - sandImg.width*k)/2, (h - sandImg.height*k)/2, sandImg.width*k, sandImg.height*k); }
+  else { sx.fillStyle = "#e8c08a"; sx.fillRect(0, 0, w, h); }
+  // Hügel-Schattierung und Körnchen
+  const g = sx.createRadialGradient(w*.5, h*.45, h*.1, w*.5, h*.5, w*.7); g.addColorStop(0, "rgba(255,240,200,.25)"); g.addColorStop(1, "rgba(120,70,20,.28)");
+  sx.fillStyle = g; sx.fillRect(0, 0, w, h);
+  for (let i = 0; i < 260; i++) { sx.fillStyle = `rgba(${pick(["140,90,40","255,235,190","110,70,30"])},${rnd(.15,.4)})`; sx.beginPath(); sx.arc(rnd(0,w), rnd(0,h), rnd(1,3.5), 0, 7); sx.fill(); }
+}
+let brushing = false;
+function digAt(x, y){
+  const r = Math.max(dig.pw, dig.ph)*.062;
+  sx.globalCompositeOperation = "destination-out";
+  const g = sx.createRadialGradient(x, y, r*.35, x, y, r); g.addColorStop(0, "rgba(0,0,0,.9)"); g.addColorStop(1, "rgba(0,0,0,0)");
+  sx.fillStyle = g; sx.beginPath(); sx.arc(x, y, r, 0, 7); sx.fill();
+  const cs = dig.cs, rr = r*.7;
+  for (let gy = Math.floor((y - rr)/cs); gy <= Math.floor((y + rr)/cs); gy++) for (let gx = Math.floor((x - rr)/cs); gx <= Math.floor((x + rr)/cs); gx++) {
+    if (gx < 0 || gy < 0 || gx >= dig.gw || gy >= dig.gh) continue;
+    if (Math.hypot((gx + .5)*cs - x, (gy + .5)*cs - y) < rr) dig.grid[gy*dig.gw + gx] = Math.min(255, dig.grid[gy*dig.gw + gx] + 1);
+  }
+  for (let i = 0; i < 2; i++) dig.dust.push({x, y, vx: rnd(-80,80), vy: rnd(-140,-40), life: rnd(.4,.8), t: 0, r: rnd(2,5)});
+}
+sand.addEventListener("pointerdown", e => { if (!dig || dig.done) return; ac(); brushing = true; sand.setPointerCapture(e.pointerId); const p = pitXY(e); dig.last = p; digAt(p.x, p.y); moveBrush(e, true); });
+sand.addEventListener("pointermove", e => {
+  moveBrush(e, brushing);
+  if (!brushing || !dig || dig.done) return;
+  const p = pitXY(e), l = dig.last || p, dist = Math.hypot(p.x - l.x, p.y - l.y), steps = Math.max(1, dist/(dig.pw*.02));
+  for (let i = 1; i <= steps; i++) digAt(l.x + (p.x - l.x)*i/steps, l.y + (p.y - l.y)*i/steps);
+  dig.last = p; dig.idle = 0;
+  if (performance.now() - (dig.bt || 0) > 1000) { dig.bt = performance.now(); sfx("brush", .55); }
+});
+const endBrush = () => { brushing = false; if (dig) dig.last = null; };
+sand.addEventListener("pointerup", endBrush); sand.addEventListener("pointercancel", endBrush);
+sand.addEventListener("pointerleave", () => { brush.style.display = "none"; });
+function pitXY(e){ const r = pit.getBoundingClientRect(); return {x: e.clientX - r.left, y: e.clientY - r.top}; }
+function moveBrush(e, down){ brush.style.display = "block"; brush.style.left = (e.clientX - U*2) + "px"; brush.style.top = (e.clientY - U*9) + "px"; brush.style.transform = `rotate(${down ? Math.sin(performance.now()/60)*14 - 20 : -20}deg)`; }
+function digLoop(dt){
+  if (!dig) return;
+  dig.idle += dt;
+  if (!dig.done && dig.idle > 9) { dig.idle = -6; say(T.digIdle); budPose(3, 2500); hintPulse(); }
+  // Fortschritt prüfen
+  for (const it of dig.list) {
+    if (it.got) continue;
+    const cl = it.cells.filter(c => dig.grid[c] > 0).length;
+    if (cl >= it.cells.length*.5) collect(it);
+  }
+  // Staub
+  const w = dig.pw, h = dig.ph; fxx.clearRect(0, 0, w, h);
+  dig.dust = dig.dust.filter(p => (p.t += dt) < p.life);
+  for (const p of dig.dust) { p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 300*dt; fxx.fillStyle = `rgba(214,160,96,${1 - p.t/p.life})`; fxx.beginPath(); fxx.arc(p.x, p.y, p.r, 0, 7); fxx.fill(); }
+  dig.sparks = dig.sparks.filter(p => (p.t += dt) < p.life);
+  for (const p of dig.sparks) { p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 120*dt; const a = 1 - p.t/p.life; fxx.fillStyle = `rgba(255,${200 + Math.random()*55|0},90,${a})`; star(fxx, p.x, p.y, p.r*(1 + p.t)); }
+}
+function star(c, x, y, r){ c.beginPath(); for (let i = 0; i < 10; i++) { const a = i*Math.PI/5 - Math.PI/2, rr = i % 2 ? r*.45 : r; c.lineTo(x + Math.cos(a)*rr, y + Math.sin(a)*rr); } c.fill(); }
+function hintPulse(){ const it = dig.list.find(i => !i.got); if (!it) return; const b = it.box; for (let i = 0; i < 14; i++) dig.sparks.push({x: b.x + b.w/2 + rnd(-b.w/3, b.w/3), y: b.y + b.h/2 + rnd(-b.h/3, b.h/3), vx: rnd(-30,30), vy: rnd(-60,-10), life: 1.2, t: 0, r: rnd(3,6)}); }
+function collect(it){
+  it.got = true;
+  // Rest-Sand über dem Fund wegpusten
+  const b = it.box; sx.globalCompositeOperation = "destination-out"; sx.fillStyle = "rgba(0,0,0,.85)";
+  sx.beginPath(); sx.ellipse(b.x + b.w/2, b.y + b.h/2, b.w*.62, b.h*.62, 0, 0, 7); sx.fill();
+  for (let i = 0; i < 24; i++) dig.sparks.push({x: b.x + b.w/2, y: b.y + b.h/2, vx: rnd(-160,160), vy: rnd(-220,-40), life: rnd(.6,1.1), t: 0, r: rnd(3,7)});
+  const isT = it.type === "treas";
+  sfx(isT ? "treasure" : "bone");
+  if (isT) { if (!S.treas.includes(it.t.id)) S.treas.push(it.t.id); save(); say(it.t.say); }
+  else { const n = dig.list.filter(i => i.type === "bone" && i.got).length; say(T.bone[Math.min(3, n - 1)]); }
+  budPose(2, 1500);
+  // in den Slot fliegen
+  setTimeout(() => {
+    const r = it.el.getBoundingClientRect(), s = it.slot.getBoundingClientRect(), f = document.createElement("div");
+    f.className = "fly"; Object.assign(f.style, {left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px"});
+    if (isT) { const im = new Image(); im.src = `assets/tr_${it.t.id}.webp`; im.style.cssText = "width:100%;height:100%;object-fit:contain"; f.appendChild(im); }
+    else { const c = clone(it.c); c.style.cssText = "width:100%;height:100%"; f.appendChild(c); }
+    document.body.appendChild(f); it.el.style.visibility = "hidden";
+    requestAnimationFrame(() => { const k = Math.min(s.width/r.width, s.height/r.height)*.8; Object.assign(f.style, {left: s.left + s.width/2 - r.width*k/2 + "px", top: s.top + s.height/2 - r.height*k/2 + "px", width: r.width*k + "px", height: r.height*k + "px"}); });
+    setTimeout(() => { f.remove(); it.slot.classList.add("got"); const c2 = isT ? Object.assign(new Image(), {src: `assets/tr_${it.t.id}.webp`}) : clone(it.c); const sw = it.slot.clientWidth*.86, k2 = Math.min(sw/it.w, sw/it.h); c2.style.cssText = isT ? "width:86%;height:86%;object-fit:contain" : `width:${it.w*k2}px;height:${it.h*k2}px`; it.slot.appendChild(c2); sfx("pop", .5); checkDigDone(); }, 850);
+  }, 650);
+}
+function checkDigDone(){
+  if (dig.done || dig.list.some(i => !i.got)) return;
+  dig.done = true; S.digs++; save();
+  setTimeout(() => { say(T.allBones); sfx("cheer"); budPose(2, 2500); }, 300);
+  setTimeout(() => startPuzzle(), 3300);
+}
+$("#back1").onclick = $("#back2").onclick = () => { sfx("tap"); dig = null; show("park"); };
+
+/* ===================== Puzzle ===================== */
+const board = $("#board"), ghost = $("#ghost");
+let puz = null;
+function startPuzzle(){
+  const d = dig.d, sk = dig.sk;
+  show("puz");
+  ["#magic","#alive"].forEach(s => $(s).style.opacity = 0);
+  $("#nextBtn").style.display = "none";
+  const land = W > H, maxW = land ? W*.55 : W*.9, maxH = land ? H*.44 : H*.34;
+  let bw = maxW, bh = bw*sk.h/sk.w; if (bh > maxH) { bh = maxH; bw = bh*sk.w/sk.h; }
+  const bx = (W - bw)/2, by = land ? H*.06 + U*2 : U*21;
+  Object.assign(board.style, {left: bx + "px", top: by + "px", width: bw + "px", height: bh + "px"});
+  ghost.src = sk.img.src;
+  board.querySelectorAll(".piece").forEach(p => p.remove());
+  const sc = bw/sk.w, list = [];
+  // Ablage: quer = Reihe unten (rechts von Buddel), hoch = 2x2 unten
+  const order = [0,1,2,3].sort(() => Math.random() - .5);
+  const trayTop = land ? by + bh + U*3 : by + bh + U*4, trayH = H - trayTop - U*3;
+  const x0 = land ? W*.2 : W*.04, x1 = W*.97, cols = land ? 4 : 2, rows = land ? 1 : 2;
+  const cw = (x1 - x0)/cols, ch = trayH/rows;
+  sk.parts.forEach((p, k) => {
+    const el = document.createElement("div"); el.className = "piece";
+    const w = p.w*sc, h = p.h*sc; el.style.width = w + "px"; el.style.height = h + "px";
+    el.appendChild(clone(p.c));
+    const slot = order.indexOf(k), cx = x0 + cw*(slot % cols) + cw/2, cy = trayTop + ch*Math.floor(slot/cols) + ch/2;
+    const ts = Math.min(1, (cw*.86)/w, (ch*.9)/h), rot = rnd(-14,14);
+    el.style.left = (cx - bx - w/2) + "px"; el.style.top = (cy - by - h/2) + "px";
+    el.style.transform = `rotate(${rot}deg) scale(${ts})`;
+    board.appendChild(el);
+    const pc = {el, tx: p.x0*sc, ty: 0, w, h, done: false, home: {l: cx - bx - w/2, t: cy - by - h/2, tf: `rotate(${rot}deg) scale(${ts})`}};
+    list.push(pc);
+    el.addEventListener("pointerdown", e => dragPiece(e, pc));
+  });
+  puz = {d, sk, list, bw, bh, bx, by, placed: 0};
+  setTimeout(() => { say(T.puzStart); budPose(3, 3000); }, 300);
+}
+function dragPiece(e, pc){
+  if (pc.done) return; e.preventDefault(); sfx("tap", .5);
+  const el = pc.el; el.classList.add("dragging"); el.style.transform = "none";
+  const r0 = board.getBoundingClientRect();
+  const at = ev => { el.style.left = (ev.clientX - r0.left - pc.w/2) + "px"; el.style.top = (ev.clientY - r0.top - pc.h/2) + "px"; };
+  at(e);
+  el.setPointerCapture(e.pointerId);
+  const mv = ev => at(ev);
+  const up = () => {
+    el.removeEventListener("pointermove", mv); el.removeEventListener("pointerup", up); el.removeEventListener("pointercancel", up);
+    el.classList.remove("dragging");
+    const x = parseFloat(el.style.left), y = parseFloat(el.style.top), dist = Math.hypot(x - pc.tx, y - pc.ty);
+    if (dist < Math.max(puz.bw*.18, U*10)) {
+      pc.done = true; el.classList.add("done"); el.style.left = pc.tx + "px"; el.style.top = pc.ty + "px"; el.style.transform = "none";
+      sfx("place"); puz.placed++;
+      const rr = el.getBoundingClientRect(); sparkleBurst(rr.left + rr.width/2, rr.top + rr.height/2, 14);
+      if (puz.placed === 4) setTimeout(magicTime, 500); else say(pick(T.placed));
+    } else { el.style.left = pc.home.l + "px"; el.style.top = pc.home.t + "px"; el.style.transform = pc.home.tf; sfx("whoosh", .4); }
+  };
+  el.addEventListener("pointermove", mv); el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+}
+function sparkleBurst(x, y, n){ for (let i = 0; i < n; i++) conf.push({x, y, vx: rnd(-260,260), vy: rnd(-380,-80), r: rnd(4,9), c: pick(["#ffd84a","#fff","#ffb43c","#7fe3ff"]), t: 0, life: rnd(.6,1.1), star: 1}); }
+async function magicTime(){
+  const d = puz.d, sk = puz.sk; say(T.magic); sfx("magic"); budPose(2, 4000);
+  // Skelett wackelt und leuchtet
+  board.animate([{transform: "rotate(0)", filter: "drop-shadow(0 0 0 #fff)"},{transform: "rotate(-2deg)"},{transform: "rotate(2deg)"},{transform: "rotate(0)", filter: "drop-shadow(0 0 30px #fff6a0)"}], {duration: 450, iterations: 4});
+  const r = board.getBoundingClientRect();
+  const spin = setInterval(() => sparkleBurst(r.left + rnd(0, r.width), r.top + rnd(0, r.height), 4), 70);
+  // lebender Dino in gleicher Größe/Position
+  const alive = $("#alive"), img = await loadImg(`assets/dino_${d.id}.webp`);
+  alive.src = img.src;
+  const ah = r.height*1.02*(d.id === "ptera" ? .95 : 1), aw = ah*img.naturalWidth/img.naturalHeight;
+  Object.assign(alive.style, {width: aw + "px", height: ah + "px", left: (r.left + r.width/2 - aw/2) + "px", top: (r.bottom - ah) + "px", transform: "scale(.6)", transition: "none", opacity: 0});
+  setTimeout(() => {
+    clearInterval(spin);
+    const fl = $("#flash"); fl.animate([{opacity: 0},{opacity: 1, offset: .3},{opacity: 0}], {duration: 900});
+    sfx("poof");
+    setTimeout(() => {
+      board.style.visibility = "hidden";
+      alive.style.opacity = 1;
+      alive.animate([{transform: "scale(.6)"},{transform: "scale(1.15) translateY(-8%)"},{transform: "scale(.95)"},{transform: "scale(1)"}], {duration: 800, easing: "ease-out", fill: "forwards"});
+      sfx("roar"); confetti();
+      if (!S.found.includes(d.id)) { S.found.push(d.id); save(); pendingNew = d.id; parkBuilt = parkBuilt && true; }
+      else pendingNew = null;
+      setTimeout(() => { say(ALIVE[d.id]); }, 700);
+      setTimeout(() => { $("#nextBtn").style.display = "grid"; say(T.toPark); }, 3200);
+    }, 260);
+  }, 1900);
+}
+$("#nextBtn").onclick = () => { sfx("whoosh"); board.style.visibility = ""; $("#alive").style.opacity = 0; dig = null; show("park"); };
+
+/* ===================== Konfetti ===================== */
+const cc = $("#confetti"), cx2 = cc.getContext("2d"); let conf = [];
+function confetti(){ for (let i = 0; i < 120; i++) conf.push({x: rnd(0, W), y: rnd(-H*.3, -10), vx: rnd(-60,60), vy: rnd(120,320), r: rnd(5,10), c: pick(["#ff5d73","#ffd84a","#4ad1ff","#8cff6a","#c48bff","#ff9f43"]), t: 0, life: rnd(2.5,4), rot: rnd(0,6), vr: rnd(-6,6)}); }
+function confLoop(dt){
+  if (!conf.length) { if (cc.dataset.on) { cx2.clearRect(0, 0, cc.width, cc.height); cc.dataset.on = ""; } return; }
+  // Konfetti-Canvas liegt über allem im aktiven Bildschirm
+  const host = $(".scr.on"); if (cc.parentNode !== host && host) host.appendChild(cc);
+  if (cc.width !== W || cc.height !== H) { cc.width = W; cc.height = H; }
+  cc.dataset.on = 1; cx2.clearRect(0, 0, W, H);
+  conf = conf.filter(p => (p.t += dt) < p.life);
+  for (const p of conf) {
+    p.x += p.vx*dt; p.y += p.vy*dt; p.vy += (p.star ? 500 : 30)*dt; p.rot = (p.rot || 0) + (p.vr || 0)*dt;
+    cx2.globalAlpha = Math.max(0, 1 - p.t/p.life); cx2.fillStyle = p.c;
+    if (p.star) star(cx2, p.x, p.y, p.r); else { cx2.save(); cx2.translate(p.x, p.y); cx2.rotate(p.rot); cx2.fillRect(-p.r/2, -p.r/4, p.r, p.r/2); cx2.restore(); }
+  }
+  cx2.globalAlpha = 1;
+}
+
+
+/* ===================== Controller (Lewolux-Pad) ===================== */
+// Menüs: Fokus + A übernimmt das Modul. Graben: Stick bewegt den Pinsel, A gedrückt = wischen. Puzzle: A legt das nächste Teil an.
+window.LXPAD_INIT = function(L){
+  const pad = {x: .5, y: .5};
+  L.game = p => {
+    if ($(".ov.on")) return false;
+    if (cur === "dig" && dig && !dig.done) {
+      pad.x = Math.max(0, Math.min(1, pad.x + p.lx*p.dt*.6)); pad.y = Math.max(0, Math.min(1, pad.y + p.ly*p.dt*.6));
+      const r = pit.getBoundingClientRect(), cx = r.left + pad.x*r.width, cy = r.top + pad.y*r.height;
+      moveBrush({clientX: cx, clientY: cy}, p.down("a"));
+      if (p.down("a")) { const q = {x: pad.x*dig.pw, y: pad.y*dig.ph}, l = dig.last || q, st = Math.max(1, Math.hypot(q.x - l.x, q.y - l.y)/(dig.pw*.02)); for (let i = 1; i <= st; i++) digAt(l.x + (q.x - l.x)*i/st, l.y + (q.y - l.y)*i/st); dig.last = q; dig.idle = 0; if (performance.now() - (dig.bt || 0) > 1000) { dig.bt = performance.now(); sfx("brush", .55); } }
+      else dig.last = null;
+      if (p.hit("b")) { $("#back1").click(); }
+      return true;
+    }
+    if (cur === "puz" && puz && puz.placed < 4) {
+      if (p.hit("a")) { const pc = puz.list.find(x => !x.done); if (pc) { pc.done = true; pc.el.classList.add("done"); pc.el.style.left = pc.tx + "px"; pc.el.style.top = pc.ty + "px"; pc.el.style.transform = "none"; sfx("place"); puz.placed++; if (puz.placed === 4) setTimeout(magicTime, 500); else say(pick(T.placed)); } }
+      if (p.hit("b")) { $("#back2").click(); }
+      return true;
+    }
+    return false;
+  };
+  L.back = () => { const ov = $(".ov.on"); if (ov) { ov.classList.remove("on"); return true; } if (cur === "park") { show("title"); return true; } return false; };
+};
+
+/* ===================== Start ===================== */
+addEventListener("resize", () => { calcU(); actors.forEach(layoutActor); updEgg(); if (cur === "dig" && dig && !dig.done) { /* Grube neu bauen ist für Kinder verwirrend: nur Größe merken */ } });
+document.addEventListener("visibilitychange", () => { if (document.hidden) { Object.values(MUS).forEach(a => a.pause()); } else if (musNow && S.sound) { const a = MUS[musNow]; if (a) a.play().catch(()=>{}); } });
+(async function boot(){
+  const list = ["title","bg_park","bg_dig","sand","buddel_1","buddel_2","buddel_3","buddel_4","ic_home","ic_shovel","ic_brush","ic_moon","ic_sun","ic_chest","ic_heart","ic_egg"]
+    .concat(DINOS.map(d => "dino_" + d.id), FOODS.map(f => "food_" + f.id), ACCS.map(a => "acc_" + a));
+  let n = 0; const bar = $("#lbar");
+  await Promise.all(list.map(s => loadImg(`assets/${s}.webp`).then(() => { n++; bar.style.width = (n/list.length*100) + "%"; })));
+  loadSfx();
+  $("#loading").remove();
+  show("title");
+  requestAnimationFrame(loop);
+  const t1 = () => { ac(); say(T.title); removeEventListener("pointerdown", t1); };
+  addEventListener("pointerdown", t1, {once: true});
+})();
+window.__db = {S, startDig, startPuzzle, show, get dig(){return dig}, get puz(){return puz}, collect, actors, say, openWardrobe, openEgg, setNight, feed};
+</script>
+</body>
+</html>

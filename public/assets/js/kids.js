@@ -147,6 +147,19 @@ window.lxInstall=function(btn,title,lead){
 <g class="k-eye"><circle cx="42" cy="38" r="3.4" fill="#1d2350"/><circle cx="58" cy="38" r="3.4" fill="#1d2350"/><circle cx="43" cy="36.8" r="1.1" fill="#fff"/><circle cx="59" cy="36.8" r="1.1" fill="#fff"/></g>
 <path d="M43 47q7 6 14 0" stroke="#a0442a" stroke-width="2.4" fill="none" stroke-linecap="round"/><g fill="#ff9d9d" opacity=".8"><circle cx="35" cy="45" r="3.2"/><circle cx="65" cy="45" r="3.2"/></g>
 <g transform="translate(80 112)"><circle r="11" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M0-5l4.8 3.5-1.8 5.6h-6l-1.8-5.6z" fill="#222"/><path d="M0-5V-11M4.8-1.5l6-2M3 4.1l3.8 5.2M-3 4.1l-3.8 5.2M-4.8-1.5l-6-2" stroke="#222" stroke-width="1.3"/></g></svg>`},
+    // Buddel aus Dino-Buddler: Baby-Dino mit Forscherhut
+    dino:{w:76,h:88,svg:`<svg viewBox="0 0 100 116">
+<path d="M22 84q-16 4-20-6q8 4 18-2z" fill="#f2b98f"/>
+<g class="lg1"><ellipse cx="38" cy="106" rx="10" ry="8" fill="#f2b98f"/></g><g class="lg2"><ellipse cx="62" cy="106" rx="10" ry="8" fill="#f2b98f"/></g>
+<ellipse cx="50" cy="84" rx="26" ry="24" fill="#f6c9a5"/><ellipse cx="50" cy="88" rx="16" ry="17" fill="#fde6d2"/>
+<g fill="#a98bd6"><circle cx="30" cy="78" r="3.4"/><circle cx="72" cy="80" r="3"/><circle cx="68" cy="92" r="2.4"/></g>
+<g class="wg1"><ellipse cx="25" cy="80" rx="6" ry="10" fill="#f2b98f" transform="rotate(25 25 80)"/></g><g class="wg2"><ellipse cx="75" cy="80" rx="6" ry="10" fill="#f2b98f" transform="rotate(-25 75 80)"/></g>
+<ellipse cx="50" cy="46" rx="31" ry="27" fill="#f6c9a5"/>
+<g fill="#a98bd6"><circle cx="24" cy="50" r="3"/><circle cx="78" cy="44" r="3.4"/><circle cx="72" cy="58" r="2.4"/></g>
+<path d="M18 30q32-12 64 0q-2-14-32-16q-30 2-32 16z" fill="#8a5a2b"/><path d="M8 32q42-10 84 0q-4 4-42 2q-38 2-42-2z" fill="#a9743d"/><path d="M19 28q31-9 62 0l-1 4q-30-8-60 0z" fill="#5a3a1a"/>
+<circle cx="38" cy="47" r="11" fill="#fff"/><circle cx="62" cy="47" r="11" fill="#fff"/>
+<g class="k-eye"><circle cx="39" cy="48" r="7" fill="#3a2414"/><circle cx="61" cy="48" r="7" fill="#3a2414"/><circle cx="41.5" cy="45.5" r="2.6" fill="#fff"/><circle cx="63.5" cy="45.5" r="2.6" fill="#fff"/></g>
+<path d="M42 62q8 7 16 0" stroke="#a0442a" stroke-width="2.6" fill="none" stroke-linecap="round"/><g fill="#ff9d9d" opacity=".8"><ellipse cx="27" cy="59" rx="4.5" ry="3"/><ellipse cx="73" cy="59" rx="4.5" ry="3"/></g></svg>`},
     // Panda (für das nächste Kinderspiel, erscheint automatisch, sobald ein KIDS-Eintrag mascot="panda" hat)
     panda:{w:78,h:90,svg:`<svg viewBox="0 0 100 116">
 <g class="lg1"><ellipse cx="36" cy="106" rx="11" ry="9" fill="#26263a"/></g><g class="lg2"><ellipse cx="64" cy="106" rx="11" ry="9" fill="#26263a"/></g>

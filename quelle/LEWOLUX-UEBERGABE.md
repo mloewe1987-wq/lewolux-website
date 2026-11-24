@@ -41,6 +41,7 @@ Stand: 9. Oktober 2026. Diese Datei fasst zusammen, was ein neuer Chat wissen mu
 | Löwe Lux | Jones – Children's audiobook narrator | Chatbot auf lewolux.de (137 Sätze) |
 | Pandi | Lumi – Tiny & Sweet | Pandi (134) |
 | Schulhofkicker | DiMario – Energetic and Fun | Schulhofkicker (864) |
+| Buddel (Dino-Buddler) | Lumi – Funny and Playful | Dino-Buddler (77), Modell Eleven v3 |
 
 - **Modell:** Eleven v4, Sprache Deutsch. Ton-Tags `[cheerful]`, `[friendly]`, `[excited]`.
 - **Ablauf:** Viele Sätze pro Generierung, getrennt durch `[long pause] [long pause]`. Ausgabe als ZIP aus dem ElevenLabs-Tab, dann an Pausen schneiden. Skripte in `quelle/werkzeuge/stimmen/`:
