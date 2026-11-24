@@ -81,8 +81,10 @@ img{-webkit-user-drag:none;user-drag:none;pointer-events:none}
 #nest img{width:100%;animation:eggw 1.6s ease-in-out infinite;transform-origin:50% 90%}
 @keyframes eggw{0%,100%{transform:rotate(0)}20%{transform:rotate(-9deg)}40%{transform:rotate(8deg)}60%{transform:rotate(0)}}
 /* Futter */
-#tray{position:absolute;z-index:31;left:50%;bottom:calc(var(--sb) + var(--u)*17);transform:translate(-50%,30px);display:flex;gap:calc(var(--u)*1.6);padding:calc(var(--u)*1.2) calc(var(--u)*2);border-radius:calc(var(--u)*4);background:rgba(255,248,235,.92);box-shadow:0 8px 24px rgba(60,40,10,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#tray{position:absolute;z-index:31;left:50%;top:calc(var(--st) + var(--u)*2.4);transform:translate(-50%,-30px);display:flex;gap:calc(var(--u)*1.6);padding:calc(var(--u)*1.2) calc(var(--u)*2);border-radius:calc(var(--u)*4);background:rgba(255,248,235,.92);box-shadow:0 8px 24px rgba(60,40,10,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
 #tray.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#park.feeding #strip{opacity:0;pointer-events:none}
+#strip{transition:opacity .25s}
 #tray .food{width:calc(var(--u)*10);height:calc(var(--u)*10);cursor:grab;touch-action:none;display:grid;place-items:center;border-radius:calc(var(--u)*2.4);background:#fff;box-shadow:0 3px 0 #ecd2ad}
 #tray .food img{width:82%;height:82%;object-fit:contain}
 .drag{position:fixed;z-index:80;width:calc(var(--u)*10);height:calc(var(--u)*10);pointer-events:none;transform:translate(-50%,-60%) scale(1.15);filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
@@ -132,7 +134,8 @@ img{-webkit-user-drag:none;user-drag:none;pointer-events:none}
 .ptitle{display:flex;justify-content:center;margin:0 0 calc(var(--u)*2.4)}
 .ptitle img{width:calc(var(--u)*10)}
 #wardrobe .panel{padding:calc(var(--u)*2.4) calc(var(--u)*3)}
-#wardrobe .stage{width:calc(var(--u)*34);height:calc(var(--u)*19);position:relative;margin:calc(var(--u)*5) auto calc(var(--u)*1)}
+#wardrobe .stage{width:calc(var(--u)*34);max-width:100%;height:calc(var(--u)*19);position:relative;margin:calc(var(--u)*6) auto calc(var(--u)*1)}
+#wardrobe .acc{pointer-events:none}
 #wardrobe .row{display:flex;gap:calc(var(--u)*1.4);justify-content:center;flex-wrap:wrap;margin-top:calc(var(--u)*1.6)}
 #wardrobe .row{gap:calc(var(--u)*1)}
 #wardrobe .row .cell{width:calc(var(--u)*8);height:calc(var(--u)*8);border-radius:calc(var(--u)*2)}
@@ -155,7 +158,7 @@ body.bud-top #bubble{left:auto;bottom:auto;right:calc(var(--sr) + var(--u)*13);t
   #bar .b.big{--bs:calc(var(--u)*10.5)}
   body:not(.bud-top) #buddel{width:calc(var(--u)*11);bottom:calc(var(--sb) + var(--u)*13)}
   body:not(.bud-top) #bubble{bottom:calc(var(--sb) + var(--u)*22);left:calc(var(--sl) + var(--u)*9)}
-  #tray{bottom:calc(var(--sb) + var(--u)*14)}
+  #tray{top:calc(var(--st) + var(--u)*12.5)}
   #tray .food{width:calc(var(--u)*8.5);height:calc(var(--u)*8.5)}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
@@ -371,38 +374,53 @@ function fadeTo(a, v, done){ const s = a.volume, t0 = performance.now(); const f
 function duck(on){ Object.values(MUS).forEach(a => { if (!a.paused) a.volume = on ? .08 : (musNow === "night" ? .32 : .26); }); }
 
 /* ===================== Stimme (ElevenLabs, sonst Gerätestimme) ===================== */
-const VOX = /*@@VOX*/{"Dino-Buddler! Tippe auf den grünen Knopf!":"842e2ccb9d","Hallo! Ich bin Buddel. Hier im Sand sind Dinos versteckt. Tippe auf die Schaufel und grab sie aus!":"6410c8bf7d","Willkommen zurück! Deine Dinos haben dich vermisst!":"c947bbb139","Tippe auf die Schaufel. Wir graben einen neuen Dino aus!":"d8c65ed8a4","Wisch mit dem Finger über den Sand!":"47f84b5d04","Weiter wischen! Da ist bestimmt noch etwas!":"80d098aa60","Ein Knochen!":"56c9d8cc03","Noch ein Knochen!":"73f9b069d4","Super gefunden!":"2cca5c426c","Toll gemacht!":"e04be1b851","Alle Knochen gefunden! Jetzt bauen wir den Dino zusammen!":"64e849a046","Zieh die Knochen an die richtige Stelle!":"cfb49e841c","Passt!":"048d5f5654","Super!":"7265776574","Richtig!":"392ebbbab3","Klasse!":"70f3a80d43","Fertig! Und jetzt der Dino-Zauber!":"bbe539349e","Ab in den Park!":"83512fdad2","Zieh das Futter zu einem Dino!":"9dba9a4b43","Mmmh, lecker!":"941c260fd9","Mein Lieblingsessen!":"ba4b4883e8","Danke!":"f4613d2841","Bäh! Ich fresse nur Pflanzen!":"359e7047c3","Bäh! Ich fresse lieber Fleisch und Fisch!":"8a8aa12ccd","Gute Nacht, Dinos! Schlaft schön!":"3772d29bf8","Guten Morgen! Aufwachen!":"9a2a73f7de","Deine Schatzkiste!":"0e6da5b1c6","Diesen Schatz hast du noch nicht gefunden.":"d1fd7a5ef8","Diesen Dino musst du noch ausgraben!":"75f35b81dc","Wow! Du hast alle zehn Dinos gefunden! Du bist ein echter Dino-Forscher!":"fa0a76d8f8","Hihi, das kitzelt!":"a6aa5c368a","Schau mal, ein Überraschungs-Ei! Tippe drauf!":"30bda82e81","Ein Kostüm für deine Dinos!":"9c0d6c1a10","Such dir ein Kostüm aus!":"d66be50167","Das Kostüm findest du in einem Überraschungs-Ei.":"72a2e29921","Grab erst einen Dino aus, dann kannst du ihn verkleiden!":"eabae88af5","Ich hab dich lieb!":"9a19a4147a","Juhu! Ich bin so glücklich!":"8e75e39cb6","Tschüss! Bis bald!":"279d5bc70c","Ich bin Rexi, ein T-Rex! Ich habe ganz kleine Ärmchen, aber einen riesigen Kopf.":"b96b67ca55","Ich bin Trixi, ein Triceratops! Ich habe drei Hörner.":"d0637351fe","Ich bin Stegi, ein Stegosaurus! Auf meinem Rücken habe ich große Platten.":"716d1bf2aa","Ich bin Flatter, ein Flugsaurier! Ich fliege hoch über das Meer.":"2871b18836","Ich bin Lotte, ein Brachiosaurus! Mit meinem langen Hals komme ich an die höchsten Blätter.":"c9e09d90db","Ich bin Anki, ein Ankylosaurus! Ich habe einen Panzer und eine Keule am Schwanz.":"45f183dc5f","Ich bin Tröti, ein Parasaurolophus! Mit meinem Kamm kann ich tröten wie eine Trompete.":"0c3edbe585","Ich bin Flitzi, ein Velociraptor! Ich bin superschnell und habe Federn.":"24452c675f","Ich bin Spino, ein Spinosaurus! Ich schwimme gern und fange Fische.":"f99e05ee8f","Ich bin Bummi, ein Pachycephalosaurus! Mein Kopf ist hart wie ein Helm.":"b3b500066c","Hurra! Rexi lebt!":"831497ef17","Hurra! Trixi lebt!":"826ab4aca1","Hurra! Stegi lebt!":"58ad316f18","Hurra! Flatter lebt!":"293a42f275","Hurra! Lotte lebt!":"80a6c3177b","Hurra! Anki lebt!":"e1c902cdc6","Hurra! Tröti lebt!":"c8764163df","Hurra! Flitzi lebt!":"a0595ec9c0","Hurra! Spino lebt!":"b501147590","Hurra! Bummi lebt!":"8d6b2a4663","Ein Bernstein! Das ist uraltes Baumharz.":"ef8712bc34","Ein Ammonit! Das war ein Meerestier mit Schneckenhaus.":"fc1d3cb72f","Ein Trilobit! Der krabbelte schon vor den Dinos durchs Meer.":"c094ee1152","Ein Haizahn! Der ist ganz schön spitz.":"d8416c8631","Ein Kristall! Der funkelt so schön.":"50b7f0e23d","Ein Goldklumpen! Wir sind reich!":"fe4b28fe98","Ein versteinertes Blatt! Das ist Millionen Jahre alt.":"8cf2208c6a","Ein Dino-Fußabdruck! Der ist riesig!":"dfb8718089","Ich bin Rexi, ein T-Rex!":"0a7e639c91","Ich bin Trixi, ein Triceratops!":"275ddc81d0","Ich bin Stegi, ein Stegosaurus!":"dd47fc4e48","Ich bin Flatter, ein Flugsaurier!":"af76d8f82b","Ich bin Lotte, ein Brachiosaurus!":"b8b36c7159","Ich bin Anki, ein Ankylosaurus!":"416593093e","Ich bin Tröti, ein Parasaurolophus!":"0e6e867f24","Ich bin Flitzi, ein Velociraptor!":"eb471d91de","Ich bin Spino, ein Spinosaurus!":"17ddfc1183","Ich bin Bummi, ein Pachycephalosaurus!":"66af8dffa0"}/*@@VOX-END*/;
+const VOX = /*@@VOX*/{"Dino-Buddler! Tippe auf den grünen Knopf!":"77cfcc4abe","Hallo! Ich bin Buddel. Hier im Sand sind Dinos versteckt. Tippe auf die Schaufel und grab sie aus!":"80c81b6c9b","Willkommen zurück! Deine Dinos haben dich vermisst!":"a0d2592728","Tippe auf die Schaufel. Wir graben einen neuen Dino aus!":"6c4218c92c","Wisch mit dem Finger über den Sand!":"560fa5aa82","Weiter wischen! Da ist bestimmt noch etwas!":"ea75488c41","Ein Knochen!":"d56a88db29","Noch ein Knochen!":"c17060856c","Super gefunden!":"c0883c499f","Toll gemacht!":"d1e5bfe265","Alle Knochen gefunden! Jetzt bauen wir den Dino zusammen!":"62cf57b9c6","Zieh die Knochen an die richtige Stelle!":"e3391306b8","Passt!":"f6e713706b","Super!":"5b76af216b","Richtig!":"744080884d","Klasse!":"6aa87350bc","Fertig! Und jetzt der Dino-Zauber!":"55806d9d69","Ab in den Park!":"228d8a0cc9","Zieh das Futter zu einem Dino!":"33b957dd18","Mmmh, lecker!":"c0468aa797","Mein Lieblingsessen!":"62dfabcc14","Danke!":"0dc538d4dc","Bäh! Ich fresse nur Pflanzen!":"db43365c6e","Bäh! Ich fresse lieber Fleisch und Fisch!":"22bb70e860","Gute Nacht, Dinos! Schlaft schön!":"6d1bb33333","Guten Morgen! Aufwachen!":"2393315e79","Deine Schatzkiste!":"e7390311f8","Diesen Schatz hast du noch nicht gefunden.":"29fb90670b","Diesen Dino musst du noch ausgraben!":"430e0d4b9b","Wow! Du hast alle zehn Dinos gefunden! Du bist ein echter Dino-Forscher!":"7d32295f70","Hihi, das kitzelt!":"c9f928e140","Schau mal, ein Überraschungs-Ei! Tippe drauf!":"c869ff2815","Ein Kostüm für deine Dinos!":"7a9387ea1b","Such dir ein Kostüm aus!":"8a96fdc564","Das Kostüm findest du in einem Überraschungs-Ei.":"279b39e687","Grab erst einen Dino aus, dann kannst du ihn verkleiden!":"bf542ac502","Ich hab dich lieb!":"0fe63c6db6","Juhu! Ich bin so glücklich!":"b9c2a46596","Tschüss! Bis bald!":"fe392cfb32","Ich bin Rexi, ein T-Rex! Ich habe ganz kleine Ärmchen, aber einen riesigen Kopf.":"1afc135900","Ich bin Trixi, ein Triceratops! Ich habe drei Hörner.":"ec27ded533","Ich bin Stegi, ein Stegosaurus! Auf meinem Rücken habe ich große Platten.":"0da3ce9fa8","Ich bin Flatter, ein Flugsaurier! Ich fliege hoch über das Meer.":"4e3374e04e","Ich bin Lotte, ein Brachiosaurus! Mit meinem langen Hals komme ich an die höchsten Blätter.":"07115fe326","Ich bin Anki, ein Ankylosaurus! Ich habe einen Panzer und eine Keule am Schwanz.":"7049f0d177","Ich bin Tröti, ein Parasaurolophus! Mit meinem Kamm kann ich tröten wie eine Trompete.":"6adc460f9e","Ich bin Flitzi, ein Velociraptor! Ich bin superschnell und habe Federn.":"25dcf8400a","Ich bin Spino, ein Spinosaurus! Ich schwimme gern und fange Fische.":"7daa6a2442","Ich bin Bummi, ein Pachycephalosaurus! Mein Kopf ist hart wie ein Helm.":"8a71a080b9","Hurra! Rexi lebt!":"57ec5edef1","Hurra! Trixi lebt!":"480d963759","Hurra! Stegi lebt!":"2df4091564","Hurra! Flatter lebt!":"a7e57163fb","Hurra! Lotte lebt!":"a4fd4657b9","Hurra! Anki lebt!":"45f466a134","Hurra! Tröti lebt!":"f24d28d237","Hurra! Flitzi lebt!":"3929318dc5","Hurra! Spino lebt!":"22a87f13b6","Hurra! Bummi lebt!":"99a445672f","Ein Bernstein! Das ist uraltes Baumharz.":"cce9a434c8","Ein Ammonit! Das war ein Meerestier mit Schneckenhaus.":"c1a9efb7e5","Ein Trilobit! Der krabbelte schon vor den Dinos durchs Meer.":"103f34f6ea","Ein Haizahn! Der ist ganz schön spitz.":"d8083daad6","Ein Kristall! Der funkelt so schön.":"a41d10f0ee","Ein Goldklumpen! Wir sind reich!":"1e6dec7cf6","Ein versteinertes Blatt! Das ist Millionen Jahre alt.":"64791ffda2","Ein Dino-Fußabdruck! Der ist riesig!":"465d57a6b3","Ich bin Rexi, ein T-Rex!":"4137a08d7a","Ich bin Trixi, ein Triceratops!":"5044f59a15","Ich bin Stegi, ein Stegosaurus!":"a4a29cdb58","Ich bin Flatter, ein Flugsaurier!":"4bd98d04b8","Ich bin Lotte, ein Brachiosaurus!":"ffc99cac22","Ich bin Anki, ein Ankylosaurus!":"2e69d77b2d","Ich bin Tröti, ein Parasaurolophus!":"54459f973f","Ich bin Flitzi, ein Velociraptor!":"ec187ac805","Ich bin Spino, ein Spinosaurus!":"f828f41f8a","Ich bin Bummi, ein Pachycephalosaurus!":"fe9823a416"}/*@@VOX-END*/;
 let vxCur = null, vxTok = 0, lastSay = "";
 const bud = $("#buddel"), bubble = $("#bubble");
 function talking(on){ bud.classList.toggle("talk", on); bubble.classList.toggle("on", on); duck(on); }
+let vxQueue = [], vxBusy = false;
+// Sätze werden nacheinander gesprochen (nichts wird abgeschnitten). {now:true} unterbricht – nur bei direktem Antippen.
 function say(t, opt={}){
   if (!t) return; lastSay = t;
-  vxTok++; const tok = vxTok;
-  if (vxCur) { try { vxCur.pause(); } catch(e) {} vxCur = null; }
-  try { speechSynthesis.cancel(); } catch(e) {}
   if (!S.sound) return;
+  if (opt.now) { vxQueue = []; stopVoice(); playLine(t, opt); return; }
+  if (vxBusy) { if (!vxQueue.some(q => q.t === t)) { vxQueue.push({t, opt}); if (vxQueue.length > 2) vxQueue.shift(); } return; }
+  playLine(t, opt);
+}
+function stopVoice(){ vxTok++; if (vxCur) { try { vxCur.onended = vxCur.onerror = null; vxCur.pause(); } catch(e) {} vxCur = null; } try { speechSynthesis.cancel(); } catch(e) {} vxBusy = false; talking(false); }
+function lineDone(tok, opt){
+  if (tok !== vxTok) return;
+  vxBusy = false; vxCur = null; talking(false);
+  if (opt && opt.done) opt.done();
+  const n = vxQueue.shift(); if (n) setTimeout(() => { if (!vxBusy) playLine(n.t, n.opt); }, 180);
+}
+function playLine(t, opt){
+  vxTok++; const tok = vxTok; vxBusy = true; talking(true);
   const id = VOX[t];
   if (id) {
-    const a = new Audio(`voice/${id}.mp3`); vxCur = a; talking(true);
-    a.onended = a.onerror = () => { if (tok === vxTok) { talking(false); vxCur = null; if (opt.done) opt.done(); } };
-    a.play().catch(() => { talking(false); });
+    const a = new Audio(`voice/${id}.mp3`); vxCur = a;
+    a.onended = () => lineDone(tok, opt);
+    a.onerror = () => lineDone(tok, opt);
+    a.play().catch(() => lineDone(tok, opt));
+    setTimeout(() => { if (tok === vxTok && vxBusy && a.paused && a.currentTime === 0) lineDone(tok, opt); }, 9000);
     return;
   }
   try {
     const u = new SpeechSynthesisUtterance(t); u.lang = "de-DE"; u.rate = .92; u.pitch = 1.25;
     const v = speechSynthesis.getVoices().find(v => /^de/i.test(v.lang)); if (v) u.voice = v;
-    u.onend = () => { if (tok === vxTok) { talking(false); if (opt.done) opt.done(); } };
-    talking(true); speechSynthesis.speak(u);
-    setTimeout(() => { if (tok === vxTok && !speechSynthesis.speaking) talking(false); }, 6000);
-  } catch(e) {}
+    u.onend = u.onerror = () => lineDone(tok, opt);
+    speechSynthesis.speak(u);
+    setTimeout(() => { if (tok === vxTok && vxBusy && !speechSynthesis.speaking) lineDone(tok, opt); }, 8000);
+  } catch(e) { lineDone(tok, opt); }
 }
-bud.addEventListener("pointerdown", () => { sfx("tap"); budPose(2, 1200); say(lastSay || T.hello); });
+bud.addEventListener("pointerdown", () => { sfx("tap"); budPose(2, 1200); say(lastSay || T.hello, {now: true}); });
 const budImg = $("#budImg"); let budT = 0;
 function budPose(n, ms){ budImg.src = `assets/buddel_${n}.webp`; clearTimeout(budT); if (ms) budT = setTimeout(() => budImg.src = `assets/buddel_${S.night && cur === "park" ? 4 : 1}.webp`, ms); }
 
 /* ===================== Bildschirme ===================== */
 let cur = "";
 function show(id){
+  vxQueue = [];
   $$(".scr").forEach(s => s.classList.toggle("on", s.id === id)); cur = id;
   bud.style.display = bubble.style.display = (id === "title") ? "none" : "";
   document.body.classList.toggle("bud-top", id === "dig" || id === "puz");
@@ -411,9 +429,12 @@ function show(id){
   else if (id === "puz") music("dig");
   else music("park");
 }
-function exitGame(){ say(T.bye); setTimeout(() => { if (/\/games\//.test(location.pathname)) location.href = "/kids/"; else history.back(); }, 900); }
+function exitGame(){ say(T.bye, {now: true}); setTimeout(() => { if (/\/games\//.test(location.pathname)) location.href = "/kids/"; else history.back(); }, 900); }
 $("#exit1").onclick = $("#exit2").onclick = () => { sfx("tap"); exitGame(); };
-$("#snd").onclick = () => { S.sound = S.sound ? 0 : 1; save(); $("#sndw").style.display = S.sound ? "" : "none"; if (!S.sound) { Object.values(MUS).forEach(a => a.pause()); musNow = null; try { speechSynthesis.cancel(); } catch(e) {} } else { sfx("tap"); music(S.night ? "night" : "park"); } };
+// Im Kinderbereich (iframe) gibt es oben „Beenden“ – dann keinen eigenen Haus-Knopf zeigen
+let inFrame = false; try { inFrame = window.top !== window; } catch(e) { inFrame = true; }
+if (inFrame) { $("#exit1").style.display = $("#exit2").style.display = "none"; }
+$("#snd").onclick = () => { S.sound = S.sound ? 0 : 1; save(); $("#sndw").style.display = S.sound ? "" : "none"; if (!S.sound) { Object.values(MUS).forEach(a => a.pause()); musNow = null; vxQueue = []; stopVoice(); } else { sfx("tap"); music(S.night ? "night" : "park"); } };
 $("#sndw").style.display = S.sound ? "" : "none";
 $("#play").onclick = () => { ac(); sfx("pop"); show("park"); };
 $$("[data-close]").forEach(b => b.onclick = () => { sfx("tap"); b.closest(".ov").classList.remove("on"); });
@@ -484,7 +505,7 @@ function tapDino(a){
   a.jump = 1; sfx("roar", .8); hearts(a.x, a.y - a.h, 2);
   tickles[a.d.id] = (tickles[a.d.id] || 0) + 1;
   addLove(a, 1);
-  if (tickles[a.d.id] % 3 === 0) say(T.tickle); else say(INTRO[a.d.id]);
+  if (tickles[a.d.id] % 3 === 0) say(T.tickle, {now: true}); else say(INTRO[a.d.id], {now: true});
 }
 function addLove(a, n){
   S.love[a.d.id] = (S.love[a.d.id] || 0) + n; save();
@@ -565,7 +586,7 @@ tray.innerHTML = FOODS.map(f => `<div class="food" data-f="${f.id}"><img src="as
 $("#bFood").onclick = () => {
   sfx("tap"); if (S.night) setNight(false);
   if (!S.found.length) { say(T.digHint); return; }
-  const on = !tray.classList.contains("on"); tray.classList.toggle("on", on); if (on) say(T.feed);
+  const on = !tray.classList.contains("on"); tray.classList.toggle("on", on); $("#park").classList.toggle("feeding", on); if (on) say(T.feed);
 };
 tray.querySelectorAll(".food").forEach(f => f.addEventListener("pointerdown", e => {
   e.preventDefault(); sfx("tap");
@@ -629,10 +650,18 @@ function openWardrobe(preAcc){
 }
 function renderWard(){
   const d = D(wSel), st = $("#wStage");
-  st.innerHTML = `<div style="position:absolute;inset:0;display:grid;place-items:end center"><div class="wbox" style="position:relative;height:100%;"><img src="assets/dino_${d.id}.webp" style="height:100%;display:block" alt=""></div></div>`;
-  const box = st.querySelector(".wbox"), img = box.querySelector("img");
-  const put = () => { box.style.width = img.clientWidth + "px"; const id = S.wear[d.id]; if (id) { const acc = document.createElement("img"); acc.className = "acc"; acc.style.position = "absolute"; acc.dataset.k = id; acc.src = `assets/acc_${id}.webp`; box.appendChild(acc); placeAcc({d}, box); } };
-  if (img.complete) put(); else img.onload = put;
+  st.innerHTML = "";
+  const box = document.createElement("div"); box.className = "wbox"; box.style.position = "absolute";
+  const img = new Image(); img.alt = ""; img.style.cssText = "display:block;width:100%;height:100%";
+  box.appendChild(img); st.appendChild(box);
+  const put = () => {
+    const sw = st.clientWidth, sh = st.clientHeight, ar = img.naturalWidth / img.naturalHeight || 1;
+    let h = sh, w = h*ar; if (w > sw) { w = sw; h = w/ar; }
+    Object.assign(box.style, {width: w + "px", height: h + "px", left: (sw - w)/2 + "px", top: (sh - h) + "px"});
+    const id = S.wear[d.id];
+    if (id) { const acc = document.createElement("img"); acc.className = "acc"; acc.style.position = "absolute"; acc.dataset.k = id; acc.src = `assets/acc_${id}.webp`; box.appendChild(acc); placeAcc({d}, box); }
+  };
+  img.onload = put; img.src = `assets/dino_${d.id}.webp`;
   $("#wAcc").innerHTML = `<button class="cell ${S.wear[d.id] ? "" : "sel"}" data-a="" aria-label="Kein Kostüm"><svg viewBox="0 0 24 24" width="50%"><circle cx="12" cy="12" r="8" fill="none" stroke="#d1a36d" stroke-width="2.4"/><path d="M6.5 6.5l11 11" stroke="#d1a36d" stroke-width="2.4"/></svg></button>` +
     ACCS.map(a => `<button class="cell ${S.accs.includes(a) ? "" : "no"} ${S.wear[d.id] === a ? "sel" : ""}" data-a="${a}"><img src="assets/acc_${a}.webp" alt=""></button>`).join("");
   $("#wDinos").innerHTML = S.found.map(id => `<button class="cell ${id === wSel ? "sel" : ""}" data-d="${id}"><img src="assets/dino_${id}.webp" alt=""></button>`).join("");
@@ -652,7 +681,7 @@ $("#bChest").onclick = () => {
   $("#chestGrid").innerHTML = TREAS.map(t => `<button class="cell ${S.treas.includes(t.id) ? "" : "no"}" data-t="${t.id}"><img src="assets/tr_${t.id}.webp" alt=""></button>`).join("");
   $$("#chestGrid .cell").forEach(b => b.onclick = () => { const t = TREAS.find(x => x.id === b.dataset.t); sfx(S.treas.includes(t.id) ? "treasure" : "tap"); say(S.treas.includes(t.id) ? t.say : T.chestNo); });
 };
-$("#bDig").onclick = () => { sfx("whoosh"); tray.classList.remove("on"); if (S.night) setNight(false, true); startDig(); };
+$("#bDig").onclick = () => { sfx("whoosh"); tray.classList.remove("on"); $("#park").classList.remove("feeding"); if (S.night) setNight(false, true); startDig(); };
 
 /* ===================== Graben ===================== */
 const pit = $("#pit"), sand = $("#sand"), sx = sand.getContext("2d"), fx = $("#fx"), fxx = fx.getContext("2d"), itemsEl = $("#items"), brush = $("#brush"), foundEl = $("#found");
@@ -687,7 +716,7 @@ async function startDig(){
   const d = nextDino(), sk = await pieces(d.id);
   if (!sandImg) sandImg = await loadImg("assets/sand.webp");
   // Grube anlegen
-  const ar = W > H ? 1.45 : .8, top = (W > H ? U*4 : U*15), bottom = U*14, avW = W - U*4, avH = H - top - bottom - (W > H ? 0 : U*2);
+  const ar = W > H ? 1.45 : .8, top = (W > H ? U*4 : U*20), bottom = U*14, avW = W - U*4, avH = H - top - bottom - (W > H ? 0 : U*2);
   let pw = Math.min(avW, avH*ar), ph = pw/ar; if (ph > avH) { ph = avH; pw = ph*ar; }
   Object.assign(pit.style, {width: pw + "px", height: ph + "px", left: (W - pw)/2 + "px", top: top + (avH - ph)/2 + "px"});
   const dpr = Math.min(2, devicePixelRatio || 1);
