@@ -56,6 +56,18 @@ GAMES = [
   shots=["Der Dino-Park mit Buddel","Knochen aus dem Sand graben","Das Skelett wird lebendig"],
   reel=["Family","Graben, puzzeln, staunen","Zehn Dinos für kleine Forscher."],
   download=dict(file="downloads/dino-buddler.html", format="Online im Browser spielen, kein Download nötig")),
+ dict(id="deep-signal", group="arcade", orient="any", ratio="16/9", scene="stern", demo="none", wide=True, accent="#2fd3c6", src="spiele-intern/deep-signal", nodl=True,
+  title="Deep Signal", short="Deep Signal", tagline="Tauch tiefer. Folge dem Signal.",
+  desc="Das Tiefsee-Bergungsspiel von Lewolux: Steuere ein kleines U-Boot ins dunkle Meer, bohre Wracks und Kristalle an, tauch rechtzeitig auf und rüste dein Boot auf. Doch dein Scheinwerfer lockt hungrige Raubfische an. Kostenlos im Browser, am Handy und mit Controller.",
+  genres=["Tiefsee","Upgrades","Spannung"], cats="arcade", status="Neu",
+  plats=["web","mobile","pad"], tech=["HTML5","Canvas","Web Audio","Gamepad"],
+  story="Am Meeresgrund sendet etwas noch immer. Mit deinem kleinen Bergungs-U-Boot tauchst du durch Sonnen-, Dämmer- und Mitternachtszone bis in den Graben, sammelst Signal-Fragmente und findest heraus, was mit der verschwundenen Forschungsstation Meridian geschehen ist.",
+  controls=[["Lenken","Maus / Ziehen · WASD · Stick"],["Bohren","Leertaste · linke Maustaste · A"],["Licht an/aus","L · rechte Maustaste · Y"],["Auftauchen","E · B"]],
+  features=["Tauchgänge bis 6.900 m durch fünf Tiefenzonen","Wracks, Kisten, Amphoren und Kristalladern anbohren","Großer Upgrade-Baum mit Modulen: leiser Rumpf oder Panzerrumpf und mehr","Raubfische jagen dein Licht: Licht aus, um dich zu verstecken","20 Signal-Fragmente, 60 Fundstücke, Drohnen, Tagesaufgaben und drei Meere"],
+  shots=["Tauchgang in der Dämmerzone","Hafen mit dem Upgrade-Baum","Tauchgang im Eismeer"],
+  reel=["Neu","Tiefsee, Upgrades und ein rätselhaftes Signal","Licht an zum Sehen, Licht aus zum Verstecken."],
+  tips=["<b>Sofort loslegen</b>, direkt im Browser, ohne Download","<b>Rechtzeitig auftauchen</b>, sonst geht ein Teil der Beute verloren","<b>Am Handy</b> quer oder hochkant, am PC mit Maus, Tastatur oder Controller","<b>Fortschritt</b> bleibt in deinem Browser gespeichert"],
+  download=dict(file="downloads/deep-signal.html", format="Online im Browser spielen, kein Download nötig")),
  dict(id="wuerfelzauber", group="strategie", ratio="9/16", scene="kritzel", demo="none", wide=True, accent="#ffc93c", src="spiele-intern/wuerfelzauber", nodl=True,
   title="Würfelzauber", short="Würfelzauber", tagline="Würfeln. Bauen. Zaubern!",
   desc="Das magische Würfel- und Königreich-Spiel von Lewolux: Würfle Münzen, Kronen und Schilde, bau 10 Königreiche aus, greif mit Löwe Leo und der Schleuder andere Reiche an und sammle 30 Haustiere. Kostenlos im Browser und am Handy.",
@@ -309,6 +321,12 @@ SEO = {
   long=["<strong>Dino-Buddler</strong> ist ein Dino-Spiel für Kinder ab 3 Jahren aus <strong>Lewolux Kids</strong>. Buddel, der kleine Forscher-Dino mit Hut, führt durch das Spiel und liest alles vor. Lesen muss niemand.",
         "Mit dem Finger wischen Kinder Sand weg und finden Knochen. Danach bauen sie das Skelett wie ein Puzzle zusammen, und mit dem <strong>Dino-Zauber</strong> wird es lebendig. So kommen nach und nach <strong>10 Dinos</strong> in den eigenen Park: T-Rex, Triceratops, Brachiosaurus, Stegosaurus, Flugsaurier und mehr. Jeder Dino stellt sich mit einem kleinen Fakt vor.",
         "Im Park werden die Dinos gefüttert. Dabei lernen Kinder nebenbei, wer Pflanzen und wer Fleisch frisst. Jeden Tag wartet ein Überraschungs-Ei mit Kostümen wie Krone, Zylinder oder Partyhut. Dino-Buddler ist kostenlos, ohne Werbung, ohne Käufe und läuft im Browser auf Tablet, Handy und PC."]),
+ "deep-signal": dict(
+  title="Deep Signal – Tiefsee-U-Boot-Spiel kostenlos im Browser",
+  meta="Deep Signal: Mit dem U-Boot in die Tiefsee, Wracks anbohren, auftauchen und aufrüsten. Raubfische jagen dein Licht. Kostenlos im Browser und am Handy.",
+  long=["<strong>Deep Signal</strong> ist ein Tiefsee-Bergungsspiel von Lewolux. Du steuerst ein kleines U-Boot ins dunkle Meer, bohrst Schiffswracks, Kisten, Amphoren, Riesenmuscheln und leuchtende Kristalladern an und siehst zu, wie die Beute in den Laderaum fliegt. Der Sauerstoff wird immer knapp: Wer rechtzeitig auftaucht, behält alles.",
+        "Dein Scheinwerfer ist dein bester Freund und dein größtes Risiko. Ab der Dämmerzone jagen Pelikanaale, Vipernfische, Anglerfische und Riesenkalmare sein Licht. Sie setzen sichtbar zum Sprung an. Schaltest du das Licht rechtzeitig aus, verlieren sie dich, dann siehst du aber nur noch, was leuchtet und was dein Sonar anpingt.",
+        "An der Oberfläche verkaufst du deine Funde und baust einen großen <strong>Upgrade-Baum</strong> aus: Sauerstoff, Rumpf, Bohrer, Motor, Licht, Sonar, Magnet und Drohnen, dazu Module wie leiser Rumpf oder Panzerrumpf. 20 Signal-Fragmente erzählen, was mit der Forschungsstation Meridian passiert ist. Deep Signal läuft kostenlos im Browser, am Handy, am PC und mit Controller. Der Fortschritt bleibt in deinem Browser gespeichert."]),
  "wuerfelzauber": dict(
   title="Würfelzauber – Würfelspiel mit Königreichen kostenlos",
   meta="Würfelzauber: würfeln, 10 Königreiche bauen, mit der Schleuder angreifen und 30 Haustiere sammeln. Kostenlos im Browser und am Handy.",
@@ -409,6 +427,7 @@ TEASERS = [
 
 # News-Laufleiste oben auf jeder Seite: (Etikett, Text, Link relativ zur Startseite)
 NEWS = [
+ ("Neu", "Deep Signal: Tiefsee-Abenteuer mit U-Boot, Upgrades und einem rätselhaften Signal", "spiele/deep-signal/"),
  ("Neu", "Pfötchen-Doc: Tierarzt für Kuscheltiere in Lewolux Kids", "kids/"),
  ("Neu", "Monster-Küche: Koch für hungrige Monster in Lewolux Kids", "kids/"),
  ("Neu", "Schiri Pfiff: Sei der Schiedsrichter in Lewolux Kids", "kids/"),
